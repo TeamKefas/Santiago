@@ -19,33 +19,33 @@
 #include <signal.h>
 #include <string>
 
-#include <boost/thread.hpp>
-#include <boost/function.hpp>
+#include <functional>
+#include <thread>
 
 #include "Santiago/Server/RequestHandler.h"
 #include "Santiago/Server/Server.h"
 
 class TimerService
 {
-    typedef boost::shared_ptr<Santiago::Server::RequestHandler<boost::asio::ip::tcp> > RequestHandlerPtr;
-    typedef boost::shared_ptr<boost::asio::deadline_timer> TimerPtr;
+    typedef std::shared_ptr<Santiago::Server::RequestHandler<boost::asio::ip::tcp> > RequestHandlerPtr;
+    typedef std::shared_ptr<boost::asio::deadline_timer> TimerPtr;
 
 public:
     TimerService(boost::asio::io_service& ioService_):
         _ioService(ioService_)
     {}
 
-    void asyncWait(uint seconds_,boost::function<void()> callbackFn_)
+    void asyncWait(uint seconds_,std::function<void()> callbackFn_)
     {
         TimerPtr timer(new boost::asio::deadline_timer(_ioService,boost::posix_time::seconds(seconds_)));
-        timer->async_wait(boost::bind(&TimerService::timerCallback,this,timer,callbackFn_));
+        timer->async_wait(std::bind(&TimerService::timerCallback,this,timer,callbackFn_));
     }
 
     ~TimerService()
     {}
 private:
 
-    void timerCallback(TimerPtr timer_,boost::function<void()> callbackFn_)
+    void timerCallback(TimerPtr timer_,std::function<void()> callbackFn_)
     {
         callbackFn_();
     }
@@ -79,8 +79,8 @@ public:
 
         request_->setAppStatus(0);
 
-        boost::function<void()> callbackFn = boost::bind(&RequestHandlerA::timerCallback,this);
-        _timerService.asyncWait(5,boost::bind(&RequestHandlerA::postInStrand,this,callbackFn));
+        std::function<void()> callbackFn = std::bind(&RequestHandlerA::timerCallback,this);
+        _timerService.asyncWait(5,std::bind(&RequestHandlerA::postInStrand,this,callbackFn));
         _request = request_;
     }
 
@@ -100,7 +100,7 @@ public:
 class MyServer:public Santiago::Server::Server<boost::asio::ip::tcp>
 {
 public:
-    typedef boost::shared_ptr<Santiago::Server::RequestHandler<boost::asio::ip::tcp> > RequestHandlerPtr; 
+    typedef std::shared_ptr<Santiago::Server::RequestHandler<boost::asio::ip::tcp> > RequestHandlerPtr; 
 
     MyServer(Santiago::LocalEndpoint<boost::asio::ip::tcp> listenEndpoint_):
         Santiago::Server::Server<boost::asio::ip::tcp>(listenEndpoint_),

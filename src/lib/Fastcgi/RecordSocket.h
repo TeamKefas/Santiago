@@ -28,12 +28,11 @@
  * Contains the RecordSocket class.
  */
 
-#include <boost/shared_ptr.hpp>
-#include <boost/assert.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "fastcgi_devkit/fastcgi.h"
 
+#include "Common.h"
 #include "PacketSocket.h"
 
 namespace Santiago{ namespace Fastcgi
@@ -49,16 +48,16 @@ namespace Santiago{ namespace Fastcgi
     {
 
     public:       
-        typedef boost::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
         typedef typename Protocol::socket ProtocolSocket;
-        typedef boost::shared_ptr<ProtocolSocket> ProtocolSocketPtr;      
-        typedef boost::shared_ptr<PacketSocket<Protocol> > PacketSocketPtr; 
+        typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;      
+        typedef std::shared_ptr<PacketSocket<Protocol> > PacketSocketPtr; 
 
-        typedef boost::function<void(uint,const char*,uint)> StdinCallbackFn;
-        typedef boost::function<void(uint,const char*,uint)> ParamsCallbackFn;
-        typedef boost::function<void(uint)> BeginRequestCallbackFn;
-        typedef boost::function<void(uint)> AbortRequestCallbackFn;
-        typedef boost::function<void(TransceiverEventInfo)> TransceiverEventCallbackFn;
+        typedef std::function<void(uint,const char*,uint)> StdinCallbackFn;
+        typedef std::function<void(uint,const char*,uint)> ParamsCallbackFn;
+        typedef std::function<void(uint)> BeginRequestCallbackFn;
+        typedef std::function<void(uint)> AbortRequestCallbackFn;
+        typedef std::function<void(TransceiverEventInfo)> TransceiverEventCallbackFn;
 
         /**
          * The constructor
@@ -80,7 +79,13 @@ namespace Santiago{ namespace Fastcgi
             _connectionStrandPtr(connectionStrandPtr_),
             _packetSocketPtr(new PacketSocket<Protocol>(connectionStrandPtr_,
                                                         protocolSocketPtr_,
-                                                        boost::bind(&RecordSocket::handleNewPacket,this,_1,_2,_3,_4,_5))),
+                                                        std::bind(&RecordSocket::handleNewPacket,
+                                                                  this,
+                                                                  std::placeholders::_1,
+                                                                  std::placeholders::_2,
+                                                                  std::placeholders::_3,
+                                                                  std::placeholders::_4,
+                                                                  std::placeholders::_5))),
             _beginRequestCallbackFn(beginRequestCallbackFn_),
             _abortRequestCallbackFn(abortRequestCallbackFn_),
             _stdinCallbackFn(stdinCallbackFn_),

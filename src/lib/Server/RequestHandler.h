@@ -29,10 +29,9 @@
  * Contains the RequestHandler class. 
  */
 
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
+#include <functional>
+
 #include <boost/asio.hpp>
-#include <boost/noncopyable.hpp>
 
 #include "Request.h"
 
@@ -47,13 +46,23 @@ namespace Santiago{ namespace Server
  * It takes the boost asio protocol tags as the template argument. 
  */
     template<typename Protocol>
-    struct RequestHandler:public boost::noncopyable
+    struct RequestHandler
     {
-        typedef boost::shared_ptr<boost::asio::strand> StrandPtr;        
+        typedef std::shared_ptr<boost::asio::strand> StrandPtr;        
 
     public:
         typedef typename Request<Protocol>::Ptr RequestPtr;
-        typedef boost::shared_ptr<RequestHandler<Protocol> > Ptr;
+        typedef std::shared_ptr<RequestHandler<Protocol> > Ptr;
+
+        /**
+         * Deleting the copy constructor to make class non copyable
+         */
+        RequestHandler(const RequestHandler&) = delete;
+
+        /**
+         * Deleting the copy assignment error to make class non copyable
+         */
+        RequestHandler& operator(const RequestHandler&) = delete;
 
         /**
          * The constructor
@@ -92,10 +101,10 @@ namespace Santiago{ namespace Server
          * Posts a callback function in the RequestHandler's strand.
          * @param callbackFn_- the callback fn for the post request.
          */
-        void postInStrand(const boost::function<void()>& callbackFn_)
+        void postInStrand(const std::function<void()>& callbackFn_)
         {
             checkIsInitialized();
-            _strand->post(boost::bind(&RequestHandler::handlePostInStrand,this,callbackFn_));           
+            _strand->post(std::bind(&RequestHandler::handlePostInStrand,this,callbackFn_));           
         }
         
         /**
@@ -110,7 +119,7 @@ namespace Santiago{ namespace Server
         /**
          * The callback function for the postInStrand()
          */
-        void handlePostInStrand(const boost::function<void()>& callbackFn_)
+        void handlePostInStrand(const std::function<void()>& callbackFn_)
         {
             callbackFn_();
         }

@@ -24,7 +24,7 @@
 
 #if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
 
-void requestHandlerStreamProtocol(boost::shared_ptr<Santiago::Fastcgi::Request<boost::asio::local::stream_protocol> > request_)
+void requestHandlerStreamProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost::asio::local::stream_protocol> > request_)
 {
     request_->out()<<"Content-Type: text/plain\r\n\r\n"<<"Echo - Unix Socket Version\n";
     std::map<std::string,std::string> &fcgiParams = request_->getFCGIParams(); 
@@ -40,7 +40,7 @@ void requestHandlerStreamProtocol(boost::shared_ptr<Santiago::Fastcgi::Request<b
     request_->commit();
 }
 
-void requestHandlerTcpProtocol(boost::shared_ptr<Santiago::Fastcgi::Request<boost::asio::ip::tcp> > request_)
+void requestHandlerTcpProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost::asio::ip::tcp> > request_)
 {
     request_->out()<<"Content-Type: text/plain\r\n\r\n"<<"Echo - Tcp Socket Version\n";
     std::map<std::string,std::string> &fcgiParams = request_->getFCGIParams(); 
@@ -74,9 +74,9 @@ int main(int argc, char* argv[])
       boost::asio::io_service io_service;
 
       std::remove(argv[1]);
-      Santiago::Fastcgi::Acceptor<boost::asio::local::stream_protocol> acceptor(io_service,Santiago::LocalEndpoint<boost::asio::local::stream_protocol>("/tmp/fastcgi-unix-echo.socket"),boost::bind(&requestHandlerStreamProtocol,_1));
+      Santiago::Fastcgi::Acceptor<boost::asio::local::stream_protocol> acceptor(io_service,Santiago::LocalEndpoint<boost::asio::local::stream_protocol>("/tmp/fastcgi-unix-echo.socket"),std::bind(&requestHandlerStreamProtocol,std::placeholders::_1));
 
-      Santiago::Fastcgi::Acceptor<boost::asio::ip::tcp> acceptor1(io_service,Santiago::LocalEndpoint<boost::asio::ip::tcp> (7000),boost::bind(&requestHandlerTcpProtocol,_1));
+      Santiago::Fastcgi::Acceptor<boost::asio::ip::tcp> acceptor1(io_service,Santiago::LocalEndpoint<boost::asio::ip::tcp> (7000),std::bind(&requestHandlerTcpProtocol,std::placeholders::_1));
 
       io_service.run();
   }

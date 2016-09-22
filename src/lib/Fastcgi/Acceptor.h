@@ -29,10 +29,9 @@
  * webserver.
  */
 
+#include <functional>
 #include <stack>
 
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
 
 #include "../LocalEndpoint.h"
@@ -52,13 +51,13 @@ namespace Santiago{ namespace Fastcgi
     class Acceptor
     {
         typedef typename Protocol::socket ProtocolSocket;
-        typedef boost::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
+        typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
 
-        typedef boost::shared_ptr<Connection<Protocol> > ConnectionPtr;
-        typedef boost::weak_ptr<Connection<Protocol> > ConnectionWeakPtr;        
+        typedef std::shared_ptr<Connection<Protocol> > ConnectionPtr;
+        typedef std::weak_ptr<Connection<Protocol> > ConnectionWeakPtr;        
         typedef std::map<uint,ConnectionPtr > ConnectionMap;
 
-        typedef boost::function<void(boost::shared_ptr<Request<Protocol> >)> NewRequestCallbackFn;
+        typedef std::function<void(std::shared_ptr<Request<Protocol> >)> NewRequestCallbackFn;
 
     public:
         /**
@@ -81,10 +80,10 @@ namespace Santiago{ namespace Fastcgi
             //listen for new connection. Make sure the callback is called in the
             //acceptor's strand            
             _acceptor.async_accept(*newProtocolSocket,
-                                   _strand.wrap(boost::bind(&Acceptor::handleAccept,
-                                                            this,
-                                                            newProtocolSocket,
-                                                            boost::asio::placeholders::error)));
+                                   _strand.wrap(std::bind(&Acceptor::handleAccept,
+                                                          this,
+                                                          newProtocolSocket,
+                                                          std::placeholders::_1)));
 
         }
 
@@ -122,10 +121,13 @@ namespace Santiago{ namespace Fastcgi
             //start new connection
             uint newConnectionId = _nextConnectionId++;
             BOOST_ASSERT(_activeConnections.find(newConnectionId) == _activeConnections.end());
-            ConnectionPtr newConnection(new Connection<Protocol>(_ioService,
-                                                                 newProtocolSocket_,
-                                                                 boost::bind(&Acceptor::handleNewRequest,this,newConnectionId,_1,_2),
-                                                                 boost::bind(&Acceptor::handleConnectionClose,this,newConnectionId)));
+            ConnectionPtr newConnection(new Connection<Protocol>(
+                                            _ioService,
+                                            newProtocolSocket_,
+                                            std::bind(&Acceptor::handleNewRequest,this,newConnectionId,
+                                                      std::placeholders::_1,
+                                                      std::placeholders::_2),
+                                            std::bind(&Acceptor::handleConnectionClose,this,newConnectionId)));
 
             _activeConnections[newConnectionId] = newConnection;
             newConnection->start();
@@ -134,10 +136,10 @@ namespace Santiago{ namespace Fastcgi
             ProtocolSocketPtr newProtocolSocket(new ProtocolSocket(_ioService));
 
             _acceptor.async_accept(*newProtocolSocket,
-                                   _strand.wrap(boost::bind(&Acceptor::handleAccept,
-                                                            this,
-                                                            newProtocolSocket,
-                                                            boost::asio::placeholders::error)));
+                                   _strand.wrap(std::bind(&Acceptor::handleAccept,
+                                                          this,
+                                                          newProtocolSocket,
+                                                          std::placeholders::_1)));
         }
 
         /**
@@ -150,7 +152,7 @@ namespace Santiago{ namespace Fastcgi
         {
             BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             //call the close connection in the acceptor's strand
-            _strand.post(boost::bind(&Acceptor::closeConnection,this,connectionId_));
+            _strand.post(std::bind(&Acceptor::closeConnection,this,connectionId_));
 
         }
 
@@ -172,7 +174,7 @@ namespace Santiago{ namespace Fastcgi
          * @param requestid- received from the server
          * @param newRequestData - new filled in request data 
          */
-        void handleNewRequest(uint connectionId_,uint newRequestId_,boost::weak_ptr<RequestData> newRequestData_)
+        void handleNewRequest(uint connectionId_,uint newRequestId_,std::weak_ptr<RequestData> newRequestData_)
         {
             if(newRequestData_.lock() == NULL)
             {   //request has already been destroyed by now...this check here is
@@ -181,9 +183,9 @@ namespace Santiago{ namespace Fastcgi
             }
 
             BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
-            boost::shared_ptr<Request<Protocol> > newRequest(new Request<Protocol>(_ioService,newRequestId_,newRequestData_,connectionId_,ConnectionWeakPtr(_activeConnections[connectionId_])));
+            std::shared_ptr<Request<Protocol> > newRequest(new Request<Protocol>(_ioService,newRequestId_,newRequestData_,connectionId_,ConnectionWeakPtr(_activeConnections[connectionId_])));
             //post it in the acceptor's strand
-            _strand.post(boost::bind(_newRequestCallbackFn,newRequest));
+            _strand.post(std::bind(_newRequestCallbackFn,newRequest));
         }
 
         boost::asio::io_service                    &_ioService;

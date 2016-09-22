@@ -27,15 +27,11 @@
  * Contains the Fastcgi::Request class.
  */
 
+#include <mutex>
 #include <stdexcept>
+#include <thread>
 
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
-#include <boost/bind.hpp>
 #include <boost/asio.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
 
 #include "Common.h"
 #include "RequestData.h"
@@ -49,16 +45,27 @@ namespace Santiago{namespace Fastcgi
  * This class object will be created by the acceptor class and not directly by the user.
  */
     template<class Protocol>
-    class Request:private boost::noncopyable
+    class Request
     {
     public:
-        typedef boost::shared_ptr<RequestData> RequestDataPtr;
-        typedef boost::weak_ptr<RequestData> RequestDataWeakPtr;
+        typedef std::shared_ptr<RequestData> RequestDataPtr;
+        typedef std::weak_ptr<RequestData> RequestDataWeakPtr;
 
-        typedef boost::shared_ptr<Connection<Protocol> > ConnectionPtr;
-        typedef boost::weak_ptr<Connection<Protocol> > ConnectionWeakPtr;
+        typedef std::shared_ptr<Connection<Protocol> > ConnectionPtr;
+        typedef std::weak_ptr<Connection<Protocol> > ConnectionWeakPtr;
 
         typedef std::pair<unsigned,unsigned> RequestId;
+
+        /**
+         * Delete the copy constructor to make the class private
+         */
+        Request(const Request&) = delete;
+
+        /**
+         * Delete the copy assignment operator to make the class private
+         */
+        Request& operator=(const Request&) = delete;
+
         /**
          * The constructor
          * @param ioService_- the ioservice of the acceptor
@@ -106,7 +113,7 @@ namespace Santiago{namespace Fastcgi
          */
         void commit()
         {
-            boost::lock_guard<boost::mutex> lock(_commitMutex);
+            std::lock_guard<std::mutex> lock(_commitMutex);
             std::pair<ConnectionPtr,RequestDataPtr> connectionRequestPair = getConnectionAndRequestData();
             connectionRequestPair.first->commitReply(_requestId,connectionRequestPair.second);            
             _dataWeakPtr.reset();
@@ -120,7 +127,7 @@ namespace Santiago{namespace Fastcgi
          */
         void cancel()
         {
-            boost::lock_guard<boost::mutex> lock(_commitMutex);
+            std::lock_guard<std::mutex> lock(_commitMutex);
             std::pair<ConnectionPtr,RequestDataPtr> connectionRequestPair = getConnectionAndRequestData();
             connectionRequestPair.second->_outBuffer.consume(connectionRequestPair.second->_outBuffer.size());
             connectionRequestPair.second->_err<<"Request cancelled by application server";
@@ -210,7 +217,7 @@ namespace Santiago{namespace Fastcgi
             return ret;
         }
 
-        boost::mutex _commitMutex;
+        std::mutex _commitMutex;
         uint _requestId;
         RequestDataWeakPtr _dataWeakPtr;
         uint _connectionId;

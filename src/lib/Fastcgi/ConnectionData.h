@@ -28,14 +28,10 @@
  * Contains the ConnectionData class.
  */
 
+#include <functional>
 #include <map>
 #include <utility>
 #include <stdexcept>
-
-#include <boost/assert.hpp>
-#include <boost/function.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
 
 #include "Common.h"
 #include "RequestData.h"
@@ -54,13 +50,13 @@ namespace Santiago{ namespace Fastcgi
         static const RequestState IN_COMPLETED     = 1;//0b00000001;
         static const RequestState PARAMS_COMPLETED = 2;//0b00000010;
 
-        typedef boost::shared_ptr<RequestData> RequestDataPtr;
-        typedef boost::weak_ptr<RequestData> RequestDataWeakPtr;
+        typedef std::shared_ptr<RequestData> RequestDataPtr;
+        typedef std::weak_ptr<RequestData> RequestDataWeakPtr;
 
         typedef std::map<uint,std::pair<RequestState,RequestDataPtr> > RequestMap;
 
-        typedef boost::function<void(uint,RequestDataWeakPtr)> RequestReadyCallbackFn;
-        typedef boost::function<void()> EmptyCallbackFn;
+        typedef std::function<void(uint,RequestDataWeakPtr)> RequestReadyCallbackFn;
+        typedef std::function<void()> EmptyCallbackFn;
 
         /**
          * The constructor

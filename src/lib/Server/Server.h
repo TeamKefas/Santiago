@@ -28,11 +28,11 @@
  * Contains the Server class. 
  */
 
+#include <functional>
 #include <stdexcept>
+#include <thread>
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
 
 #include "Santiago/LocalEndpoint.h"
 #include "Santiago/Fastcgi/Acceptor.h"
@@ -50,11 +50,11 @@ namespace Santiago{ namespace Server
     template<typename Protocol>
     class Server
     {
-        typedef boost::shared_ptr<RequestHandler<Protocol> > RequestHandlerPtr;
+        typedef std::shared_ptr<RequestHandler<Protocol> > RequestHandlerPtr;
         typedef typename Request<Protocol>::RequestId RequestId;
-        typedef boost::shared_ptr<Fastcgi::Request<Protocol> > FastcgiRequestPtr;
-        typedef boost::shared_ptr<Request<Protocol> > RequestPtr;
-        typedef boost::shared_ptr<boost::thread> ThreadPtr;
+        typedef std::shared_ptr<Fastcgi::Request<Protocol> > FastcgiRequestPtr;
+        typedef std::shared_ptr<Request<Protocol> > RequestPtr;
+        typedef std::shared_ptr<std::thread> ThreadPtr;
 
         enum Status
         {
@@ -70,7 +70,7 @@ namespace Santiago{ namespace Server
          */
         Server(LocalEndpoint<Protocol> listenEndpoint_):
             _status(STOPPED),
-            _acceptor(_ioService,listenEndpoint_,boost::bind(&Server::handleNewRequest,this,_1))
+            _acceptor(_ioService,listenEndpoint_,std::bind(&Server::handleNewRequest,this,_1))
         {
             for(unsigned i=0;i<NO_OF_ASIO_USER_THREADS;i++)
             {
@@ -100,7 +100,7 @@ namespace Santiago{ namespace Server
             _status = STARTED;
             for(unsigned i=0;i<NO_OF_ASIO_USER_THREADS;i++)
             {
-                _threads[i].reset(new boost::thread(boost::bind(&boost::asio::io_service::run,&_ioService)));
+                _threads[i].reset(new std::thread(std::bind(&boost::asio::io_service::run,&_ioService)));
             }
 //            _ioService.run();
         }
@@ -164,7 +164,7 @@ namespace Santiago{ namespace Server
             }
             requestHandler->init(_ioService);
 
-            boost::function<void()> onRequestDeleteCallbackFn = boost::bind(&Server::handleRequestDelete,this,fastcgiRequest_->getId());
+            std::function<void()> onRequestDeleteCallbackFn = std::bind(&Server::handleRequestDelete,this,fastcgiRequest_->getId());
 
             RequestPtr request(new Request<Protocol>(fastcgiRequest_,onRequestDeleteCallbackFn));
             //store the request in the active requests
@@ -172,7 +172,7 @@ namespace Santiago{ namespace Server
             BOOST_ASSERT(iter == _activeRequestHandlers.end());
             _activeRequestHandlers[fastcgiRequest_->getId()] =  requestHandler;
             
-            requestHandler->getStrand().post(boost::bind(&RequestHandler<Protocol>::handleRequest,requestHandler,request));
+            requestHandler->getStrand().post(std::bind(&RequestHandler<Protocol>::handleRequest,requestHandler,request));
         }
 
         /**
@@ -184,7 +184,7 @@ namespace Santiago{ namespace Server
         {            
             if(_status != STOPPED)
             {
-                _acceptor.getStrand().post(boost::bind(&Server::handleRequestDeleteImpl,this,requestId_));
+                _acceptor.getStrand().post(std::bind(&Server::handleRequestDeleteImpl,this,requestId_));
             }
         }
 

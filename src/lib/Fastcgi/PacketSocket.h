@@ -28,14 +28,10 @@
  * Contains the PacketSocket class.
  */
 
+#include <functional>
+
 #include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/asio/streambuf.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/assert.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 
 #include "fastcgi_devkit/fastcgi.h"
 
@@ -49,7 +45,7 @@ namespace Santiago{ namespace Fastcgi
  * takes the boost asio protocol tags as the template argument. 
  */
     template<typename Protocol>
-    class PacketSocket:public boost::enable_shared_from_this<PacketSocket<Protocol> >,public boost::noncopyable
+    class PacketSocket:public std::enable_shared_from_this<PacketSocket<Protocol> >
     {
 
     private:
@@ -63,10 +59,21 @@ namespace Santiago{ namespace Fastcgi
 
     public:
         typedef typename Protocol::socket ProtocolSocket;
-        typedef boost::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
-        typedef boost::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
+        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
 
-        typedef boost::function<void(boost::system::error_code,uint,uchar,uint,const char*)> NewPacketCallbackFn;
+        typedef std::function<void(boost::system::error_code,uint,uchar,uint,const char*)> NewPacketCallbackFn;
+
+        /**
+         * Deleting the copy constructor to make the class non copyable
+         */
+        PacketSocket(const PacketSocket&) = delete;
+        
+        /**
+         * Deleting the copy assignment operator to make the class non copyable
+         */
+        PacketSocket& operator=(const PacketSocket&) = delete;
+
         /**
          * The constructor
          * @param connectionStrand_ - the strand of the connection 
@@ -89,10 +96,10 @@ namespace Santiago{ namespace Fastcgi
         {
             _protocolSocketPtr->async_read_some(
                 _inputBuffer.prepare(BUFFER_INCREMENT_SIZE),
-                (*_connectionStrandPtr).wrap(boost::bind(&PacketSocket::handleRead,
-                                               this->shared_from_this(),
-                                               boost::asio::placeholders::error,
-                                               boost::asio::placeholders::bytes_transferred)));
+                (*_connectionStrandPtr).wrap(std::bind(&PacketSocket::handleRead,
+                                                       this->shared_from_this(),
+                                                       std::placeholders::_1,
+                                                       std::placeholders::_2)));
 
         }
 
@@ -162,7 +169,7 @@ namespace Santiago{ namespace Fastcgi
                 boost::system::error_code ec;
                 _protocolSocketPtr->shutdown(ProtocolSocket::shutdown_both,ec);
 //                BOOST_ASSERT(!ec); //not always - can get disconnected in between. so remove this line later
-                _connectionStrandPtr->post(boost::bind(&PacketSocket::flushProtocolSocket,this->shared_from_this()));
+                _connectionStrandPtr->post(std::bind(&PacketSocket::flushProtocolSocket,this->shared_from_this()));
                 _state = CLOSED;
             }
         }

@@ -30,9 +30,7 @@
  * webserver.
  */
 
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-#include <boost/noncopyable.hpp>
+#include <functional>
 
 #include "Santiago/Fastcgi/Acceptor.h"
 
@@ -46,13 +44,23 @@ namespace Santiago{ namespace Server
  * This class object will be created by the Server class and not directly by the user.
  */
     template <typename Protocol>
-    class Request:public boost::noncopyable
+    class Request
     {
-        typedef boost::shared_ptr<Fastcgi::Request<Protocol> > FastcgiRequestPtr;
+        typedef std::shared_ptr<Fastcgi::Request<Protocol> > FastcgiRequestPtr;
 
     public:
         typedef typename Fastcgi::Request<Protocol>::RequestId RequestId;
-        typedef typename boost::shared_ptr<Request> Ptr;
+        typedef typename std::shared_ptr<Request> Ptr;
+
+        /**
+         * Deleting the copy constructor to make class non copyable
+         */
+        Request(const Request&) = delete;
+
+        /**
+         * Deleting the copy assignment operator to make class non copyable
+         */
+        Request& operator(const Request&) = delete;
 
         /**
          * The Constructor
@@ -61,7 +69,7 @@ namespace Santiago{ namespace Server
          * this function queues the request's corresponding requesthandler for removal
          * from the server in the server's strand.  
          */
-        Request(FastcgiRequestPtr fastcgiRequest_,boost::function<void()> onDeleteCallbackFn_):
+        Request(FastcgiRequestPtr fastcgiRequest_,std::function<void()> onDeleteCallbackFn_):
             _fastcgiRequest(fastcgiRequest_),
             _onDeleteCallbackFn(onDeleteCallbackFn_)
         {}
@@ -144,7 +152,7 @@ namespace Santiago{ namespace Server
     private:
 
         FastcgiRequestPtr            _fastcgiRequest;
-        boost::function<void()>      _onDeleteCallbackFn;
+        std::function<void()>        _onDeleteCallbackFn;
     };
 }}
 #endif

@@ -28,12 +28,9 @@
  * Contains the Connection class.
  */
 
+#include <functional>
+
 #include <boost/asio.hpp>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-#include <boost/assert.hpp>
-#include <boost/weak_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "Common.h"
 #include "ConnectionData.h"
@@ -50,15 +47,15 @@ namespace Santiago{ namespace Fastcgi
     template<typename Protocol>
     class Connection
     {
-        typedef boost::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
         typedef typename Protocol::socket ProtocolSocket;
-        typedef boost::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
+        typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
 
-        typedef boost::shared_ptr<RequestData> RequestDataPtr;
-        typedef boost::weak_ptr<RequestData> RequestDataWeakPtr;
+        typedef std::shared_ptr<RequestData> RequestDataPtr;
+        typedef std::weak_ptr<RequestData> RequestDataWeakPtr;
 
-        typedef boost::function<void(uint,RequestDataWeakPtr)> NewRequestCallbackFn;
-        typedef boost::function<void()> CloseCallbackFn;
+        typedef std::function<void(uint,RequestDataWeakPtr)> NewRequestCallbackFn;
+        typedef std::function<void()> CloseCallbackFn;
 
         enum State
         {
@@ -80,17 +77,24 @@ namespace Santiago{ namespace Fastcgi
                    CloseCallbackFn closeCallbackFn_):
             _newRequestCallbackFn(newRequestCallbackFn_),
             _closeCallbackFn(closeCallbackFn_),
-            _data(boost::bind(&Connection::handleRequestReady,this,_1,_2),
-                  boost::bind(&Connection::handleOnEmpty,this)),
+            _data(std::bind(&Connection::handleRequestReady,this,std::placeholders::_1,std::placeholders::_2),
+                  std::bind(&Connection::handleOnEmpty,this)),
             _ioService(ioService_),
             _strandPtr(new boost::asio::strand(ioService_)),
             _recordSocket(_strandPtr,
                           protocolSocketPtr_,
-                          boost::bind(&ConnectionData::handleBeginRequest,&_data,_1),
-                          boost::bind(&ConnectionData::handleAbortRequest,&_data,_1),
-                          boost::bind(&ConnectionData::handleStdin,&_data,_1,_2,_3),
-                          boost::bind(&ConnectionData::handleParams,&_data,_1,_2,_3),
-                          boost::bind(&Connection::handleTransceiverEvent,this,_1)),
+                          std::bind(&ConnectionData::handleBeginRequest,&_data,std::placeholders::_1),
+                          std::bind(&ConnectionData::handleAbortRequest,&_data,std::placeholders::_1),
+                          std::bind(&ConnectionData::handleStdin,
+                                    &_data,std::placeholders::_1,
+                                    std::placeholders::_2,
+                                    std::placeholders::_3),
+                          std::bind(&ConnectionData::handleParams,
+                                    &_data,
+                                    std::placeholders::_1,
+                                    std::placeholders::_2,
+                                    std::placeholders::_3),
+                          std::bind(&Connection::handleTransceiverEvent,this,std::placeholders::_1)),
             _state(OPEN)
         {}
 
@@ -103,7 +107,7 @@ namespace Santiago{ namespace Fastcgi
          */
         void commitReply(uint requestId_,RequestDataPtr requestData_)
         {
-            _strandPtr->post(boost::bind(&Connection::commitReplyImpl,this,requestId_,requestData_));
+            _strandPtr->post(std::bind(&Connection::commitReplyImpl,this,requestId_,requestData_));
         }
 
         /**

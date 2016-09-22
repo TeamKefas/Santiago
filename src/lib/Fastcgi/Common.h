@@ -27,8 +27,9 @@
  * Contains the Common definitions.
  */
 
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
+
+#include <boost/assert.hpp>
 
 #define MAX_REQUEST_PER_CONNECTION 1
 
