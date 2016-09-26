@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_USERCONTROLLER_H
-#define SANTIAGO_AUTHENTICATION_USERCONTROLLER_H
+#ifndef SANTIAGO_USER_SERVER_USERCONTROLLER_H
+#define SANTIAGO_USER_SERVER_USERCONTROLLER_H
 
 #include <ctime>
 #include <functional>
@@ -12,7 +12,7 @@
 #include "ConnectionMessageSocket.h"
 
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     class UserController
     {
@@ -58,5 +58,5 @@ namespace Santiago{ namespace Authentication
     };
 
 
-}} //closing namespace Santiago::Authentication
+}}} //closing namespace Santiago::User::Server
 #endif

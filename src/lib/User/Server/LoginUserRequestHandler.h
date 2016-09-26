@@ -1,9 +1,9 @@
-#ifndef SANTIAGO_AUTHENTICATION_LOGINUSERREQUESTHANDLER_H
-#define SANTIAGO_AUTHENTICATION_LOGINUSERREQUESTHANDLER_H
+#ifndef SANTIAGO_USER_SERVER_LOGINUSERREQUESTHANDLER_H
+#define SANTIAGO_USER_SERVER_LOGINUSERREQUESTHANDLER_H
 
 #include "RequestHandlerBase.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     class LoginUserRequestHandler:public RequestHandlerBase
     {
@@ -15,6 +15,6 @@ namespace Santiago{ namespace Authentication
         virtual void handleReplyMessage(const ServerMessage& serverMessage);
     };
 
-}}
+}}}
 
 #endif

@@ -1,6 +1,6 @@
 #include "UserController.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     void UserController::handleClientMessage(const ServerMessage& serverMessage_)
     {
@@ -150,4 +150,4 @@ namespace Santiago{ namespace Authentication
     }
 
 
-}}//closing Santiago::Authentication
+}}}//closing Santiago::User::Server

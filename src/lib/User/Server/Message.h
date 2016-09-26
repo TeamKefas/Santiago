@@ -1,12 +1,12 @@
-#ifndef SANTIAGO_AUTHENTICATION_MESSAGE_H
-#define SANTIAGO_AUTHENTICATION_MESSAGE_H
+#ifndef SANTIAGO_USER_SERVER_MESSAGE_H
+#define SANTIAGO_USER_SERVER_MESSAGE_H
 
 #include <string>
 #include <vector>
 #include <map>
 #include <sstream>
 #include <string>
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
 
     /***********************************************************
@@ -104,6 +104,6 @@ namespace Santiago{ namespace Authentication
 //        std::string                    _dbMessage;
     };
 
-}} //closing namespace Santiago::Authentication
+}}} //closing namespace Santiago::User::Server
 
 #endif

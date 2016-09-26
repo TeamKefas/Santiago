@@ -1,6 +1,6 @@
 #include"ConnectionMessageSocket.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
 
     ConnectionMessageSocket::ConnectionMessageSocket(const MySocketPtr& socketPtr_,
@@ -114,5 +114,5 @@ namespace Santiago{ namespace Authentication
         }
     }
     
-}}      //closing namespace Santiago::Authentication
+}}}      //closing namespace Santiago::User::Server
 

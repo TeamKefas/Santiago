@@ -1,6 +1,6 @@
 #include "Server.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     Server::Server(boost::asio::io_service& ioService_,int port_)
         :_acceptor(ioService_, tcp::endpoint(tcp::v4(),port_))
@@ -58,4 +58,4 @@ namespace Santiago{ namespace Authentication
         return _idConnectionPtrMap[serverMessage_._connectionId]->sendMessage(serverMessage_._connectionMessage);
     }
 
-}}// closing Santiago::Authentication
+}}}// closing Santiago::User::Server

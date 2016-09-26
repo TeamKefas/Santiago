@@ -1,9 +1,9 @@
-#ifndef SANTIAGO_AUTHENTICATION_REMOVEDCOOKIEFROMAPPSERVERREQUESTHANDLER_H
-#define SANTIAGO_AUTHENTICATION_REMOVEDCOOKIEFROMAPPSERVERREQUESTHANDLER_H
+#ifndef SANTIAGO_USER_SERVER_REMOVEDCOOKIEFROMAPPSERVERREQUESTHANDLER_H
+#define SANTIAGO_USER_SERVER_REMOVEDCOOKIEFROMAPPSERVERREQUESTHANDLER_H
 
 #include "RequestHandlerBase.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     class RemovedCookieFromAppserverRequestHandler:public RequestHandlerBase
     {
@@ -16,6 +16,6 @@ namespace Santiago{ namespace Authentication
         
     };
 
-}}
+}}}
 
 #endif

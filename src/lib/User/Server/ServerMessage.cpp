@@ -1,6 +1,6 @@
 #include "ServerMessage.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     RequestId::RequestId(unsigned initiatingConnectionId_,unsigned requestNo_)
         :_initiatingConnectionId(initiatingConnectionId_)
@@ -44,4 +44,4 @@ namespace Santiago{ namespace Authentication
         ,_connectionMessage(connectionMessage_)
     {}
 
-}}//closing Santiago::Authentication 
+}}}//closing Santiago::User::Server 

@@ -1,11 +1,11 @@
-#ifndef SANTIAGO_AUTHENTICATION_SERVERDATA_H
-#define SANTIAGO_AUTHENTICATION_SERVERDATA_H
+#ifndef SANTIAGO_USER_SERVER_SERVERDATA_H
+#define SANTIAGO_USER_SERVER_SERVERDATA_H
 
 #include <map>
 #include <string>
 #include <vector>
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     struct ResourceData
     {
@@ -31,6 +31,6 @@ namespace Santiago{ namespace Authentication
         std::map<std::string,ResourceData>               _resourceIdResourceDataMap;
         std::map<std::string,std::vector<std::string> >  _cookieIdResourceIdMap;
     };
-}}
+}}}
 
 #endif

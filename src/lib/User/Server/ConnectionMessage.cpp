@@ -1,6 +1,6 @@
 #include "ConnectionMessage.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     ConnectionMessage::ConnectionMessage(const char* content_, unsigned size_)
     {
@@ -69,4 +69,4 @@ namespace Santiago{ namespace Authentication
         return size;
     }
     
-}}//closing Santiago::Authentication 
+}}}//closing Santiago::User::Server 

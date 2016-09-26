@@ -1,6 +1,6 @@
 #include "LogoutUserForCookieRequestHandler.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
 
     LogoutUserForCookieRequestHandler::LogoutUserForCookieRequestHandler(ConnectionServer& connectionServer_
@@ -39,4 +39,4 @@ namespace Santiago{ namespace Authentication
         BOOST_ASSERT(false);
     }
     
-}}
+}}}

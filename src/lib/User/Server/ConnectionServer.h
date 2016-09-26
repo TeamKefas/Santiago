@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_CONNECTIONSERVER_H
-#define SANTIAGO_AUTHENTICATION_CONNECTIONSERVER_H
+#ifndef SANTIAGO_USER_SERVER_CONNECTIONSERVER_H
+#define SANTIAGO_USER_SERVER_CONNECTIONSERVER_H
 
 
 #include <boost/asio/socket_acceptor_service.hpp>
@@ -9,7 +9,7 @@
 #include "ConnectionMessageSocket.h"
 using boost::asio::ip::tcp;
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     class ConnectionServer
     {
@@ -51,5 +51,5 @@ namespace Santiago{ namespace Authentication
 
        
     };
-}}
+}}}
 #endif

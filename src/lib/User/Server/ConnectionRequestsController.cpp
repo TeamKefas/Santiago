@@ -1,6 +1,6 @@
 #include "ConnectionRequestsController.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
 
     ConnectionRequestsController::ConnectionRequestsController(unsigned connectionId_,
@@ -105,4 +105,4 @@ namespace Santiago{ namespace Authentication
         }
     }
 
-}}
+}}}

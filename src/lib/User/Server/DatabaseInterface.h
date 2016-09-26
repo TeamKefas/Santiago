@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_DATABASEINTERFACE_H
-#define SANTIAGO_AUTHENTICATION_DATABASEINTERFACE_H
+#ifndef SANTIAGO_USER_SERVER_DATABASEINTERFACE_H
+#define SANTIAGO_USER_SERVER_DATABASEINTERFACE_H
 
 #include <vector>
 #include <cstdlib>
@@ -9,7 +9,7 @@
 #include "SantiagoDBTables/MariaDBConnections.h"
 #include "ServerData.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     using namespace boost::posix_time;
     class DatabaseInterface
@@ -35,5 +35,5 @@ namespace Santiago{ namespace Authentication
     };
 
 
-}} //closing namespace Santiago::Authentication
+}}} //closing namespace Santiago::User::Server
 #endif

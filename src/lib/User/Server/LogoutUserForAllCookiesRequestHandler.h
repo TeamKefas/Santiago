@@ -1,10 +1,10 @@
-#ifndef SANTIAGO_AUTHENTICATION_LOGOUTUSERFORALLCOOKIESREQUESTHANDLER_H
-#define SANTIAGO_AUTHENTICATION_LOGOUTUSERFORALLCOOKIESREQUESTHANDLER_H
+#ifndef SANTIAGO_USER_SERVER_LOGOUTUSERFORALLCOOKIESREQUESTHANDLER_H
+#define SANTIAGO_USER_SERVER_LOGOUTUSERFORALLCOOKIESREQUESTHANDLER_H
 
 #include "RequestHandlerBase.h"
 
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     class LogoutUserForAllCookiesRequestHandler:public RequestHandlerBase
     {
@@ -16,6 +16,6 @@ namespace Santiago{ namespace Authentication
         virtual void handleReplyMessage(const ServerMessage& serverMessage);
     };
 
-}}
+}}}
 
 #endif

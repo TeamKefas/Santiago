@@ -1,10 +1,10 @@
-#ifndef SANTIAGO_AUTHENTICATION_VERIFYUSERFORCOOKIEREQUESTHANDLER_H
-#define SANTIAGO_AUTHENTICATION_VERIFYUSERFORCOOKIEREQUESTHANDLER_H
+#ifndef SANTIAGO_USER_SERVER_VERIFYUSERFORCOOKIEREQUESTHANDLER_H
+#define SANTIAGO_USER_SERVER_VERIFYUSERFORCOOKIEREQUESTHANDLER_H
 
 #include "RequestHandlerBase.h"
 
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     class VerifyUserForCookieRequestHandler:public RequestHandlerBase
     {
@@ -17,6 +17,6 @@ namespace Santiago{ namespace Authentication
         
     };
 
-}}
+}}}
 
 #endif

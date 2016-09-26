@@ -1,4 +1,4 @@
-set(Authentication_SRCS
+set(UserServer_SRCS
   ConnectionMessage.cpp
   ServerMessage.cpp
   ServerV1.cpp
@@ -16,7 +16,7 @@ set(Authentication_SRCS
   RemovedCookieFromAppserverRequestHandler.cpp)
 
 if(WIN32)
-  set(Authentication_SRCS ${Authentication_SRCS}   
+  set(UserServer_SRCS ${UserServer_SRCS}   
   ConnectionMessage.h
   ServerMessage.h
   ServerV1.h
@@ -35,5 +35,5 @@ if(WIN32)
   RemovedCookieFromAppserverRequestHandler.h)
 endif(WIN32)
 
-add_library(Authentication STATIC ${Authentication_SRCS})
-target_link_libraries(Authentication Fastcgi ${Boost_LIBRARIES})
+add_library(UserServer STATIC ${UserServer_SRCS})
+target_link_libraries(UserServer Fastcgi ${Boost_LIBRARIES})

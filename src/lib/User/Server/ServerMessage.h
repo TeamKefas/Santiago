@@ -1,11 +1,11 @@
-#ifndef SANTIAGO_AUTHENTICATION_SERVER_MESSAGE_H
-#define SANTIAGO_AUTHENTICATION_SERVER_MESSAGE_H
+#ifndef SANTIAGO_USER_SERVER_SERVER_MESSAGE_H
+#define SANTIAGO_USER_SERVER_SERVER_MESSAGE_H
 
 #include <boost/optional.hpp>
 #include "ConnectionMessage.h"
 
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     struct RequestId 
     {
@@ -38,6 +38,6 @@ namespace Santiago{ namespace Authentication
 //        std::string                    _dbMessage;
     };
 
-}} //closing namespace Santiago::Authentication
+}}} //closing namespace Santiago::User::Server
 
 #endif

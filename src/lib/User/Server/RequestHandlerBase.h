@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_CONNECTIONCONTROLLER_H
-#define SANTIAGO_AUTHENTICATION_CONNECTIONCONTROLLER_H
+#ifndef SANTIAGO_USER_SERVER_CONNECTIONCONTROLLER_H
+#define SANTIAGO_USER_SERVER_CONNECTIONCONTROLLER_H
 
 #include <functional>
 #include <algorithm>
@@ -9,7 +9,7 @@
 #include "ServerData.h"
 #include "ConnectionServer.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     class RequestHandlerBase
     {
@@ -38,6 +38,6 @@ namespace Santiago{ namespace Authentication
 
     };
 
-}}
+}}}
 
 #endif

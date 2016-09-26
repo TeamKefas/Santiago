@@ -1,6 +1,6 @@
 #include "AddResourceRequestHandler.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
 
     AddResourceRequestHandler:: AddResourceRequestHandler(ConnectionServer& connectionServer_
@@ -41,4 +41,4 @@ namespace Santiago{ namespace Authentication
         BOOST_ASSERT(false);
     }
 
-}}
+}}}

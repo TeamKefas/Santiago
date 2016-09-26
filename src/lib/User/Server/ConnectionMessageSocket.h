@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_CONNECTIONMESSAGESOCKET_H
-#define SANTIAGO_AUTHENTICATION_CONNECTIONMESSAGESOCKET_H
+#ifndef SANTIAGO_USER_SERVER_CONNECTIONMESSAGESOCKET_H
+#define SANTIAGO_USER_SERVER_CONNECTIONMESSAGESOCKET_H
 
 #include <memory>
 #include <string>
@@ -17,7 +17,7 @@
 
 #include "ServerMessage.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     class ConnectionMessageSocket:public std::enable_shared_from_this<ConnectionMessageSocket>
     {
@@ -57,7 +57,7 @@ namespace Santiago{ namespace Authentication
 
 
 
-}} //closing namespace Santiango::Authentication
+}}} //closing namespace Santiango::User::Server
 
 #endif
 

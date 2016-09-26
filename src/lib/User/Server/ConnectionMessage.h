@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_CONNECTION_MESSAGE_H
-#define SANTIAGO_AUTHENTICATION_CONNECTION_MESSAGE_H
+#ifndef SANTIAGO_USER_SERVER_CONNECTION_MESSAGE_H
+#define SANTIAGO_USER_SERVER_CONNECTION_MESSAGE_H
 
 #include <string>
 #include <vector>
@@ -7,7 +7,7 @@
 #include <sstream>
 #include <string>
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     enum class ConnectionMessageType
     {
@@ -54,6 +54,6 @@ namespace Santiago{ namespace Authentication
     inline std::ostream& operator<<(std::ostream& ostream_, const ConnectionMessage& connectionMessage_)
     { return connectionMessage_.writeToStream(ostream_);}
 
-}} //closing namespace Santiago::Authentication
+}}} //closing namespace Santiago::User::Server
 
 #endif

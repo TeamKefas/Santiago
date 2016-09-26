@@ -1,6 +1,6 @@
 #include "DatabaseInterface.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {   
     bool DatabaseInterface::createUser(const std::string& userId_, const std::string& password_)
     {
@@ -99,4 +99,4 @@ namespace Santiago{ namespace Authentication
     }
 
 
-}}//closing Santiago::Authentication
+}}}//closing Santiago::User::Server

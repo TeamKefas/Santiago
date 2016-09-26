@@ -1,6 +1,6 @@
 #include "ServerV1.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     Server::Server(boost::asio::io_service& ioService_,unsigned port_)
         :_ioService(ioService_)
@@ -124,4 +124,4 @@ namespace Santiago{ namespace Authentication
     }
 
 
-}} //closing namespace Santiago::Authentication
+}}} //closing namespace Santiago::User::Server

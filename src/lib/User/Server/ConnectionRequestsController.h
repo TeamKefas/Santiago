@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_CONNECTIONREQUESTSCONTROLLER_H
-#define SANTIAGO_AUTHENTICATION_CONNECTIONREQUESTSCONTROLLER_H
+#ifndef SANTIAGO_USER_SERVER_CONNECTIONREQUESTSCONTROLLER_H
+#define SANTIAGO_USER_SERVER_CONNECTIONREQUESTSCONTROLLER_H
 
 #include <memory>
 
@@ -9,7 +9,7 @@
 #include "ServerMessage.h"
 #include "ConnectionMessageSocket.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     class ConnectionRequestsController
     {
@@ -48,6 +48,6 @@ namespace Santiago{ namespace Authentication
 
     };
 
-}}
+}}}
 
 #endif

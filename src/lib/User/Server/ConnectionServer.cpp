@@ -2,7 +2,7 @@
 
 
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
     ConnectionServer::ConnectionServer(boost::asio::io_service& ioService_,
                                        unsigned port_,
@@ -51,4 +51,4 @@ namespace Santiago{ namespace Authentication
     }
     
     
-}}
+}}}

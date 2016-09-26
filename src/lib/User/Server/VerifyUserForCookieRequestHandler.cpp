@@ -1,6 +1,6 @@
 #include "VerifyUserForCookieRequestHandler.h"
 
-namespace Santiago{ namespace Authentication
+namespace Santiago{ namespace User { namespace Server
 {
 
     VerifyUserForCookieRequestHandler::VerifyUserForCookieRequestHandler(ConnectionServer& connectionServer_
@@ -55,4 +55,4 @@ namespace Santiago{ namespace Authentication
         BOOST_ASSERT(false);
     }
     
-}}
+}}}

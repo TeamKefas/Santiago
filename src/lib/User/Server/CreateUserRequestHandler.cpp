@@ -1,7 +1,7 @@
 #include "CreateUserRequestHandler.h"
 
 
-namespace Santiago{namespace Authentication
+namespace Santiago{namespace User { namespace Server
 {
     CreateUserRequestHandler::CreateUserRequestHandler(ConnectionServer& connectionServer_
                                                        ,const OnCompletedCallbackFn& onCompletedCallbackFn_
@@ -41,4 +41,4 @@ namespace Santiago{namespace Authentication
     }
 
     
-}}
+}}}
