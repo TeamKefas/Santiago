@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 
-#include "Database/MariaDBConnections.h"
+#include "SantiagoDBTables/MariaDBConnections.h"
 #include "ServerData.h"
 
 namespace Santiago{ namespace Authentication
