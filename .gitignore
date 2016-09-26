@@ -1,0 +1,11 @@
+*~
+*.h~
+*.cpp~
+*.o
+*.gch
+*.cpp#
+*.h#
+.#*
+build/
+testbin/
+bin/
