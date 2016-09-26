@@ -7,7 +7,7 @@
 #include <vector>
 #include <cstdlib>
 
-#include "User/Database/MariaDBConnections.h"
+#include "Database/MariaDBConnections.h"
 #include "ServerMessage.h"
 #include "ConnectionMessageSocket.h"
 
