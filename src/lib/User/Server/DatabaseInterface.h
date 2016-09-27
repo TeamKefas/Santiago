@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 
-#include "SantiagoDBTables/MariaDBConnections.h"
+#include "SantiagoDBTables/MariaDBConnection.h"
 #include "ServerData.h"
 
 namespace Santiago{ namespace User { namespace Server
@@ -24,12 +24,12 @@ namespace Santiago{ namespace User { namespace Server
         bool changeUserPassword(const std::string& userId_,const std::string& oldPassword_,
                                 const std::string& newPassword_);
         bool addResource(std::string resId_,std::string userName_,
-                         Database::UserPermission permission_);
+                         SantiagoDBTables::UserPermission permission_);
 
     protected:
         
-        Database::MariaDBConnections            _databaseConnector;
-        ServerData                              _serverData;
+        SantiagoDBTables::MariaDBConnection             _databaseConnector;
+        ServerData                              	_serverData;
         
 
     };
