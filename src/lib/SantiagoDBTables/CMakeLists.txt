@@ -2,7 +2,7 @@ set(SantiagoDBTables_SRCS
   MariaDBConnection.cpp)
 
 if(WIN32)
-  set(SantiagoDBTables_SRCS ${Database_SRCS}   
+  set(SantiagoDBTables_SRCS ${SantiagoDBTables_SRCS}   
   Records.h
   MariaDBConnection.h)
 endif(WIN32)
