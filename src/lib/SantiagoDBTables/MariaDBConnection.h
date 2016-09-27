@@ -1,5 +1,5 @@
-#ifndef MARIADBCONNECTIONS_H
-#define MARIADBCONNECTIONS_H
+#ifndef MARIADBCONNECTION_H
+#define MARIADBCONNECTION_H
 
 #include "Records.h"
 #include <mysql.h>
@@ -8,14 +8,14 @@
 #include <sstream>
 #include <map>
 
-namespace Santiago{ namespace Database
+namespace Santiago{ namespace SantiagoDBTables
 {
-    class MariaDBConnections
+    class MariaDBConnection
     {
     public:
         std::map<UserPermission, std::string> _permission;
         
-        MariaDBConnections();
+        MariaDBConnection();
         bool addUserProfileRecord(const std::string, const std::string);
         bool checkUserProfileRecord(const std::string, const std::string);
         bool updateUserPassword(const std::string, const std::string, const std::string);

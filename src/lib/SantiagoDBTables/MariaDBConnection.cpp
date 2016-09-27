@@ -1,8 +1,8 @@
-#include "MariaDBConnections.h"
+#include "MariaDBConnection.h"
 
-namespace Santiago{ namespace Database
+namespace Santiago{ namespace SantiagoDBTables
 {
-    MariaDBConnections::MariaDBConnections()
+    MariaDBConnection::MariaDBConnection()
     {
         MYSQL* con1 = mysql_init(NULL);
         
@@ -107,7 +107,7 @@ namespace Santiago{ namespace Database
              {UserPermission::READ_WRITE, "READ_WRITE"}};
     }
     
-    bool MariaDBConnections::addUserProfileRecord(const std::string userName_, const std::string password_)
+    bool MariaDBConnection::addUserProfileRecord(const std::string userName_, const std::string password_)
     {
         MYSQL* con = mysql_init(NULL);
         
@@ -184,7 +184,7 @@ namespace Santiago{ namespace Database
         return 1;
     }
     
-    bool MariaDBConnections::checkUserProfileRecord(const std::string userId_, const std::string password_)
+    bool MariaDBConnection::checkUserProfileRecord(const std::string userId_, const std::string password_)
     {
         MYSQL* con = mysql_init(NULL);
         if (con == NULL) 
@@ -236,7 +236,7 @@ namespace Santiago{ namespace Database
         return 1;
     }
     
-    bool MariaDBConnections::updateUserPassword(const std::string userId_,
+    bool MariaDBConnection::updateUserPassword(const std::string userId_,
                                                 const std::string oldPassword_, const std::string newPassword_)
     {
         MYSQL* con = mysql_init(NULL);
@@ -316,7 +316,7 @@ namespace Santiago{ namespace Database
         }
     }
         
-    bool MariaDBConnections::addSessionRecord(const std::string userName_,
+    bool MariaDBConnection::addSessionRecord(const std::string userName_,
                                               const std::string cookieId_, ptime loginTime_)
     {
         MYSQL* con = mysql_init(NULL);
@@ -370,7 +370,7 @@ namespace Santiago{ namespace Database
         return 1;
     }
 
-    bool MariaDBConnections::updateSessionRecord(const std::string userId_, ptime logoutTime_)
+    bool MariaDBConnection::updateSessionRecord(const std::string userId_, ptime logoutTime_)
     {
         MYSQL* con = mysql_init(NULL);
         if (con == NULL) 
@@ -418,7 +418,7 @@ namespace Santiago{ namespace Database
     }
     
     
-    bool MariaDBConnections::addPermissionRecord(int resId_,
+    bool MariaDBConnection::addPermissionRecord(int resId_,
                                                  std::string userName_,
                                                  UserPermission permission_)
     {
@@ -455,7 +455,7 @@ namespace Santiago{ namespace Database
         return 1;
     }
     
-    std::vector<UserProfile> MariaDBConnections::getUserProfileRecord()
+    std::vector<UserProfile> MariaDBConnection::getUserProfileRecord()
     {
         std::vector<UserProfile> empty = {};
         
@@ -505,7 +505,7 @@ namespace Santiago{ namespace Database
         return records;
     }
     
-    std::vector<Session> MariaDBConnections::getSessionRecord()
+    std::vector<Session> MariaDBConnection::getSessionRecord()
     {
         std::vector<Session> empty = {};
         
@@ -589,7 +589,7 @@ namespace Santiago{ namespace Database
         return records;
     }
     
-    std::vector<Permission> MariaDBConnections::getPermissionRecord()
+    std::vector<Permission> MariaDBConnection::getPermissionRecord()
     {
         std::vector<Permission> empty = {};
         

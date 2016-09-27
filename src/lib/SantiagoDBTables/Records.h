@@ -5,7 +5,7 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-namespace Santiago{ namespace Database
+namespace Santiago{ namespace SantiagoDBTables
 {
     using namespace boost::posix_time;
         
