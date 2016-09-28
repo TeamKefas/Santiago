@@ -106,6 +106,16 @@ namespace Santiago{ namespace SantiagoDBTables
              {UserPermission::WRITE, "WRITE"},
              {UserPermission::READ_WRITE, "READ_WRITE"}};
     }
+
+    bool MariaDBConnection::connect()
+    {
+        // TODO
+    }
+
+    bool MariaDBConnection::disconnect()
+    {
+        // TODO
+    }
     
     bool MariaDBConnection::addUserProfileRecord(const std::string userName_, const std::string password_)
     {
@@ -183,59 +193,7 @@ namespace Santiago{ namespace SantiagoDBTables
         mysql_close(con);
         return 1;
     }
-    
-    bool MariaDBConnection::checkUserProfileRecord(const std::string userId_, const std::string password_)
-    {
-        MYSQL* con = mysql_init(NULL);
-        if (con == NULL) 
-        {
-            return 0;
-        }
-        
-        if (mysql_real_connect(con, "localhost", "root", "kefas123", 
-                               "databaseName", 0, NULL, 0) == NULL) //replace kefas123 with MariaDB password
-        {
-            mysql_close(con);
-            return 0;
-        }
-        
-        std::string checkPassword = "SELECT PASSWORD FROM USER_PROFILE WHERE USERNAME='" + userId_ + "'";
-        
-        if(mysql_query(con, checkPassword.c_str()))
-        {
-            mysql_close(con);
-            return 0;
-        }
-        
-        MYSQL_RES *result = mysql_store_result(con);
-        
-        if (result == NULL) 
-        {
-            mysql_close(con);
-            return 0;
-        }
-        
-        MYSQL_ROW row;
-        row = mysql_fetch_row(result);
-        
-        if(row)
-        {
-            if(password_ != row[0])
-            {
-                mysql_close(con);
-                return 0;
-            }
-        }
-        
-        else
-        {
-            return 0;
-        }
-        
-        mysql_close(con);
-        return 1;
-    }
-    
+       
     bool MariaDBConnection::updateUserPassword(const std::string userId_,
                                                 const std::string oldPassword_, const std::string newPassword_)
     {
@@ -419,8 +377,8 @@ namespace Santiago{ namespace SantiagoDBTables
     
     
     bool MariaDBConnection::addPermissionRecord(int resId_,
-                                                 std::string userName_,
-                                                 UserPermission permission_)
+                                                std::string userName_,
+                                                UserPermission permission_)
     {
         MYSQL* con = mysql_init(NULL);
         if (con == NULL) 
@@ -455,27 +413,28 @@ namespace Santiago{ namespace SantiagoDBTables
         return 1;
     }
     
-    std::vector<UserProfile> MariaDBConnection::getUserProfileRecord()
+    bool MariaDBConnection::getUserProfileRecord(std::string userName_,
+                                                 boost::optional<UserProfile>& userProfileRecord_)
     {
-        std::vector<UserProfile> empty = {};
-        
         MYSQL* con = mysql_init(NULL);
         if (con == NULL) 
         {
-            return empty;
+            return 0;
         }    
         
         if (mysql_real_connect(con, "localhost", "root", "kefas123", 
                                "databaseName", 0, NULL, 0) == NULL) 
         {
             mysql_close(con);
-            return empty;
+            return 0;
         }
-        
-        if (mysql_query(con, "SELECT * FROM USER_PROFILE"))
+
+        std::string getUserProfileRecordQuery = "SELECT * FROM USER_PROFILE WHERE USERNAME = '" + userName_ + "'";
+    
+        if (mysql_query(con, getUserProfileRecordQuery.c_str()))
         {
             mysql_close(con);
-            return empty;
+            return 0;
         }
         
         MYSQL_RES *result = mysql_store_result(con);
@@ -483,49 +442,46 @@ namespace Santiago{ namespace SantiagoDBTables
         if (result == NULL) 
         {
             mysql_close(con);
-            return empty;
+            return 0;
         }
         
-        //  int num_fields = mysql_num_fields(result);
         MYSQL_ROW row;
-        UserProfile record;
-        std::vector<UserProfile> records;
-        
+                        
         while ((row = mysql_fetch_row(result))) 
         { 
-            record._id = atoi(row[0]);
-            record._userName = row[1];
-            record._password = row[2];
-            records.push_back(record);
+            userProfileRecord_->_id = atoi(row[0]);
+            userProfileRecord_->_userName = row[1];
+            userProfileRecord_->_password = row[2];
         }
         
         mysql_free_result(result);
         mysql_close(con);
         
-        return records;
+        return 1;
     }
-    
-    std::vector<Session> MariaDBConnection::getSessionRecord()
+
+    bool MariaDBConnection::getSessionRecord(std::string userName_,
+                                             boost::optional<Session>& sessionRecord_)
     {
-        std::vector<Session> empty = {};
-        
         MYSQL* con = mysql_init(NULL);
         if (con == NULL) 
         {
-            return empty;
+            return 0;
         }    
         
         if (mysql_real_connect(con, "localhost", "root", "kefas123", 
                                "databaseName", 0, NULL, 0) == NULL) //replace kefas123 with MariaDB password
         {
             mysql_close(con);
-            return empty;
+            return 0;
         }
         
-        if (mysql_query(con, "SELECT * FROM SESSION"))
+         std::string getSessionRecordQuery = "SELECT * FROM SESSION WHERE USERNAME = '" + userName_ + "'";
+    
+        if (mysql_query(con, getSessionRecordQuery.c_str()))
         {
             mysql_close(con);
-            return empty;
+            return 0;
         }
         
         MYSQL_RES *result = mysql_store_result(con);
@@ -533,14 +489,11 @@ namespace Santiago{ namespace SantiagoDBTables
         if (result == NULL) 
         {
             mysql_close(con);
-            return empty;
+            return 0;
         }
         
-        //  int num_fields = mysql_num_fields(result);
         MYSQL_ROW row;
-        Session record;
-        std::vector<Session> records;
-        
+       
         std::map<std::string, std::string> months
         {{"01", "Jan"},
          {"02", "Feb"},
@@ -558,9 +511,9 @@ namespace Santiago{ namespace SantiagoDBTables
         
         while ((row = mysql_fetch_row(result))) 
         { 
-            record._id = atoi(row[0]);
-            record._userName = row[1];
-            record._cookieId = row[2];
+            sessionRecord_->_id = atoi(row[0]);
+            sessionRecord_->_userName = row[1];
+            sessionRecord_->_cookieId = row[2];
             
             std::stringstream loginTime;
             loginTime << row[3];
@@ -569,7 +522,7 @@ namespace Santiago{ namespace SantiagoDBTables
             login += searchLogin->second + loginTime.str().substr(7,12);
             loginTime.str("");
             loginTime << login;
-            loginTime >> record._loginTime;
+            loginTime >> sessionRecord_->_loginTime;
             
             std::stringstream logoutTime;
             logoutTime << row[4];
@@ -578,38 +531,37 @@ namespace Santiago{ namespace SantiagoDBTables
             logout += searchLogout->second + logoutTime.str().substr(7,12);
             logoutTime.str("");
             logoutTime << logout;
-            logoutTime >> record._logoutTime;
-            
-            records.push_back(record);
+            logoutTime >> sessionRecord_->_logoutTime;  
         }
         
         mysql_free_result(result);
         mysql_close(con);
         
-        return records;
+        return 1;
     }
-    
-    std::vector<Permission> MariaDBConnection::getPermissionRecord()
+
+    bool MariaDBConnection::getPermissionRecord(std::string userName_,
+                                                 boost::optional<Permission>& permissionRecord_)
     {
-        std::vector<Permission> empty = {};
-        
         MYSQL* con = mysql_init(NULL);
         if (con == NULL) 
         {
-            return empty;
+            return 0;
         }    
         
         if (mysql_real_connect(con, "localhost", "root", "kefas123", 
                                "databaseName", 0, NULL, 0) == NULL) //replace kefas123 with MariaDB password
         {
             mysql_close(con);
-            return empty;
+            return 0;
         }
         
-        if (mysql_query(con, "SELECT * FROM PERMISSION"))
+         std::string getPermissionRecordQuery = "SELECT * FROM PERMISSION WHERE USERNAME = '" + userName_ + "'";
+    
+        if (mysql_query(con, getPermissionRecordQuery.c_str()))
         {
             mysql_close(con);
-            return empty;
+            return 0;
         }
         
         MYSQL_RES *result = mysql_store_result(con);
@@ -617,13 +569,11 @@ namespace Santiago{ namespace SantiagoDBTables
         if (result == NULL) 
         {
             mysql_close(con);
-            return empty;
+            return 0;
         }
         
-        //   int num_fields = mysql_num_fields(result);
         MYSQL_ROW row;
-        Permission record;
-        std::vector<Permission> records;
+        
         std::map<std::string, UserPermission> permission =
             {{"OWNER", UserPermission::OWNER}, 
              {"READ", UserPermission::READ},
@@ -632,21 +582,21 @@ namespace Santiago{ namespace SantiagoDBTables
         
         while ((row = mysql_fetch_row(result))) 
         { 
-            record._id = atoi(row[0]);
-            record._resId = atoi(row[1]);
-            record._userName = row[2];
+            permissionRecord_->_id = atoi(row[0]);
+            permissionRecord_->_resId = atoi(row[1]);
+            permissionRecord_->_userName = row[2];
             std::string permissionString = row[3];
             auto search = permission.find(permissionString);
             if(search != permission.end())
             {
-                record._userPermission = search->second;
+                permissionRecord_->_userPermission = search->second;
             }
-            records.push_back(record);
         }
         
         mysql_free_result(result);
         mysql_close(con);
-        
-        return records;
+
+        return 1;
     }
+    
 }}

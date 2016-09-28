@@ -1,5 +1,5 @@
-#ifndef MARIADBCONNECTION_H
-#define MARIADBCONNECTION_H
+#ifndef SANTIAGO_SANTIAGODBTABLES_MARIADBCONNECTION_H
+#define SANTIAGO_SANTIAGODBTABLES_MARIADBCONNECTION_H
 
 #include "Records.h"
 #include <mysql.h>
@@ -7,6 +7,8 @@
 #include <vector>
 #include <sstream>
 #include <map>
+
+#include <boost/optional.hpp>
 
 namespace Santiago{ namespace SantiagoDBTables
 {
@@ -16,16 +18,21 @@ namespace Santiago{ namespace SantiagoDBTables
         std::map<UserPermission, std::string> _permission;
         
         MariaDBConnection();
-        bool addUserProfileRecord(const std::string, const std::string);
-        bool checkUserProfileRecord(const std::string, const std::string);
-        bool updateUserPassword(const std::string, const std::string, const std::string);
-        bool addSessionRecord(const std::string, const std::string, ptime);
-        bool updateSessionRecord(const std::string, ptime);
-        bool addPermissionRecord(int, const std::string, UserPermission);
-        std::vector<UserProfile> getUserProfileRecord();
-        std::vector<Session> getSessionRecord();
-        std::vector<Permission> getPermissionRecord();
 
+        bool connect();
+        bool disconnect();
+        
+        bool addUserProfileRecord(const std::string userName_, const std::string password_);
+        bool updateUserPassword(const std::string userId_,
+                                const std::string oldPassword_, const std::string newPassword_);
+        bool addSessionRecord(const std::string userName_,
+                              const std::string cookieId_, ptime loginTime_);
+        bool updateSessionRecord(const std::string userId_, ptime logoutTime_);
+        bool addPermissionRecord(int resId_,std::string userName_, UserPermission permission_);
+        bool getUserProfileRecord(std::string userName_, boost::optional<UserProfile>&);
+        bool getSessionRecord(std::string userName_, boost::optional<Session>&);
+        bool getPermissionRecord(std::string userName_, boost::optional<Permission>&);
+        
     private:
         int _userProfileId, _sessionId, _permissionId;
     };
