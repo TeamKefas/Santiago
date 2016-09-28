@@ -20,8 +20,9 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::loginUser(const std::string& userId_,
                                       const std::string& password_)
     {
-               
-        bool match = _databaseConnector.getUserProfileRecord(userId_, boost::optional<UserProfile>(UserProfile()));
+        boost::optional<UserProfile> userProfileRecord = UserProfile();
+        
+        bool match = _databaseConnector.getUserProfileRecord(userId_, userProfileRecord);
         
         if(match)
         {
