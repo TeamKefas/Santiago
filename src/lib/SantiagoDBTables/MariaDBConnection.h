@@ -34,6 +34,7 @@ namespace Santiago{ namespace SantiagoDBTables
         bool getPermissionRecord(std::string userName_, boost::optional<Permission>&);
         
     private:
+        MYSQL* con;
         int _userProfileId, _sessionId, _permissionId;
     };
 }}
