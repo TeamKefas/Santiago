@@ -5,6 +5,7 @@ using namespace Santiago::SantiagoDBTables;
 int main()
 {
     MariaDBConnection connection;
+    Maps tempmap;
     UserPermission permission = UserPermission::READ_WRITE;
        
     if(connection.addUserProfileRecord("junais", "pakistan"))
@@ -115,7 +116,7 @@ int main()
         std::cout << "\n" << permissionRecord->_id << "\t"
                   << permissionRecord->_resId << "\t"
                   << permissionRecord->_userName << "\t"
-                  << connection._permission.find(permissionRecord->_userPermission)->second << "\n";
+                  << tempmap.userPermissionString.find(permissionRecord->_userPermission)->second << "\n";
     }
     else
     {
@@ -127,7 +128,7 @@ int main()
         std::cout << "\n" << permissionRecord->_id << "\t"
                   << permissionRecord->_resId << "\t"
                   << permissionRecord->_userName << "\t"
-                  << connection._permission.find(permissionRecord->_userPermission)->second << "\n";
+                  << tempmap.userPermissionString.find(permissionRecord->_userPermission)->second << "\n";
     }
     else
     {

@@ -3,20 +3,14 @@
 
 #include <string>
 
+#include "UserPermissions.h"
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace Santiago{ namespace SantiagoDBTables
 {
     using namespace boost::posix_time;
-        
-    enum UserPermission 
-    {
-        OWNER,
-        READ,
-        WRITE,
-        READ_WRITE
-    };
-    
+            
     struct UserProfile
     {
         int _id;
