@@ -6,7 +6,7 @@ int main()
 {
     MariaDBConnection connection;
     UserPermission permission = UserPermission::READ_WRITE;
-    
+       
     if(connection.addUserProfileRecord("junais", "pakistan"))
     {
         std::cout << "\nAdded.\n";   
@@ -133,7 +133,7 @@ int main()
     {
         std::cout << "\nInvalid User Id.\n";
     }
-
+    
     return 0;
 }
     
