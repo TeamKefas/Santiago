@@ -46,43 +46,33 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         if(connect())
         {
-            std::string checkUserId =
-                "SELECT COALESCE(MAX(ID), 0) FROM USER_PROFILE WHERE USERNAME = '" + userName_ + "'";
-            
-            if(mysql_query(con, checkUserId.c_str()))
+            boost::optional<UserProfile> userProfileRecord = UserProfile();
+
+            if(!getUserProfileRecord(userName_, userProfileRecord))
             {
-                disconnect();
+                if(connect())
+                {
+                    std::string insertQuery = "INSERT INTO USER_PROFILE(USERNAME,PASSWORD) VALUES('" +
+                        userName_ + "', '" + password_ + "')";
+                    
+                    if(mysql_query(con, insertQuery.c_str()))
+                    {
+                        disconnect();
+                        return 0;
+                    }
+                    
+                    disconnect();
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
                 return 0;
             }
-            
-            MYSQL_RES *result = mysql_store_result(con);
-            
-            if(result == NULL) 
-            {
-                disconnect();
-                return 0;
-            }
-            
-            MYSQL_ROW row;
-            row = mysql_fetch_row(result);
-            
-            if(atoi(row[0]))
-            {
-                disconnect();
-                return 0;
-            }
-                                   
-            std::string insertQuery = "INSERT INTO USER_PROFILE(USERNAME,PASSWORD) VALUES('" +
-                 userName_ + "', '" + password_ + "')";
-            
-            if(mysql_query(conInside, insertQuery.c_str()))
-            {
-                disconnect();
-                return 0;
-            }
-            
-            disconnect();
-            return 1;           
         }
         else
         {
