@@ -20,7 +20,7 @@ namespace Santiago{ namespace SantiagoDBTables
         MariaDBConnection(){};
         
         bool connect();
-        bool disconnect();
+        void disconnect();
         
         bool addUserProfileRecord(const std::string userName_,
                                   const std::string password_);
@@ -36,7 +36,7 @@ namespace Santiago{ namespace SantiagoDBTables
         bool getPermissionRecord(const std::string userName_, boost::optional<Permission>&);
         
     private:
-        MYSQL *con, *conInside;
+        MYSQL *con;
         Maps _map;
     };
 }}

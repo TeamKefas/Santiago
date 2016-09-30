@@ -14,32 +14,16 @@ namespace Santiago{ namespace SantiagoDBTables
         if(mysql_real_connect(con, "localhost", "root", "kefas123", 
                                "databaseName", 0, NULL, 0) == NULL) //replace kefas123 with MariaDB password
         {
-            mysql_close(con);
-            return 0;
-        }
-
-        conInside = mysql_init(NULL);
-               
-        if(conInside == NULL) 
-        {
+            disconnect();
             return 0;
         }
         
-        if(mysql_real_connect(conInside, "localhost", "root", "kefas123", 
-                               "databaseName", 0, NULL, 0) == NULL) //replace kefas123 with MariaDB password
-        {
-            mysql_close(conInside);
-            return 0;
-        }
-        
-        return 1;        
+        return 1;
     }
 
-    bool MariaDBConnection::disconnect()
+    void MariaDBConnection::disconnect()
     {
-        mysql_close(conInside);
         mysql_close(con);
-        return 1;
     }
     
     bool MariaDBConnection::addUserProfileRecord(const std::string userName_, const std::string password_)
@@ -81,55 +65,81 @@ namespace Santiago{ namespace SantiagoDBTables
     }
        
     bool MariaDBConnection::updateUserPassword(const std::string userId_,
-                                                const std::string oldPassword_, const std::string newPassword_)
+                                               const std::string oldPassword_, const std::string newPassword_)
     {
         if(connect())
         {
-            std::string checkOldPassword = "SELECT PASSWORD FROM USER_PROFILE WHERE USERNAME='" + userId_ + "'";
-        
-            if(mysql_query(con, checkOldPassword.c_str()))
+            boost::optional<UserProfile> userProfileRecord = UserProfile();
+
+            if(getUserProfileRecord(userId_, userProfileRecord))
             {
-                disconnect();
-                return 0;
-            }
-            
-            MYSQL_RES *result = mysql_store_result(con);
-            
-            if(result == NULL) 
-            {
-                disconnect();
-                return 0;
-            }
-            
-            MYSQL_ROW row;
-            row = mysql_fetch_row(result);
-            
-            if(row)
-            {
-                if(oldPassword_ != row[0])
+                if(connect())
                 {
-                    disconnect();
-                    return 0;
-                }
-                
-                else
-                {                   
-                    std::string updateQuery = "UPDATE USER_PROFILE SET PASSWORD='" +
-                        newPassword_ + "' WHERE USERNAME='" + userId_ +"'";
+                    std::string checkOldPassword = "SELECT PASSWORD FROM USER_PROFILE WHERE USERNAME = '"
+                        + userId_ + "'";
+        
+                    if(mysql_query(con, checkOldPassword.c_str()))
+                    {
+                        disconnect();
+                        return 0;
+                    }
+            
+                    MYSQL_RES *result = mysql_store_result(con);
                     
-                    if(mysql_query(conInside, updateQuery.c_str()))
-                    {              
+                    if(result == NULL) 
+                    {
                         disconnect();
                         return 0;
                     }
                     
-                    disconnect();
-                    return 1;   
+                    MYSQL_ROW row;
+                    row = mysql_fetch_row(result);
+                    
+                    if(row)
+                    {
+                        if(oldPassword_ != row[0])
+                        {
+                            disconnect();
+                            return 0;
+                        }
+                
+                        else
+                        {                   
+                            disconnect();
+
+                            if(connect())
+                            {
+                                std::string updateQuery = "UPDATE USER_PROFILE SET PASSWORD='" +
+                                    newPassword_ + "' WHERE USERNAME='" + userId_ +"'";
+                                
+                                if(mysql_query(con, updateQuery.c_str()))
+                                {              
+                                    disconnect();
+                                    return 0;
+                                }
+                                
+                                disconnect();
+                                return 1;
+                            }
+                            else
+                            {
+                                return 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        disconnect();
+                        return 0;
+                    }
                 }
+                else
+                {
+                    return 0;
+                }  
             }
             else
             {
-                disconnect();
                 return 0;
             }
         }

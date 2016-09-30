@@ -11,7 +11,6 @@ namespace Santiago{ namespace SantiagoDBTables
     class Maps
     {
     public:
-
         Maps();
         
         std::map<UserPermission, std::string> userPermissionString;
