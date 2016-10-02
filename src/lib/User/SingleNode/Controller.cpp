@@ -22,7 +22,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::tie(error,userProfilesRecOpt) = verifyUserNamePasswordAndGetUserProfilesRec(userName_,password_);
         if(Error::DATABASE_ERROR == error.value())
         {
-            ocCreateUserCallbackFn_(error);
+            onCreateUserCallbackFn_(error);
             return;
         }
         else if(Error::INVALID_USERNAME_PASSWORD != error.value())
@@ -39,7 +39,6 @@ namespace Santiago{ namespace User{ namespace SingleNode
         error = _databaseConnection.addUserProfilesRec(userProfilesRec);
         if(error)
         {
-            LOG_DEBUG("Database Error for addUserProfilesRec(). userName:"<<userName_<<std::endl);
             ocCreateUserCallbackFn_(error);
             return;
         }
@@ -75,7 +74,6 @@ namespace Santiago{ namespace User{ namespace SingleNode
         error = _databaseConnection.addSessionsRec(sessionsRec);
         if(error)
         {
-            LOG_DEBUG("Add sessionsRec failed. userName:"<<userName_<<std::endl);
             onLoginUserCallbackFn_(error,boost::none);
             return;
         }
@@ -182,11 +180,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //change and update the password
         userProfilesRecOpt->_password = newPassword_;
         error = _databaseConnection.updateUserProfilesRec(*userProfilesRecOpt);
-        if(error)
-        {
-            LOG_DEBUG("Database Error for updateUserProfilesRec(). userName:"<<userName_<<std::endl);
-        }
-
+        //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
         onChangePasswordCallbackFn_(error);
         return;
     }
@@ -222,20 +216,19 @@ namespace Santiago{ namespace User{ namespace SingleNode
         return;
     }
 
+
     std::pair<std::error_code,std::optional<SantiagoDBTables::UserProfilesRec> > 
-    Controller::verifyUserNamePasswordAndGetUserProfilesRec(const std::string& userName_,
-                                                            const std::string& password_)
+    Controller::verifyUserNamePasswordAndGetUserProfilesRec(const std::string& userName_, const std::string& password_)
     {
+        //get the UserProfilesRec from db
         std::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
-        //verify username-password
         std::error_code error = _databaseConnection.getUserProfilesRec(userName_,userProfilesRecOpt);
         if(error)
         {
-            LOG_DEBUG("Database Error for getUserProfilesRec(). userName:"<<userName_<<std::endl);
-            BOOST_ASSERT(false);
             return std::make_pair(error,userProfilesRecOpt);
         }
 
+        //check if the username/password matches
         if(!userProfilesRecOpt || (userProfilesRecOpt->_password != password_))
         {
             LOG_INFO("Wrong username_password. userName:"<<userName_<<std::endl);
@@ -249,16 +242,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
     }
 
     std::pair<std::error_code,std::optional<SantiagoDBTables::SessionsRec> > 
-    Controller::checkForCookieInMapAndGetSessionsRecIter(const std::string cookieString_)
+    Controller::checkForCookieInMapAndGetSessionsRecIter(const std::string& cookieString_)
     {
-
-        //verify if the cookie is in the cookieStringSessionsRecMap.
         std::map<std::string,SantiagoDBTable::SessionsRec>::iterator cookieStringSessionsRecMapIter =
             _cookieStringSessionsRecMap.find(cookieString_);
         if(cookieStringSessionsRecMapIter == _cookieStringSessionsRecMap.end())
         {
-            LOG_INFO("Cookied not in _cookieStringSessionsRecMap. cookieString:"
-                     <<cookieString_<<std::endl);
+            LOG_INFO("Cookie not in _cookieStringSessionsRecMap. cookieString:" <<cookieString_<<std::endl);
             return std::make_pair(std::error_code(Error::INVALID_SESSION_COOKIE,Error::ErrorCategory::GetInstance()),
                                   boost::none);
         }
@@ -273,8 +263,9 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::map<std::string,SantiagoDBTable::SessionsRec>::iterator cookieStringSessionsRecMapIter =
             _cookieStringSessionsRecMap.find(cookieString_);
         BOOST_ASSERT(cookieStringSessionsRecMapIter != _cookieStringSessionsRecMap.end());
-        cookieStringSessionsRecMapIter->second._logoutTime = boost::posix_time::second_clock::universal_time();
+
         //update the db
+        cookieStringSessionsRecMapIter->second._logoutTime = boost::posix_time::second_clock::universal_time();
         std::error_code error = _databaseConnection.updateSessionsRec(cookieStringSessionsRecMapIter->second);
         if(error)
         {

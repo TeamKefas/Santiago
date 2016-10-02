@@ -11,7 +11,7 @@ namespace Santiago{ namespace User
 
     void ControllerBase::createUser(const std::string& userName_,
                                     const std::string& password_,
-                                    const ErrorCodeStringCallbackFn& onCreateUserCallbackFn_)
+                                    const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
         _strand.post(std::bind(&ControllerBase::createUserImpl,this,userName_,password_,onCreateUserCallbackFn_));
     }
@@ -26,7 +26,7 @@ namespace Santiago{ namespace User
     void ControllerBase::verifyCookieAndGetUserName(const std::string& cookieString_,
                                                     const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_)
     {
-        _strand.post(std::bind(&ControllerBase::verifyCookiedAndGetUserNameImpl,
+        _strand.post(std::bind(&ControllerBase::verifyCookieAndGetUserNameImpl,
                                this,
                                cookieString_,
                                onVerifyUserCallbackFn_));
@@ -63,7 +63,7 @@ namespace Santiago{ namespace User
     void ControllerBase::deleteUser(const std::string& cookieString_,
                                     const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
-        _strand.post(std::bind(&ControllerBase::deleteUserImpl,this,userName_,onDeleteUserCallbackFn_));
+        _strand.post(std::bind(&ControllerBase::deleteUserImpl,this,cookieString_,onDeleteUserCallbackFn_));
     }
 
 }}

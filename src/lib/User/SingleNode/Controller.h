@@ -30,7 +30,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                    const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_);
 
         virtual void verifyCookieAndGetUserNameImpl(const std::string cookieString_,
-                                                       const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_);
+                                                    const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_);
 
         virtual void logoutUserForCookieImpl(const std::string& cookieString_,
                                              const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
@@ -48,15 +48,16 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
     protected:
 
+        //helper fns
         std::pair<std::error_code,std::optional<SantiagoDBTables::UserProfilesRec> > 
         verifyUserNamePasswordAndGetUserProfilesRec(const std::string& userName_, const std::string& password_);
         std::pair<std::error_code,std::map<std::string,SantiagoDBTable::SessionsRec>::iterator > 
-        checkForCookieInMapAndGetSessionsRecIter(const std::string cookieString_);
+        checkForCookieInMapAndGetSessionsRecIter(const std::string& cookieString_);
 
         void cleanupCookieDataAndUpdateSessionRecord(const std::string& cookieString_);
         void cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const std::string& userName_);
 
-        SantiagoDBTables::MariaDBConnection     &_databaseConnection;
+        SantiagoDBTables::MariaDBConnection                 &_databaseConnection;
 
         std::map<std::string,SantiagoDBTable::SessionsRec>   _cookieStringSessionsRecMap;
         std::map<std::string,std::vector<std::string> >      _userNameCookieListMap;
