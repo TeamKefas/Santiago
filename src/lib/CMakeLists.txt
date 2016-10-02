@@ -1,3 +1,4 @@
+add_subdirectory(Error)
 add_subdirectory(Fastcgi)
 add_subdirectory(fastcgi_devkit)
 add_subdirectory(User)
