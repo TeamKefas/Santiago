@@ -1,11 +1,14 @@
-set(Database_SRCS
-  MariaDBConnections.cpp)
+set(SantiagoDBTables_SRCS
+  Maps.cpp
+  MariaDBConnection.cpp)
 
 if(WIN32)
-  set(Database_SRCS ${Database_SRCS}   
+  set(SantiagoDBTables_SRCS ${SantiagoDBTables_SRCS}   
+  UserPermissions.h
+  Maps.h
   Records.h
-  MariaDBConnections.h)
+  MariaDBConnection.h)
 endif(WIN32)
 
-add_library(Database STATIC ${Database_SRCS})
-target_link_libraries(Database Fastcgi ${Boost_LIBRARIES})
+add_library(SantiagoDBTables STATIC ${SantiagoDBTables_SRCS})
+target_link_libraries(SantiagoDBTables Fastcgi ${Boost_LIBRARIES})

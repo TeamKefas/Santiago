@@ -20,8 +20,9 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::loginUser(const std::string& userId_,
                                       const std::string& password_)
     {
-               
-        bool match = _databaseConnector.checkUserProfileRecord(userId_, password_);
+        boost::optional<UserProfile> userProfileRecord = UserProfile();
+        
+        bool match = _databaseConnector.getUserProfileRecord(userId_, userProfileRecord);
         
         if(match)
         {
@@ -82,7 +83,7 @@ namespace Santiago{ namespace User { namespace Server
     }
 
     bool DatabaseInterface::addResource(std::string resId_,std::string userName_,
-                                        Database::UserPermission permission_)
+                                        SantiagoDBTables::UserPermission permission_)
     {
         std::stringstream resId;
         resId<<resId_;
