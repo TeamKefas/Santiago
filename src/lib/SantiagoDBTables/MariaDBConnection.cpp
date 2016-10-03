@@ -2,7 +2,7 @@
 
 namespace Santiago{ namespace SantiagoDBTables
 {
-    bool MariaDBConnection::connect()
+    std::error_code MariaDBConnection::connect()
     {       
         con = mysql_init(NULL);
 
@@ -21,150 +21,31 @@ namespace Santiago{ namespace SantiagoDBTables
         return 1;
     }
 
-    void MariaDBConnection::disconnect()
+    bool MariaDBConnection::isConnected()
+    {
+        if(connect)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    std::error_code MariaDBConnection::disconnect()
     {
         mysql_close(con);
     }
     
-    bool MariaDBConnection::addUserProfileRecord(const std::string userName_, const std::string password_)
+    std::error_code MariaDBConnection::addUserProfilesRec(UserProfilesRec& userProfilesRec_)
     {
         if(connect())
         {
-            boost::optional<UserProfile> userProfileRecord = UserProfile();
-
-            if(!getUserProfileRecord(userName_, userProfileRecord))
-            {
-                if(connect())
-                {
-                    std::string insertQuery = "INSERT INTO USER_PROFILE(USERNAME,PASSWORD) VALUES('" +
-                        userName_ + "', '" + password_ + "')";
+            std::string addUserProfilesRecQuery = "INSERT INTO USER_PROFILE(USERNAME,PASSWORD) VALUES('" +
+                userProfilesRec_.userName_ + "', '" + userProfilesRec_.password_ + "')";
                     
-                    if(mysql_query(con, insertQuery.c_str()))
-                    {
-                        disconnect();
-                        return 0;
-                    }
-                    
-                    disconnect();
-                    return 1;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        else
-        {
-            return 0;
-        }
-    }
-       
-    bool MariaDBConnection::updateUserPassword(const std::string userId_,
-                                               const std::string oldPassword_, const std::string newPassword_)
-    {
-        if(connect())
-        {
-            boost::optional<UserProfile> userProfileRecord = UserProfile();
-
-            if(getUserProfileRecord(userId_, userProfileRecord))
-            {
-                if(connect())
-                {
-                    std::string checkOldPassword = "SELECT PASSWORD FROM USER_PROFILE WHERE USERNAME = '"
-                        + userId_ + "'";
-        
-                    if(mysql_query(con, checkOldPassword.c_str()))
-                    {
-                        disconnect();
-                        return 0;
-                    }
-            
-                    MYSQL_RES *result = mysql_store_result(con);
-                    
-                    if(result == NULL) 
-                    {
-                        disconnect();
-                        return 0;
-                    }
-                    
-                    MYSQL_ROW row;
-                    row = mysql_fetch_row(result);
-                    
-                    if(row)
-                    {
-                        if(oldPassword_ != row[0])
-                        {
-                            disconnect();
-                            return 0;
-                        }
-                
-                        else
-                        {                   
-                            disconnect();
-
-                            if(connect())
-                            {
-                                std::string updateQuery = "UPDATE USER_PROFILE SET PASSWORD='" +
-                                    newPassword_ + "' WHERE USERNAME='" + userId_ +"'";
-                                
-                                if(mysql_query(con, updateQuery.c_str()))
-                                {              
-                                    disconnect();
-                                    return 0;
-                                }
-                                
-                                disconnect();
-                                return 1;
-                            }
-                            else
-                            {
-                                return 0;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        disconnect();
-                        return 0;
-                    }
-                }
-                else
-                {
-                    return 0;
-                }  
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        else
-        {
-            return 0;
-        }
-    }
-        
-    bool MariaDBConnection::addSessionRecord(const std::string userName_,
-                                             const std::string cookieId_, ptime loginTime_)
-    {
-        if(connect())
-        {
-            std::stringstream loginTime;
-            loginTime << loginTime_;
-            std::string login = loginTime.str().substr(0, 5);
-            auto searchLogin = _map.alphabetDigit.find(loginTime.str().substr(5, 3));
-            login += searchLogin->second + loginTime.str().substr(8,12);
-            
-            std::string insertQuery = "INSERT INTO SESSION(USERNAME,COOKIE_ID,LOGIN_TIME) VALUES('" +
-                userName_ + "', '" +
-                cookieId_ + "', '" + login + "')";
-            
-            if(mysql_query(con, insertQuery.c_str()))
+            if(mysql_query(con, addUserProfilesRecQuery.c_str()))
             {
                 disconnect();
                 return 0;
@@ -179,69 +60,14 @@ namespace Santiago{ namespace SantiagoDBTables
         }
     }
 
-    bool MariaDBConnection::updateSessionRecord(const std::string userId_, ptime logoutTime_)
-    {
-        if(connect())
-        {        
-            std::stringstream logoutTime;
-            logoutTime << logoutTime_;
-            std::string logout = logoutTime.str().substr(0, 5);
-            auto searchLogout = _map.alphabetDigit.find(logoutTime.str().substr(5, 3));
-            logout += searchLogout->second + logoutTime.str().substr(8, 12);
-            std::string addLogoutTime = "UPDATE SESSION SET LOGOUT_TIME='" +
-                logout + "' WHERE USERNAME='" + userId_ + "'";
-            
-            if(mysql_query(con, addLogoutTime.c_str()))
-            {
-                disconnect();
-                return 0;
-            }
-            
-            disconnect();
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    
-    bool MariaDBConnection::addPermissionRecord(int resId_,
-                                                const std::string userName_,
-                                                UserPermission permission_)
+    std::error_code MariaDBConnection::getUserProfilesRec(const std::string userName_,
+                                                          boost::optional<UserProfile>& userProfilesRec_)
     {
         if(connect())
         {
-            std::stringstream resId;
-            resId << resId_;
-            auto search = _map.userPermissionString.find(permission_);
+            std::string getUserProfilesRecQuery = "SELECT * FROM USER_PROFILE WHERE USERNAME = '" + userName_ + "'";
             
-            std::string insertQuery = "INSERT INTO PERMISSION(RES_ID,USERNAME,PERMISSION) VALUES(" +
-                resId.str() + ", '" + userName_ + "', '" + search->second + "')";
-            
-            if(mysql_query(con, insertQuery.c_str()))
-            {
-                disconnect();
-                return 0;
-            }
-            
-            disconnect();
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    
-    bool MariaDBConnection::getUserProfileRecord(const std::string userName_,
-                                                 boost::optional<UserProfile>& userProfileRecord_)
-    {
-        if(connect())
-        {
-            std::string getUserProfileRecordQuery = "SELECT * FROM USER_PROFILE WHERE USERNAME = '" + userName_ + "'";
-            
-            if(mysql_query(con, getUserProfileRecordQuery.c_str()))
+            if(mysql_query(con, getUserProfilesRecQuery.c_str()))
             {
                 disconnect();
                 return 0;
@@ -259,9 +85,9 @@ namespace Santiago{ namespace SantiagoDBTables
             
             while((row = mysql_fetch_row(result))) 
             { 
-                userProfileRecord_->_id = atoi(row[0]);
-                userProfileRecord_->_userName = row[1];
-                userProfileRecord_->_password = row[2];
+                userProfilesRec_->_id = atoi(row[0]);
+                userProfilesRec_->_userName = row[1];
+                userProfilesRec_->_password = row[2];
             }
         
             mysql_free_result(result);
@@ -281,15 +107,134 @@ namespace Santiago{ namespace SantiagoDBTables
             return 0;
         }
     }
-
-    bool MariaDBConnection::getSessionRecord(const std::string userName_,
-                                             boost::optional<Session>& sessionRecord_)
+       
+    std::error_code MariaDBConnection::updateUserProfilesRec(UserProfilesRec& userProfilesRec_)
     {
         if(connect())
         {
-            std::string getSessionRecordQuery = "SELECT * FROM SESSION WHERE USERNAME = '" + userName_ + "'";
+            std::string retrieveOldPassword = "SELECT PASSWORD FROM USER_PROFILE WHERE USERNAME = '"
+                + userProfilesRec_.userId_ + "'";
+        
+            if(mysql_query(con, retrieveOldPassword.c_str()))
+            {
+                disconnect();
+                return 0;
+            }
             
-            if(mysql_query(con, getSessionRecordQuery.c_str()))
+            MYSQL_RES *result = mysql_store_result(con);
+            
+            if(result == NULL) 
+            {
+                disconnect();
+                return 0;
+            }
+                    
+            MYSQL_ROW row;
+            row = mysql_fetch_row(result);
+            
+            if(mysql_num_rows(result))
+            {
+                if(oldPassword_ != row[0])
+                {
+                    disconnect();
+                    return 0;
+                }
+                
+                else
+                {                   
+                    disconnect();
+                    
+                    if(connect())
+                    {
+                        std::string updateUserProfilesRecQuery = "UPDATE USER_PROFILE SET PASSWORD='" +
+                            newPassword_ + "' WHERE USERNAME = '" + userProfilesRec_.userId_ +"'";
+                        
+                        if(mysql_query(con, updateUserProfilesRecQuery.c_str()))
+                        {              
+                            disconnect();
+                            return 0;
+                        }
+                        
+                        disconnect();
+                        return 1;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+            }
+            else
+            {
+                disconnect();
+                return 0;
+            }
+        }
+        else
+        {
+            return 0;
+        }  
+    }
+
+    std::error_code MariaDBConnection::deleteUserProfilesRec(const std::string& userName_)
+    {
+        if(connect())
+        {
+            std::string deleteUserProfilesRecQuery = "DELETE FROM USER_PROFILE WHERE USERNAME = '" +
+                userName_ + ")";
+                    
+            if(mysql_query(con, deleteUserProfilesRecQuery.c_str()))
+            {
+                disconnect();
+                return 0;
+            }
+            
+            disconnect();
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+        
+    std::error_code MariaDBConnection::addSessionsRec(SessionsRec& sessionsRec_)
+    {
+        if(connect())
+        {
+            std::stringstream loginTime;
+            loginTime << sessionsRec_.loginTime_;
+            std::string login = loginTime.str().substr(0, 5);
+            auto searchLogin = alphabetDigit.find(loginTime.str().substr(5, 3));
+            login += searchLogin->second + loginTime.str().substr(8,12);
+            
+            std::string addSessionsRecQuery = "INSERT INTO SESSION(USERNAME,COOKIE_ID,LOGIN_TIME) VALUES('" +
+                sessionsRec_.userName_ + "', '" +
+                sessionsRec_.cookieId_ + "', '" + login + "')";
+            
+            if(mysql_query(con, addSessionsRecQuery.c_str()))
+            {
+                disconnect();
+                return 0;
+            }
+            
+            disconnect();
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+      
+    std::error_code MariaDBConnection::getSessionsRec(const std::string userName_,
+                                                      boost::optional<Session>& sessionsRec_)
+    {
+        if(connect())
+        {
+            std::string getSessionsRecQuery = "SELECT * FROM SESSION WHERE USERNAME = '" + userName_ + "'";
+            
+            if(mysql_query(con, getSessionsRecQuery.c_str()))
             {
                 disconnect();
                 return 0;
@@ -307,27 +252,27 @@ namespace Santiago{ namespace SantiagoDBTables
                        
             while((row = mysql_fetch_row(result))) 
             { 
-                sessionRecord_->_id = atoi(row[0]);
-                sessionRecord_->_userName = row[1];
-                sessionRecord_->_cookieId = row[2];
+                sessionsRec_->_id = atoi(row[0]);
+                sessionsRec_->_userName = row[1];
+                sessionsRec_->_cookieId = row[2];
                 
                 std::stringstream loginTime;
                 loginTime << row[3];
                 std::string login = loginTime.str().substr(0, 5);
-                auto searchLogin = _map.digitAlphabet.find(loginTime.str().substr(5, 2));
+                auto searchLogin = digitAlphabet.find(loginTime.str().substr(5, 2));
                 login += searchLogin->second + loginTime.str().substr(7,12);
                 loginTime.str("");
                 loginTime << login;
-                loginTime >> sessionRecord_->_loginTime;
+                loginTime >> sessionsRec_->_loginTime;
             
                 std::stringstream logoutTime;
                 logoutTime << row[4];
                 std::string logout = logoutTime.str().substr(0, 5);
-                auto searchLogout = _map.digitAlphabet.find(logoutTime.str().substr(5, 2));
+                auto searchLogout = digitAlphabet.find(logoutTime.str().substr(5, 2));
                 logout += searchLogout->second + logoutTime.str().substr(7,12);
                 logoutTime.str("");
                 logoutTime << logout;
-                logoutTime >> sessionRecord_->_logoutTime;  
+                logoutTime >> sessionsRec_->_logoutTime;  
             }
             
             mysql_free_result(result);
@@ -348,14 +293,67 @@ namespace Santiago{ namespace SantiagoDBTables
         }
     }
 
-    bool MariaDBConnection::getPermissionRecord(const std::string userName_,
-                                                 boost::optional<Permission>& permissionRecord_)
+    std::error_code MariaDBConnection::updateSessionsRec(SessionsRec& sessionsRec_)
+    {
+        if(connect())
+        {        
+            std::stringstream logoutTime;
+            logoutTime << sessionsRec_.logoutTime_;
+            std::string logout = logoutTime.str().substr(0, 5);
+            auto searchLogout = alphabetDigit.find(logoutTime.str().substr(5, 3));
+            logout += searchLogout->second + logoutTime.str().substr(8, 12);
+            std::string updateSessionsRecQuery = "UPDATE SESSION SET LOGOUT_TIME='" +
+                logout + "' WHERE USERNAME='" + sessionsRec_.userId_ + "'";
+            
+            if(mysql_query(con, updateSessionsRecQuery.c_str()))
+            {
+                disconnect();
+                return 0;
+            }
+            
+            disconnect();
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    
+    std::error_code MariaDBConnection::addPermissionsRec(PermissionsRec& permissionsRec_)
     {
         if(connect())
         {
-            std::string getPermissionRecordQuery = "SELECT * FROM PERMISSION WHERE USERNAME = '" + userName_ + "'";
+            std::stringstream resId;
+            resId << permissionsRec_.resId_;
+            auto search = userPermissionString.find(permission_);
             
-            if(mysql_query(con, getPermissionRecordQuery.c_str()))
+            std::string addPermissionsRecQuery = "INSERT INTO PERMISSION(RES_ID,USERNAME,PERMISSION) VALUES(" +
+                resId.str() + ", '" + permissionsRec_.userName_ + "', '" + search->second + "')";
+            
+            if(mysql_query(con, addPermissionsRecQuery.c_str()))
+            {
+                disconnect();
+                return 0;
+            }
+            
+            disconnect();
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+  
+    std::error_code MariaDBConnection::getPermissionsRec(const std::string userName_,
+                                                         boost::optional<Permission>& permissionsRec_)
+    {
+        if(connect())
+        {
+            std::string getPermissionsRecQuery = "SELECT * FROM PERMISSION WHERE USERNAME = '" + userName_ + "'";
+            
+            if(mysql_query(con, getPermissionsRecQuery.c_str()))
             {
                 disconnect();
                 return 0;
@@ -373,14 +371,14 @@ namespace Santiago{ namespace SantiagoDBTables
             
             while((row = mysql_fetch_row(result))) 
             { 
-                permissionRecord_->_id = atoi(row[0]);
-                permissionRecord_->_resId = atoi(row[1]);
-                permissionRecord_->_userName = row[2];
+                permissionsRec_->_id = atoi(row[0]);
+                permissionsRec_->_resId = atoi(row[1]);
+                permissionsRec_->_userName = row[2];
                 std::string permissionString = row[3];
-                auto search = _map.stringUserPermission.find(permissionString);
-                if(search != _map.stringUserPermission.end())
+                auto search = stringUserPermission.find(permissionString);
+                if(search != stringUserPermission.end())
                 {
-                    permissionRecord_->_userPermission = search->second;
+                    permissionsRec_->_userPermission = search->second;
                 }
             }
             

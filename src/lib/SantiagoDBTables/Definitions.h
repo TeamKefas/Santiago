@@ -4,11 +4,6 @@
 #include <string>
 #include <map>
 
-extern const std::map<UserPermission, std::string> userPermissionString;
-extern const std::map<std::string, UserPermission> stringUserPermission;
-extern const std::map<std::string, std::string> alphabetDigit;
-extern const std::map<std::string, std::string> digitAlphabet;
-
 namespace Santiago{ namespace SantiagoDBTables
 {
     enum UserPermission 
@@ -18,6 +13,12 @@ namespace Santiago{ namespace SantiagoDBTables
         WRITE,
         READ_WRITE
     };
+
+    extern const std::map<UserPermission, std::string> userPermissionString;
+    extern const std::map<std::string, UserPermission> stringUserPermission;
+    extern const std::map<std::string, std::string> alphabetDigit;
+    extern const std::map<std::string, std::string> digitAlphabet;
+
 }}
 
 #endif    

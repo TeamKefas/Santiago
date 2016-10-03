@@ -8,34 +8,14 @@
 
 #include <boost/optional.hpp>
 
-#include "Records.h"
-#include "Maps.h"
+#include "DatabaseRecords.h"
+#include "Definitions.h"
+#include "ErrorCategory.h"
 
 namespace Santiago{ namespace SantiagoDBTables
 {
     class MariaDBConnection
     {
-    public:
-               
-        MariaDBConnection(){};
-        
-        bool connect();
-        void disconnect();
-        
-        bool addUserProfileRecord(const std::string userName_,
-                                  const std::string password_);
-        bool updateUserPassword(const std::string userId_,
-                                const std::string oldPassword_, const std::string newPassword_);
-        bool addSessionRecord(const std::string userName_,
-                              const std::string cookieId_, ptime loginTime_);
-        bool updateSessionRecord(const std::string userId_, ptime logoutTime_);
-        bool addPermissionRecord(int resId_,
-                                 const std::string userName_, UserPermission permission_);
-        bool getUserProfileRecord(const std::string userName_, boost::optional<UserProfile>&);
-        bool getSessionRecord(const std::string userName_, boost::optional<Session>&);
-        bool getPermissionRecord(const std::string userName_, boost::optional<Permission>&);
-
-/*
     public:
 
         //take db ip, port, username, password from config
@@ -55,19 +35,19 @@ namespace Santiago{ namespace SantiagoDBTables
         std::error_code addSessionsRec(SessionsRec& sessionsRec_);
         std::error_code getSessionsRec(const std::string& cookieString_, boost::optional<SessionsRec>& sessionsRec_);
         std::error_code updateSessionsRec(SessionsRec& userProfilesRec_);
+
+        // set permissionsRec_._id to the auto generated id from db
+        std::error_code addPermissionsRec(PermissionsRec& permissionsRec_);
+        std::error_code getPermissionsRec(const std::string userName_, boost::optional<Permission>&);
         
     private:
-        
+        MYSQL *con;
+
         //attempt to connect 5 times before return DATABASE_EXCEPTION
         std::error_code connect();
         bool isConnected();
         std::error_code disconnect();
-*/       
-
-
-    private:
-        MYSQL *con;
-        Maps _map;
+        
     };
 }}
 

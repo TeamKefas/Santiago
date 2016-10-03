@@ -70,7 +70,7 @@ namespace Santiago{ namespace User { namespace Server
                                                const std::string& oldPassword_,
                                                const std::string& newPassword_)
     {
-        bool update = _databaseConnector.updateUserPassword(userId_, oldPassword_, newPassword_);
+        bool update = _databaseConnector.updateUserProfilesRec(userId_, oldPassword_, newPassword_);
         if(update)
         {
             return 1;
