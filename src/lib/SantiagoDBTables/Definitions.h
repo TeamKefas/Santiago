@@ -4,10 +4,10 @@
 #include <string>
 #include <map>
 
-const extern std::map<UserPermission, std::string> userPermissionString;
-const extern std::map<std::string, UserPermission> stringUserPermission;
-const extern std::map<std::string, std::string> alphabetDigit;
-const extern std::map<std::string, std::string> digitAlphabet;
+extern const std::map<UserPermission, std::string> userPermissionString;
+extern const std::map<std::string, UserPermission> stringUserPermission;
+extern const std::map<std::string, std::string> alphabetDigit;
+extern const std::map<std::string, std::string> digitAlphabet;
 
 namespace Santiago{ namespace SantiagoDBTables
 {

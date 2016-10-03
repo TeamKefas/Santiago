@@ -2,19 +2,19 @@
 
 namespace Santiago{ namespace SantiagoDBTables
 {
-    userPermissionString = 
+    const userPermissionString = 
     {{UserPermission::OWNER, "OWNER"}, 
      {UserPermission::READ, "READ"},
      {UserPermission::WRITE, "WRITE"},
      {UserPermission::READ_WRITE, "READ_WRITE"}};
 
-    stringUserPermission = 
+    const stringUserPermission = 
     {{"OWNER", UserPermission::OWNER}, 
      {"READ", UserPermission::READ},
      {"WRITE", UserPermission::WRITE},
      {"READ_WRITE", UserPermission::READ_WRITE}};
     
-    alphabetDigit = 
+    const alphabetDigit = 
     {{"Jan", "01"},
      {"Feb", "02"},
      {"Mar", "03"},
@@ -28,7 +28,7 @@ namespace Santiago{ namespace SantiagoDBTables
      {"Nov", "11"},
      {"Dec", "12"}};
     
-    digitAlphabet = 
+    const digitAlphabet = 
     {{"01", "Jan"},
      {"02", "Feb"},
      {"03", "Mar"},
