@@ -8,17 +8,17 @@ namespace Santiago{ namespace SantiagoDBTables
 
         if(con == NULL) 
         {
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
         
         if(mysql_real_connect(con, "localhost", "root", "kefas123", 
                                "databaseName", 0, NULL, 0) == NULL) //replace kefas123 with MariaDB password
         {
             disconnect();
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
         
-        return 1;
+        return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());;
     }
 
     bool MariaDBConnection::isConnected()
@@ -48,15 +48,15 @@ namespace Santiago{ namespace SantiagoDBTables
             if(mysql_query(con, addUserProfilesRecQuery.c_str()))
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
             disconnect();
-            return 1;
+            return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());
         }
         else
         {
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCategory::GetInstance());
         }
     }
 
@@ -78,7 +78,7 @@ namespace Santiago{ namespace SantiagoDBTables
             if(result == NULL) 
             {
                 disconnect();
-                return 0;
+                return  std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
         
             MYSQL_ROW row;
@@ -95,16 +95,16 @@ namespace Santiago{ namespace SantiagoDBTables
             
             if(mysql_num_rows(result))
             {
-                return 1;
+                return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());
             }
             else
             {
-                return 0;
+                return std::error_code(Error::DATABASE_QUERY_FAILED, Error::ErrorCode::GetInstance());
             }
         }
         else
         {
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
     }
        
@@ -119,7 +119,7 @@ namespace Santiago{ namespace SantiagoDBTables
             if(mysql_query(con, retrieveOldPassword.c_str()))
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
             MYSQL_RES *result = mysql_store_result(con);
@@ -127,7 +127,7 @@ namespace Santiago{ namespace SantiagoDBTables
             if(result == NULL) 
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
                     
             MYSQL_ROW row;
@@ -138,7 +138,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 if(oldPassword_ != row[0])
                 {
                     disconnect();
-                    return 0;
+                    return std::error_code(Error::INVALID_USERNAME_PASSWORD, Error::ErrorCode::GetInstance());
                 }
                 
                 else
@@ -153,27 +153,27 @@ namespace Santiago{ namespace SantiagoDBTables
                         if(mysql_query(con, updateUserProfilesRecQuery.c_str()))
                         {              
                             disconnect();
-                            return 0;
+                            return  std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCategory::GetInstance());
                         }
                         
                         disconnect();
-                        return 1;
+                        return  std::error_code(Error::SUCCESS, Error::ErrorCategory::GetInstance());
                     }
                     else
                     {
-                        return 0;
+                        return  std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
                     }
                 }
             }
             else
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
         }
         else
         {
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }  
     }
 
@@ -187,15 +187,15 @@ namespace Santiago{ namespace SantiagoDBTables
             if(mysql_query(con, deleteUserProfilesRecQuery.c_str()))
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
             disconnect();
-            return 1;
+            return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());
         }
         else
         {
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
     }
         
@@ -216,15 +216,15 @@ namespace Santiago{ namespace SantiagoDBTables
             if(mysql_query(con, addSessionsRecQuery.c_str()))
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
             disconnect();
-            return 1;
+            return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());
         }
         else
         {
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
     }
       
@@ -238,7 +238,7 @@ namespace Santiago{ namespace SantiagoDBTables
             if(mysql_query(con, getSessionsRecQuery.c_str()))
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
             MYSQL_RES *result = mysql_store_result(con);
@@ -246,7 +246,7 @@ namespace Santiago{ namespace SantiagoDBTables
             if(result == NULL) 
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
             MYSQL_ROW row;
@@ -281,16 +281,16 @@ namespace Santiago{ namespace SantiagoDBTables
             
             if(mysql_num_rows(result))
             {
-                return 1;
+                return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());
             }
             else
             {
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
         }
         else
         {
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
     }
 
@@ -309,15 +309,15 @@ namespace Santiago{ namespace SantiagoDBTables
             if(mysql_query(con, updateSessionsRecQuery.c_str()))
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
             disconnect();
-            return 1;
+            return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());
         }
         else
         {
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
     }
     
@@ -335,15 +335,15 @@ namespace Santiago{ namespace SantiagoDBTables
             if(mysql_query(con, addPermissionsRecQuery.c_str()))
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
             disconnect();
-            return 1;
+            return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());
         }
         else
         {
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
     }
   
@@ -357,7 +357,7 @@ namespace Santiago{ namespace SantiagoDBTables
             if(mysql_query(con, getPermissionsRecQuery.c_str()))
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
             MYSQL_RES *result = mysql_store_result(con);
@@ -365,7 +365,7 @@ namespace Santiago{ namespace SantiagoDBTables
             if(result == NULL) 
             {
                 disconnect();
-                return 0;
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
             MYSQL_ROW row;
@@ -388,16 +388,16 @@ namespace Santiago{ namespace SantiagoDBTables
 
             if(mysql_num_rows(result))
             {
-                return 1;
+                return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());
             }
             else
             {
-                return 0;
+                return std::error_code(Error::INVALID_USERNAME_PASSWORD, Error::ErrorCode::GetInstance());
             }
         }
         else
         {
-            return 0;
+            return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
     }
     
