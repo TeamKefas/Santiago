@@ -1,9 +1,9 @@
-#ifndef SANTIAGO_SANTIAGODBTABLES_RECORDS_H
-#define SANTIAGO_SANTIAGODBTABLES_RECORDS_H
+#ifndef SANTIAGO_SANTIAGODBTABLES_DATABASERECORDS_H
+#define SANTIAGO_SANTIAGODBTABLES_DATABASERECORDS_H
 
 #include <string>
 
-#include "UserPermissions.h"
+#include "Definitions.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -11,14 +11,14 @@ namespace Santiago{ namespace SantiagoDBTables
 {
     using namespace boost::posix_time;
             
-    struct UserProfile
+    struct UserProfilesRec
     {
         int _id;
         std::string _userName;
         std::string _password;
     };
     
-    struct Session
+    struct SessionsRec
     {
         int _id;
         std::string _userName;
@@ -27,7 +27,7 @@ namespace Santiago{ namespace SantiagoDBTables
         ptime _logoutTime;  
     };
         
-    struct Permission
+    struct PermissionsRec
     {
         int _id;
         int _resId;
