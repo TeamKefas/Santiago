@@ -108,7 +108,8 @@ namespace Santiago{ namespace SantiagoDBTables
         }
     }
        
-    std::error_code MariaDBConnection::updateUserProfilesRec(UserProfilesRec& userProfilesRec_)
+    std::error_code MariaDBConnection::updateUserProfilesRec(UserProfilesRec& userProfilesRec_,
+                                                             const std::string newPassword_)
     {
         if(connect())
         {
