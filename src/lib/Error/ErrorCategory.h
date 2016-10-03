@@ -9,10 +9,11 @@ namespace Santiago{ namespace Error
     enum ErrorCode
     {
         SUCCESS = 0,
-        DATABASE_ERROR = 1,
-        USERNAME_ALREADY_EXISTS = 2,
-        INVALID_USERNAME_PASSWORD = 3,
-        INVALID_SESSION_COOKIE = 4,
+        DATABASE_EXCEPTION = 1,
+        DATABASE_QUERY_FAILED = 2,
+        USERNAME_ALREADY_EXISTS = 3,
+        INVALID_USERNAME_PASSWORD = 4,
+        INVALID_SESSION_COOKIE = 5,
     };
 
     class ErrorCategory:public std::error_category
