@@ -21,9 +21,9 @@ namespace Santiago{ namespace User { namespace Server
         bool verifyUserForCookie(const std::string& cookie_);
         bool logoutUserForCookie(const std::string& cookie_);
         bool logoutUserForAllCookies(const std::string& userId_);
-        bool changeUserPassword(const std::string& userId_,const std::string& oldPassword_,
+        bool changeUserPassword(const std::string& userId_, const std::string& oldPassword_,
                                 const std::string& newPassword_);
-        bool addResource(std::string resId_,std::string userName_,
+        bool addResource(const std::string resId_, const std::string userName_,
                          SantiagoDBTables::UserPermission permission_);
 
     protected:

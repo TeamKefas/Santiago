@@ -4,7 +4,7 @@ namespace Santiago{ namespace User { namespace Server
 {   
     bool DatabaseInterface::createUser(const std::string& userId_, const std::string& password_)
     {
-        bool available = _databaseConnector.addUserProfileRecord(userId_, password_);
+        bool available = _databaseConnector.addUserProfilesRec(userId_, password_);
         
         if(available)
         {
@@ -22,7 +22,7 @@ namespace Santiago{ namespace User { namespace Server
     {
         boost::optional<UserProfile> userProfileRecord = UserProfile();
         
-        bool match = _databaseConnector.getUserProfileRecord(userId_, userProfileRecord);
+        bool match = _databaseConnector.getUserProfilesRec(userId_, userProfileRecord);
         
         if(match)
         {
@@ -32,7 +32,7 @@ namespace Santiago{ namespace User { namespace Server
             temp << cookieNum;
             cookie = temp.str();          // Random generated cookie. May not be unique.
             ptime loginTime = second_clock::local_time();
-            _databaseConnector.addSessionRecord(userId_, cookie, loginTime);
+            _databaseConnector.addSessionsRec(userId_, cookie, loginTime);
             return 1;
         }
 
@@ -48,7 +48,7 @@ namespace Santiago{ namespace User { namespace Server
         ptime loginTime = second_clock::local_time();
         
         CookieData cookieData = _serverData._cookieCookieDataMap.find(cookie_)->second;     
-        _databaseConnector.addSessionRecord(cookieData._userId, cookie_, loginTime);
+        _databaseConnector.addSessionsRec(cookieData._userId, cookie_, loginTime);
         return 1;
     }
     // TODO: 
@@ -56,7 +56,7 @@ namespace Santiago{ namespace User { namespace Server
     {
         //TODO: has some work..skip this for now  
         ptime logoutTime = second_clock::local_time();
-        _databaseConnector.updateSessionRecord(userId_, logoutTime);
+        _databaseConnector.updateSessionsRec(userId_, logoutTime);
         return 1;
     }
 
@@ -82,14 +82,14 @@ namespace Santiago{ namespace User { namespace Server
         }
     }
 
-    bool DatabaseInterface::addResource(std::string resId_,std::string userName_,
+    bool DatabaseInterface::addResource(const std::string resId_, const std::string userName_,
                                         SantiagoDBTables::UserPermission permission_)
     {
         std::stringstream resId;
-        resId<<resId_;
+        resId << resId_;
         int newResId;
-        resId>>newResId;
-        if(_databaseConnector.addPermissionRecord(newResId,userName_,permission_))
+        resId >> newResId;
+        if(_databaseConnector.addPermissionsRec(newResId,userName_,permission_))
         {
             return 1;
         }
