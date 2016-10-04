@@ -44,7 +44,7 @@ namespace Santiago{ namespace SantiagoDBTables
         {
              boost::optional<UserProfilesRec> userProfilesRecord = UserProfilesRec();
 
-             if(getUserProfilesRec(userProfilesRec_._userName, userProfilesRecord) != Error::SUCCESS)
+             if(!getUserProfilesRec(userProfilesRec_._userName, userProfilesRecord))
             {
                 std::string addUserProfilesRecQuery = "INSERT INTO USER_PROFILE(USERNAME,PASSWORD) VALUES('" +
                     userProfilesRec_._userName + "', '" + userProfilesRec_._password + "')";
