@@ -313,7 +313,7 @@ namespace Santiago{ namespace SantiagoDBTables
             auto searchLogout = alphabetDigit.find(logoutTime.str().substr(5, 3));
             logout += searchLogout->second + logoutTime.str().substr(8, 12);
             std::string updateSessionsRecQuery = "UPDATE SESSION SET LOGOUT_TIME='" +
-                logout + "' WHERE USERNAME='" + sessionsRec_._userId + "'";
+                logout + "' WHERE USERNAME='" + sessionsRec_._userName + "'";
             
             if(mysql_query(_mysql, updateSessionsRecQuery.c_str()))
             {
