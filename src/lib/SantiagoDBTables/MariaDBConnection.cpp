@@ -42,11 +42,12 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         if(isConnected())
         {
-            if(getUserProfilesRec(userProfilesRec_.userName_,
-                                  boost::optional<UserProfile>& userProfilesRecord_) != Error::SUCCESS)
+             boost::optional<UserProfilesRec> userProfilesRecord = UserProfilesRec();
+
+             if(getUserProfilesRec(userProfilesRec_._userName, userProfilesRecord) != Error::SUCCESS)
             {
                 std::string addUserProfilesRecQuery = "INSERT INTO USER_PROFILE(USERNAME,PASSWORD) VALUES('" +
-                    userProfilesRec_.userName_ + "', '" + userProfilesRec_.password_ + "')";
+                    userProfilesRec_._userName + "', '" + userProfilesRec_._password + "')";
                 
                 if(mysql_query(_mysql, addUserProfilesRecQuery.c_str()))
                 {
@@ -69,7 +70,7 @@ namespace Santiago{ namespace SantiagoDBTables
     }
 
     std::error_code MariaDBConnection::getUserProfilesRec(const std::string userName_,
-                                                          boost::optional<UserProfile>& userProfilesRec_)
+                                                          boost::optional<UserProfilesRec>& userProfilesRec_)
     {
         if(isConnected())
         {
@@ -212,16 +213,16 @@ namespace Santiago{ namespace SantiagoDBTables
         if(isConnected())
         {
             std::stringstream loginTime;
-            loginTime << sessionsRec_.loginTime_;
+            loginTime << sessionsRec_._loginTime;
             std::string login = loginTime.str().substr(0, 5);
             auto searchLogin = alphabetDigit.find(loginTime.str().substr(5, 3));
             login += searchLogin->second + loginTime.str().substr(8,12);
             
             std::string addSessionsRecQuery = "INSERT INTO SESSION(USERNAME,COOKIE_ID,LOGIN_TIME) VALUES('" +
-                sessionsRec_.userName_ + "', '" +
-                sessionsRec_.cookieId_ + "', '" + login + "')";
+                sessionsRec_._userName + "', '" +
+                sessionsRec_._cookieId + "', '" + login + "')";
             
-            if(mysql_query(con, addSessionsRecQuery.c_str()))
+            if(mysql_query(_mysql, addSessionsRecQuery.c_str()))
             {
                 //  disconnect();
                 return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
@@ -237,7 +238,7 @@ namespace Santiago{ namespace SantiagoDBTables
     }
       
     std::error_code MariaDBConnection::getSessionsRec(const std::string userName_,
-                                                      boost::optional<Session>& sessionsRec_)
+                                                      boost::optional<SessionsRec>& sessionsRec_)
     {
         if(isConnected())
         {
@@ -307,12 +308,12 @@ namespace Santiago{ namespace SantiagoDBTables
         if(isConnected())
         {        
             std::stringstream logoutTime;
-            logoutTime << sessionsRec_.logoutTime_;
+            logoutTime << sessionsRec_._logoutTime;
             std::string logout = logoutTime.str().substr(0, 5);
             auto searchLogout = alphabetDigit.find(logoutTime.str().substr(5, 3));
             logout += searchLogout->second + logoutTime.str().substr(8, 12);
             std::string updateSessionsRecQuery = "UPDATE SESSION SET LOGOUT_TIME='" +
-                logout + "' WHERE USERNAME='" + sessionsRec_.userId_ + "'";
+                logout + "' WHERE USERNAME='" + sessionsRec_._userId + "'";
             
             if(mysql_query(_mysql, updateSessionsRecQuery.c_str()))
             {
@@ -356,7 +357,7 @@ namespace Santiago{ namespace SantiagoDBTables
     }
   
     std::error_code MariaDBConnection::getPermissionsRec(const std::string userName_,
-                                                         boost::optional<Permission>& permissionsRec_)
+                                                         boost::optional<PermissionsRec>& permissionsRec_)
     {
         if(isConnected())
         {

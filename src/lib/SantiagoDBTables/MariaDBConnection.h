@@ -1,4 +1,4 @@
-\#ifndef SANTIAGO_SANTIAGODBTABLES_MARIADBCONNECTION_H
+#ifndef SANTIAGO_SANTIAGODBTABLES_MARIADBCONNECTION_H
 #define SANTIAGO_SANTIAGODBTABLES_MARIADBCONNECTION_H
 
 #include <mysql.h>
@@ -55,7 +55,8 @@ namespace Santiago{ namespace SantiagoDBTables
 
         // set permissionsRec_._id to the auto generated id from db
         std::error_code addPermissionsRec(PermissionsRec& permissionsRec_);
-        std::error_code getPermissionsRec(const std::string userName_, boost::optional<Permission>&);
+        std::error_code getPermissionsRec(const std::string userName_,
+                                          boost::optional<PermissionsRec>& permissionsRec_);
         
     private:
         
