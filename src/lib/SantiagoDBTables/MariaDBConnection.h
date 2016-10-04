@@ -12,6 +12,8 @@
 #include "Definitions.h"
 #include "Error/ErrorCategory.h"
 
+#include <boost/property_tree/ptree.hpp>
+
 namespace Santiago{ namespace SantiagoDBTables
 {
     class MariaDBConnection
@@ -19,7 +21,18 @@ namespace Santiago{ namespace SantiagoDBTables
     public:
 
         //take db ip, port, username, password from config
-        MariaDBConnection(const boost::property_tree::config& config_){};
+        MariaDBConnection(const boost::property_tree::config& config_)
+        {
+            // float v = pt.get<float>("a.path.to.float.value");
+            MYSQL *_mysql = config_.get<MYSQL*>("Santiago.SantiagoDBTables.mysql");
+            const char *_host = config_.get<const char*>("Santiago.SantiagoDBTables.host");
+            const char *_user = config_.get<const char*>("Santiago.SantiagoDBTables.user");
+            const char *_passwd = config_.get<const char*>("Santiago.SantiagoDBTables.passwd");
+            const char *_db = config_.get<const char*>("Santiago.SantiagoDBTables.db");
+            unsigned int _port = config_.get<unsigned int>("Santiago.SantiagoDBTables.port");
+            const char * _unixSocket = config_.get<const char*>("Santiago.SantiagoDBTables.unix_socket");
+            unsigned long _flags = config_.get<unsigned long>("Santiago.SantiagoDBTables.flags");
+        };
 
         // possible error_code returns for the following fns
         // SUCCESS, DATABASE_EXCEPTION, DATABASE_QUERY_FAILED
@@ -41,13 +54,22 @@ namespace Santiago{ namespace SantiagoDBTables
         std::error_code getPermissionsRec(const std::string userName_, boost::optional<Permission>&);
         
     private:
-        MYSQL *con;
+        
+        MYSQL *_mysql;
+        const char *_host;
+        const char *_user;
+        const char *_passwd;
+        const char *_db;
+        unsigned int _port;
+        const char *_unixSocket;
+        unsigned long _flags;
+        
+        
 
         //attempt to connect 5 times before return DATABASE_EXCEPTION
         std::error_code connect();
         bool isConnected();
-        std::error_code disconnect();
-        
+        std::error_code disconnect();        
     };
 }}
 
