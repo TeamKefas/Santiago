@@ -43,7 +43,7 @@ namespace Santiago{ namespace SantiagoDBTables
         
         // set userProfilesRec_._id to the auto generated id from db
         std::error_code addUserProfilesRec(UserProfilesRec& userProfilesRec_);
-        std::error_code getUserProfileRec(const std::string& userName_,
+        std::error_code getUserProfilesRec(const std::string& userName_,
                                           boost::optional<UserProfilesRec>& userProfilesRec_);
         std::error_code updateUserProfilesRec(UserProfilesRec& userProfilesRec_, const std::string newPassword_);
         std::error_code deleteUserProfilesRec(const std::string& userName_);
