@@ -4,9 +4,13 @@ namespace Santiago{ namespace User { namespace Server
 {   
     bool DatabaseInterface::createUser(const std::string& userId_, const std::string& password_)
     {
-        bool available = _databaseConnector.addUserProfilesRec(userId_, password_);
+        UserProfile userProfilesRec;
+        userProfilesRec._userName = userId_;
+        userProfilesRec._password = password_;
+
+        int available = _databaseConnector.addUserProfilesRec(&userProfilesRec);
         
-        if(available)
+        if(!available)
         {
             return 1;
         }
@@ -22,18 +26,28 @@ namespace Santiago{ namespace User { namespace Server
     {
         boost::optional<UserProfile> userProfileRecord = UserProfile();
         
-        bool match = _databaseConnector.getUserProfilesRec(userId_, userProfileRecord);
+        int match = _databaseConnector.getUserProfilesRec(userId_, boost::optional<UserProfile>& userProfilesRec_);
         
-        if(match)
+        if(!match)
         {
-            std::string cookie;
+            Session sessionsRec;
+            sessionsRec._userName = userId_;
+
             long cookieNum = rand() % 1000000000000000;
-            std::stringstream temp;
-            temp << cookieNum;
-            cookie = temp.str();          // Random generated cookie. May not be unique.
-            ptime loginTime = second_clock::local_time();
-            _databaseConnector.addSessionsRec(userId_, cookie, loginTime);
-            return 1;
+            std::stringstream cookie;
+            cookie << cookieNum;
+            sessionsRec._cookieId = temp.str();          // Random generated cookie. May not be unique.
+
+            sessionsRec._loginTime = second_clock::local_time();
+           
+            if(!_databaseConnector.addSessionsRec(&sessionsRec))
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         else
@@ -45,19 +59,38 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::verifyUserForCookie(const std::string& cookie_)
     {    
         //TODO: if the verify call from another connection add that connection to the _userIdUserIdDataMap   
-        ptime loginTime = second_clock::local_time();
+        Session sessionsRec;
+        sessionsRec._cookieId = cookie_;
+        sessionsRec._loginTime = second_clock::local_time();
         
-        CookieData cookieData = _serverData._cookieCookieDataMap.find(cookie_)->second;     
-        _databaseConnector.addSessionsRec(cookieData._userId, cookie_, loginTime);
-        return 1;
+        CookieData cookieData = _serverData._cookieCookieDataMap.find(cookie_)->second;
+        //TODO: sessionsRec._userId = ;
+
+        if(!_databaseConnector.addSessionsRec(&sessionsRec))
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
     }
     // TODO: 
     bool DatabaseInterface::logoutUserForCookie(const std::string& userId_)
     {
-        //TODO: has some work..skip this for now  
-        ptime logoutTime = second_clock::local_time();
-        _databaseConnector.updateSessionsRec(userId_, logoutTime);
-        return 1;
+        //TODO: has some work..skip this for now
+        Session sessionsRec;
+        sessionsRec._userName = userId_;
+        sessionsRec._logoutTime = second_clock::local_time();
+
+        if(!_databaseConnector.addSessionsRec(&sessionsRec))
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     bool DatabaseInterface::logoutUserForAllCookies(const std::string& userId_)
@@ -70,12 +103,16 @@ namespace Santiago{ namespace User { namespace Server
                                                const std::string& oldPassword_,
                                                const std::string& newPassword_)
     {
-        bool update = _databaseConnector.updateUserProfilesRec(userId_, oldPassword_, newPassword_);
-        if(update)
+        UserProfile userProfilesRec;
+        userProfilesRec._userName = userId_;
+        userProfilesRec._password = oldPassword_;
+        
+        int update = _databaseConnector.updateUserProfilesRec(&userProfilesRec, newPassword_);
+
+        if(!update)
         {
             return 1;
         }
-
         else
         {
             return 0;
@@ -85,11 +122,16 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::addResource(const std::string resId_, const std::string userName_,
                                         SantiagoDBTables::UserPermission permission_)
     {
+        Permission permissionsRec;
+
         std::stringstream resId;
         resId << resId_;
-        int newResId;
-        resId >> newResId;
-        if(_databaseConnector.addPermissionsRec(newResId,userName_,permission_))
+        resId >> permissionsRec._resId;
+
+        permissionsRec._userName = userName_;
+        permissionsRec._userPermission = permission_;
+        
+        if(!_databaseConnector.addPermissionsRec(&permissionsRec))
         {
             return 1;
         }
