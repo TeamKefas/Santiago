@@ -192,7 +192,7 @@ namespace Santiago{ namespace SantiagoDBTables
             std::string deleteUserProfilesRecQuery = "DELETE FROM USER_PROFILE WHERE USERNAME = '" +
                 userName_ + ")";
                     
-            if(mysql_query(con, deleteUserProfilesRecQuery.c_str()))
+            if(mysql_query(_mysql, deleteUserProfilesRecQuery.c_str()))
             {
                 //disconnect();
                 return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
@@ -227,7 +227,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
             }
             
-            disconnect();
+            //disconnect();
             return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());
         }
         else
@@ -243,7 +243,7 @@ namespace Santiago{ namespace SantiagoDBTables
         {
             std::string getSessionsRecQuery = "SELECT * FROM SESSION WHERE USERNAME = '" + userName_ + "'";
             
-            if(mysql_query(con, getSessionsRecQuery.c_str()))
+            if(mysql_query(_mysql, getSessionsRecQuery.c_str()))
             {
                 //disconnect();
                 return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
