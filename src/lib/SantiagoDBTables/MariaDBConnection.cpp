@@ -6,13 +6,13 @@ namespace Santiago{ namespace SantiagoDBTables
     {       
         _mysql = mysql_init(NULL);
 
-        if(con == NULL) 
+        if(_mysql == NULL) 
         {
             return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
         
         if(mysql_real_connect(_mysql,_host,_user,_passwd,
-                              _db,_port,_unixSocket,_flags) == NULL) //replace kefas123 with MariaDB password
+                              _db,_port,_unixSocket,_flags) == NULL)
         {
             return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCode::GetInstance());
         }
@@ -59,7 +59,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 return std::error_code(Error::USERNAME_ALREADY_EXISTS, Error::ErrorCode::GetInstance());
             }
             
-            disconnect();
+            //  disconnect();
             return std::error_code(Error::SUCCESS, Error::ErrorCode::GetInstance());
         }
         else
