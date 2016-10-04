@@ -1,12 +1,11 @@
 set(SantiagoDBTables_SRCS
-  Maps.cpp
+  Definitions.cpp
   MariaDBConnection.cpp)
 
 if(WIN32)
   set(SantiagoDBTables_SRCS ${SantiagoDBTables_SRCS}   
-  UserPermissions.h
-  Maps.h
-  Records.h
+  DatabaseRecords.h
+  Definitions.h
   MariaDBConnection.h)
 endif(WIN32)
 
