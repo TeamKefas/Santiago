@@ -122,7 +122,7 @@ namespace Santiago{ namespace SantiagoDBTables
         if(isConnected())
         {
             std::string retrieveOldPassword = "SELECT PASSWORD FROM USER_PROFILE WHERE USERNAME = '"
-                + userProfilesRec_.userId_ + "'";
+                + userProfilesRec_._userId + "'";
         
             if(mysql_query(_mysql, retrieveOldPassword.c_str()))
             {
@@ -143,7 +143,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 MYSQL_ROW row;
                 row = mysql_fetch_row(result);
                         
-                if(oldPassword_ != row[0])
+                if(userProfilesRec_._password != row[0])
                 {
                     //  disconnect();
                     return std::error_code(Error::INVALID_USERNAME_PASSWORD, Error::ErrorCategory::GetInstance());
