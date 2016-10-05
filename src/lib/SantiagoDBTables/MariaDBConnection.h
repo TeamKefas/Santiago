@@ -31,7 +31,8 @@ namespace Santiago{ namespace SantiagoDBTables
             unsigned int _port = config_.get<unsigned int>("Santiago.SantiagoDBTables.port");
             const char * _unixSocket = config_.get<const char*>("Santiago.SantiagoDBTables.unix_socket");
             unsigned long _flags = config_.get<unsigned long>("Santiago.SantiagoDBTables.flags");
-        }
+         }
+
         ~MariaDBConnection()
         {
             disconnect();
@@ -45,17 +46,17 @@ namespace Santiago{ namespace SantiagoDBTables
         std::error_code addUserProfilesRec(UserProfilesRec& userProfilesRec_);
         std::error_code getUserProfilesRec(const std::string& userName_,
                                           boost::optional<UserProfilesRec>& userProfilesRec_);
-        std::error_code updateUserProfilesRec(UserProfilesRec& userProfilesRec_, const std::string newPassword_);
+        std::error_code updateUserProfilesRec(UserProfilesRec& userProfilesRec_, const std::string& newPassword_);
         std::error_code deleteUserProfilesRec(const std::string& userName_);
 
         // set sessionsRec_._id to the auto generated id from db
         std::error_code addSessionsRec(SessionsRec& sessionsRec_);
-        std::error_code getSessionsRec(const std::string& cookieString_, boost::optional<SessionsRec>& sessionsRec_);
+        std::error_code getSessionsRec(const std::string& userName_, boost::optional<SessionsRec>& sessionsRec_);
         std::error_code updateSessionsRec(SessionsRec& userProfilesRec_);
 
         // set permissionsRec_._id to the auto generated id from db
         std::error_code addPermissionsRec(PermissionsRec& permissionsRec_);
-        std::error_code getPermissionsRec(const std::string userName_,
+        std::error_code getPermissionsRec(const std::string& userName_,
                                           boost::optional<PermissionsRec>& permissionsRec_);
         
     private:

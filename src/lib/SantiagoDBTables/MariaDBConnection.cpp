@@ -12,7 +12,8 @@ namespace Santiago{ namespace SantiagoDBTables
         }
         
         if(mysql_real_connect(_mysql,_host,_user,_passwd,
-          _db,_port,_unixSocket,_flags) == NULL)
+           _db,_port,_unixSocket,_flags) == NULL)
+        {
             return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCategory::GetInstance());
         }
        
@@ -44,7 +45,7 @@ namespace Santiago{ namespace SantiagoDBTables
              boost::optional<UserProfilesRec> userProfilesRecord = UserProfilesRec();
 
              if(!getUserProfilesRec(userProfilesRec_._userName, userProfilesRecord))
-            {
+             {
                 std::string addUserProfilesRecQuery = "INSERT INTO USER_PROFILE(USERNAME,PASSWORD) VALUES('" +
                     userProfilesRec_._userName + "', '" + userProfilesRec_._password + "')";
                 
@@ -52,12 +53,12 @@ namespace Santiago{ namespace SantiagoDBTables
                 {
                     return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCategory::GetInstance());
                 }
-            }
-            else
-            {
+             }
+             else
+             {
                 // disconnect();
                 return std::error_code(Error::USERNAME_ALREADY_EXISTS, Error::ErrorCategory::GetInstance());
-            }
+             }
             
             //  disconnect();
             return std::error_code(Error::SUCCESS, Error::ErrorCategory::GetInstance());
@@ -68,7 +69,7 @@ namespace Santiago{ namespace SantiagoDBTables
         }
     }
 
-    std::error_code MariaDBConnection::getUserProfilesRec(const std::string userName_,
+    std::error_code MariaDBConnection::getUserProfilesRec(const std::string& userName_,
                                                           boost::optional<UserProfilesRec>& userProfilesRec_)
     {
         if(isConnected())
@@ -78,7 +79,7 @@ namespace Santiago{ namespace SantiagoDBTables
             if(mysql_query(_mysql, getUserProfilesRecQuery.c_str()))
             {
                 // disconnect();
-                retur std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCategory::GetInstance());
+                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCategory::GetInstance());
             }
         
             MYSQL_RES *result = mysql_store_result(_mysql);
@@ -117,12 +118,12 @@ namespace Santiago{ namespace SantiagoDBTables
     }
        
     std::error_code MariaDBConnection::updateUserProfilesRec(UserProfilesRec& userProfilesRec_,
-                                                             const std::string newPassword_)
+                                                             const std::string& newPassword_)
     {
         if(isConnected())
         {
             std::string retrieveOldPassword = "SELECT PASSWORD FROM USER_PROFILE WHERE USERNAME = '"
-                + userProfilesRec_._userId + "'";
+                + userProfilesRec_._userName + "'";
         
             if(mysql_query(_mysql, retrieveOldPassword.c_str()))
             {
@@ -156,7 +157,7 @@ namespace Santiago{ namespace SantiagoDBTables
                     if(isConnected())
                     {
                         std::string updateUserProfilesRecQuery = "UPDATE USER_PROFILE SET PASSWORD='" +
-                            newPassword_ + "' WHERE USERNAME = '" + userProfilesRec_.userId_ +"'";
+                            newPassword_ + "' WHERE USERNAME = '" + userProfilesRec_._userName +"'";
                         
                         if(mysql_query(_mysql, updateUserProfilesRecQuery.c_str()))
                         {              
@@ -236,7 +237,7 @@ namespace Santiago{ namespace SantiagoDBTables
         }
     }
       
-    std::error_code MariaDBConnection::getSessionsRec(const std::string userName_,
+    std::error_code MariaDBConnection::getSessionsRec(const std::string& userName_,
                                                       boost::optional<SessionsRec>& sessionsRec_)
     {
         if(isConnected())
@@ -355,7 +356,7 @@ namespace Santiago{ namespace SantiagoDBTables
         }
     }
   
-    std::error_code MariaDBConnection::getPermissionsRec(const std::string userName_,
+    std::error_code MariaDBConnection::getPermissionsRec(const std::string& userName_,
                                                          boost::optional<PermissionsRec>& permissionsRec_)
     {
         if(isConnected())
