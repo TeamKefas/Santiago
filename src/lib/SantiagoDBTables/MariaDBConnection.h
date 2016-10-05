@@ -31,6 +31,8 @@ namespace Santiago{ namespace SantiagoDBTables
             unsigned int _port = config_.get<unsigned int>("Santiago.SantiagoDBTables.port");
             const char * _unixSocket = config_.get<const char*>("Santiago.SantiagoDBTables.unix_socket");
             unsigned long _flags = config_.get<unsigned long>("Santiago.SantiagoDBTables.flags");
+	    
+            connect();
          }
 
         ~MariaDBConnection()
