@@ -3,16 +3,16 @@
 namespace Santiago{ namespace SantiagoDBTables
 {
     const std::map<UserPermission, std::string> userPermissionString = 
-    {{UserPermission::OWNER, "OWNER"}, 
-     {UserPermission::READ, "READ"},
-     {UserPermission::WRITE, "WRITE"},
-     {UserPermission::READ_WRITE, "READ_WRITE"}};
+    {{OWNER, "OWNER"}, 
+     {READ, "READ"},
+     {WRITE, "WRITE"},
+     {READ_WRITE, "READ_WRITE"}};
 
     const std::map<std::string, UserPermission> stringUserPermission = 
-    {{"OWNER", UserPermission::OWNER}, 
-     {"READ", UserPermission::READ},
-     {"WRITE", UserPermission::WRITE},
-     {"READ_WRITE", UserPermission::READ_WRITE}};
+    {{"OWNER", OWNER}, 
+     {"READ", READ},
+     {"WRITE", WRITE},
+     {"READ_WRITE", READ_WRITE}};
     
     const std::map<std::string, std::string> alphabetDigit = 
     {{"Jan", "01"},

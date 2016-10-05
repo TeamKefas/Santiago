@@ -5,7 +5,7 @@ using namespace Santiago::SantiagoDBTables;
 int main()
 {
     MariaDBConnection connection;
-    UserPermission permission = UserPermission::READ_WRITE;
+    UserPermission permission = READ_WRITE;
        
     UserProfilesRec userProfileRecord;
     userProfileRecord._userName = "junais";
@@ -216,7 +216,7 @@ int main()
     {
         std::cout << "\nInvalid User Id.\n";
     }
-
+    
     return 0;
 }
     
