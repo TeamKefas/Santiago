@@ -5,32 +5,132 @@ using namespace Santiago::SantiagoDBTables;
 int main()
 {
     MariaDBConnection connection;
-    Maps tempmap;
     UserPermission permission = UserPermission::READ_WRITE;
        
-    if(connection.addUserProfileRecord("junais", "pakistan"))
+    UserProfilesRec userProfileRecord;
+    userProfileRecord._userName = "junais";
+    userProfileRecord._password = "pakistan";
+    
+    if(!connection.addUserProfilesRec(userProfileRecord))
     {
-        std::cout << "\nAdded.\n";   
+        std::cout << "\nUser Profile Added.\n";   
     }
     else
     {
         std::cout << "\nUsername already used.\n";
     }
-       
-    if(connection.addUserProfileRecord("junais", "india"))
+
+    userProfileRecord._userName = "vinay";
+    userProfileRecord._password = "india";
+    
+    if(!connection.addUserProfilesRec(userProfileRecord))
     {
-        std::cout << "\nAdded.\n";   
+        std::cout << "\nUser Profile Added.\n";   
     }
     else
     {
         std::cout << "\nUsername already used.\n";
     }
-        
-    connection.addSessionRecord("junais", "kefas", from_iso_string("20160612T120000"));
-    connection.updateSessionRecord("junais", from_iso_string("20160612T130015"));
-    connection.addPermissionRecord(34, "junais", permission);
+
+    userProfileRecord._userName = "junais";
+    userProfileRecord._password = "india";
     
-    if(connection.updateUserPassword("junais", "pakistan","india"))
+    if(!connection.addUserProfilesRec(userProfileRecord))
+    {
+        std::cout << "\nUser Profile Added.\n";   
+    }
+    else
+    {
+        std::cout << "\nUsername already used.\n";
+    }
+    
+    if(!connection.deleteUserProfilesRec("vinay"))
+    {
+        std::cout << "\nUser Profile Deleted.\n";   
+    }
+    else
+    {
+        std::cout << "\nInvalid User Id.\n";
+    }
+
+    if(!connection.deleteUserProfilesRec("bineesh"))
+    {
+        std::cout << "\nUser Profile Deleted.\n";   
+    }
+    else
+    {
+        std::cout << "\nInvalid User Id.\n";
+    }
+
+    SessionsRec sessionRecord;
+    sessionRecord._userName = "junais";
+    sessionRecord._cookieId = "kefas";
+    ptime loginTime(from_iso_string("20160612T120000"));
+    sessionRecord._loginTime = loginTime;
+
+    if(!connection.addSessionsRec(sessionRecord))
+    {
+         std::cout << "\nSession Added.\n"; 
+    }
+    else
+    {
+         std::cout << "\nSession Add Error.\n"; 
+    }
+
+    ptime logoutTime(from_iso_string("20160612T130015"));
+    sessionRecord._logoutTime = logoutTime;
+    
+    if(!connection.updateSessionsRec(sessionRecord))
+    {
+         std::cout << "\nUpdated Session Record.\n"; 
+    }
+    else
+    {
+         std::cout << "\nSession Updation Error.\n"; 
+    }
+
+    PermissionsRec permissionRecord;
+    permissionRecord._resId = 34;
+    permissionRecord._userName = "junais";
+    permissionRecord._userPermission = permission;
+    
+    if(!connection.addPermissionsRec(permissionRecord))
+    {
+        std::cout << "\nPermission Added.\n"; 
+    }
+    else
+    {
+        std::cout << "\nPermission Add Error.\n"; 
+    }
+    
+    userProfileRecord._userName = "junais";
+    userProfileRecord._password = "pakistan";
+    
+    if(!connection.updateUserProfilesRec(userProfileRecord,"india"))
+    {
+        std::cout<< "\nPassword updated.\n";
+    }
+    else
+    {
+        std::cout << "\nInvalid User Id or Password.\n";
+    }
+
+    userProfileRecord._userName = "vinay";
+    userProfileRecord._password = "pakistan";
+    
+    if(!connection.updateUserProfilesRec(userProfileRecord,"india"))
+    {
+        std::cout<< "\nPassword updated.\n";
+    }
+    else
+    {
+        std::cout << "\nInvalid User Id or Password.\n";
+    }
+
+    userProfileRecord._userName = "junais";
+    userProfileRecord._password = "pakistan";
+    
+    if(!connection.updateUserProfilesRec(userProfileRecord,"india"))
     {
         std::cout<< "\nPassword updated.\n";
     }
@@ -39,102 +139,84 @@ int main()
         std::cout << "\nInvalid User Id or Password.\n";
     }
     
-    if(connection.updateUserPassword("vinay", "pakistan","india"))
-    {
-        std::cout<< "\nPassword updated.\n";
-    }
-    else
-    {
-        std::cout << "\nInvalid User Id or Password.\n";
-    }
+    boost::optional<UserProfilesRec> userProfileRec = UserProfilesRec();
     
-    if(connection.updateUserPassword("junais", "pakistan","india"))
+    if(!connection.getUserProfilesRec("junais", userProfileRec))
     {
-        std::cout<< "\nPassword updated.\n";
-    }
-    else
-    {
-        std::cout << "\nInvalid User Id or Password.\n";
-    }
-
-    boost::optional<UserProfile> userProfileRecord = UserProfile();
-    
-    if(connection.getUserProfileRecord("junais", userProfileRecord))
-    {
-        std::cout << "\n" << userProfileRecord->_id << "\t"
-                  << userProfileRecord->_userName << "\t"
-                  << userProfileRecord->_password << "\n";
+        std::cout << "\n" << userProfileRec->_id << "\t"
+                  << userProfileRec->_userName << "\t"
+                  << userProfileRec->_password << "\n";
     }
     else
     {
         std::cout << "\nInvalid User Id.\n";
     }
         
-    if(connection.getUserProfileRecord("vinay", userProfileRecord))
+    if(!connection.getUserProfilesRec("vinay", userProfileRec))
     {
-        std::cout << "\n" << userProfileRecord->_id << "\t"
-                  << userProfileRecord->_userName << "\t"
-                  << userProfileRecord->_password << "\n";
+        std::cout << "\n" << userProfileRec->_id << "\t"
+                  << userProfileRec->_userName << "\t"
+                  << userProfileRec->_password << "\n";
     }
     else
     {
         std::cout << "\nInvalid User Id.\n";
     }
 
-    boost::optional<Session> sessionRecord = Session();
+    boost::optional<SessionsRec> sessionRec = SessionsRec();
     
-    if(connection.getSessionRecord("junais", sessionRecord))
+    if(!connection.getSessionsRec("junais", sessionRec))
     {
-        std::cout << "\n" << sessionRecord->_id << "\t"
-                  << sessionRecord->_userName << "\t"
-                  << sessionRecord->_cookieId << "\t"
-                  << sessionRecord->_loginTime << "\t"
-                  << sessionRecord->_logoutTime << "\n";
+        std::cout << "\n" << sessionRec->_id << "\t"
+                  << sessionRec->_userName << "\t"
+                  << sessionRec->_cookieId << "\t"
+                  << sessionRec->_loginTime << "\t"
+                  << sessionRec->_logoutTime << "\n";
     }
     else
     {
         std::cout << "\nInvalid User Id.\n";
     }
 
-    if(connection.getSessionRecord("vinay", sessionRecord))
+    if(!connection.getSessionsRec("vinay", sessionRec))
     {
-        std::cout << "\n" << sessionRecord->_id << "\t"
-                  << sessionRecord->_userName << "\t"
-                  << sessionRecord->_cookieId << "\t"
-                  << sessionRecord->_loginTime << "\t"
-                  << sessionRecord->_logoutTime << "\n";
+        std::cout << "\n" << sessionRec->_id << "\t"
+                  << sessionRec->_userName << "\t"
+                  << sessionRec->_cookieId << "\t"
+                  << sessionRec->_loginTime << "\t"
+                  << sessionRec->_logoutTime << "\n";
     }
     else
     {
         std::cout << "\nInvalid User Id.\n";
     }
 
-    boost::optional<Permission> permissionRecord = Permission();
+    boost::optional<PermissionsRec> permissionRec = PermissionsRec();
         
-    if(connection.getPermissionRecord("junais", permissionRecord))
+    if(!connection.getPermissionsRec("junais", permissionRec))
     {
-        std::cout << "\n" << permissionRecord->_id << "\t"
-                  << permissionRecord->_resId << "\t"
-                  << permissionRecord->_userName << "\t"
-                  << tempmap.userPermissionString.find(permissionRecord->_userPermission)->second << "\n";
+        std::cout << "\n" << permissionRec->_id << "\t"
+                  << permissionRec->_resId << "\t"
+                  << permissionRec->_userName << "\t"
+                  << userPermissionString.find(permissionRec->_userPermission)->second << "\n";
     }
     else
     {
         std::cout << "\nInvalid User Id.\n";
     }
 
-    if(connection.getPermissionRecord("vinay", permissionRecord))
+    if(!connection.getPermissionsRec("vinay", permissionRec))
     {
-        std::cout << "\n" << permissionRecord->_id << "\t"
-                  << permissionRecord->_resId << "\t"
-                  << permissionRecord->_userName << "\t"
-                  << tempmap.userPermissionString.find(permissionRecord->_userPermission)->second << "\n";
+        std::cout << "\n" << permissionRec->_id << "\t"
+                  << permissionRec->_resId << "\t"
+                  << permissionRec->_userName << "\t"
+                  << userPermissionString.find(permissionRec->_userPermission)->second << "\n";
     }
     else
     {
         std::cout << "\nInvalid User Id.\n";
     }
-    
+
     return 0;
 }
     
