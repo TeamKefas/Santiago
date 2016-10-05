@@ -24,7 +24,7 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::loginUser(const std::string& userId_,
                                       const std::string& password_)
     {
-        boost::optional<UserProfilesRec> userProfilesRec = UserProfile();
+        boost::optional<UserProfilesRec> userProfilesRec = UserProfilesRec();
         
         int match = _databaseConnector.getUserProfilesRec(userId_, userProfilesRec);
         
