@@ -4,11 +4,11 @@ namespace Santiago{ namespace User { namespace Server
 {   
     bool DatabaseInterface::createUser(const std::string& userId_, const std::string& password_)
     {
-        UserProfile userProfilesRec;
+        UserProfilesRec userProfilesRec;
         userProfilesRec._userName = userId_;
         userProfilesRec._password = password_;
 
-        int available = _databaseConnector.addUserProfilesRec(&userProfilesRec);
+        int available = _databaseConnector.addUserProfilesRec(userProfilesRec);
         
         if(!available)
         {
@@ -24,13 +24,13 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::loginUser(const std::string& userId_,
                                       const std::string& password_)
     {
-        boost::optional<UserProfile> userProfileRecord = UserProfile();
+        boost::optional<UserProfilesRec> userProfilesRec = UserProfile();
         
-        int match = _databaseConnector.getUserProfilesRec(userId_, boost::optional<UserProfile>& userProfilesRec_);
+        int match = _databaseConnector.getUserProfilesRec(userId_, userProfilesRec);
         
         if(!match)
         {
-            Session sessionsRec;
+            SessionsRec sessionsRec;
             sessionsRec._userName = userId_;
 
             long cookieNum = rand() % 1000000000000000;
@@ -40,7 +40,7 @@ namespace Santiago{ namespace User { namespace Server
 
             sessionsRec._loginTime = second_clock::local_time();
            
-            if(!_databaseConnector.addSessionsRec(&sessionsRec))
+            if(!_databaseConnector.addSessionsRec(sessionsRec))
             {
                 return 1;
             }
@@ -59,14 +59,14 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::verifyUserForCookie(const std::string& cookie_)
     {    
         //TODO: if the verify call from another connection add that connection to the _userIdUserIdDataMap   
-        Session sessionsRec;
+        SessionsRec sessionsRec;
         sessionsRec._cookieId = cookie_;
         sessionsRec._loginTime = second_clock::local_time();
         
         CookieData cookieData = _serverData._cookieCookieDataMap.find(cookie_)->second;
         //TODO: sessionsRec._userId = ;
 
-        if(!_databaseConnector.addSessionsRec(&sessionsRec))
+        if(!_databaseConnector.addSessionsRec(sessionsRec))
         {
             return 1;
         }
@@ -79,11 +79,11 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::logoutUserForCookie(const std::string& userId_)
     {
         //TODO: has some work..skip this for now
-        Session sessionsRec;
+        SessionsRec sessionsRec;
         sessionsRec._userName = userId_;
         sessionsRec._logoutTime = second_clock::local_time();
 
-        if(!_databaseConnector.addSessionsRec(&sessionsRec))
+        if(!_databaseConnector.updateSessionsRec(sessionsRec))
         {
             return 1;
         }
@@ -103,11 +103,11 @@ namespace Santiago{ namespace User { namespace Server
                                                const std::string& oldPassword_,
                                                const std::string& newPassword_)
     {
-        UserProfile userProfilesRec;
+        UserProfilesRec userProfilesRec;
         userProfilesRec._userName = userId_;
         userProfilesRec._password = oldPassword_;
         
-        int update = _databaseConnector.updateUserProfilesRec(&userProfilesRec, newPassword_);
+        int update = _databaseConnector.updateUserProfilesRec(userProfilesRec, newPassword_);
 
         if(!update)
         {
@@ -122,7 +122,7 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::addResource(const std::string resId_, const std::string userName_,
                                         SantiagoDBTables::UserPermission permission_)
     {
-        Permission permissionsRec;
+        PermissionsRec permissionsRec;
 
         std::stringstream resId;
         resId << resId_;
@@ -131,7 +131,7 @@ namespace Santiago{ namespace User { namespace Server
         permissionsRec._userName = userName_;
         permissionsRec._userPermission = permission_;
         
-        if(!_databaseConnector.addPermissionsRec(&permissionsRec))
+        if(!_databaseConnector.addPermissionsRec(permissionsRec))
         {
             return 1;
         }
