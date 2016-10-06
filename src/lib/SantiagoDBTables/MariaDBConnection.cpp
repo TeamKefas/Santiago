@@ -192,7 +192,7 @@ namespace Santiago{ namespace SantiagoDBTables
             }
             else
             {
-                return std::error_code(Error::DATABASE_EXCEPTION, Error::ErrorCategory::GetInstance());
+                return std::error_code(Error::INVALID_USERNAME_PASSWORD, Error::ErrorCategory::GetInstance());
             }
         }
         else
