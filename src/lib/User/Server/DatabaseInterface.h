@@ -15,7 +15,7 @@ namespace Santiago{ namespace User { namespace Server
     class DatabaseInterface
     {
     public:
-        
+        DatabaseInterface(const boost::property_tree::ptree& config_);
         bool createUser(const std::string& userId_, const std::string& password_);
         bool loginUser(const std::string& userId_, const std::string& password_);
         bool verifyUserForCookie(const std::string& cookie_);
@@ -27,10 +27,10 @@ namespace Santiago{ namespace User { namespace Server
                          SantiagoDBTables::UserPermission permission_);
 
     protected:
-        
+
+        boost::property_tree::ptree&                    _config;
         SantiagoDBTables::MariaDBConnection             _databaseConnector;
         ServerData                              	_serverData;
-        
 
     };
 

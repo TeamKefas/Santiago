@@ -1,16 +1,22 @@
 #include "DatabaseInterface.h"
 
 namespace Santiago{ namespace User { namespace Server
-{   
+{
+    DatabaseInterface::DatabaseInterface(const boost::property_tree::ptree& config_)
+        :_config(config_),
+         _databaseConnector(_config)
+    {}
+    
+    
     bool DatabaseInterface::createUser(const std::string& userId_, const std::string& password_)
     {
-        UserProfilesRec userProfilesRec;
+        SantiagoDBTables::UserProfilesRec userProfilesRec;
         userProfilesRec._userName = userId_;
         userProfilesRec._password = password_;
-
-        int available = _databaseConnector.addUserProfilesRec(userProfilesRec);
         
-        if(!available)
+        //int available = _databaseConnector.addUserProfilesRec(userProfilesRec);
+        
+        if(!(_databaseConnector.addUserProfilesRec(userProfilesRec)))
         {
             return 1;
         }
@@ -24,19 +30,19 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::loginUser(const std::string& userId_,
                                       const std::string& password_)
     {
-        boost::optional<UserProfilesRec> userProfilesRec = UserProfilesRec();
+        boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRec =SantiagoDBTables::UserProfilesRec();
         
-        int match = _databaseConnector.getUserProfilesRec(userId_, userProfilesRec);
+        //  int match = _databaseConnector.getUserProfilesRec(userId_, userProfilesRec);
         
-        if(!match)
+        if(!( _databaseConnector.getUserProfilesRec(userId_, userProfilesRec)))
         {
-            SessionsRec sessionsRec;
+            SantiagoDBTables::SessionsRec sessionsRec;
             sessionsRec._userName = userId_;
 
             long cookieNum = rand() % 1000000000000000;
             std::stringstream cookie;
             cookie << cookieNum;
-            sessionsRec._cookieId = temp.str();          // Random generated cookie. May not be unique.
+            sessionsRec._cookieId = cookie.str();          // Random generated cookie. May not be unique.
 
             sessionsRec._loginTime = second_clock::local_time();
            
@@ -59,7 +65,7 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::verifyUserForCookie(const std::string& cookie_)
     {    
         //TODO: if the verify call from another connection add that connection to the _userIdUserIdDataMap   
-        SessionsRec sessionsRec;
+        SantiagoDBTables::SessionsRec sessionsRec;
         sessionsRec._cookieId = cookie_;
         sessionsRec._loginTime = second_clock::local_time();
         
@@ -79,7 +85,7 @@ namespace Santiago{ namespace User { namespace Server
     bool DatabaseInterface::logoutUserForCookie(const std::string& userId_)
     {
         //TODO: has some work..skip this for now
-        SessionsRec sessionsRec;
+        SantiagoDBTables::SessionsRec sessionsRec;
         sessionsRec._userName = userId_;
         sessionsRec._logoutTime = second_clock::local_time();
 
@@ -103,13 +109,13 @@ namespace Santiago{ namespace User { namespace Server
                                                const std::string& oldPassword_,
                                                const std::string& newPassword_)
     {
-        UserProfilesRec userProfilesRec;
+        SantiagoDBTables::UserProfilesRec userProfilesRec;
         userProfilesRec._userName = userId_;
         userProfilesRec._password = oldPassword_;
         
-        int update = _databaseConnector.updateUserProfilesRec(userProfilesRec, newPassword_);
+        //  int update = _databaseConnector.updateUserProfilesRec(userProfilesRec, newPassword_);
 
-        if(!update)
+        if(!(_databaseConnector.updateUserProfilesRec(userProfilesRec, newPassword_)))
         {
             return 1;
         }
@@ -120,9 +126,9 @@ namespace Santiago{ namespace User { namespace Server
     }
 
     bool DatabaseInterface::addResource(const std::string resId_, const std::string userName_,
-                                        SantiagoDBTables::permission_)
+                                        SantiagoDBTables::UserPermission permission_)
     {
-        PermissionsRec permissionsRec;
+        SantiagoDBTables::PermissionsRec permissionsRec;
 
         std::stringstream resId;
         resId << resId_;

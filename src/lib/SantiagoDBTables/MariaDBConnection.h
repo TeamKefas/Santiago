@@ -14,6 +14,9 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+//using boost::property_tree::ptree;
+
+
 namespace Santiago{ namespace SantiagoDBTables
 {
     class MariaDBConnection
@@ -21,16 +24,16 @@ namespace Santiago{ namespace SantiagoDBTables
     public:
 
         //take db ip, port, username, password from config
-        MariaDBConnection(const boost::property_tree::config& config_)
+        MariaDBConnection(const boost::property_tree::ptree& config_)
         {
-            MYSQL *_mysql = config_.get<MYSQL*>("Santiago.SantiagoDBTables.mysql");
+            /*  MYSQL *_mysql = config_.get<MYSQL*>("Santiago.SantiagoDBTables.mysql");
             const char *_host = config_.get<const char*>("Santiago.SantiagoDBTables.host");
             const char *_user = config_.get<const char*>("Santiago.SantiagoDBTables.user");
             const char *_passwd = config_.get<const char*>("Santiago.SantiagoDBTables.passwd");
             const char *_db = config_.get<const char*>("Santiago.SantiagoDBTables.db");
             unsigned int _port = config_.get<unsigned int>("Santiago.SantiagoDBTables.port");
             const char * _unixSocket = config_.get<const char*>("Santiago.SantiagoDBTables.unix_socket");
-            unsigned long _flags = config_.get<unsigned long>("Santiago.SantiagoDBTables.flags");
+            unsigned long _flags = config_.get<unsigned long>("Santiago.SantiagoDBTables.flags");*/
 	    
             connect();
          }

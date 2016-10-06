@@ -34,7 +34,8 @@ namespace Santiago{ namespace User { namespace Server
         ServerMessage                  _initiatingMessage;
         ServerData                     _serverData;
 
-        DatabaseInterface              _databaseInterface; 
+        DatabaseInterface              _databaseInterface;
+        
 
     };
 
