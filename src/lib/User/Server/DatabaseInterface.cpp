@@ -126,7 +126,7 @@ namespace Santiago{ namespace User { namespace Server
     }
 
     bool DatabaseInterface::addResource(const std::string resId_, const std::string userName_,
-                                        SantiagoDBTables permission_)
+                                        SantiagoDBTables::UserPermission permission_)
     {
         SantiagoDBTables::PermissionsRec permissionsRec;
 
