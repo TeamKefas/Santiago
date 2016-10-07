@@ -24,7 +24,7 @@ namespace Santiago{ namespace User { namespace Server
         bool changeUserPassword(const std::string& userId_, const std::string& oldPassword_,
                                 const std::string& newPassword_);
         bool addResource(const std::string resId_, const std::string userName_,
-                         SantiagoDBTables::UserPermission permission_);
+                         SantiagoDBTables permission_);
 
     protected:
 

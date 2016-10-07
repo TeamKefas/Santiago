@@ -34,7 +34,7 @@ namespace Santiago{ namespace User { namespace Server
         
         //  int match = _databaseConnector.getUserProfilesRec(userId_, userProfilesRec);
         
-        if(!( _databaseConnector.getUserProfilesRec(userId_, userProfilesRec)))
+        if(!(_databaseConnector.getUserProfilesRec(userId_, userProfilesRec)))
         {
             SantiagoDBTables::SessionsRec sessionsRec;
             sessionsRec._userName = userId_;
@@ -126,7 +126,7 @@ namespace Santiago{ namespace User { namespace Server
     }
 
     bool DatabaseInterface::addResource(const std::string resId_, const std::string userName_,
-                                        SantiagoDBTables::UserPermission permission_)
+                                        SantiagoDBTables permission_)
     {
         SantiagoDBTables::PermissionsRec permissionsRec;
 
