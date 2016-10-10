@@ -162,19 +162,29 @@ namespace Santiago{namespace Fastcgi
         }
 
         /**
-         * returns the post name value pairs. //TODO
+         * returns the get name value pairs. //TODO---
          */
         const std::map<std::string,std::string>& getGetData() const;
+        {
+            return _dataWeakPtr->_requestGetData;
+        }
+        
 
         /**
          * returns the post name value pairs. //TODO
          */
-        const std::map<std::string,std::string>& getPostData() const;
+        const std::map<std::string,std::string>& getPostData() const
+        {
+            return _dataWeakPtr->_requestPostData;
+        }
 
         /**
          * returns the cookie name value params received from server. //TODO
          */
-        const std::map<std::string,std::string>& getHTTPCookiesReceived() const;
+        const std::map<std::string,std::string>& getHTTPCookiesReceived() const
+        {
+            return _dataWeakPtr->_requestHTTPCookies;
+        }
 
         /**
          * sets the content type to be sent to the user. Default Html

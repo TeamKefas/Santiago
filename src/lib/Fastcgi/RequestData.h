@@ -84,7 +84,7 @@ namespace Santiago{namespace Fastcgi
 
         std::map<std::string, std::string>     _requestGetData;
         std::map<std::string, std::string>     _requestPostData;
-        std::map<std::string,std::string>      _requestHTTPCookies;
+        std::map<std::string, std::string>     _requestHTTPCookies;
 
         MIMEType                               _responseContentType
         std::map<std::string,HTTPCookieData>   _responseHTTPCookies;
@@ -107,11 +107,21 @@ namespace Santiago{namespace Fastcgi
         }
 
 
-        std::map<std::string,std::string>  parseNameValuePairs(const std::string& inString_) const; //TODO
-        void parseRequestGetData(); //TODO using parseNameValuePairs fn
+        std::map<std::string,std::string> parseNameValuePairs(const std::string& inString_) const; //TODO--           
+        void parseRequestGetData() //TODO using parseNameValuePairs fn
+        {
+            _requestGetData = parseNameValuePairs();
+        }
         void parseRequestPostData() //TODO using parseNameValuePairs fn
+        {
+            _requestPostData = parseNameValuePairs(_in);
+        }
 
-        void parseRequestHTTPCookies() const; //TODO
+        void parseRequestHTTPCookies() const //TODO
+        {
+            _requestHTTPCookies = parseNameValuePairs();
+        }
+        
 
     };
 
