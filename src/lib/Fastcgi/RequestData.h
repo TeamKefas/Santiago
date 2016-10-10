@@ -40,6 +40,30 @@
 
 namespace Santiago{namespace Fastcgi
 {
+    enum class MIMEType
+    {
+        TEXT,
+        HTML,
+        XML
+    };
+
+
+/**
+ * Thic structure represents 1 HTTP cookie to be sent to the client
+ */
+    struct HTTPCookieData
+    {
+        std::string                                     _value;
+        boost::optional<boost::posix_time::ptime>       _expiryTime;
+        boost::optional<std::string>                    _domain;
+        boost::optional<std::string>                    _path;
+        bool                                            _isSecure;
+        bool                                            _isHTTPOnly;
+
+        std::string    getCookieHeaderString() const; //TODO
+    };
+
+
 /**
  * Thic structure stores the input (from web network) and to be output (from the user
  * app) data of a request.
@@ -58,6 +82,13 @@ namespace Santiago{namespace Fastcgi
         std::ostream            _err;
         int                     _appStatus;
 
+        std::map<std::string, std::string>     _requestGetData;
+        std::map<std::string, std::string>     _requestPostData;
+        std::map<std::string,std::string>      _requestHTTPCookies;
+
+        MIMEType                               _responseContentType
+        std::map<std::string,HTTPCookieData>   _responseHTTPCookies;
+
         /**
          *The constructor
          */
@@ -70,8 +101,22 @@ namespace Santiago{namespace Fastcgi
         void parseFCGIParams()
         {
             ParsePairs(_paramsBuffer.data(),_paramsBuffer.size(),_paramsMap);
-        }        
+            parseRequestGetData();
+            parseRequestPostData();
+            parseRequestHTTPCookies();
+        }
+
+
+        std::map<std::string,std::string>  parseNameValuePairs(const std::string& inString_) const; //TODO
+        void parseRequestGetData(); //TODO using parseNameValuePairs fn
+        void parseRequestPostData() //TODO using parseNameValuePairs fn
+
+        void parseRequestHTTPCookies() const; //TODO
+
     };
+
+
+
 }}
 
 #endif
