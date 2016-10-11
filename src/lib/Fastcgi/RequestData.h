@@ -107,19 +107,19 @@ namespace Santiago{namespace Fastcgi
         }
 
 
-        std::map<std::string,std::string> parseNameValuePairs(const std::string& inString_) const; //TODO--           
-        void parseRequestGetData() //TODO using parseNameValuePairs fn
+        std::map<std::string,std::string> parseNameValuePairs(const std::string& inString_) const;            
+        void parseRequestGetData() 
         {
-            _requestGetData = parseNameValuePairs();
+            _requestGetData = parseNameValuePairs(_paramsMap["QUERY_STRING"]);
         }
-        void parseRequestPostData() //TODO using parseNameValuePairs fn
+        void parseRequestPostData() 
         {
             _requestPostData = parseNameValuePairs(_in);
         }
 
-        void parseRequestHTTPCookies() const //TODO
+        void parseRequestHTTPCookies() const
         {
-            _requestHTTPCookies = parseNameValuePairs();
+            _requestHTTPCookies = parseNameValuePairs(_paramsMap["HTTP_COOKIE"]);
         }
         
 
