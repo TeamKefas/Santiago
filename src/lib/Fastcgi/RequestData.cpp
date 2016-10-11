@@ -58,8 +58,8 @@ namespace Santiago{namespace Fastcgi
                     auto replace2 = str2.find(it->first);
                     while(replace2 != std::string::npos)
                     {
-                        str2.erase(replace1, 3);
-                        str2.insert(replace1, it->second);
+                        str2.erase(replace2, 3);
+                        str2.insert(replace2, it->second);
                         auto start = replace2 + 1;
                         replace2 = str2.find(it->first, start);
                     }
@@ -85,8 +85,8 @@ namespace Santiago{namespace Fastcgi
                 auto replace2 = str2.find(it->first);
                 while(replace2 != std::string::npos)
                 {
-                    str2.erase(replace1, 3);
-                    str2.insert(replace1, it->second);
+                    str2.erase(replace2, 3);
+                    str2.insert(replace2, it->second);
                     auto start = replace2 + 1;
                     replace2 = str2.find(it->first, start);
                 }
@@ -115,8 +115,8 @@ namespace Santiago{namespace Fastcgi
                     auto replace2 = str2.find(it->first);
                     while(replace2 != std::string::npos)
                     {
-                        str2.erase(replace1, 3);
-                        str2.insert(replace1, it->second);
+                        str2.erase(replace2, 3);
+                        str2.insert(replace2, it->second);
                         auto start = replace2 + 1;
                         replace2 = str2.find(it->first, start);
                     }
@@ -142,8 +142,8 @@ namespace Santiago{namespace Fastcgi
                 auto replace2 = str2.find(it->first);
                 while(replace2 != std::string::npos)
                 {
-                    str2.erase(replace1, 3);
-                    str2.insert(replace1, it->second);
+                    str2.erase(replace2, 3);
+                    str2.insert(replace2, it->second);
                     auto start = replace2 + 1;
                     replace2 = str2.find(it->first, start);
                 }
