@@ -107,10 +107,11 @@ namespace Santiago{namespace Fastcgi
             parseRequestHTTPCookies();
         }
 
+        std::pair<std::string, std::string> makeNameValuePairs(std::string &inString_,
+                                                               std::size_t start, std::size_t end);
 
         std::map<std::string,std::string> parseNameValuePairs(const std::string& inString_) const;
-        std::pair<std::string, std::string> stringSplitter(std::string &inString_, std::size_t start, std::size_t end);
-        
+         
         void parseRequestGetData() 
         {
             _requestGetData = parseNameValuePairs(_paramsMap["QUERY_STRING"]);

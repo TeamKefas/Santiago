@@ -3,10 +3,10 @@
 
 namespace Santiago{namespace Fastcgi
 {
-    std::pair<std::string, std::string> RequestData::stringSplitter(std::string &inString_,
-                                                                    std::size_t start, std::size_t end)
+    std::pair<std::string, std::string> RequestData::makeNameValuePairs(std::string &inString_,
+                                                                        std::size_t start, std::size_t end)
     {
-        std::map<std::string, std::string> toEscCharMap =
+        std::map<std::string, std::string> escCharMap =
             {{"%20", " "},
              {"%23", "#"},
              {"%24", "$"},
@@ -39,7 +39,7 @@ namespace Santiago{namespace Fastcgi
         std::string str1 = inString_.substr(start, newEnd);
         std::string str2 = inString_.substr(start + newEnd + 1, end - (start + newEnd + 1));
         for(std::map<std::std::ring, std::string>::const_iterator it =
-                toEscCharMap.begin(); it != toEscCharMap.end(); ++it)
+                escCharMap.begin(); it != escCharMap.end(); ++it)
         {
             auto str1ReplacePos = str1.find(it->first);
             while(str1ReplacePos != std::string::npos)
@@ -63,7 +63,7 @@ namespace Santiago{namespace Fastcgi
 
     std::map<std::string,std::string> RequestData::parseNameValuePairs(const std::string& inString_) const
     {
-        std::map<std::string, std::string> nameValueMap;
+        std::map<std::string, std::string> nameValuePairMap;
         char delimiter;
         auto start = 0U;
         auto test = inString_.find('&');
@@ -78,14 +78,14 @@ namespace Santiago{namespace Fastcgi
         auto end = inString_.find(delimiter);
         while(end != std::string::npos)
         {
-            std::pair<std::string, std::string> strPair = stringSplitter(inString_, start, end);
-            nameValueMap.insert(strPair);
+            std::pair<std::string, std::string> strPair = makeNameValuePairs(inString_, start, end);
+            nameValuePairMap.insert(strPair);
             start = end + 1;
             end = inString_.find(delimiter, start);
         }
-        std::pair<std::string, std::string> strPair = stringSplitter(inString_, start, end);
-        nameValueMap.insert(strPair);
-        return nameValueMap;    
+        std::pair<std::string, std::string> strPair = makeNameValuePairs(inString_, start, end);
+        nameValuePairMap.insert(strPair);
+        return nameValuePairMap;    
     }
 
     std::string HTTPCookieData::getCookieHeaderString() const
