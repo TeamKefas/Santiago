@@ -3,7 +3,7 @@
 
 namespace Santiago{namespace Fastcgi
 {
-    std::map<std::string,std::string>  parseNameValuePairs(const std::string& inString_) const
+    std::map<std::string,std::string> RequestData::parseNameValuePairs(const std::string& inString_) const
     {
         std::map<std::string, std::string> tempMap;
         std::map<std::string, std::string> escChar =
@@ -152,5 +152,43 @@ namespace Santiago{namespace Fastcgi
         }
         return tempMap;    
     }
-    
+
+    std::string HTTPCookieData::getCookieHeaderString() const
+    {
+        std::string cookieString;
+        cookieString.append("Set-cookie: ");
+        cookieString.append(_name);
+        cookieString.append("=");
+        cookieString.append(_value);
+        if(_expiryTime != NULL)
+        {
+            cookieString.append("; ");
+            cookieString.append("Expires=");
+            cookieString.append(_expiryTime);
+        }
+        if(_domain != NULL)
+        {
+            cookieString.append("; ");
+            cookieString.append("Domain=");
+            cookieString.append(_domain);
+        }
+        if(_path != NULL)
+        {
+            cookieString.append("; ");
+            cookieString.append("Path=");
+            cookieString.append(_path);
+        }
+        if(_isSecure)
+        {
+            cookieString.append("; ");
+            cookieString.append("Secure");
+        }
+        if(_isHTTPOnly)
+        {
+            cookieString.append("; ");
+            cookieString.append(HTTPOnly);
+        }
+        return cookieString;
+    }
+       
 }}
