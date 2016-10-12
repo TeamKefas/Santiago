@@ -108,7 +108,9 @@ namespace Santiago{namespace Fastcgi
         }
 
 
-        std::map<std::string,std::string> parseNameValuePairs(const std::string& inString_) const;            
+        std::map<std::string,std::string> parseNameValuePairs(const std::string& inString_) const;
+        std::pair<std::string, std::string> stringSplitter(std::string &inString_, std::size_t start, std::size_t end);
+        
         void parseRequestGetData() 
         {
             _requestGetData = parseNameValuePairs(_paramsMap["QUERY_STRING"]);

@@ -3,10 +3,10 @@
 
 namespace Santiago{namespace Fastcgi
 {
-    std::map<std::string,std::string> RequestData::parseNameValuePairs(const std::string& inString_) const
+    std::pair<std::string, std::string> RequestData::stringSplitter(std::string &inString_,
+                                                                    std::size_t start, std::size_t end)
     {
-        std::map<std::string, std::string> tempMap;
-        std::map<std::string, std::string> escChar =
+        std::map<std::string, std::string> toEscCharMap =
             {{"%20", " "},
              {"%23", "#"},
              {"%24", "$"},
@@ -34,123 +34,58 @@ namespace Santiago{namespace Fastcgi
              {"%2B", "+"},
              {"%2C", "-"}};
         
-        char delimiter1 = '&', delimiter2 = ';';
-        auto start = 0U;
-        auto end = s.find(delimiter1);
-        if(end != std::string::npos)
+        char delimiter = '=';
+        auto newEnd = inString_.substr(start, end).find(delimiter);
+        std::string str1 = inString_.substr(start, newEnd);
+        std::string str2 = inString_.substr(start + newEnd + 1, end - (start + newEnd + 1));
+        for(std::map<std::std::ring, std::string>::const_iterator it =
+                toEscCharMap.begin(); it != toEscCharMap.end(); ++it)
         {
-            while(end != std::string::npos)
+            auto str1ReplacePos = str1.find(it->first);
+            while(str1ReplacePos != std::string::npos)
             {
-                char delimiter = '=';
-                auto inEnd = inString_.substr(start, end).find(delimiter);
-                std::string str1 = inString_.substr(start, inEnd);
-                std::string str2 = inString_.substr(start + inEnd + 1, end-(start+inEnd+1));
-                for(std::map<std::string, std::string>::const_iterator it = escChar.begin(); it != escChar.end(); ++it)
-                {
-                    auto replace1 = str1.find(it->first);
-                    while(replace1 != std::string::npos)
-                    {
-                        str1.erase(replace1, 3);
-                        str1.insert(replace1, it->second);
-                        auto start = replace1 + 1;
-                        replace1 = str1.find(it->first, start);
-                    }
-                    auto replace2 = str2.find(it->first);
-                    while(replace2 != std::string::npos)
-                    {
-                        str2.erase(replace2, 3);
-                        str2.insert(replace2, it->second);
-                        auto start = replace2 + 1;
-                        replace2 = str2.find(it->first, start);
-                    }
-                }
-                tempMap.insert(make_pair(str1, str2));
-                start = end + 1;
-                end = inString_.find(delimiter1, start);
+                str1.erase(str1ReplacePos, 3);
+                str1.insert(str1ReplacePos, it->second);
+                auto start = str1ReplacePos + 1;
+                str1ReplacePos = str1.find(it->first, start);
             }
-            char delimiter = '=';
-            auto inEnd = inString_.substr(start, end).find(delimiter);
-            std::string str1 = inString_.substr(start, inEnd);
-            std::string str2 = inString_.substr(start + inEnd + 1, end-(start+inEnd+1));
-            for(std::map<std::string, std::string>::const_iterator it = escChar.begin(); it != escChar.end(); ++it)
+            auto str2ReplacePos = str2.find(it->first);
+            while(str2ReplacePos != std::string::npos)
             {
-                auto replace1 = str1.find(it->first);
-                while(replace1 != std::string::npos)
-                {
-                    str1.erase(replace1, 3);
-                    str1.insert(replace1, it->second);
-                    auto start = replace1 + 1;
-                    replace1 = str1.find(it->first, start);
-                }
-                auto replace2 = str2.find(it->first);
-                while(replace2 != std::string::npos)
-                {
-                    str2.erase(replace2, 3);
-                    str2.insert(replace2, it->second);
-                    auto start = replace2 + 1;
-                    replace2 = str2.find(it->first, start);
-                }
+                str2.erase(str2ReplacePos, 3);
+                str2.insert(str2ReplacePos, it->second);
+                auto start = str2ReplacePos + 1;
+                str2ReplacePos = str2.find(it->first, start);
             }
-            tempMap.insert(make_pair(str1, str2));
+        }
+        return make_pair(str1, str2);   
+    }
+
+    std::map<std::string,std::string> RequestData::parseNameValuePairs(const std::string& inString_) const
+    {
+        std::map<std::string, std::string> nameValueMap;
+        char delimiter;
+        auto start = 0U;
+        auto test = inString_.find('&');
+        if(test != std::string::npos)
+        {
+            delimiter = '&';
         }
         else
         {
-            auto end = inString_.find(delimiter2);
-            while(end != std::string::npos)
-            {
-                char delimiter = '=';
-                auto inEnd = inString_.substr(start, end).find(delimiter);
-                std::string str1 = inString_.substr(start, inEnd);
-                std::string str2 = inString_.substr(start + inEnd + 1, end-(start+inEnd+1));
-                for(std::map<std::string, std::string>::const_iterator it = escChar.begin(); it != escChar.end(); ++it)
-                {
-                    auto replace1 = str1.find(it->first);
-                    while(replace1 != std::string::npos)
-                    {
-                        str1.erase(replace1, 3);
-                        str1.insert(replace1, it->second);
-                        auto start = replace1 + 1;
-                        replace1 = str1.find(it->first, start);
-                    }
-                    auto replace2 = str2.find(it->first);
-                    while(replace2 != std::string::npos)
-                    {
-                        str2.erase(replace2, 3);
-                        str2.insert(replace2, it->second);
-                        auto start = replace2 + 1;
-                        replace2 = str2.find(it->first, start);
-                    }
-                }
-                tempMap.insert(make_pair(str1, str2));
-                start = end + 1;
-                end = inString_.find(delimiter2, start);
-            }
-            char delimiter = '=';
-            auto inEnd = inString_.substr(start, end).find(delimiter);
-            std::string str1 = inString_.substr(start, inEnd);
-            std::string str2 = inString_.substr(start + inEnd + 1, end-(start+inEnd+1));
-            for(std::map<std::string, std::string>::const_iterator it = escChar.begin(); it != escChar.end(); ++it)
-            {
-                auto replace1 = str1.find(it->first);
-                while(replace1 != std::string::npos)
-                {
-                    str1.erase(replace1, 3);
-                    str1.insert(replace1, it->second);
-                    auto start = replace1 + 1;
-                    replace1 = str1.find(it->first, start);
-                }
-                auto replace2 = str2.find(it->first);
-                while(replace2 != std::string::npos)
-                {
-                    str2.erase(replace2, 3);
-                    str2.insert(replace2, it->second);
-                    auto start = replace2 + 1;
-                    replace2 = str2.find(it->first, start);
-                }
-            }
-        tempMap.insert(make_pair(str1, str2));
+            delimiter = ';';
         }
-        return tempMap;    
+        auto end = inString_.find(delimiter);
+        while(end != std::string::npos)
+        {
+            std::pair<std::string, std::string> strPair = stringSplitter(inString_, start, end);
+            nameValueMap.insert(strPair);
+            start = end + 1;
+            end = inString_.find(delimiter, start);
+        }
+        std::pair<std::string, std::string> strPair = stringSplitter(inString_, start, end);
+        nameValueMap.insert(strPair);
+        return nameValueMap;    
     }
 
     std::string HTTPCookieData::getCookieHeaderString() const
