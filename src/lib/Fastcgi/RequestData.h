@@ -53,7 +53,9 @@ namespace Santiago{namespace Fastcgi
     struct RequestData
     {
         typedef std::map<std::string,std::string> ParamsMap;
+        typedef std::weak_ptr<IsRequestAlive> IsRequestAliveWeakPtr;
 
+        IsRequestAliveWeakPtr   _isRequestAliveWeakPtr;
         ParamsMap               _paramsMap;
         std::string             _paramsBuffer;
 
@@ -75,7 +77,8 @@ namespace Santiago{namespace Fastcgi
         /**
          *The constructor
          */
-        RequestData():
+        RequestData(const IsRequestAliveWeakPtr& isRequestAliveWeakPtr_):
+            _isRequestAliveWeakPtr(isRequestAliveWeakPtr_),
             _out(&_outBuffer),
             _err(&_errBuffer)
         {}

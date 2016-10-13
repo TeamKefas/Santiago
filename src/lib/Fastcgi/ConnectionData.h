@@ -36,7 +36,18 @@ namespace Santiago{ namespace Fastcgi
         typedef std::shared_ptr<IsRequestAlive> IsRequestAlivePtr;
         typedef std::weak_ptr<IsRequestAlive> IsRequestAliveWeakPtr;
 
-        typedef std::map<uint,std::pair<RequestStateFlags,RequestDataPtr> > RequestMap;
+        struct RequestStateInfo
+        {
+            RequestStateInfo(RequestStateFlags requestStateFlags_, const IsRequestAlivePtr& isRequestAlivePtr_):
+                _requestStateFlags(requestStateFlags_),
+                _isRequestAlivePtr(isRequestAlivePtr_)
+            {}
+            
+            RequestStateFlags _requestStateFlags;
+            IsRequestAlivePtr _isRequestAlivePtr;
+        };
+
+        typedef std::map<uint,std::pair<RequestStateInfo,RequestDataPtr> > RequestMap;
 
         typedef std::function<void(uint,RequestDataWeakPtr)> RequestReadyCallbackFn;
         typedef std::function<void()> EmptyCallbackFn;
@@ -47,8 +58,8 @@ namespace Santiago{ namespace Fastcgi
          * processing
          * @param emptyCallbackFn - called when the connection data becomes empty
          */
-        ConnectionData(RequestReadyCallbackFn requestReadyCallbackFn_,
-                       EmptyCallbackFn emptyCallbackFn_):
+        ConnectionData(const RequestReadyCallbackFn& requestReadyCallbackFn_,
+                       const EmptyCallbackFn& emptyCallbackFn_):
             _requestReadyCallbackFn(requestReadyCallbackFn_),
             _emptyCallbackFn(emptyCallbackFn_)   
         {}
@@ -68,8 +79,15 @@ namespace Santiago{ namespace Fastcgi
             if(_requestMap.find(requestId_) != _requestMap.end())
             {
                 throw std::runtime_error("requestId already exists");
-            }            
-            _requestMap[requestId_] = std::pair<RequestStateFlags,RequestDataPtr>(0/*0b00000000*/,RequestDataPtr(new RequestData()));            
+            }
+
+            RequestStateInfo requestStateInfo(0/*0b00000000*/,IsRequestAlivePtr(new IsRequestAlive()));
+            RequestDataPtr requestDataPtr(new RequestData(IsRequestAliveWeakPtr(requestStateInfo._isRequestAlivePtr)));
+
+            bool insertFlag = _requestMap.insert(
+                std::make_pair(requestId_,
+                               std::make_pair(requestStateInfo,requestDataPtr))).second;
+            BOOST_ASSERT(insertFlag);
         }
 
         /**
@@ -99,14 +117,14 @@ namespace Santiago{ namespace Fastcgi
             {
                 throw std::runtime_error("stdin requestId does not exist");
             }
-            if((iter->second.first & IN_COMPLETED) != 0)
+            if((iter->second.first._requestStateFlags & IN_COMPLETED) != 0)
             {
                 throw std::runtime_error("stdin already closed");
             }
 
             if(size_ == 0)
             {
-                iter->second.first |= IN_COMPLETED;
+                iter->second.first._requestStateFlags |= IN_COMPLETED;
             }
             else
             {
@@ -129,7 +147,7 @@ namespace Santiago{ namespace Fastcgi
             {
                 throw std::runtime_error("params requestId does not exist");
             }
-            if((iter->second.first & PARAMS_COMPLETED) != 0)
+            if((iter->second.first._requestStateFlags & PARAMS_COMPLETED) != 0)
             {
                 throw std::runtime_error("params already closed");
             }
@@ -137,7 +155,7 @@ namespace Santiago{ namespace Fastcgi
             if(size_ == 0)
             {
                 iter->second.second->parseFCGIParams();
-                iter->second.first |= PARAMS_COMPLETED;                
+                iter->second.first._requestStateFlags |= PARAMS_COMPLETED;                
             }
             else
             {
@@ -159,7 +177,8 @@ namespace Santiago{ namespace Fastcgi
                 throw std::runtime_error("requestId does not exist");
             }
 
-            BOOST_ASSERT((iter->second.first & IN_COMPLETED) != 0 && (iter->second.first & IN_COMPLETED) != 0);
+            BOOST_ASSERT((iter->second.first._requestStateFlags & IN_COMPLETED) != 0 && 
+                         (iter->second.first._requestStateFlags & IN_COMPLETED) != 0);
 
             _requestMap.erase(iter);  
           
@@ -219,7 +238,8 @@ namespace Santiago{ namespace Fastcgi
          */
         void checkForRequestReady(RequestMap::iterator iter_)
         {
-            if((iter_->second.first & PARAMS_COMPLETED) != 0 && (iter_->second.first & IN_COMPLETED) != 0)
+            if((iter_->second.first._requestStateFlags & PARAMS_COMPLETED) != 0 && 
+               (iter_->second.first._requestStateFlags & IN_COMPLETED) != 0)
             {
                 _requestReadyCallbackFn(iter_->first,RequestDataWeakPtr(iter_->second.second));
             }
