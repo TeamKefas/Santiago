@@ -14,6 +14,8 @@
 
 #include <boost/asio.hpp>
 
+#include "Error/ErrorCategory.h"
+
 #include "Common.h"
 #include "RequestData.h"
 #include "Connection.h"
@@ -30,10 +32,12 @@ namespace Santiago{namespace Fastcgi
     {
     public:
         typedef std::shared_ptr<RequestData> RequestDataPtr;
-        typedef std::weak_ptr<RequestData> RequestDataWeakPtr;
 
         typedef std::shared_ptr<Connection<Protocol> > ConnectionPtr;
         typedef std::weak_ptr<Connection<Protocol> > ConnectionWeakPtr;
+
+        typedef std::shared_ptr<IsRequestAlive> IsRequestAlivePtr;
+        typedef std::weak_ptr<IsRequestAlive> IsRequestAliveWeakPtr;
 
         typedef std::pair<unsigned,unsigned> RequestId;
 
@@ -51,17 +55,17 @@ namespace Santiago{namespace Fastcgi
          * The constructor
          * @param ioService_- the ioservice of the acceptor
          * @param requestId - the requestId of the request
-         * @param dataWeakptr_- weak ptr to the data
+         * @param dataPtr_- shared ptr to the data
          * @param connectionId - the id given to the connection by the acceptor
          * @param connectionWeakPtr - weak ptr to the connection
          */
         Request(boost::asio::io_service& ioService_,
                 uint requestId_,
-                RequestDataWeakPtr dataWeakPtr_,
+                RequestDataPtr dataPtr_,
                 uint connectionId_,
                 ConnectionWeakPtr connectionWeakPtr_):
             _requestId(requestId_),
-            _dataWeakPtr(dataWeakPtr_),
+            _dataPtr(dataPtr_),
             _connectionId(connectionId_),
             _connectionWeakPtr(connectionWeakPtr_),
             _hasReplied(false)
@@ -81,7 +85,7 @@ namespace Santiago{namespace Fastcgi
          */
         bool isValid()
         {
-            return ((!_hasReplied) && (_dataWeakPtr.lock() != NULL) && (_connectionWeakPtr.lock() != NULL));
+            return ((!_hasReplied) && (_dataPtr->_isRequestAliveWeakPtr.lock() != NULL) && (_connectionWeakPtr.lock() != NULL));
         }
 
         /**
@@ -91,13 +95,19 @@ namespace Santiago{namespace Fastcgi
          * the multiple commits from different threads are weeded out. But making this
          * thread safe using lock will allow for giving error messages to the user on
          * multiple writes from multiple threads.
+         * @param error code- sets to INVALID_FASTCGI_REQUEST if the request not valid
          */
-        void commit()
+        void commit(std::error_code& error_)
         {
             std::lock_guard<std::mutex> lock(_commitMutex);
-            std::pair<ConnectionPtr,RequestDataPtr> connectionRequestPair = getConnectionAndRequestData();
-            connectionRequestPair.first->commitReply(_requestId,connectionRequestPair.second);            
-            _dataWeakPtr.reset();
+            ConnectionPtr connectionPtr = checkRequestValidityAndGetConnectionPtr(error_);
+
+            if(!error_)
+            {
+                connectionPtr->commitReply(_requestId,_dataPtr);
+            }
+
+            _dataPtr.reset();
             _hasReplied = true;
         }
 
@@ -106,14 +116,19 @@ namespace Santiago{namespace Fastcgi
          * to commit except that all the data in the out buffer is emptied before
          * flushing. 
          */
-        void cancel()
+        void cancel(std::error_code& error_)
         {
             std::lock_guard<std::mutex> lock(_commitMutex);
-            std::pair<ConnectionPtr,RequestDataPtr> connectionRequestPair = getConnectionAndRequestData();
-            connectionRequestPair.second->_outBuffer.consume(connectionRequestPair.second->_outBuffer.size());
-            connectionRequestPair.second->_err<<"Request cancelled by application server";
-            connectionRequestPair.first->commitReply(_requestId,connectionRequestPair.second);            
-            _dataWeakPtr.reset();
+            ConnectionPtr connectionPtr = checkRequestValidityAndGetConnectionPtr(error_);
+
+            if(!error_)
+            {
+                _dataPtr->_outBuffer.consume(_dataPtr->_outBuffer.size());
+                _dataPtr->_err<<"Request cancelled by application server";
+                connectionPtr->commitReply(_requestId,_dataPtr);
+            }
+
+            _dataPtr.reset();
             _hasReplied = true;
         }
 
@@ -123,7 +138,7 @@ namespace Santiago{namespace Fastcgi
          */
         void setAppStatus(uint status_)
         {
-            getConnectionAndRequestData().second->_appStatus = status_;
+            _dataPtr->_appStatus = status_;
         }
 
         /**
@@ -131,7 +146,7 @@ namespace Santiago{namespace Fastcgi
          */
         const std::string& getStdinBuffer()
         {
-            return getConnectionAndRequestData().second->_in;
+            return _dataPtr->_in;
         }
 
         /**
@@ -139,41 +154,56 @@ namespace Santiago{namespace Fastcgi
          */
         RequestData::ParamsMap& getFCGIParams()
         {
-            return getConnectionAndRequestData().second->_paramsMap;
+            return _dataPtr->_paramsMap;
         }
 
         /**
          * returns the get name value pairs. //TODO---
          */
-        const std::map<std::string,std::string>& getGetData() const;
+        const std::map<std::string,std::string>& getGetData() const
+        {
+            return _dataPtr->_requestGetData;
+        }
         
 
         /**
          * returns the post name value pairs. //TODO
          */
-        const std::map<std::string,std::string>& getPostData() const;
+        const std::map<std::string,std::string>& getPostData() const
+        {
+            return _dataPtr->_requestPostData;
+        }
 
         /**
          * returns the cookie name value params received from server. //TODO
          */
-        const std::map<std::string,std::string>& getHTTPCookiesReceived() const;
+        const std::map<std::string,std::string>& getHTTPCookiesReceived() const
+        {
+            return _dataPtr->_requestHTTPCookies;
+        }
 
         /**
          * sets the content type to be sent to the user. Default Html
          */
-        void setContentMIMEType(MIMEType contentType_);
+        void setContentMIMEType(MIMEType contentType_)
+        {
+            return _dataPtr->_responseContentType = contentType_;
+        }
 
         /**
          * returns cookies to be sent to the user //TODO
          */
-        std::map<std::string,HTTPCookieData>& responseHTTPCookies();
+        std::map<std::string,HTTPCookieData>& responseHTTPCookies()
+        {
+            return _dataPtr->_responseHTTPCookies;
+        }
 
         /**
          * the error buffer of the request
          */
         std::ostream& err()
         {
-            return getConnectionAndRequestData().second->_err;
+            return _dataPtr->_err;
         }
 
         /**
@@ -181,7 +211,7 @@ namespace Santiago{namespace Fastcgi
          */
         std::ostream& out()
         {
-            return getConnectionAndRequestData().second->_out;
+            return _dataPtr->_out;
         }
 
        
@@ -190,46 +220,42 @@ namespace Santiago{namespace Fastcgi
          */
         ~Request()
         {
-            try
+            if(isValid())
             {
-                if(isValid())
-                {
-                    cancel();
-                }
-            }
-            catch(...)
-            {
-                BOOST_ASSERT(false);
+                std::error_code error;
+                cancel(error);
             }
         }
 
     private:
         /**
-         * Converts the connection and data weak ptrs to shared ptrs and returns. 
-         * Inability to convert indicates that the request/connection has be
-         * aborted/disconnected/flushed. An exception is called then which is passed 
-         * unhandled to the user by the public functions which calls this functions.
+         * Checks the validity of the request and Cnverts the connection ptrs to shared ptrs and returns. 
+         * Inability to convert indicates that the connection has been disconnected.
+         * @param error_ - can be INVALID_FASTCGI_REQUEST or FASTCGI_REQUEST_ALREADY_REPLIED
+         * @return - the connection shared_ptr
          */
-        std::pair<ConnectionPtr,RequestDataPtr> getConnectionAndRequestData()
+        ConnectionPtr checkRequestValidityAndGetConnectionPtr(std::error_code& error_)
         {
             if(_hasReplied)
             {
-                throw std::runtime_error("The request has already been committed or cancelled");
+                error_ = std::error_code(Error::FASTCGI_REQUEST_ALREADY_REPLIED, Error::ErrorCategory::GetInstance());
+                return ConnectionPtr();
             }
-            std::pair<ConnectionPtr,RequestDataPtr> ret(_connectionWeakPtr.lock(),_dataWeakPtr.lock());
-            if(ret.first == NULL || ret.second == NULL)
+
+            ConnectionPtr ret(_connectionWeakPtr.lock());
+            if(ret == NULL)
             {
-                throw std::runtime_error("The request is not active or aborted");
+                error_ = std::error_code(Error::INVALID_FASTCGI_REQUEST, Error::ErrorCategory::GetInstance());
             }
             return ret;
         }
 
-        std::mutex _commitMutex;
-        uint _requestId;
-        RequestDataWeakPtr _dataWeakPtr;
-        uint _connectionId;
-        ConnectionWeakPtr _connectionWeakPtr;
-        bool _hasReplied;
+        std::mutex               _commitMutex;
+        uint                     _requestId;
+        RequestDataPtr           _dataPtr;
+        uint                     _connectionId;
+        ConnectionWeakPtr        _connectionWeakPtr;
+        bool                     _hasReplied;
 
     };    
 }}

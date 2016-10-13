@@ -33,9 +33,8 @@ namespace Santiago{ namespace Fastcgi
         typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
 
         typedef std::shared_ptr<RequestData> RequestDataPtr;
-        typedef std::weak_ptr<RequestData> RequestDataWeakPtr;
 
-        typedef std::function<void(uint,RequestDataWeakPtr)> NewRequestCallbackFn;
+        typedef std::function<void(uint,RequestDataPtr)> NewRequestCallbackFn;
         typedef std::function<void()> CloseCallbackFn;
 
         enum State
@@ -113,7 +112,7 @@ namespace Santiago{ namespace Fastcgi
          * @param requestId_
          * @param newRequest_
          */
-        void handleRequestReady(uint requestId_,RequestDataWeakPtr newRequest_)
+        void handleRequestReady(uint requestId_,RequestDataPtr newRequest_)
         {
 //            BOOST_ASSERT(_state == OPEN);
             _newRequestCallbackFn(requestId_,newRequest_);

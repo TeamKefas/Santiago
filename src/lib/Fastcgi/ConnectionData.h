@@ -32,7 +32,7 @@ namespace Santiago{ namespace Fastcgi
         static const RequestStateFlags PARAMS_COMPLETED = 2;//0b00000010;
 
         typedef std::shared_ptr<RequestData> RequestDataPtr;
-        typedef std::weak_ptr<RequestData> RequestDataWeakPtr;
+
         typedef std::shared_ptr<IsRequestAlive> IsRequestAlivePtr;
         typedef std::weak_ptr<IsRequestAlive> IsRequestAliveWeakPtr;
 
@@ -49,7 +49,7 @@ namespace Santiago{ namespace Fastcgi
 
         typedef std::map<uint,std::pair<RequestStateInfo,RequestDataPtr> > RequestMap;
 
-        typedef std::function<void(uint,RequestDataWeakPtr)> RequestReadyCallbackFn;
+        typedef std::function<void(uint,RequestDataPtr)> RequestReadyCallbackFn;
         typedef std::function<void()> EmptyCallbackFn;
 
         /**
@@ -241,7 +241,7 @@ namespace Santiago{ namespace Fastcgi
             if((iter_->second.first._requestStateFlags & PARAMS_COMPLETED) != 0 && 
                (iter_->second.first._requestStateFlags & IN_COMPLETED) != 0)
             {
-                _requestReadyCallbackFn(iter_->first,RequestDataWeakPtr(iter_->second.second));
+                _requestReadyCallbackFn(iter_->first,iter_->second.second);
             }
         }
 

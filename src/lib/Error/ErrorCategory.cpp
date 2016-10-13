@@ -42,7 +42,9 @@ namespace Santiago{ namespace Error
              {DATABASE_QUERY_FAILED,         "Database query failed."},
              {USERNAME_ALREADY_EXISTS,       "Username already exists."},
              {INVALID_USERNAME_PASSWORD,     "Invalid username-password."},
-             {INVALID_SESSION_COOKIE,        "Invalid session cookie."}
+             {INVALID_SESSION_COOKIE,        "Invalid session cookie."},
+             {INVALID_FASTCGI_REQUEST,       "Invalud fastcgi request."},
+             {FASTCGI_REQUEST_ALREADY_REPLIED, "Fastcgi request already replied"}
          }
     {}
 

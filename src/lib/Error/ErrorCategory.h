@@ -14,6 +14,8 @@ namespace Santiago{ namespace Error
         USERNAME_ALREADY_EXISTS = 3,
         INVALID_USERNAME_PASSWORD = 4,
         INVALID_SESSION_COOKIE = 5,
+        INVALID_FASTCGI_REQUEST = 6,
+        FASTCGI_REQUEST_ALREADY_REPLIED = 7
     };
 
     class ErrorCategory:public std::error_category

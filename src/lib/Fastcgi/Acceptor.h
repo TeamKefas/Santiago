@@ -155,14 +155,8 @@ namespace Santiago{ namespace Fastcgi
          * @param requestid- received from the server
          * @param newRequestData - new filled in request data 
          */
-        void handleNewRequest(uint connectionId_,uint newRequestId_,std::weak_ptr<RequestData> newRequestData_)
+        void handleNewRequest(uint connectionId_,uint newRequestId_,const std::shared_ptr<RequestData>& newRequestData_)
         {
-            if(newRequestData_.lock() == NULL)
-            {   //request has already been destroyed by now...this check here is
-                //unnecessary..as it will be cheked when it is going to be used
-                return;
-            }
-
             BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             std::shared_ptr<Request<Protocol> > newRequest(new Request<Protocol>(_ioService,newRequestId_,newRequestData_,connectionId_,ConnectionWeakPtr(_activeConnections[connectionId_])));
             //post it in the acceptor's strand

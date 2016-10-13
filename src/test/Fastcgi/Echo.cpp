@@ -37,7 +37,8 @@ void requestHandlerStreamProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boo
 //    std::cout<<request_->getFCGIParams()[REQUEST_URI];
 
     request_->setAppStatus(0);
-    request_->commit();
+    std::error_code error;
+    request_->commit(error);
 }
 
 void requestHandlerTcpProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost::asio::ip::tcp> > request_)
@@ -53,7 +54,8 @@ void requestHandlerTcpProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost:
 //    std::cout<<request_->getFCGIParams()[REQUEST_URI];
 
     request_->setAppStatus(0);
-    request_->commit();
+    std::error_code error;
+    request_->commit(error);
 }
 
 void onSigintHandler(int signum_)
