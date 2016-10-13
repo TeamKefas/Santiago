@@ -14,7 +14,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/asio/streambuf.hpp>
-
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "Common.h"
 #include "PairParseFunctions.h"
@@ -53,6 +53,7 @@ namespace Santiago{namespace Fastcgi
     struct RequestData
     {
         typedef std::map<std::string,std::string> ParamsMap;
+
         ParamsMap               _paramsMap;
         std::string             _paramsBuffer;
 
@@ -68,13 +69,15 @@ namespace Santiago{namespace Fastcgi
         std::map<std::string, std::string>     _requestPostData;
         std::map<std::string, std::string>     _requestHTTPCookies;
 
-        MIMEType                               _responseContentType
+        MIMEType                               _responseContentType;
         std::map<std::string,HTTPCookieData>   _responseHTTPCookies;
 
         /**
          *The constructor
          */
-        RequestData():_out(&_outBuffer),_err(&_errBuffer)
+        RequestData():
+            _out(&_outBuffer),
+            _err(&_errBuffer)
         {}
 
         /**
@@ -102,7 +105,7 @@ namespace Santiago{namespace Fastcgi
             _requestPostData = parseNameValuePairs(_in);
         }
 
-        void parseRequestHTTPCookies() const
+        void parseRequestHTTPCookies()
         {
             _requestHTTPCookies = parseNameValuePairs(_paramsMap["HTTP_COOKIE"]);
         }

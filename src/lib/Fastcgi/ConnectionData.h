@@ -27,14 +27,16 @@ namespace Santiago{ namespace Fastcgi
     {
     public:
 
-        typedef unsigned char RequestState;
-        static const RequestState IN_COMPLETED     = 1;//0b00000001;
-        static const RequestState PARAMS_COMPLETED = 2;//0b00000010;
+        typedef unsigned char RequestStateFlags;
+        static const RequestStateFlags IN_COMPLETED     = 1;//0b00000001;
+        static const RequestStateFlags PARAMS_COMPLETED = 2;//0b00000010;
 
         typedef std::shared_ptr<RequestData> RequestDataPtr;
         typedef std::weak_ptr<RequestData> RequestDataWeakPtr;
+        typedef std::shared_ptr<IsRequestAlive> IsRequestAlivePtr;
+        typedef std::weak_ptr<IsRequestAlive> IsRequestAliveWeakPtr;
 
-        typedef std::map<uint,std::pair<RequestState,RequestDataPtr> > RequestMap;
+        typedef std::map<uint,std::pair<RequestStateFlags,RequestDataPtr> > RequestMap;
 
         typedef std::function<void(uint,RequestDataWeakPtr)> RequestReadyCallbackFn;
         typedef std::function<void()> EmptyCallbackFn;
@@ -67,7 +69,7 @@ namespace Santiago{ namespace Fastcgi
             {
                 throw std::runtime_error("requestId already exists");
             }            
-            _requestMap[requestId_] = std::pair<RequestState,RequestDataPtr>(0/*0b00000000*/,RequestDataPtr(new RequestData()));            
+            _requestMap[requestId_] = std::pair<RequestStateFlags,RequestDataPtr>(0/*0b00000000*/,RequestDataPtr(new RequestData()));            
         }
 
         /**

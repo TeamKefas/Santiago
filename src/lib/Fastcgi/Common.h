@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <boost/assert.hpp>
+#include <boost/optional.hpp>
 
 #define MAX_REQUEST_PER_CONNECTION 1
 
@@ -24,6 +25,8 @@ namespace Santiago{ namespace Fastcgi
         SOCKET_CLOSED,
         CONNECTION_WIND_DOWN
     };
+
+    struct IsRequestAlive{};
 }}
     
 #endif
