@@ -78,16 +78,35 @@ namespace Santiago{ namespace Fastcgi
          * Synchronously send the reply. This function is called by the connection and
          * is always called in the connection's strand.
          * @param requestId
+         * @param httpHeaderOut - http headers sent back
          * @param outBuffer
          * @param errBuffer
          * @param appStatus - set by the user
          * @param error code
          */
-        void sendReply(uint requestId_,boost::asio::streambuf &outBuffer_,boost::asio::streambuf& errBuffer_,int appStatus_,boost::system::error_code &ec_)
+        void sendReply(uint requestId_,
+                       boost::asio::streambuf &httpHeaderOutBuffer_,
+                       boost::asio::streambuf &outBuffer_,
+                       boost::asio::streambuf& errBuffer_,
+                       int appStatus_,
+                       boost::system::error_code &ec_)
         {
 //            BOOST_ASSERT((this->_state & SocketBase<Protocol,Socket>::INTERNAL_CLOSED)== 0);
 
-            std::string outputBuffer;
+            if(httpHeaderOutBuffer_.size() != 0)
+            {
+                const char* httpHeaderOutBufferArray = 
+                    boost::asio::buffer_cast<const char*>(httpHeaderOutBuffer_.data());
+                _packetSocketPtr->writePacket(requestId_,
+                                              FCGI_STDOUT,
+                                              httpHeaderOutBuffer_.size(),
+                                              httpHeaderOutBufferArray,ec_);
+                if(ec_)
+                {
+                    return;
+                }
+                httpHeaderOutBuffer_.consume(httpHeaderOutBuffer_.size());
+            }
 
             if(outBuffer_.size() != 0)
             {

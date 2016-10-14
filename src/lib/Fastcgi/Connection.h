@@ -177,7 +177,16 @@ namespace Santiago{ namespace Fastcgi
                 return;
             }
             boost::system::error_code ec;
-            _recordSocket.sendReply(requestId_,requestData_->_outBuffer,requestData_->_errBuffer,requestData_->_appStatus,ec);
+            boost::asio::streambuf httpHeaderOutBuffer;
+            std::ostream httpHeaderOut(&httpHeaderOutBuffer);
+            requestData_->fillHTTPHeaderData(httpHeaderOut);
+
+            _recordSocket.sendReply(requestId_,
+                                    httpHeaderOutBuffer,
+                                    requestData_->_outBuffer,
+                                    requestData_->_errBuffer,
+                                    requestData_->_appStatus,
+                                    ec);
             if(!ec) 
             {
                 _data.cleanupRequest(requestId_);

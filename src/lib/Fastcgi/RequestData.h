@@ -9,7 +9,7 @@
  */
 
 #include <string>
-#include <map>
+#include <set>
 #include <ostream>
 
 #include <boost/asio.hpp>
@@ -42,8 +42,11 @@ namespace Santiago{namespace Fastcgi
         bool                                            _isSecure;
         bool                                            _isHTTPOnly;
 
-        std::string    getCookieHeaderString() const; //TODO
+        std::string    getSetCookieHeaderString() const; //TODO
     };
+
+    bool operator < (const HTTPCookieData& lhs_ , const HTTPCookieData& rhs_) {return (lhs_._name < rhs_._name);}
+    
 
 
 /**
@@ -52,6 +55,9 @@ namespace Santiago{namespace Fastcgi
  */
     struct RequestData
     {
+
+//        static const std::map<MIMEType,std::string>& getMIMETypeStringMap();
+
         typedef std::map<std::string,std::string> ParamsMap;
         typedef std::weak_ptr<IsRequestAlive> IsRequestAliveWeakPtr;
 
@@ -63,6 +69,7 @@ namespace Santiago{namespace Fastcgi
         
         boost::asio::streambuf  _outBuffer;
         boost::asio::streambuf  _errBuffer;
+
         std::ostream            _out;
         std::ostream            _err;
         int                     _appStatus;
@@ -72,7 +79,9 @@ namespace Santiago{namespace Fastcgi
         std::map<std::string, std::string>     _requestHTTPCookies;
 
         MIMEType                               _responseContentType;
-        std::map<std::string,HTTPCookieData>   _responseHTTPCookies;
+        std::set<HTTPCookieData>               _responseHTTPCookies;
+
+        std::map<MIMEType,std::string>         _mimeTypeStringMap;
 
         /**
          *The constructor
@@ -80,8 +89,11 @@ namespace Santiago{namespace Fastcgi
         RequestData(const IsRequestAliveWeakPtr& isRequestAliveWeakPtr_):
             _isRequestAliveWeakPtr(isRequestAliveWeakPtr_),
             _out(&_outBuffer),
-            _err(&_errBuffer)
-        {}
+            _err(&_errBuffer),
+            _mimeTypeStringMap{{MIMEType::TEXT,"text/plain"},
+                               {MIMEType::HTML,"text/html"}}
+        {           
+        }
 
         /**
          *Parse the data in param buffer and store it as map
@@ -98,11 +110,12 @@ namespace Santiago{namespace Fastcgi
                                                                std::size_t start, std::size_t end);
 
         std::map<std::string,std::string> parseNameValuePairs(const std::string& inString_) const;
-         
-        void parseRequestGetData() 
+
+        void parseRequestGetData()
         {
             _requestGetData = parseNameValuePairs(_paramsMap["QUERY_STRING"]);
         }
+
         void parseRequestPostData() 
         {
             _requestPostData = parseNameValuePairs(_in);
@@ -111,6 +124,18 @@ namespace Santiago{namespace Fastcgi
         void parseRequestHTTPCookies()
         {
             _requestHTTPCookies = parseNameValuePairs(_paramsMap["HTTP_COOKIE"]);
+        }
+
+        void fillHTTPHeaderData(std::ostream& out_) const
+        {
+            for(std::set<HTTPCookieData>::const_iterator iter = _responseHTTPCookies.begin();
+                iter != _responseHTTPCookies.end();
+                ++iter)
+            {
+                out_<<iter->getSetCookieHeaderString();
+            }
+
+            out_<<"Content-Type: "<<_mimeTypeStringMap.find(_responseContentType)->second<<"\r\n\r\n";
         }
         
 

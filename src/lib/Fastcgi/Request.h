@@ -187,13 +187,13 @@ namespace Santiago{namespace Fastcgi
          */
         void setContentMIMEType(MIMEType contentType_)
         {
-            return _dataPtr->_responseContentType = contentType_;
+            _dataPtr->_responseContentType = contentType_;
         }
 
         /**
          * returns cookies to be sent to the user //TODO
          */
-        std::map<std::string,HTTPCookieData>& responseHTTPCookies()
+        std::set<HTTPCookieData>& responseHTTPCookies()
         {
             return _dataPtr->_responseHTTPCookies;
         }

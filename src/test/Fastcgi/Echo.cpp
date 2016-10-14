@@ -26,10 +26,49 @@
 
 void requestHandlerStreamProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost::asio::local::stream_protocol> > request_)
 {
-    request_->out()<<"Content-Type: text/plain\r\n\r\n"<<"Echo - Unix Socket Version\n";
-    std::map<std::string,std::string> &fcgiParams = request_->getFCGIParams(); 
+
+    Santiago::Fastcgi::HTTPCookieData cookieData;
+    cookieData._name = "name1";
+    cookieData._value = "val1";
+    cookieData._expiryTime = boost::posix_time::second_clock::universal_time();
+    cookieData._isHTTPOnly = true;
+
+    bool flag = request_->responseHTTPCookies().insert(cookieData).second;
+    BOOST_ASSERT(flag);
+
+    request_->setContentMIMEType(Santiago::Fastcgi::MIMEType::TEXT);
+    request_->out()<<"Echo - Unix Socket Version\n"<<"FCGI Params:\n";
+
+    const std::map<std::string,std::string>& fcgiParams = request_->getFCGIParams(); 
     
-    for(std::map<std::string,std::string>::iterator iter = fcgiParams.begin();iter != fcgiParams.end();iter++)
+    for(std::map<std::string,std::string>::const_iterator iter = fcgiParams.begin();iter != fcgiParams.end();iter++)
+    {
+        request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
+    }
+
+    request_->out()<<"Cookies:\n";
+    
+    const std::map<std::string,std::string>& cookies = request_->getHTTPCookiesReceived(); 
+    
+    for(std::map<std::string,std::string>::const_iterator iter = cookies.begin();iter != cookies.end();iter++)
+    {
+        request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
+    }
+
+    request_->out()<<"Get query data:\n";
+    
+    const std::map<std::string,std::string>& getData = request_->getGetData(); 
+    
+    for(std::map<std::string,std::string>::const_iterator iter = getData.begin();iter != getData.end();iter++)
+    {
+        request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
+    }
+
+    request_->out()<<"Post data:\n";
+    
+    const std::map<std::string,std::string>& postData = request_->getPostData(); 
+    
+    for(std::map<std::string,std::string>::const_iterator iter = postData.begin();iter != postData.end();iter++)
     {
         request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
     }
@@ -43,10 +82,49 @@ void requestHandlerStreamProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boo
 
 void requestHandlerTcpProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost::asio::ip::tcp> > request_)
 {
-    request_->out()<<"Content-Type: text/plain\r\n\r\n"<<"Echo - Tcp Socket Version\n";
-    std::map<std::string,std::string> &fcgiParams = request_->getFCGIParams(); 
+
+    Santiago::Fastcgi::HTTPCookieData cookieData;
+    cookieData._name = "name1";
+    cookieData._value = "val1";
+    cookieData._expiryTime = boost::posix_time::second_clock::universal_time();
+    cookieData._isHTTPOnly = true;
+
+    bool flag = request_->responseHTTPCookies().insert(cookieData).second;
+    BOOST_ASSERT(flag);
+
+    request_->setContentMIMEType(Santiago::Fastcgi::MIMEType::TEXT);
+    request_->out()<<"Echo - Tcp Socket Version\n"<<"FCGI Params:\n";
+
+    const std::map<std::string,std::string>& fcgiParams = request_->getFCGIParams(); 
     
-    for(std::map<std::string,std::string>::iterator iter = fcgiParams.begin();iter != fcgiParams.end();iter++)
+    for(std::map<std::string,std::string>::const_iterator iter = fcgiParams.begin();iter != fcgiParams.end();iter++)
+    {
+        request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
+    }
+
+    request_->out()<<"Cookies:\n";
+    
+    const std::map<std::string,std::string>& cookies = request_->getHTTPCookiesReceived(); 
+    
+    for(std::map<std::string,std::string>::const_iterator iter = cookies.begin();iter != cookies.end();iter++)
+    {
+        request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
+    }
+
+    request_->out()<<"Get query data:\n";
+    
+    const std::map<std::string,std::string>& getData = request_->getGetData(); 
+    
+    for(std::map<std::string,std::string>::const_iterator iter = getData.begin();iter != getData.end();iter++)
+    {
+        request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
+    }
+
+    request_->out()<<"Post data:\n";
+    
+    const std::map<std::string,std::string>& postData = request_->getPostData(); 
+    
+    for(std::map<std::string,std::string>::const_iterator iter = postData.begin();iter != postData.end();iter++)
     {
         request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
     }
