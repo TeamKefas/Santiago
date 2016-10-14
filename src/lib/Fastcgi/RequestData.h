@@ -11,6 +11,7 @@
 #include <string>
 #include <set>
 #include <ostream>
+#include <sstream>
 
 #include <boost/asio.hpp>
 #include <boost/asio/streambuf.hpp>
@@ -45,7 +46,7 @@ namespace Santiago{namespace Fastcgi
         std::string    getSetCookieHeaderString() const; //TODO
     };
 
-    bool operator < (const HTTPCookieData& lhs_ , const HTTPCookieData& rhs_) {return (lhs_._name < rhs_._name);}
+    bool operator < (const HTTPCookieData& lhs_ , const HTTPCookieData& rhs_);
     
 
 
@@ -106,8 +107,8 @@ namespace Santiago{namespace Fastcgi
             parseRequestHTTPCookies();
         }
 
-        std::pair<std::string, std::string> makeNameValuePairs(std::string &inString_,
-                                                               std::size_t start, std::size_t end);
+        std::pair<std::string, std::string> makeNameValuePairs(const std::string &inString_,
+                                                               std::size_t start, std::size_t end) const;
 
         std::map<std::string,std::string> parseNameValuePairs(const std::string& inString_) const;
 
@@ -136,6 +137,11 @@ namespace Santiago{namespace Fastcgi
             }
 
             out_<<"Content-Type: "<<_mimeTypeStringMap.find(_responseContentType)->second<<"\r\n\r\n";
+            std::cout<<boost::asio::buffer_cast<const char*>(static_cast<boost::asio::streambuf*>(out_.rdbuf())->data());
+            //std::stringstream ss;
+            //ss << out_.rdbuf();
+            //std::cout<<ss.str();
+            
         }
         
 

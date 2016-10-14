@@ -30,7 +30,7 @@ void requestHandlerStreamProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boo
     Santiago::Fastcgi::HTTPCookieData cookieData;
     cookieData._name = "name1";
     cookieData._value = "val1";
-    cookieData._expiryTime = boost::posix_time::second_clock::universal_time();
+    //cookieData._expiryTime = boost::posix_time::second_clock::universal_time()+ boost::posix_time::seconds(900);
     cookieData._isHTTPOnly = true;
 
     bool flag = request_->responseHTTPCookies().insert(cookieData).second;
@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
       boost::asio::io_service io_service;
 
       std::remove(argv[1]);
-      Santiago::Fastcgi::Acceptor<boost::asio::local::stream_protocol> acceptor(io_service,Santiago::LocalEndpoint<boost::asio::local::stream_protocol>("/tmp/fastcgi-unix-echo.socket"),std::bind(&requestHandlerStreamProtocol,std::placeholders::_1));
+      /* Santiago::Fastcgi::Acceptor<boost::asio::local::stream_protocol> acceptor(io_service,Santiago::LocalEndpoint<boost::asio::local::stream_protocol>("/tmp/fastcgi-unix-echo.socket"),std::bind(&requestHandlerStreamProtocol,std::placeholders::_1));*/
 
       Santiago::Fastcgi::Acceptor<boost::asio::ip::tcp> acceptor1(io_service,Santiago::LocalEndpoint<boost::asio::ip::tcp> (7000),std::bind(&requestHandlerTcpProtocol,std::placeholders::_1));
 

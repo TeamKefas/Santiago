@@ -3,8 +3,8 @@
 
 namespace Santiago{namespace Fastcgi
 {
-    std::pair<std::string, std::string> RequestData::makeNameValuePairs(std::string &inString_,
-                                                                        std::size_t start, std::size_t end)
+    std::pair<std::string, std::string> RequestData::makeNameValuePairs(const std::string &inString_,
+                                                                        std::size_t start, std::size_t end) const
     {
         std::map<std::string, std::string> escCharMap =
             {{"%20", " "},
@@ -38,7 +38,7 @@ namespace Santiago{namespace Fastcgi
         auto newEnd = inString_.substr(start, end).find(delimiter);
         std::string str1 = inString_.substr(start, newEnd);
         std::string str2 = inString_.substr(start + newEnd + 1, end - (start + newEnd + 1));
-        for(std::map<std::std::ring, std::string>::const_iterator it =
+        for(std::map<std::string, std::string>::const_iterator it =
                 escCharMap.begin(); it != escCharMap.end(); ++it)
         {
             auto str1ReplacePos = str1.find(it->first);
@@ -88,30 +88,32 @@ namespace Santiago{namespace Fastcgi
         return nameValuePairMap;    
     }
 
-    std::string HTTPCookieData::getCookieHeaderString() const
+    std::string HTTPCookieData::getSetCookieHeaderString() const
     {
         std::string cookieString;
         cookieString.append("Set-cookie: ");
         cookieString.append(_name);
         cookieString.append("=");
         cookieString.append(_value);
-        if(_expiryTime != NULL)
+        if(_expiryTime)
         {
             cookieString.append("; ");
             cookieString.append("Expires=");
-            cookieString.append(_expiryTime);
+            std::stringstream stream;
+            stream << *_expiryTime;
+            cookieString.append(stream.str());
         }
-        if(_domain != NULL)
+        if(_domain)
         {
             cookieString.append("; ");
             cookieString.append("Domain=");
-            cookieString.append(_domain);
+            cookieString.append(*_domain);
         }
-        if(_path != NULL)
+        if(_path)
         {
             cookieString.append("; ");
             cookieString.append("Path=");
-            cookieString.append(_path);
+            cookieString.append(*_path);
         }
         if(_isSecure)
         {
@@ -121,9 +123,11 @@ namespace Santiago{namespace Fastcgi
         if(_isHTTPOnly)
         {
             cookieString.append("; ");
-            cookieString.append(HTTPOnly);
+            cookieString.append("HTTPOnly");
         }
+        cookieString.append("\n");
         return cookieString;
     }
+    bool operator < (const HTTPCookieData& lhs_ , const HTTPCookieData& rhs_) {return (lhs_._name < rhs_._name);}
        
 }}
