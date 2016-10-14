@@ -1,4 +1,5 @@
-set(Fastcgi_SRCS Dummy.cpp)
+set(Fastcgi_SRCS Dummy.cpp
+ RequestData.cpp)
 
 if(WIN32)
   set(Fastcgi_SRCS ${fastcgi_devkit_SRCS}
