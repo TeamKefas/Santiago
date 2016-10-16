@@ -35,6 +35,12 @@ namespace Santiago{namespace Fastcgi
  */
     struct HTTPCookieData
     {
+        HTTPCookieData():
+        _isSecure(false),
+        _isHTTPOnly(false)
+        {}
+
+
         std::string                                     _name;
         std::string                                     _value;
         boost::optional<boost::posix_time::ptime>       _expiryTime;

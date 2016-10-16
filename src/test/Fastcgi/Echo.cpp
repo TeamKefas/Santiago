@@ -30,7 +30,7 @@ void requestHandlerStreamProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boo
     Santiago::Fastcgi::HTTPCookieData cookieData;
     cookieData._name = "name1";
     cookieData._value = "val1";
-    //cookieData._expiryTime = boost::posix_time::second_clock::universal_time()+ boost::posix_time::seconds(900);
+    cookieData._expiryTime = boost::posix_time::second_clock::local_time()+ boost::posix_time::seconds(900);
     cookieData._isHTTPOnly = true;
 
     bool flag = request_->responseHTTPCookies().insert(cookieData).second;
@@ -86,8 +86,8 @@ void requestHandlerTcpProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost:
     Santiago::Fastcgi::HTTPCookieData cookieData;
     cookieData._name = "name1";
     cookieData._value = "val1";
-    cookieData._expiryTime = boost::posix_time::second_clock::universal_time();
-    cookieData._isHTTPOnly = true;
+    cookieData._expiryTime = boost::posix_time::second_clock::local_time() + boost::posix_time::seconds(900);
+//    cookieData._isHTTPOnly = true;
 
     bool flag = request_->responseHTTPCookies().insert(cookieData).second;
     BOOST_ASSERT(flag);
