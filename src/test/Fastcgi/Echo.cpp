@@ -27,7 +27,7 @@
 void requestHandlerStreamProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost::asio::local::stream_protocol> > request_)
 {
 
-    Santiago::Fastcgi::HTTPCookieData cookieData;
+    Santiago::HTTPCookieData cookieData;
     cookieData._name = "name1";
     cookieData._value = "val1";
     cookieData._expiryTime = boost::posix_time::second_clock::local_time()+ boost::posix_time::seconds(900);
@@ -36,7 +36,7 @@ void requestHandlerStreamProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boo
     bool flag = request_->responseHTTPCookies().insert(cookieData).second;
     BOOST_ASSERT(flag);
 
-    request_->setContentMIMEType(Santiago::Fastcgi::MIMEType::TEXT);
+    request_->setContentMIMEType(Santiago::MIMEType::TEXT);
     request_->out()<<"Echo - Unix Socket Version\n"<<"FCGI Params:\n";
 
     const std::map<std::string,std::string>& fcgiParams = request_->getFCGIParams(); 
@@ -83,7 +83,7 @@ void requestHandlerStreamProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boo
 void requestHandlerTcpProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost::asio::ip::tcp> > request_)
 {
 
-    Santiago::Fastcgi::HTTPCookieData cookieData;
+    Santiago::HTTPCookieData cookieData;
     cookieData._name = "name1";
     cookieData._value = "val1";
     cookieData._expiryTime = boost::posix_time::second_clock::local_time() + boost::posix_time::seconds(900);
@@ -92,7 +92,7 @@ void requestHandlerTcpProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost:
     bool flag = request_->responseHTTPCookies().insert(cookieData).second;
     BOOST_ASSERT(flag);
 
-    request_->setContentMIMEType(Santiago::Fastcgi::MIMEType::TEXT);
+    request_->setContentMIMEType(Santiago::MIMEType::TEXT);
     request_->out()<<"Echo - Tcp Socket Version\n"<<"FCGI Params:\n";
 
     const std::map<std::string,std::string>& fcgiParams = request_->getFCGIParams(); 

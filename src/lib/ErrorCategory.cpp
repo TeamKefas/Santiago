@@ -2,7 +2,7 @@
 
 #include "ErrorCategory.h"
 
-namespace Santiago{ namespace Error
+namespace Santiago
 {
     std::error_condition ErrorCategory::default_error_condition(int code_) const noexcept
     {
@@ -37,15 +37,15 @@ namespace Santiago{ namespace Error
     ErrorCategory::ErrorCategory()
         :_errorValueDescriptionMap
          {
-             {SUCCESS,                       "Success."},
-             {DATABASE_EXCEPTION,            "Database exception."},
-             {DATABASE_QUERY_FAILED,         "Database query failed."},
-             {USERNAME_ALREADY_EXISTS,       "Username already exists."},
-             {INVALID_USERNAME_PASSWORD,     "Invalid username-password."},
-             {INVALID_SESSION_COOKIE,        "Invalid session cookie."},
-             {INVALID_FASTCGI_REQUEST,       "Invalud fastcgi request."},
-             {FASTCGI_REQUEST_ALREADY_REPLIED, "Fastcgi request already replied"}
+             {ERR_SUCCESS,                         "Success."},
+             {ERR_DATABASE_EXCEPTION,              "Database exception."},
+             {ERR_DATABASE_QUERY_FAILED,           "Database query failed."},
+             {ERR_USERNAME_ALREADY_EXISTS,         "Username already exists."},
+             {ERR_INVALID_USERNAME_PASSWORD,       "Invalid username-password."},
+             {ERR_INVALID_SESSION_COOKIE,          "Invalid session cookie."},
+             {ERR_INVALID_FASTCGI_REQUEST,         "Invalud fastcgi request."},
+             {ERR_FASTCGI_REQUEST_ALREADY_REPLIED, "Fastcgi request already replied"}
          }
     {}
 
-}}
+}

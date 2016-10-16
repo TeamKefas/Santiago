@@ -8,9 +8,10 @@
 
 #include <boost/optional.hpp>
 
+#include "ErrorCategory.h"
+
 #include "DatabaseRecords.h"
 #include "Definitions.h"
-#include "Error/ErrorCategory.h"
 
 #include <boost/property_tree/ptree.hpp>
 

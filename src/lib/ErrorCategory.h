@@ -1,21 +1,21 @@
-#ifndef SANTIAGO_ERROR_ERRORCATEGORY_H
-#define SANTIAGO_ERROR_ERRORCATEGORY_H
+#ifndef SANTIAGO_ERRORCATEGORY_H
+#define SANTIAGO_ERRORCATEGORY_H
 
 #include <map>
 #include <system_error>
 
-namespace Santiago{ namespace Error
+namespace Santiago
 {
     enum ErrorCode
     {
-        SUCCESS = 0,
-        DATABASE_EXCEPTION = 1,
-        DATABASE_QUERY_FAILED = 2,
-        USERNAME_ALREADY_EXISTS = 3,
-        INVALID_USERNAME_PASSWORD = 4,
-        INVALID_SESSION_COOKIE = 5,
-        INVALID_FASTCGI_REQUEST = 6,
-        FASTCGI_REQUEST_ALREADY_REPLIED = 7
+        ERR_SUCCESS = 0,
+        ERR_DATABASE_EXCEPTION = 1,
+        ERR_DATABASE_QUERY_FAILED = 2,
+        ERR_USERNAME_ALREADY_EXISTS = 3,
+        ERR_INVALID_USERNAME_PASSWORD = 4,
+        ERR_INVALID_SESSION_COOKIE = 5,
+        ERR_INVALID_FASTCGI_REQUEST = 6,
+        ERR_FASTCGI_REQUEST_ALREADY_REPLIED = 7
     };
 
     class ErrorCategory:public std::error_category
@@ -38,5 +38,5 @@ namespace Santiago{ namespace Error
         std::map<int,std::string>  _errorValueDescriptionMap;
 
     };
-}} 
+}
 #endif

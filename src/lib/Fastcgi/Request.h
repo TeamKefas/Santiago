@@ -14,7 +14,7 @@
 
 #include <boost/asio.hpp>
 
-#include "Error/ErrorCategory.h"
+#include "ErrorCategory.h"
 
 #include "Common.h"
 #include "RequestData.h"
@@ -238,14 +238,14 @@ namespace Santiago{namespace Fastcgi
         {
             if(_hasReplied)
             {
-                error_ = std::error_code(Error::FASTCGI_REQUEST_ALREADY_REPLIED, Error::ErrorCategory::GetInstance());
+                error_ = std::error_code(ERR_FASTCGI_REQUEST_ALREADY_REPLIED, ErrorCategory::GetInstance());
                 return ConnectionPtr();
             }
 
             ConnectionPtr ret(_connectionWeakPtr.lock());
             if(ret == NULL)
             {
-                error_ = std::error_code(Error::INVALID_FASTCGI_REQUEST, Error::ErrorCategory::GetInstance());
+                error_ = std::error_code(ERR_INVALID_FASTCGI_REQUEST, ErrorCategory::GetInstance());
             }
             return ret;
         }

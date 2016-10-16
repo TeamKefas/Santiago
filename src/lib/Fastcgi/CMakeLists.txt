@@ -16,4 +16,4 @@ if(WIN32)
 endif(WIN32)
 
 add_library(Fastcgi STATIC ${Fastcgi_SRCS})
-target_link_libraries(Fastcgi Error ${Boost_LIBRARIES})
+target_link_libraries(Fastcgi ${Boost_LIBRARIES})
