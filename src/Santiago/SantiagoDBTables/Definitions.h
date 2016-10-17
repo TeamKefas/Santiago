@@ -19,6 +19,7 @@ namespace Santiago{ namespace SantiagoDBTables
     extern const std::map<std::string, std::string> alphabetDigit;
     extern const std::map<std::string, std::string> digitAlphabet;
 
+    static const int INVALID_DATABASE_ID = -1;
 }}
 
 #endif    

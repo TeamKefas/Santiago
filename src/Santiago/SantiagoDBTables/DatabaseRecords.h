@@ -13,6 +13,9 @@ namespace Santiago{ namespace SantiagoDBTables
             
     struct UserProfilesRec
     {
+        UserProfilesRec():_id(INVALID_DATABASE_ID)
+        {}
+
         int _id;
         std::string _userName;
         std::string _password;
@@ -20,15 +23,22 @@ namespace Santiago{ namespace SantiagoDBTables
     
     struct SessionsRec
     {
-        int _id;
-        std::string _userName;
-        std::string _cookieId;
-        ptime _loginTime;
-        ptime _logoutTime;  
+        SessionsRec():_id(INVALID_DATABASE_ID)
+        {}
+
+        int                      _id;
+        std::string              _userName;
+        std::string              _cookieString;
+        ptime                    _loginTime;
+        boost::optional<ptime>   _logoutTime;
+        ptime                    _lastUpdateTime;
     };
         
     struct PermissionsRec
     {
+        PermissionsRec():_id(INVALID_DATABASE_ID)
+        {}
+
         int _id;
         int _resId;
         std::string _userName;
