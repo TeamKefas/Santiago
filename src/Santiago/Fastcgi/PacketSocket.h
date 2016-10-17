@@ -14,7 +14,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/streambuf.hpp>
 
-#include "fastcgi_devkit/fastcgi.h"
+#include "../fastcgi_devkit/fastcgi.h"
 
 #include "Common.h"
 

@@ -34,8 +34,8 @@
 
 #include <boost/asio.hpp>
 
-#include "Santiago/LocalEndpoint.h"
-#include "Santiago/Fastcgi/Acceptor.h"
+#include "../LocalEndpoint.h"
+#include "../Fastcgi/Acceptor.h"
 
 #include "RequestHandler.h"
 #define NO_OF_ASIO_USER_THREADS 5

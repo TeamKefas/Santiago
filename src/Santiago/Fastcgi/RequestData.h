@@ -16,7 +16,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/streambuf.hpp>
 
-#include "HTTPDefinitions.h"
+#include "../HTTPDefinitions.h"
 
 #include "Common.h"
 #include "PairParseFunctions.h"

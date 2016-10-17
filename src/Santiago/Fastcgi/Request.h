@@ -14,7 +14,7 @@
 
 #include <boost/asio.hpp>
 
-#include "ErrorCategory.h"
+#include "../ErrorCategory.h"
 
 #include "Common.h"
 #include "RequestData.h"

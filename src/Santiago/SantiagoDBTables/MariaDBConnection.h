@@ -8,7 +8,7 @@
 
 #include <boost/optional.hpp>
 
-#include "ErrorCategory.h"
+#include "../ErrorCategory.h"
 
 #include "DatabaseRecords.h"
 #include "Definitions.h"

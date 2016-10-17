@@ -36,7 +36,7 @@ else()
 message(FATAL_ERROR "maria db not found")
 endif()
 
-include_directories (${CMAKE_SOURCE_DIR}/src/lib)
+include_directories (${CMAKE_SOURCE_DIR}/src)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
