@@ -2,11 +2,11 @@
 #define SANTIAGO_APPSERVER_REQUEST_H
 
 /**
- * @file Server/Request.h
+ * @file AppServer/Request.h
  *
  * @section DESCRIPTION
  *
- * Contains the Server::Request class
+ * Contains the AppServer::Request class
  * webserver.
  */
 
@@ -49,23 +49,33 @@ namespace Santiago{ namespace AppServer
          * this function queues the request's corresponding requesthandler for removal
          * from the server in the server's strand.  
          */
-        Request(FastcgiRequestPtr fastcgiRequest_,std::function<void()> onDeleteCallbackFn_):
+        Request(const FastcgiRequestPtr& fastcgiRequest_,const std::function<void()>& onCompletedCallbackFn_):
             _fastcgiRequest(fastcgiRequest_),
-            _onDeleteCallbackFn(onDeleteCallbackFn_)
+            _onCompletedCallbackFn(onCompletedCallbackFn_)
         {}
 
         /**
-         * The Destructor
+         * Returns the requestId which is a pair of connectionId and RequestId.
          */
-        ~Request()
+        RequestId getId() const
         {
-            _onDeleteCallbackFn();
+            return _fastcgiRequest->getId();
+        }
+
+
+        /**
+         * Tells if the request is still active.
+         * @return true if the request is still valid
+         */
+        bool isValid() const
+        {
+            return _fastcgiRequest->isValid();
         }
 
         /**
          * returns the stdin buffer
          */
-        const std::string& getStdinBuffer()
+        const std::string& getStdinBuffer() const
         {
             return _fastcgiRequest->getStdinBuffer();
         }
@@ -73,9 +83,50 @@ namespace Santiago{ namespace AppServer
         /**
          * returns the parameter map
          */
-        std::map<std::string,std::string>& getFCGIParams()
+        const std::map<std::string,std::string>& getFCGIParams() const
         {
             return _fastcgiRequest->getFCGIParams();
+        }
+
+        /**
+         * returns the get name value pairs.
+         */
+        const std::map<std::string,std::string>& getGetData() const
+        {
+            return _fastcgiRequest->getGetData();
+        }
+        
+
+        /**
+         * returns the post name value pairs.
+         */
+        const std::map<std::string,std::string>& getPostData() const
+        {
+            return _fastcgiRequest->getPostData();
+        }
+
+        /**
+         * returns the cookie name value params received from server.
+         */
+        const std::map<std::string,std::string>& getHTTPCookiesReceived() const
+        {
+            return _fastcgiRequest->getHTTPCookiesReceived();
+        }
+
+        /**
+         * sets the content type to be sent to the user. Default Html
+         */
+        void setContentMIMEType(MIMEType contentType_)
+        {
+            _fastcgiRequest->setContentMIMEType(contentType_);
+        }
+
+        /**
+         * returns cookies to be sent to the user.
+         */
+        std::set<HTTPCookieData>& responseHTTPCookies()
+        {
+            return _fastcgiRequest->responseHTTPCookies();
         }
 
         /**
@@ -106,33 +157,39 @@ namespace Santiago{ namespace AppServer
         /**
          * Commits the data in the request and closes the request.Can be called from 
          * any thread as Fastcgi::Request::Commit is threadsafe.
+         * @param error code- sets to INVALID_FASTCGI_REQUEST if the request not valid
          */
-        void commit()
+        void commit(std::error_code& error_)
         {
-            _fastcgiRequest->commit();
+            _fastcgiRequest->commit(error_);
+            _onCompletedCallbackFn();
         }
 
         /**
          * Cancels the data in the request and closes the request.Can be called from 
          * any thread as Fastcgi::Request::Cancel is threadsafe.
+         * @param error code- sets to INVALID_FASTCGI_REQUEST if the request not valid
          */
-        void cancel()
+        void cancel(std::error_code& error_)
         {
-            _fastcgiRequest->cancel();
+            _fastcgiRequest->cancel(error_);
+            _onCompletedCallbackFn();
         }
 
-        /**
-         * Returns the requestId.
-         */
-        std::pair<unsigned,unsigned> getID()
+        ~Request()
         {
-            return _fastcgiRequest->getID();
+            if(isValid())
+            {
+                std::error_code error;
+                cancel(error);
+            }
         }
+
 
     private:
 
         FastcgiRequestPtr            _fastcgiRequest;
-        std::function<void()>        _onDeleteCallbackFn;
+        std::function<void()>        _onCompletedCallbackFn;
     };
 }}
 #endif

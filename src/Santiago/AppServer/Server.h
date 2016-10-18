@@ -1,11 +1,11 @@
-#ifndef SANTIAGO_APPSERVER_SERVER_H
-#define SANTIAGO_APPSERVER_SERVER_H
+#ifndef SANTIAGO_APPSERVER_SERVERBASE_H
+#define SANTIAGO_APPSERVER_SERVERBASE_H
 /**
  * @file RequestHandler.h
  *
  * @section DESCRIPTION
  *
- * Contains the Server class. 
+ * Contains the ServerBase class. 
  */
 
 #include <functional>
@@ -20,7 +20,7 @@
 #include "RequestHandler.h"
 #define NO_OF_ASIO_USER_THREADS 5
 
-namespace Santiago{ namespace Server
+namespace Santiago{ namespace AppServer
 {
 /**
  * The class which will be used as the base class of all Servers. Is an abstract class
@@ -28,7 +28,7 @@ namespace Santiago{ namespace Server
  * It takes the boost asio protocol tags as the template argument. 
  */
     template<typename Protocol>
-    class Server
+    class ServerBase
     {
         typedef std::shared_ptr<RequestHandler<Protocol> > RequestHandlerPtr;
         typedef typename Request<Protocol>::RequestId RequestId;
@@ -48,9 +48,9 @@ namespace Santiago{ namespace Server
          * The contructor.
          * @param localEndpoint_- the endpoint to listen to.
          */
-        Server(LocalEndpoint<Protocol> listenEndpoint_):
+        ServerBase(LocalEndpoint<Protocol> listenEndpoint_):
             _status(STOPPED),
-            _acceptor(_ioService,listenEndpoint_,std::bind(&Server::handleNewRequest,this,_1))
+            _acceptor(_ioService,listenEndpoint_,std::bind(&ServerBase::handleNewRequest,this,_1))
         {
             for(unsigned i=0;i<NO_OF_ASIO_USER_THREADS;i++)
             {
@@ -105,7 +105,7 @@ namespace Santiago{ namespace Server
         /**
          * The destructor
          */
-        virtual ~Server()
+        virtual ~ServerBase()
         {
             if(_status == STOPPED)
             {
@@ -144,11 +144,13 @@ namespace Santiago{ namespace Server
             }
             requestHandler->init(_ioService);
 
-            std::function<void()> onRequestDeleteCallbackFn = std::bind(&Server::handleRequestDelete,this,fastcgiRequest_->getId());
+            std::function<void()> onRequestCompleteCallbackFn =
+                std::bind(&ServerBase::handleRequestComplete,this,fastcgiRequest_->getId());
 
-            RequestPtr request(new Request<Protocol>(fastcgiRequest_,onRequestDeleteCallbackFn));
+            RequestPtr request(new Request<Protocol>(fastcgiRequest_,onRequestCompleteCallbackFn));
             //store the request in the active requests
-            typename std::map<RequestId,RequestHandlerPtr>::iterator iter = _activeRequestHandlers.find(fastcgiRequest_->getId());
+            typename std::map<RequestId,RequestHandlerPtr>::iterator iter =
+                _activeRequestHandlers.find(fastcgiRequest_->getId());
             BOOST_ASSERT(iter == _activeRequestHandlers.end());
             _activeRequestHandlers[fastcgiRequest_->getId()] =  requestHandler;
             
@@ -156,22 +158,23 @@ namespace Santiago{ namespace Server
         }
 
         /**
-         * The callback function called by the Server::Request destuctor. Queues up the
-         * RequestHandler for destruction in the server's thread.
+         * The callback function called by the Server::Request commit/cancel. Queues up the
+         * RequestHandler for removal from the activRequestHandlers list in the server's thread.
          * @param requestId_
          */
-        void handleRequestDelete(const RequestId& requestId_)
+        void handleRequestComplete(const RequestId& requestId_)
         {            
             if(_status != STOPPED)
             {
-                _acceptor.getStrand().post(std::bind(&Server::handleRequestDeleteImpl,this,requestId_));
+                _acceptor.getStrand().post(std::bind(&ServerBase::handleRequestCompleteImpl,this,requestId_));
             }
         }
 
         /**
-         * The server strand implementation that deletes a queued up requestHandler.
+         * The server strand implementation that removes a queued up requestHandler from the
+         * activeRequestHandlers list.
          */
-        void handleRequestDeleteImpl(const RequestId& requestId_)
+        void handleRequestCompleteImpl(const RequestId& requestId_)
         {
             typename std::map<RequestId,RequestHandlerPtr>::iterator iter = _activeRequestHandlers.find(requestId_);
             BOOST_ASSERT(iter != _activeRequestHandlers.end());

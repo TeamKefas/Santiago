@@ -74,7 +74,7 @@ namespace Santiago{namespace Fastcgi
         /**
          * Returns the requestId which is a pair of connectionId and RequestId.
          */
-        RequestId getId()
+        RequestId getId() const
         {
             return std::pair<uint,uint>(_connectionId,_requestId);
         }
@@ -83,7 +83,7 @@ namespace Santiago{namespace Fastcgi
          * Tells if the request and the connection has not be aborted/disconnected.
          * @return true if the request is still valid
          */
-        bool isValid()
+        bool isValid() const
         {
             return ((!_hasReplied) && (_dataPtr->_isRequestAliveWeakPtr.lock() != NULL) && (_connectionWeakPtr.lock() != NULL));
         }
@@ -144,7 +144,7 @@ namespace Santiago{namespace Fastcgi
         /**
          * returns the stdin buffer
          */
-        const std::string& getStdinBuffer()
+        const std::string& getStdinBuffer() const
         {
             return _dataPtr->_in;
         }
@@ -152,13 +152,13 @@ namespace Santiago{namespace Fastcgi
         /**
          * returns the parameter map
          */
-        RequestData::ParamsMap& getFCGIParams()
+        const RequestData::ParamsMap& getFCGIParams() const
         {
             return _dataPtr->_paramsMap;
         }
 
         /**
-         * returns the get name value pairs. //TODO---
+         * returns the get name value pairs.
          */
         const std::map<std::string,std::string>& getGetData() const
         {
@@ -167,7 +167,7 @@ namespace Santiago{namespace Fastcgi
         
 
         /**
-         * returns the post name value pairs. //TODO
+         * returns the post name value pairs.
          */
         const std::map<std::string,std::string>& getPostData() const
         {
@@ -175,7 +175,7 @@ namespace Santiago{namespace Fastcgi
         }
 
         /**
-         * returns the cookie name value params received from server. //TODO
+         * returns the cookie name value params received from server.
          */
         const std::map<std::string,std::string>& getHTTPCookiesReceived() const
         {
@@ -191,7 +191,7 @@ namespace Santiago{namespace Fastcgi
         }
 
         /**
-         * returns cookies to be sent to the user //TODO
+         * returns cookies to be sent to the user
          */
         std::set<HTTPCookieData>& responseHTTPCookies()
         {

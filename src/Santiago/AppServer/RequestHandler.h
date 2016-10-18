@@ -1,12 +1,12 @@
-#ifndef SANTIAGO_APPSERVER_REQUESTHANDLER_H
-#define SANTIAGO_APPSERVER_REQUESTHANDLER_H
+#ifndef SANTIAGO_APPSERVER_REQUESTHANDLERBASE_H
+#define SANTIAGO_APPSERVER_REQUESTHANDLERBASE_H
 
 /**
  * @file RequestHandler.h
  *
  * @section DESCRIPTION
  *
- * Contains the RequestHandler class. 
+ * Contains the RequestHandlerBase class. 
  */
 
 #include <functional>
@@ -15,7 +15,7 @@
 
 #include "Request.h"
 
-namespace Santiago{ namespace Server
+namespace Santiago{ namespace AppServer
 {
     template<typename Protocol>
     class Server;
@@ -26,41 +26,56 @@ namespace Santiago{ namespace Server
  * It takes the boost asio protocol tags as the template argument. 
  */
     template<typename Protocol>
-    struct RequestHandler
+    struct RequestHandlerBase:public std::enable_shared_from_this<RequestHandlerBase<Protocol> >
     {
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;        
 
     public:
         typedef typename Request<Protocol>::Ptr RequestPtr;
-        typedef std::shared_ptr<RequestHandler<Protocol> > Ptr;
+        typedef std::shared_ptr<RequestHandlerBase<Protocol> > Ptr;
 
         /**
          * Deleting the copy constructor to make class non copyable
          */
-        RequestHandler(const RequestHandler&) = delete;
+        RequestHandlerBase(const RequestHandlerBase&) = delete;
 
         /**
          * Deleting the copy assignment error to make class non copyable
          */
-        RequestHandler& operator(const RequestHandler&) = delete;
+        RequestHandlerBase& operator(const RequestHandlerBase&) = delete;
 
         /**
          * The constructor
          */
-        RequestHandler()
+        RequestHandlerBase()
         {}
         
         /**
          * The destructor
          */
-        virtual ~RequestHandler()
+        virtual ~RequestHandlerBase()
         {}
+
+        /**
+         * The function that is to be overloaded by the  user request handler's. This
+         * function will be called by the server in the RequestHandlerBase's strand.
+         * @param request_ - the info about the request.
+         */
+        virtual void handleRequest(RequestPtr request_) = 0;
+
+    protected:
 
         /**
          * Returns the strand of the handler. Each of the handler has a strand and the
          * initial requestHandler() is called in this strand. This is provided for the
          * users to implement asynchronous calls using boost asio if the callbacks are
          * to  happen in a single thread (i.e. not happen simultaneously).
+         * Caution: The server stores a shared_ptr to each handler. This shared_ptr is 
+         * destroyed when the request_ object received in the handleRequest is destroyed
+         * or request_->commit()/cancel() is called. So if you are using the RequestHandler
+         * past these 3 situation by posting to strand/io_service please use the 
+         * this->shared_from_this() to keep the request alive. If not sure then use
+         * postInStrand() fn. postInStrand() fn will keep the handler object alive.
          */
         boost::asio::strand& getStrand()
         {
@@ -70,6 +85,12 @@ namespace Santiago{ namespace Server
 
         /**
          * Returns the underlying io_service
+         * Caution: The server stores a shared_ptr to each handler. This shared_ptr is 
+         * destroyed when the request_ object received in the handleRequest is destroyed
+         * or request_->commit()/cancel() is called. So if you are using the RequestHandler
+         * past these 3 situations by posting to strand/io_service please use the 
+         * this->shared_from_this() to keep the request alive. If not sure then use
+         * postInStrand() fn. postInStrand() fn will keep the handler object alive.
          */
         boost::asio::io_service& getIOService()
         {
@@ -78,24 +99,18 @@ namespace Santiago{ namespace Server
         }
 
         /**
-         * Posts a callback function in the RequestHandler's strand.
+         * Posts a callback function in the RequestHandlerBase's strand.
          * @param callbackFn_- the callback fn for the post request.
          */
         void postInStrand(const std::function<void()>& callbackFn_)
         {
             checkIsInitialized();
-            _strand->post(std::bind(&RequestHandler::handlePostInStrand,this,callbackFn_));           
+            _strand->post(std::bind(&RequestHandlerBase::handlePostInStrand,
+                                    this->shared_from_this(),
+                                    callbackFn_));           
         }
-        
-        /**
-         * The function that is to be overloaded by the  user request handler's. This
-         * function will be called by the server in the RequestHandler's strand.
-         * @param request_ - the info about the request.
-         */
-        virtual void handleRequest(RequestPtr request_) = 0;       
 
     private:
-
         /**
          * The callback function for the postInStrand()
          */
@@ -105,19 +120,20 @@ namespace Santiago{ namespace Server
         }
 
         /**
-         * Check if the RequestHandler was initialized and throw exception if not
+         * Check if the RequestHandlerBase was initialized and throw exception if not
          * initialized.
          */
         void checkIsInitialized()
         {
             if(_strand == NULL)
             {
+                BOOST_ASSERT(false); //this will happen only if user starts using the fns before the init is called
                 throw std::runtime_error("Handler not initialized");
             }
         }
 
         /**
-         * Will be called by the server class to initialize the RequestHandler.
+         * Will be called by the server class to initialize the RequestHandlerBase.
          * @param - ioService.
          */
         void init(boost::asio::io_service& ioService_)
