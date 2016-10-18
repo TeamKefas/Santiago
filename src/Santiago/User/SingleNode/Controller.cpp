@@ -20,7 +20,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
         std::error_code error;
         std::tie(error,userProfilesRecOpt) = verifyUserNamePasswordAndGetUserProfilesRec(userName_,password_);
-        if(Error::DATABASE_ERROR == error.value())
+        if(Error::DATABASE_EXCEPTION == error.value() || Error::DATABASE_QUERY_FAILED == error.value())
         {
             onCreateUserCallbackFn_(error);
             return;
@@ -36,7 +36,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         SantiagoDBTables::UserProfilesRec userProfilesRec;
         userProfilesRec._userName = userName_;
         userProfilesRec._password = password_;
-        error = _databaseConnection.addUserProfilesRec(userProfilesRec);
+        _databaseConnection.addUserProfilesRec(userProfilesRec,error);
         if(error)
         {
             ocCreateUserCallbackFn_(error);
@@ -71,7 +71,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         sessionsRec._loginTime = boost::posix_time::second_clock::universal_time();
         sessionsRec._lastActiveTime = sessionsRec._loginTime;
 
-        error = _databaseConnection.addSessionsRec(sessionsRec);
+        _databaseConnection.addSessionsRec(sessionsRec,error);
         if(error)
         {
             onLoginUserCallbackFn_(error,boost::none);
@@ -179,7 +179,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
         //change and update the password
         userProfilesRecOpt->_password = newPassword_;
-        error = _databaseConnection.updateUserProfilesRec(*userProfilesRecOpt);
+        _databaseConnection.updateUserProfilesRec(*userProfilesRecOpt,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
         onChangePasswordCallbackFn_(error);
         return;
@@ -203,7 +203,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::tie(error,userProfilesRecOpt) =
             verifyUserNamePasswordAndGetUserProfilesRec(cookieStringSessionsRecMapIter->second._userName,"");
         BOOST_ASSER(userProfilesRecOpt);
-        error = _databaseConnection.deleteUserProfilesRec(*userProfilesRecOpt);
+        _databaseConnection.deleteUserProfilesRec(userProfilesRecOpt->userName,error_);
         if(error)
         {
             onDeleteCallbackFn(error);
@@ -221,9 +221,10 @@ namespace Santiago{ namespace User{ namespace SingleNode
     Controller::verifyUserNamePasswordAndGetUserProfilesRec(const std::string& userName_, const std::string& password_)
     {
         //get the UserProfilesRec from db
-        std::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
-        std::error_code error = _databaseConnection.getUserProfilesRec(userName_,userProfilesRecOpt);
-        if(error)
+        std::error_code error;
+        std::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt =
+            _databaseConnection.getUserProfilesRec(userName_,error);
+        if(error)//TODO
         {
             return std::make_pair(error,userProfilesRecOpt);
         }
@@ -266,7 +267,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
         //update the db
         cookieStringSessionsRecMapIter->second._logoutTime = boost::posix_time::second_clock::universal_time();
-        std::error_code error = _databaseConnection.updateSessionsRec(cookieStringSessionsRecMapIter->second);
+        std::error_code error;
+        _databaseConnection.updateSessionsRec(cookieStringSessionsRecMapIter->second,error);
         if(error)
         {
             LOG_INFO("updateSessionsRec failed. Logging out without writing to db. SessionsRec:"
