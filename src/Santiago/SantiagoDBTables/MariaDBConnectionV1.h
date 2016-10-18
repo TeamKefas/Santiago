@@ -22,20 +22,7 @@ namespace Santiago{ namespace SantiagoDBTables
     {
     public:
 
-        //take db ip, port, username, password from config
-        MariaDBConnection(const boost::property_tree::ptree& config_)
-        {
-            /*  MYSQL *_mysql = config_.get<MYSQL*>("Santiago.SantiagoDBTables.mysql");
-            const char *_host = config_.get<const char*>("Santiago.SantiagoDBTables.host");
-            const char *_user = config_.get<const char*>("Santiago.SantiagoDBTables.user");
-            const char *_passwd = config_.get<const char*>("Santiago.SantiagoDBTables.passwd");
-            const char *_db = config_.get<const char*>("Santiago.SantiagoDBTables.db");
-            unsigned int _port = config_.get<unsigned int>("Santiago.SantiagoDBTables.port");
-            const char * _unixSocket = config_.get<const char*>("Santiago.SantiagoDBTables.unix_socket");
-            unsigned long _flags = config_.get<unsigned long>("Santiago.SantiagoDBTables.flags");*/
-	    
-            connect();
-         }
+        MariaDBConnection(const boost::property_tree::ptree& config_);
 
         virtual ~MariaDBConnection();
         
@@ -49,7 +36,7 @@ namespace Santiago{ namespace SantiagoDBTables
         void deleteUserProfilesRec(const std::string& userName_,std::error_code& error_);
 
         void addSessionsRec(SessionsRec& sessionsRec_,std::error_code& error_);
-        boost::optional<SessionsRec> getSessionsRec(const std::string& userName_,std::error_code& error_);
+        boost::optional<SessionsRec> getSessionsRec(const std::string& cookieString_,std::error_code& error_);
         void updateSessionsRec(SessionsRec& userProfilesRec_,std::error_code& error_);
 
     protected:
@@ -64,10 +51,7 @@ namespace Santiago{ namespace SantiagoDBTables
                             const std::function<void(MYSQL_RES *, std::error_code&)>& postQueryFn_,
                             std::error_code& error_);
         void runUpdateQuery(const std::string& queryString_,std::error_code& error_);
-        void runDeleteQuery(const std::string& queryString_,std::error_code& error_);
-        
-        std::string convertPtimeToString(const boost::posix_time::ptime& ptime_) const;
-        boost::posix_time::ptime convertStringToPtime(const std::string& timeStr_) const;
+        void runDeleteQuery(const std::string& queryString_,std::error_code& error_);        
 
         boost::property_tree::ptree   _config;
         MYSQL                        *_mysql;
