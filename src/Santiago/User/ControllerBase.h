@@ -7,6 +7,8 @@
 #include <boost/asio.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include <experimental/optional>
+
 namespace Santiago{ namespace User
 {
 
@@ -14,7 +16,7 @@ namespace Santiago{ namespace User
     {
     public:
 
-        typedef std::function<void(const std::error_code&,const std::optional<std::string>&)> ErrorCodeStringCallbackFn;
+        typedef std::function<void(const std::error_code&,const std::experimental::optional<std::string>&)> ErrorCodeStringCallbackFn;
         typedef std::function<void(const std::error_code&)> ErrorCodeCallbackFn;
 
         ControllerBase(const ControllerBase&) = delete;

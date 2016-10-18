@@ -1,6 +1,6 @@
 set(SantiagoDBTables_SRCS
-  Definitions.cpp
-  MariaDBConnectionV1.cpp)
+  Definitions.cpp)
+  #MariaDBConnectionV1.cpp)
 
 if(WIN32)
   set(SantiagoDBTables_SRCS ${SantiagoDBTables_SRCS}   

@@ -6,9 +6,11 @@
 #include <system_error>
 #include <vector>
 
-#include "SantiagoDBTables/MariaDBConnection.h"
+#include "Santiago/SantiagoDBTables/MariaDBConnectionV1.h"
 
-#include "User/ControllerBase.h"
+#include "Santiago/User/ControllerBase.h"
+#include "Santiago/Utils/STLog.h"
+#define MAX_SESSION_DURATION 1
 
 namespace Santiago{ namespace User{ namespace SingleNode
 {
@@ -29,7 +31,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                    const std::string& passworld_,
                                    const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_);
 
-        virtual void verifyCookieAndGetUserNameImpl(const std::string cookieString_,
+        virtual void verifyCookieAndGetUserNameImpl(const std::string& cookieString_,
                                                     const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_);
 
         virtual void logoutUserForCookieImpl(const std::string& cookieString_,
@@ -49,18 +51,18 @@ namespace Santiago{ namespace User{ namespace SingleNode
     protected:
 
         //helper fns
-        std::pair<std::error_code,std::optional<SantiagoDBTables::UserProfilesRec> > 
+        std::pair<std::error_code,std::experimental::optional<SantiagoDBTables::UserProfilesRec> > 
         verifyUserNamePasswordAndGetUserProfilesRec(const std::string& userName_, const std::string& password_);
-        std::pair<std::error_code,std::map<std::string,SantiagoDBTable::SessionsRec>::iterator > 
+        std::pair<std::error_code,std::map<std::string,Santiago::SantiagoDBTables::SessionsRec>::iterator > 
         checkForCookieInMapAndGetSessionsRecIter(const std::string& cookieString_);
 
         void cleanupCookieDataAndUpdateSessionRecord(const std::string& cookieString_);
         void cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const std::string& userName_);
 
-        SantiagoDBTables::MariaDBConnection                 &_databaseConnection;
+        SantiagoDBTables::MariaDBConnection                  &_databaseConnection;
 
-        std::map<std::string,SantiagoDBTable::SessionsRec>   _cookieStringSessionsRecMap;
-        std::map<std::string,std::vector<std::string> >      _userNameCookieListMap;
+        std::map<std::string,SantiagoDBTables::SessionsRec>   _cookieStringSessionsRecMap;
+        std::map<std::string,std::vector<std::string> >       _userNameCookieListMap;
         
     };
 
