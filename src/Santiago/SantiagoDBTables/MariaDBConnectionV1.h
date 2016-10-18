@@ -30,14 +30,14 @@ namespace Santiago{ namespace SantiagoDBTables
         // possible error_code returns for the following fns
         // SUCCESS, DATABASE_EXCEPTION, DATABASE_QUERY_FAILED
         
-        void addUserProfilesRec(UserProfilesRec& userProfilesRec_,std::error_code& error_);
-        boost::optional<UserProfilesRec> getUserProfilesRec(const std::string& userName_,std::error_code& error_);
-        void updateUserProfilesRec(UserProfilesRec& newUserProfilesRec_,std::error_code& error_);
-        void deleteUserProfilesRec(const std::string& userName_,std::error_code& error_);
-
-        void addSessionsRec(SessionsRec& sessionsRec_,std::error_code& error_);
-        boost::optional<SessionsRec> getSessionsRec(const std::string& cookieString_,std::error_code& error_);
-        void updateSessionsRec(SessionsRec& userProfilesRec_,std::error_code& error_);
+        void addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_);
+        boost::optional<UserProfilesRec> getUserProfilesRec(const std::string& userName_, std::error_code& error_);
+        void updateUserProfilesRec(UserProfilesRec& newUserProfilesRec_, std::error_code& error_);
+        void deleteUserProfilesRec(const std::string& userName_, std::error_code& error_);
+        
+        void addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_);
+        boost::optional<SessionsRec> getSessionsRec(const std::string& cookieString_, std::error_code& error_);
+        void updateSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_);
 
     protected:
      
@@ -45,13 +45,13 @@ namespace Santiago{ namespace SantiagoDBTables
         void disconnect(std::error_code& error_);
 
 
-        void runQueryImpl(const std::string& queryString_,std::error_code& error_);
-        int runInsertQuery(const std::string& queryString_,std::error_code& error_);
+        void runQueryImpl(const std::string& queryString_, std::error_code& error_);
+        int runInsertQuery(const std::string& queryString_, std::error_code& error_);
         void runSelectQuery(const std::string& queryString_,
                             const std::function<void(MYSQL_RES *, std::error_code&)>& postQueryFn_,
                             std::error_code& error_);
-        void runUpdateQuery(const std::string& queryString_,std::error_code& error_);
-        void runDeleteQuery(const std::string& queryString_,std::error_code& error_);        
+        void runUpdateQuery(const std::string& queryString_, std::error_code& error_);
+        void runDeleteQuery(const std::string& queryString_, std::error_code& error_);        
 
         boost::property_tree::ptree   _config;
         MYSQL                        *_mysql;
