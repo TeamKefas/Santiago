@@ -1,5 +1,5 @@
-#include "Utils/PTimeUtils.h"
-#include "Utils/STLog.h"
+#include "../Utils/PTimeUtils.h"
+#include "../Utils/STLog.h"
 
 #include "MariaDBConnectionV1.h"
 
@@ -224,7 +224,7 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         std::string deleteUserProfilesRecQuery = "DELETE FROM user_profiles WHERE username = '" +
                     userName_ + "'";
-        runDeleteQuery(deleteUserProfilesRecQuery,error_);
+        runDeleteQuery(deleteUserProfilesRecQuery, error_);
     }
 
     void MariaDBConnection::addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_)
