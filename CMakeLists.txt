@@ -16,7 +16,7 @@ endif (WIN32)
 #commands specific to unix
 if (UNIX)
 add_definitions (-D__UNIX__)
-add_definitions("-std=c++0x -Wall -pedantic")
+add_definitions("-std=c++0x -std=gnu++1y -Wall -pedantic")
 endif (UNIX)
 
 #Make tie src/lib directory in the include path for the whole project
