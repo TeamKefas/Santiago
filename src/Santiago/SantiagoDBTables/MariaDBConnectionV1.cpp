@@ -26,31 +26,32 @@ namespace Santiago{ namespace SantiagoDBTables
         BOOST_ASSERT(_mysql != NULL); //This should be very rare. hence BOOST_ASSERT.
 
         mysql_options(_mysql, MYSQL_OPT_RECONNECT, (void *)"1"); //set auto reconnect.
-        std::string host = _config.get<std::string>("SantiagoDBTables.host");
-        std::string user = _config.get<std::string>("SantiagoDBTables.user");
-        std::string password = _config.get<std::string>("SantiagoDBTables.password");
-        std::string db = _config.get<std::string>("SantiagoDBTables.db");
+        std::string host = _config.get<std::string>("Santiago.SantiagoDBTables.host");
+        std::string user = _config.get<std::string>("Santiago.SantiagoDBTables.user");
+        std::string password = _config.get<std::string>("Santiago.SantiagoDBTables.password");
+        std::string db = _config.get<std::string>("Santiago.SantiagoDBTables.db");
 
         if(mysql_real_connect(_mysql,
                               host.c_str(),
                               user.c_str(),
                               password.c_str(),
                               db.c_str(),
-                              _config.get<unsigned>("SantiagoDBTables.port"),
+                              _config.get<unsigned>("Santiago.SantiagoDBTables.port"),
                               NULL,
                               0) == NULL)
         {
-            ST_LOG_ERROR("mysql_real_connect() failed. host = " << config_.get<const char*>("SantiagoDBTables.host")
-                         <<" user = " << config_.get<const char*>("SantiagoDBTables.user")
-                         <<" db = " << config_.get<const char*>("SantiagoDBTables.db")
-                         <<" port = " << config_.get<unsigned>("SantiagoDBTables.port") << std::endl);
+            ST_LOG_ERROR("mysql_real_connect() failed. host = " 
+                         << config_.get<const char*>("Santiago.SantiagoDBTables.host")
+                         <<" user = " << config_.get<const char*>("Santiago.SantiagoDBTables.user")
+                         <<" db = " << config_.get<const char*>("Santiago.SantiagoDBTables.db")
+                         <<" port = " << config_.get<unsigned>("Santiago.SantiagoDBTables.port") << std::endl);
 
             error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
         }
         
-        ST_LOG_INFO("mysql_real_connect() succeeded." << config_.get<const char*>("SantiagoDBTables.host")
-                    <<" user = " << config_.get<const char*>("SantiagoDBTables.user")
-                    <<" db = " << config_.get<const char*>("SantiagoDBTables.db") << std::endl);
+        ST_LOG_INFO("mysql_real_connect() succeeded." << config_.get<const char*>("Santiago.SantiagoDBTables.host")
+                    <<" user = " << config_.get<const char*>("Santiago.SantiagoDBTables.user")
+                    <<" db = " << config_.get<const char*>("Santiago.SantiagoDBTables.db") << std::endl);
        
         error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
     }
@@ -72,9 +73,11 @@ namespace Santiago{ namespace SantiagoDBTables
         {
             ST_LOG_DEBUG("Db error:"<< mysql_error(_mysql) << std::endl);
             error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            return;
         }
 
         error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        return;
     }
 
     int MariaDBConnection::runInsertQuery(const std::string& queryString_, std::error_code& error_)
@@ -89,7 +92,7 @@ namespace Santiago{ namespace SantiagoDBTables
         if(0 == mysql_affected_rows(_mysql))
         {
             ST_LOG_DEBUG("mysql_affected_rows() returns 0.");
-            error_ = std::error_code(ERR_DATABASE_QUERY_FAILED, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
             return INVALID_DATABASE_ID;
         }
 
@@ -119,17 +122,17 @@ namespace Santiago{ namespace SantiagoDBTables
             return;
         }
 
-        if(0 == mysql_num_rows(result))
+        if(0 != mysql_num_rows(result))
+        {
+            ST_LOG_INFO("Results found for select query." << std::endl);
+            postQueryFn_(result, error_); //error code to be set inside the postQueryFn
+        }
+        else
         {
             ST_LOG_DEBUG("mysql_num_rows() returned 0." << std::endl);
-            error_ = std::error_code(ERR_DATABASE_QUERY_FAILED, ErrorCategory::GetInstance());
-            mysql_free_result(result);
-            return;
+            error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
         }
-        
-        postQueryFn_(result, error_);
         mysql_free_result(result);
-        ST_LOG_INFO("Select query successful." << std::endl);
         return;
     }
 
@@ -145,8 +148,8 @@ namespace Santiago{ namespace SantiagoDBTables
         if(0 == mysql_affected_rows(_mysql))
         {
             ST_LOG_DEBUG("mysql_affected_rows() returns 0." << std::endl);
-            error_ = std::error_code(ERR_DATABASE_QUERY_FAILED, ErrorCategory::GetInstance());
-            return;
+//            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+//            return;
         }
 
         error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
@@ -166,8 +169,8 @@ namespace Santiago{ namespace SantiagoDBTables
         if(0 == mysql_affected_rows(_mysql))
         {
             ST_LOG_DEBUG("mysql_affected_rows() returns 0." << std::endl);
-            error_ = std::error_code(ERR_DATABASE_QUERY_FAILED, ErrorCategory::GetInstance());
-            return;
+//            error_ = std::error_code(ERR_DATABASE_QUERY_FAILED, ErrorCategory::GetInstance());
+//            return;
         }
 
         error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
@@ -197,7 +200,7 @@ namespace Santiago{ namespace SantiagoDBTables
                     ST_LOG_DEBUG("More than 1 records with same username in the user_profiles table"
                                  << std::endl);
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                    BOOST_ASSERT(false);
+                    BOOST_ASSERT(false);                    
                 }
                 
                 MYSQL_ROW row = mysql_fetch_row(mysqlResult_);
@@ -216,13 +219,13 @@ namespace Santiago{ namespace SantiagoDBTables
     void MariaDBConnection::updateUserProfilesRec(UserProfilesRec& newUserProfilesRec_, std::error_code& error_)
     {
         std::string updateUserProfilesRecQuery = "UPDATE user_profiles SET password ='" +
-            newUserProfilesRec_._password + "' WHERE username = '" + newUserProfilesRec_._userName +"'";
+            newUserProfilesRec_._password + "' WHERE user_name = '" + newUserProfilesRec_._userName +"'";
         runUpdateQuery(updateUserProfilesRecQuery,error_);
     }
 
     void MariaDBConnection::deleteUserProfilesRec(const std::string& userName_,std::error_code& error_)
     {
-        std::string deleteUserProfilesRecQuery = "DELETE FROM user_profiles WHERE username = '" +
+        std::string deleteUserProfilesRecQuery = "DELETE FROM user_profiles WHERE user_name = '" +
                     userName_ + "'";
         runDeleteQuery(deleteUserProfilesRecQuery, error_);
     }

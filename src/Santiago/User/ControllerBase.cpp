@@ -38,7 +38,7 @@ namespace Santiago{ namespace User
         _strand.post(std::bind(&ControllerBase::logoutUserForCookieImpl,this,cookieString_,onLogoutCookieCallbackFn_));
     }
 
-    void ControllerBase::logoutUserForAllCookies(const std::string& ccurrentCookieString_,
+    void ControllerBase::logoutUserForAllCookies(const std::string& currentCookieString_,
                                                  const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
     {
         _strand.post(std::bind(&ControllerBase::logoutUserForAllCookiesImpl,
@@ -54,7 +54,7 @@ namespace Santiago{ namespace User
     {
         _strand.post(std::bind(&ControllerBase::changeUserPasswordImpl,
                                this,
-                               cookieString__,
+                               cookieString_,
                                oldPassword_,
                                newPassword_,
                                onChangePasswordCallbackFn_));

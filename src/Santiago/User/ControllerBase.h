@@ -7,7 +7,7 @@
 #include <boost/asio.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include <experimental/optional>
+#include <boost/optional.hpp>
 
 namespace Santiago{ namespace User
 {
@@ -16,7 +16,8 @@ namespace Santiago{ namespace User
     {
     public:
 
-        typedef std::function<void(const std::error_code&,const std::experimental::optional<std::string>&)> ErrorCodeStringCallbackFn;
+        typedef std::function<void(const std::error_code&,const boost::optional<std::string>&)>
+        ErrorCodeStringCallbackFn;
         typedef std::function<void(const std::error_code&)> ErrorCodeCallbackFn;
 
         ControllerBase(const ControllerBase&) = delete;
@@ -53,7 +54,7 @@ namespace Santiago{ namespace User
 
         virtual void createUserImpl(const std::string& userName_,
                                     const std::string& password_,
-                                    const ErrorCodeStringCallbackFn& onCreateUserCallbackFn_) = 0;
+                                    const ErrorCodeCallbackFn& onCreateUserCallbackFn_) = 0;
 
         virtual void loginUserImpl(const std::string& userName_,
                                    const std::string& passworld_,

@@ -39,7 +39,7 @@ namespace Santiago
          {
              {ERR_SUCCESS,                         "Success."},
              {ERR_DATABASE_EXCEPTION,              "Database exception."},
-             {ERR_DATABASE_QUERY_FAILED,           "Database query failed."},
+//             {ERR_DATABASE_QUERY_FAILED,           "Database query failed."},
              {ERR_USERNAME_ALREADY_EXISTS,         "Username already exists."},
              {ERR_INVALID_USERNAME_PASSWORD,       "Invalid username-password."},
              {ERR_INVALID_SESSION_COOKIE,          "Invalid session cookie."},
