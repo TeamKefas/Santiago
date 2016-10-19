@@ -15,6 +15,7 @@ namespace SimpleAppServer
     {
     public:
 
+        typedef Santiago::AppServer::RequestHandlerBase<boost::asio::ip::tcp> MyBase;
         typedef std::shared_ptr<RequestHandlerBase> Ptr;
 
         RequestHandlerBase(Santiago::User::ControllerBase& userController_):
@@ -28,7 +29,7 @@ namespace SimpleAppServer
         virtual void handleVerifyCookieAndGetUserName(const RequestPtr& request_,
                                                       const std::string& cookieString_,
                                                       std::error_code error_,
-                                                      const std::string& userName_);
+                                                      const boost::optional<std::string>& userName_);
 
         virtual void handleVerifiedRequest(const RequestPtr& request_,
                                            const std::string& userName_,

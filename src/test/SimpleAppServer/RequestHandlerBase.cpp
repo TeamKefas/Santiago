@@ -6,13 +6,13 @@ namespace SimpleAppServer
     {
 
         std::map<std::string,std::string>::const_iterator iter =  request_->getHTTPCookiesReceived().find("SID");
-        if(request_.getHTTPCookiesReceived().end() == iter)
+        if(request_->getHTTPCookiesReceived().end() == iter)
         {
             handleNonVerifiedRequest(request_);
         }
 
         MyBase::Ptr thisBasePtr = this->shared_from_this();
-        Ptr thisPtr(static_pointer_cast<RequestHandlerBase>(thisBasePtr));
+        Ptr thisPtr(std::static_pointer_cast<RequestHandlerBase>(thisBasePtr));
         
         _userController.verifyCookieAndGetUserName(
             iter->second,
@@ -28,7 +28,7 @@ namespace SimpleAppServer
     void RequestHandlerBase::handleVerifyCookieAndGetUserName(const RequestPtr& request_,
                                                               const std::string& cookieString_,
                                                               std::error_code error_,
-                                                              const std::string& userName_)
+                                                              const boost::optional<std::string>& userName_)
     {
         if(error_)
         {
@@ -36,8 +36,9 @@ namespace SimpleAppServer
         }
         else
         {
+            BOOST_ASSERT(userName_);
             handleVerifiedRequest(request_,
-                                  userName_,
+                                  *userName_,
                                   cookieString_);
         }
     }

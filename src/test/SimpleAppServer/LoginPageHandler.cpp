@@ -54,7 +54,7 @@ namespace SimpleAppServer
         request_->commit(error);
     }
 
-    void SimplePageHandler::handleNonVerifiedRequest(const RequestPtr& request_)
+    void LoginPageHandler::handleNonVerifiedRequest(const RequestPtr& request_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
 
@@ -96,9 +96,9 @@ namespace SimpleAppServer
         
 //    std::cout<<request_->getFCGIParams()[REQUEST_URI];
 
-        std::map<std::string,std::string>::const_iterator userNameIter =  request_.getPostData().find("user_name");
-        std::map<std::string,std::string>::const_iterator passwordIter =  request_.getPostData().find("password");
-        if(request_.getPostData().end() == userNameIter || request_.getPostData().end() == passwordIter)
+        std::map<std::string,std::string>::const_iterator userNameIter =  request_->getPostData().find("user_name");
+        std::map<std::string,std::string>::const_iterator passwordIter =  request_->getPostData().find("password");
+        if(request_->getPostData().end() == userNameIter || request_->getPostData().end() == passwordIter)
         {
             request_->out()<<"user_name/password not send in the post data. \n";
             request_->setAppStatus(0);
@@ -108,12 +108,12 @@ namespace SimpleAppServer
         else
         {
             MyBase::MyBase::Ptr thisBasePtr = this->shared_from_this();
-            Ptr thisPtr(static_pointer_cast<RequestHandlerBase>(thisBasePtr));
+            Ptr thisPtr(std::static_pointer_cast<LoginPageHandler>(thisBasePtr));
             
             _userController.loginUser(
                 userNameIter->second,
                 passwordIter->second,
-                std::bind(&RequestHandlerBase::handleLoginUser,
+                std::bind(&LoginPageHandler::handleLoginUser,
                           thisPtr,
                           request_,
                           userNameIter->second,
@@ -127,12 +127,12 @@ namespace SimpleAppServer
     void LoginPageHandler::handleLoginUser(const RequestPtr& request_,
                                            const std::string& userName_,
                                            std::error_code error_,
-                                           const std::string& cookieString_)
+                                           const boost::optional<std::string>& cookieString_)
     {
         if(error_)
         {
             request_->out()<<"User authentication failed. \n";
-            request_->out()<<error_.description()<<std::endl;
+            request_->out()<<error_.message()<<std::endl;
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);
@@ -141,7 +141,7 @@ namespace SimpleAppServer
         {
             Santiago::HTTPCookieData cookieData;
             cookieData._name = "SID";
-            cookieData._value = cookieString_;
+            cookieData._value = *cookieString_;
             cookieData._expiryTime = boost::posix_time::second_clock::local_time() + boost::posix_time::seconds(900);
             bool flag = request_->responseHTTPCookies().insert(cookieData).second;
 

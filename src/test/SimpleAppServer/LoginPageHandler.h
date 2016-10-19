@@ -11,6 +11,9 @@ namespace SimpleAppServer
    {
    public:
 
+       typedef RequestHandlerBase MyBase;
+       typedef std::shared_ptr<LoginPageHandler> Ptr;
+
        LoginPageHandler(Santiago::User::ControllerBase& userController_):
             RequestHandlerBase(userController_)
        {}
@@ -20,7 +23,7 @@ namespace SimpleAppServer
        void handleLoginUser(const RequestPtr& request_,
                             const std::string& userName_,
                             std::error_code error_,
-                            const std::string& cookieString_);
+                            const boost::optional<std::string>& cookieString_);
 
        virtual void handleVerifiedRequest(const RequestPtr& request_,
                                           const std::string& userName_,
