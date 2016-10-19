@@ -17,7 +17,7 @@ namespace SimpleAppServer
 
         typedef std::shared_ptr<RequestHandlerBase> Ptr;
 
-        RequestHandlerBase(User::ControllerBase& userController_):
+        RequestHandlerBase(Santiago::User::ControllerBase& userController_):
             _userController(userController_)
         {}
 
@@ -33,10 +33,11 @@ namespace SimpleAppServer
         virtual void handleVerifiedRequest(const RequestPtr& request_,
                                            const std::string& userName_,
                                            const std::string& cookieString_) = 0;
-        virtual void handleNonVerifiedRequest() = 0;
+        virtual void handleNonVerifiedRequest(const RequestPtr& request_) = 0;
 
         
-        User::ControllerBase                  &_userController;
+        Santiago::User::ControllerBase                  &_userController;
     };
 
 }
+#endif

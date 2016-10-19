@@ -42,7 +42,7 @@ namespace Santiago{ namespace AppServer
         /**
          * Deleting the copy assignment error to make class non copyable
          */
-        RequestHandlerBase& operator(const RequestHandlerBase&) = delete;
+        RequestHandlerBase& operator=(const RequestHandlerBase&) = delete;
 
         /**
          * The constructor
@@ -63,7 +63,6 @@ namespace Santiago{ namespace AppServer
          */
         virtual void handleRequest(const RequestPtr& request_) = 0;
 
-    protected:
 
         /**
          * Returns the strand of the handler. Each of the handler has a strand and the
@@ -82,6 +81,17 @@ namespace Santiago{ namespace AppServer
             checkIsInitialized();
             return *_strand;
         }
+
+         /**
+         * Will be called by the server class to initialize the RequestHandlerBase.
+         * @param - ioService.
+         */
+        void init(boost::asio::io_service& ioService_)
+        {
+            _strand.reset(new boost::asio::strand(ioService_));
+        }
+
+    protected:
 
         /**
          * Returns the underlying io_service
@@ -132,14 +142,6 @@ namespace Santiago{ namespace AppServer
             }
         }
 
-        /**
-         * Will be called by the server class to initialize the RequestHandlerBase.
-         * @param - ioService.
-         */
-        void init(boost::asio::io_service& ioService_)
-        {
-            _strand.reset(new boost::asio::strand(ioService_));
-        }
 
         friend class Server<Protocol>;
 

@@ -5,15 +5,17 @@
 
 #include "Santiago/AppServer/ServerBase.h"
 #include "Santiago/User/SingleNode/Controller.h"
+#include "LoginPageHandler.h"
+#include "SimplePageHandler.h"
 
 namespace SimpleAppServer
 {
-    class Server:public AppServer::ServerBase<boost::asio::tcp::ip>
+    class Server:public Santiago::AppServer::ServerBase<boost::asio::ip::tcp>
     {
 
     public:
 
-        typedef AppServer::ServerBase<boost::asio::tcp::ip> MyBase;
+        typedef Santiago::AppServer::ServerBase<boost::asio::ip::tcp> MyBase;
 
         Server(const boost::property_tree::ptree& config_):
             MyBase(getServerLocalEndpoint(config_)),
@@ -25,9 +27,9 @@ namespace SimpleAppServer
 
     protected:
 
-        virtual RequestHandlerPtr route(const std::string& documentURI_)
+        virtual RequestHandlerBasePtr route(const std::string& documentURI_)
         {
-            RequestHandlerPtr ret;
+            RequestHandlerBasePtr ret;
             if(documentURI_ == "/login.fcgi")
             {
                 ret.reset(new LoginPageHandler(_userController));
@@ -43,8 +45,8 @@ namespace SimpleAppServer
         getServerLocalEndpoint(const boost::property_tree::ptree& config_) const;
 
         boost::property_tree::ptree                         _config;
-        SantiagoDBTables::MariaDBConnection                 _databaseConnection;
-        User::SingleNode::Controller                        _userController;
+        Santiago::SantiagoDBTables::MariaDBConnection       _databaseConnection;
+        Santiago::User::SingleNode::Controller                        _userController;
     };
 
 }

@@ -40,7 +40,7 @@ namespace Santiago{ namespace AppServer
         /**
          * Deleting the copy assignment operator to make class non copyable
          */
-        Request& operator(const Request&) = delete;
+        Request& operator = (const Request&) = delete;
 
         /**
          * The Constructor

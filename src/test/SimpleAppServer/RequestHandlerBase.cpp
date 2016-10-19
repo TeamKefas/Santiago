@@ -5,7 +5,7 @@ namespace SimpleAppServer
     void RequestHandlerBase::handleRequest(const RequestPtr& request_)
     {
 
-        std::map<std::string,std::string>::const_iterator iter =  request_.getHTTPCookiesReceived().find("SID");
+        std::map<std::string,std::string>::const_iterator iter =  request_->getHTTPCookiesReceived().find("SID");
         if(request_.getHTTPCookiesReceived().end() == iter)
         {
             handleNonVerifiedRequest(request_);

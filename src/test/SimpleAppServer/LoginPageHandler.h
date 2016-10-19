@@ -11,7 +11,7 @@ namespace SimpleAppServer
    {
    public:
 
-       LoginPageHandler(User::ControllerBase& userController_):
+       LoginPageHandler(Santiago::User::ControllerBase& userController_):
             RequestHandlerBase(userController_)
        {}
 

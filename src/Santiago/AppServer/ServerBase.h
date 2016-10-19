@@ -30,7 +30,7 @@ namespace Santiago{ namespace AppServer
     template<typename Protocol>
     class ServerBase
     {
-        typedef std::shared_ptr<RequestHandlerBase<Protocol> > RequestHandlerBasePtr;
+        
         typedef typename Request<Protocol>::RequestId RequestId;
         typedef std::shared_ptr<Fastcgi::Request<Protocol> > FastcgiRequestPtr;
         typedef std::shared_ptr<Request<Protocol> > RequestPtr;
@@ -43,14 +43,14 @@ namespace Santiago{ namespace AppServer
         };
 
     public:
-
+      
         /**
          * The contructor.
          * @param localEndpoint_- the endpoint to listen to.
          */
         ServerBase(LocalEndpoint<Protocol> listenEndpoint_):
             _status(STOPPED),
-            _acceptor(_ioService,listenEndpoint_,std::bind(&ServerBase::handleNewRequest,this,_1))
+            _acceptor(_ioService,listenEndpoint_,std::bind(&ServerBase::handleNewRequest,this,std::placeholders::_1))
         {
             for(unsigned i=0;i<NO_OF_ASIO_USER_THREADS;i++)
             {
@@ -72,7 +72,12 @@ namespace Santiago{ namespace AppServer
             _status = STARTED;
             for(unsigned i=0;i<NO_OF_ASIO_USER_THREADS;i++)
             {
-                _threads[i].reset(new std::thread(std::bind(&boost::asio::io_service::run,&_ioService)));
+                // _threads[i].reset(new std::thread(std::bind(&boost::asio::io_service::run,&_ioService)));
+                _threads[i].reset
+                    (new std::thread
+                     (std::bind(static_cast<std::size_t (boost::asio::io_service::*)()>
+                                (&boost::asio::io_service::run),
+                                                   &_ioService)));
             }
 //            _ioService.run();
         }
@@ -110,6 +115,9 @@ namespace Santiago{ namespace AppServer
         }
 
     protected:
+
+        typedef std::shared_ptr<RequestHandlerBase<Protocol> > RequestHandlerBasePtr;
+        boost::asio::io_service                             _ioService;
 
         /**
          * The route function. Called by the server on receiving a request. The child 
@@ -154,9 +162,9 @@ namespace Santiago{ namespace AppServer
 
             RequestPtr request(new Request<Protocol>(fastcgiRequest_,onRequestCompleteCallbackFn));
             //store the request in the active requests
-            typename std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
+            typename std::map<RequestId,RequestHandlerBasePtr>::iterator iter1 =
                 _activeRequestHandlers.find(fastcgiRequest_->getId());
-            BOOST_ASSERT(iter == _activeRequestHandlers.end());
+            BOOST_ASSERT(iter1 == _activeRequestHandlers.end());
             _activeRequestHandlers[fastcgiRequest_->getId()] =  requestHandler;
             
             requestHandler->getStrand().post(std::bind(&RequestHandlerBase<Protocol>::handleRequest,
@@ -188,11 +196,10 @@ namespace Santiago{ namespace AppServer
             _activeRequestHandlers.erase(iter);
         }
 
-        Status                                          _status;
-        boost::asio::io_service                         _ioService;
-        Fastcgi::Acceptor<Protocol>                     _acceptor;
-        typename std::map<RequestId,RequestHandlerPtr>  _activeRequestHandlers;
-        std::vector<ThreadPtr>                          _threads;
+        Status                                              _status;
+        Fastcgi::Acceptor<Protocol>                         _acceptor;
+        typename std::map<RequestId,RequestHandlerBasePtr>  _activeRequestHandlers;
+        std::vector<ThreadPtr>                              _threads;
 
     };
 

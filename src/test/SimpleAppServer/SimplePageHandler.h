@@ -9,7 +9,7 @@ namespace SimpleAppServer
    {
    public:
 
-       SimplePageHandlerBase(User::ControllerBase& userController_):
+       SimplePageHandler(Santiago::User::ControllerBase& userController_):
             RequestHandlerBase(userController_)
        {}
 

@@ -107,7 +107,7 @@ namespace SimpleAppServer
         }
         else
         {
-            MyBase::Ptr thisBasePtr = this->shared_from_this();
+            MyBase::MyBase::Ptr thisBasePtr = this->shared_from_this();
             Ptr thisPtr(static_pointer_cast<RequestHandlerBase>(thisBasePtr));
             
             _userController.loginUser(
