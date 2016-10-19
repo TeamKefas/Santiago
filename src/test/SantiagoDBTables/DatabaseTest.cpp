@@ -1,4 +1,4 @@
-#include "MariaDBConnection.h"
+#include "MariaDBConnectionV1.h"
 
 using namespace Santiago::SantiagoDBTables;
 
@@ -6,12 +6,14 @@ int main()
 {
     MariaDBConnection connection;
     UserPermission permission = READ_WRITE;
+    std::error_code error;
        
     UserProfilesRec userProfileRecord;
     userProfileRecord._userName = "junais";
     userProfileRecord._password = "pakistan";
-    
-    if(!connection.addUserProfilesRec(userProfileRecord))
+
+    connection.addUserProfilesRec(userProfileRecord, error);
+    if(!error)
     {
         std::cout << "\nUser Profile Added.\n";   
     }
@@ -22,8 +24,9 @@ int main()
 
     userProfileRecord._userName = "vinay";
     userProfileRecord._password = "india";
-    
-    if(!connection.addUserProfilesRec(userProfileRecord))
+
+    connection.addUserProfilesRec(userProfileRecord, error);
+    if(!error)
     {
         std::cout << "\nUser Profile Added.\n";   
     }
@@ -34,8 +37,9 @@ int main()
 
     userProfileRecord._userName = "junais";
     userProfileRecord._password = "india";
-    
-    if(!connection.addUserProfilesRec(userProfileRecord))
+
+    connection.addUserProfilesRec(userProfileRecord, error);
+    if(!error)
     {
         std::cout << "\nUser Profile Added.\n";   
     }
@@ -43,8 +47,9 @@ int main()
     {
         std::cout << "\nUsername already used.\n";
     }
-    
-    if(!connection.deleteUserProfilesRec("vinay"))
+
+    connection.deleteUserProfilesRec("vinay", error);
+    if(!error)
     {
         std::cout << "\nUser Profile Deleted.\n";   
     }
@@ -52,8 +57,9 @@ int main()
     {
         std::cout << "\nInvalid User Id.\n";
     }
-
-    if(!connection.deleteUserProfilesRec("bineesh"))
+    
+    connection.deleteUserProfilesRec("bineesh", error);
+    if(!error)
     {
         std::cout << "\nUser Profile Deleted.\n";   
     }
@@ -64,11 +70,14 @@ int main()
 
     SessionsRec sessionRecord;
     sessionRecord._userName = "junais";
-    sessionRecord._cookieId = "kefas";
+    sessionRecord._cookieString = "kefas";
     ptime loginTime(from_iso_string("20160612T120000"));
     sessionRecord._loginTime = loginTime;
+    ptime lastActiveTime(from_iso_string("20160612T120506"));
+    sessionRecord._lastActiveTime = lastActiveTime;
 
-    if(!connection.addSessionsRec(sessionRecord))
+    connection.addSessionsRec(sessionRecord, error);
+    if(!error)
     {
          std::cout << "\nSession Added.\n"; 
     }
@@ -80,7 +89,8 @@ int main()
     ptime logoutTime(from_iso_string("20160612T130015"));
     sessionRecord._logoutTime = logoutTime;
     
-    if(!connection.updateSessionsRec(sessionRecord))
+    connection.updateSessionsRec(sessionRecord, error);
+    if(!error)
     {
          std::cout << "\nUpdated Session Record.\n"; 
     }
@@ -89,24 +99,36 @@ int main()
          std::cout << "\nSession Updation Error.\n"; 
     }
 
-    PermissionsRec permissionRecord;
+    sessionRecord._cookieString = "safek";
+    connection.updateSessionsRec(sessionRecord, error);
+    if(!error)
+    {
+         std::cout << "\nUpdated Session Record.\n"; 
+    }
+    else
+    {
+         std::cout << "\nSession Updation Error.\n"; 
+    }
+
+    /*PermissionsRec permissionRecord;
     permissionRecord._resId = 34;
     permissionRecord._userName = "junais";
     permissionRecord._userPermission = permission;
     
-    if(!connection.addPermissionsRec(permissionRecord))
+    if(!connection.addPermissionsRec(permissionRecord, error))
     {
         std::cout << "\nPermission Added.\n"; 
     }
     else
     {
         std::cout << "\nPermission Add Error.\n"; 
-    }
+        }*/
     
     userProfileRecord._userName = "junais";
-    userProfileRecord._password = "pakistan";
-    
-    if(!connection.updateUserProfilesRec(userProfileRecord,"india"))
+    userProfileRecord._password = "india";
+
+    connection.updateUserProfilesRec(userProfileRecord, error);
+    if(!error)
     {
         std::cout<< "\nPassword updated.\n";
     }
@@ -117,8 +139,9 @@ int main()
 
     userProfileRecord._userName = "vinay";
     userProfileRecord._password = "pakistan";
-    
-    if(!connection.updateUserProfilesRec(userProfileRecord,"india"))
+
+    connection.updateUserProfilesRec(userProfileRecord, error);
+    if(!error)
     {
         std::cout<< "\nPassword updated.\n";
     }
@@ -127,22 +150,23 @@ int main()
         std::cout << "\nInvalid User Id or Password.\n";
     }
 
-    userProfileRecord._userName = "junais";
+    /*userProfileRecord._userName = "junais";
     userProfileRecord._password = "pakistan";
     
-    if(!connection.updateUserProfilesRec(userProfileRecord,"india"))
+    if(!connection.updateUserProfilesRec(userProfileRecord,"india", error))
     {
         std::cout<< "\nPassword updated.\n";
     }
     else
     {
         std::cout << "\nInvalid User Id or Password.\n";
-    }
+        }*/
     
     boost::optional<UserProfilesRec> userProfileRec = UserProfilesRec();
-    
-    if(!connection.getUserProfilesRec("junais", userProfileRec))
-    {
+
+    userProfileRec = connection.getUserProfilesRec("junais", error);
+    if(!error)
+    { 
         std::cout << "\n" << userProfileRec->_id << "\t"
                   << userProfileRec->_userName << "\t"
                   << userProfileRec->_password << "\n";
@@ -151,8 +175,9 @@ int main()
     {
         std::cout << "\nInvalid User Id.\n";
     }
-        
-    if(!connection.getUserProfilesRec("vinay", userProfileRec))
+
+    userProfileRec = connection.getUserProfilesRec("vinay", error);
+    if(!error)
     {
         std::cout << "\n" << userProfileRec->_id << "\t"
                   << userProfileRec->_userName << "\t"
@@ -164,34 +189,38 @@ int main()
     }
 
     boost::optional<SessionsRec> sessionRec = SessionsRec();
-    
-    if(!connection.getSessionsRec("junais", sessionRec))
+
+    sessionRec = connection.getSessionsRec("kefas", error);
+    if(!error)
     {
         std::cout << "\n" << sessionRec->_id << "\t"
                   << sessionRec->_userName << "\t"
-                  << sessionRec->_cookieId << "\t"
+                  << sessionRec->_cookieString << "\t"
                   << sessionRec->_loginTime << "\t"
-                  << sessionRec->_logoutTime << "\n";
+                  << sessionRec->_logoutTime << "\t"
+                  << sessionRec->_lastActiveTime << "\n";
     }
     else
     {
-        std::cout << "\nInvalid User Id.\n";
+        std::cout << "\nInvalid Cookie String.\n";
     }
 
-    if(!connection.getSessionsRec("vinay", sessionRec))
+    sessionRec = connection.getSessionsRec("safek", error);
+    if(!error)
     {
         std::cout << "\n" << sessionRec->_id << "\t"
                   << sessionRec->_userName << "\t"
-                  << sessionRec->_cookieId << "\t"
+                  << sessionRec->_cookieString << "\t"
                   << sessionRec->_loginTime << "\t"
-                  << sessionRec->_logoutTime << "\n";
+                  << sessionRec->_logoutTime << "\t"
+                  << sessionRec->_lastActiveTime << "\n";
     }
     else
     {
-        std::cout << "\nInvalid User Id.\n";
+        std::cout << "\nInvalid Cookie String.\n";
     }
 
-    boost::optional<PermissionsRec> permissionRec = PermissionsRec();
+    /*boost::optional<PermissionsRec> permissionRec = PermissionsRec();
         
     if(!connection.getPermissionsRec("junais", permissionRec))
     {
@@ -215,7 +244,7 @@ int main()
     else
     {
         std::cout << "\nInvalid User Id.\n";
-    }
+        }*/
     
     return 0;
 }
