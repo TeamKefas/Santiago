@@ -285,7 +285,7 @@ namespace Santiago{ namespace SantiagoDBTables
     void MariaDBConnection::updateSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_)
     {
         std::string updateSessionsRecQuery = "UPDATE sessions SET logout_time = '" +
-            (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL'") + "', " + 
+            (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', " + 
             "last_active_time = '" + Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) +
             "' WHERE cookie_string ='" +
             sessionsRec_._cookieString + "'";
