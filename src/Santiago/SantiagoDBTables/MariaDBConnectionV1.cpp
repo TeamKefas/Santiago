@@ -180,7 +180,7 @@ namespace Santiago{ namespace SantiagoDBTables
 
     void MariaDBConnection::addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_)
     {
-        std::string addUserProfilesRecQuery = "INSERT INTO user_profiles(user_name,password) VALUES('" +
+        std::string addUserProfilesRecQuery = "INSERT INTO user_profiles(user_name, password) VALUES('" +
             userProfilesRec_._userName + "', '" + userProfilesRec_._password + "')";
 
         userProfilesRec_._id = runInsertQuery(addUserProfilesRecQuery, error_);
@@ -189,7 +189,7 @@ namespace Santiago{ namespace SantiagoDBTables
     boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRec(const std::string& userName_,
                                                                            std::error_code& error_)
     {
-        std::string getUserProfilesRecQuery = "SELECT * FROM user_profiles WHERE username = '" + userName_ + "'";
+        std::string getUserProfilesRecQuery = "SELECT * FROM user_profiles WHERE user_name = '" + userName_ + "'";
         boost::optional<UserProfilesRec> userProfilesRec;
         runSelectQuery(
             getUserProfilesRecQuery,
@@ -233,7 +233,7 @@ namespace Santiago{ namespace SantiagoDBTables
     void MariaDBConnection::addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_)
     {
         std::string addSessionsRecQuery =
-            "INSERT INTO sessions(username, cookie_string, login_time, logout_time, last_active_time) values('" +
+            "INSERT INTO sessions(user_name, cookie_string, login_time, logout_time, last_active_time) values('" +
             sessionsRec_._userName + "', '" +
             sessionsRec_._cookieString + "', '" +
             Utils::ConvertPtimeToString(sessionsRec_._loginTime) + "', '" +
@@ -286,7 +286,7 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         std::string updateSessionsRecQuery = "UPDATE sessions SET logout_time = '" +
             (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', '" + 
-            "last_update_time = '" + Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) +
+            "last_active_time = '" + Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) +
             "' WHERE cookie_string ='" +
             sessionsRec_._cookieString + "'";
         runUpdateQuery(updateSessionsRecQuery,error_);
