@@ -190,7 +190,7 @@ namespace Santiago{ namespace SantiagoDBTables
                                                                            std::error_code& error_)
     {
         std::string getUserProfilesRecQuery = "SELECT * FROM user_profiles WHERE user_name = '" + userName_ + "'";
-        boost::optional<UserProfilesRec> userProfilesRec;
+        boost::optional<UserProfilesRec> userProfilesRec = UserProfilesRec();
         runSelectQuery(
             getUserProfilesRecQuery,
             [&userProfilesRec](MYSQL_RES* mysqlResult_, std::error_code& error_)
@@ -247,7 +247,7 @@ namespace Santiago{ namespace SantiagoDBTables
                                                                    std::error_code& error_)
     {
         std::string getSessionsRecQuery = "SELECT * FROM sessions WHERE cookie_string = '" + cookieString_ + "'";
-        boost::optional<SessionsRec> sessionsRec;
+        boost::optional<SessionsRec> sessionsRec = SessionsRec();
 
         runSelectQuery(
             getSessionsRecQuery,
