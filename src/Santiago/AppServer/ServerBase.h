@@ -17,7 +17,7 @@
 #include "../LocalEndpoint.h"
 #include "../Fastcgi/Acceptor.h"
 
-#include "RequestHandler.h"
+#include "RequestHandlerBase.h"
 #define NO_OF_ASIO_USER_THREADS 5
 
 namespace Santiago{ namespace AppServer
@@ -30,7 +30,7 @@ namespace Santiago{ namespace AppServer
     template<typename Protocol>
     class ServerBase
     {
-        typedef std::shared_ptr<RequestHandler<Protocol> > RequestHandlerPtr;
+        typedef std::shared_ptr<RequestHandlerBase<Protocol> > RequestHandlerBasePtr;
         typedef typename Request<Protocol>::RequestId RequestId;
         typedef std::shared_ptr<Fastcgi::Request<Protocol> > FastcgiRequestPtr;
         typedef std::shared_ptr<Request<Protocol> > RequestPtr;
@@ -58,14 +58,6 @@ namespace Santiago{ namespace AppServer
             }
             
         }
-
-        /**
-         * The route function. Called by the server on receiving a request. The child 
-         * class must implement this function.
-         * @param requestParams- the fastcgi params passed by the webserver.
-         * @return  A RequestHandlerPtr. 
-         */
-        virtual RequestHandlerPtr route(std::map<std::string,std::string>& requestParams_) = 0;
 
         /**
          * Starts the server and its threads.
@@ -120,6 +112,15 @@ namespace Santiago{ namespace AppServer
     protected:
 
         /**
+         * The route function. Called by the server on receiving a request. The child 
+         * class must implement this function.
+         * @param requestParams- the fastcgi params passed by the webserver.
+         * @return  A RequestHandlerBasePtr. 
+         */
+        virtual RequestHandlerBasePtr route(const std::string& documentURI_) = 0;
+
+
+        /**
          * Gets the underlying boost io_service.
          */
         boost::asio::io_service& getIOService()
@@ -137,7 +138,11 @@ namespace Santiago{ namespace AppServer
         void handleNewRequest(FastcgiRequestPtr fastcgiRequest_)
         {
             //init the request handler
-            RequestHandlerPtr requestHandler = route(fastcgiRequest_->getFCGIParams());
+            std::map<std::string,std::string>::const_iterator iter =
+                fastcgiRequest_->getFCGIParams().find("DOCUMENT_URI");
+            BOOST_ASSERT(iter != fastcgiRequest_->getFCGIParams().end());
+
+            RequestHandlerBasePtr requestHandler = route(iter->second);
             if(requestHandler == NULL)
             {
                 return;
@@ -149,12 +154,13 @@ namespace Santiago{ namespace AppServer
 
             RequestPtr request(new Request<Protocol>(fastcgiRequest_,onRequestCompleteCallbackFn));
             //store the request in the active requests
-            typename std::map<RequestId,RequestHandlerPtr>::iterator iter =
+            typename std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
                 _activeRequestHandlers.find(fastcgiRequest_->getId());
             BOOST_ASSERT(iter == _activeRequestHandlers.end());
             _activeRequestHandlers[fastcgiRequest_->getId()] =  requestHandler;
             
-            requestHandler->getStrand().post(std::bind(&RequestHandler<Protocol>::handleRequest,requestHandler,request));
+            requestHandler->getStrand().post(std::bind(&RequestHandlerBase<Protocol>::handleRequest,
+                                                       requestHandler,request));
         }
 
         /**
@@ -176,7 +182,8 @@ namespace Santiago{ namespace AppServer
          */
         void handleRequestCompleteImpl(const RequestId& requestId_)
         {
-            typename std::map<RequestId,RequestHandlerPtr>::iterator iter = _activeRequestHandlers.find(requestId_);
+            typename std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
+                _activeRequestHandlers.find(requestId_);
             BOOST_ASSERT(iter != _activeRequestHandlers.end());
             _activeRequestHandlers.erase(iter);
         }

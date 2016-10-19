@@ -61,7 +61,7 @@ namespace Santiago{ namespace AppServer
          * function will be called by the server in the RequestHandlerBase's strand.
          * @param request_ - the info about the request.
          */
-        virtual void handleRequest(RequestPtr request_) = 0;
+        virtual void handleRequest(const RequestPtr& request_) = 0;
 
     protected:
 
