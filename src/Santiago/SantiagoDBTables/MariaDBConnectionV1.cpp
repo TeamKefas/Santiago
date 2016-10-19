@@ -169,8 +169,8 @@ namespace Santiago{ namespace SantiagoDBTables
         if(0 == mysql_affected_rows(_mysql))
         {
             ST_LOG_DEBUG("mysql_affected_rows() returns 0." << std::endl);
-//            error_ = std::error_code(ERR_DATABASE_QUERY_FAILED, ErrorCategory::GetInstance());
-//            return;
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            return;
         }
 
         error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
@@ -226,7 +226,7 @@ namespace Santiago{ namespace SantiagoDBTables
     void MariaDBConnection::deleteUserProfilesRec(const std::string& userName_,std::error_code& error_)
     {
         std::string deleteUserProfilesRecQuery = "DELETE FROM user_profiles WHERE user_name = '" +
-                    userName_ + "'";
+            userName_ + "'";
         runDeleteQuery(deleteUserProfilesRecQuery, error_);
     }
 
@@ -285,7 +285,7 @@ namespace Santiago{ namespace SantiagoDBTables
     void MariaDBConnection::updateSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_)
     {
         std::string updateSessionsRecQuery = "UPDATE sessions SET logout_time = '" +
-            (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', '" + 
+            (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', " + 
             "last_active_time = '" + Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) +
             "' WHERE cookie_string ='" +
             sessionsRec_._cookieString + "'";
