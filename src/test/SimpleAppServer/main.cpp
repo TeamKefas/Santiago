@@ -23,7 +23,7 @@ int main()
 
       //   SimpleAppServer::Server server(Santiago::LocalEndpoint<boost::asio::ip::tcp> (7000));
       boost::property_tree::ptree config;
-      boost::property_tree::read_json("config.json",config);
+      boost::property_tree::read_json("../src/test/SimpleAppServer/config.json",config);
       SimpleAppServer::Server server(config);
       server.start();
       int i;
