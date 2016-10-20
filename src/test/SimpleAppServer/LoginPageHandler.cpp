@@ -4,8 +4,8 @@ namespace SimpleAppServer
 {
 
     void LoginPageHandler::handleVerifiedRequest(const RequestPtr& request_,
-                                                  const std::string& userName_,
-                                                  const std::string& cookieString_)
+                                                 const std::string& userName_,
+                                                 const std::string& cookieString_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out()<<"User already logged in."<<std::endl;

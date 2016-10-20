@@ -28,7 +28,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                     const ErrorCodeCallbackFn& onCreateUserCallbackFn_);
 
         virtual void loginUserImpl(const std::string& userName_,
-                                   const std::string& passworld_,
+                                   const std::string& password_,
                                    const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_);
 
         virtual void verifyCookieAndGetUserNameImpl(const std::string& cookieString_,
