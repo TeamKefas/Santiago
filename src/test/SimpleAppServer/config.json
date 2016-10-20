@@ -1,12 +1,14 @@
-"Santiago" :
 {
+    "Santiago" :
+    {
 	"SantiagoDBTables" :
-   	 {
-        	"host" : "localhost"
-       		"user" : "root"
-		"password" : "password"
-		"db" : "DATABASE_NAME"
-		"port" : "13306"
+   	{
+            "host" : "localhost",
+       	    "user" : "root",
+	    "password" : "password",
+	    "db" : "DATABASE_NAME",
+	    "port" : "13306"
     	}
-}
+    }	
+}	
 
