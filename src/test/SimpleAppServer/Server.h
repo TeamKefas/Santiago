@@ -42,7 +42,11 @@ namespace SimpleAppServer
         }
 
         Santiago::LocalEndpoint<boost::asio::ip::tcp> 
-        getServerLocalEndpoint(const boost::property_tree::ptree& config_) const;
+        getServerLocalEndpoint(const boost::property_tree::ptree& config_) const 
+        {
+            return Santiago::LocalEndpoint<typename boost::asio::ip::tcp>
+                (config_.get<unsigned short>("Santiago.SantiagoDBTables.port"));
+        }
 
         boost::property_tree::ptree                         _config;
         Santiago::SantiagoDBTables::MariaDBConnection       _databaseConnection;
