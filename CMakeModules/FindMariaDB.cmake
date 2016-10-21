@@ -13,7 +13,7 @@ find_path(MARIADB_INCLUDE_DIR mysql.h
           /usr/local/include/mysql
           )
 
-find_library(MARIADB_LIBRARIES NAMES mysqlclient
+find_library(MARIADB_LIBRARIES NAMES mariadbclient
             PATHS
             /usr/lib/mysql
             /usr/local/lib/mysql

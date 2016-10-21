@@ -74,7 +74,7 @@ namespace Santiago{namespace Fastcgi
         {
             ParsePairs(_paramsBuffer.data(),_paramsBuffer.size(),_paramsMap);
             parseRequestGetData();
-            parseRequestPostData();
+//            parseRequestPostData();
             parseRequestHTTPCookies();
         }
 

@@ -124,6 +124,7 @@ namespace Santiago{ namespace Fastcgi
 
             if(size_ == 0)
             {
+                iter->second.second->parseRequestPostData();
                 iter->second.first._requestStateFlags |= IN_COMPLETED;
             }
             else

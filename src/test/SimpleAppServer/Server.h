@@ -44,8 +44,10 @@ namespace SimpleAppServer
         Santiago::LocalEndpoint<boost::asio::ip::tcp> 
         getServerLocalEndpoint(const boost::property_tree::ptree& config_) const 
         {
+            unsigned portNo = config_.get<unsigned>("Santiago.AppServer.port");
+
             return Santiago::LocalEndpoint<typename boost::asio::ip::tcp>
-                (config_.get<unsigned short>("Santiago.SantiagoDBTables.port"));
+                (config_.get<unsigned>("Santiago.AppServer.port"));
         }
 
         boost::property_tree::ptree                         _config;

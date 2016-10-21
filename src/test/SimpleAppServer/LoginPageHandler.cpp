@@ -101,6 +101,7 @@ namespace SimpleAppServer
         if(request_->getPostData().end() == userNameIter || request_->getPostData().end() == passwordIter)
         {
             request_->out()<<"user_name/password not send in the post data. \n";
+            request_->out()<<"in buffer: "<<request_->getStdinBuffer()<<std::endl;
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);        
@@ -144,6 +145,7 @@ namespace SimpleAppServer
             cookieData._value = *cookieString_;
             cookieData._expiryTime = boost::posix_time::second_clock::local_time() + boost::posix_time::seconds(900);
             bool flag = request_->responseHTTPCookies().insert(cookieData).second;
+            BOOST_ASSERT(flag);
 
             request_->out()<<"User login successfull. \n";
             request_->setAppStatus(0);
