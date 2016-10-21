@@ -10,7 +10,28 @@ namespace Santiago{ namespace User{ namespace SingleNode
                            const boost::property_tree::ptree& config_)
         :User::ControllerBase(ioService_,config_)
         ,_databaseConnection(databaseConnection_)
-    {}
+    {
+        srand ( time(NULL) );
+    }
+
+    std::string Controller::generateUniqueCookie()
+    {
+        std::string str;
+        static const char alphanum[] =
+            "0123456789"
+            "!@#$%^&*"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
+        
+        int stringLength = sizeof(alphanum) - 1;
+	
+        //return alphanum[rand() % stringLength];
+	for(unsigned int i = 0; i < 200; ++i)
+	{
+            str += alphanum[rand() % stringLength];
+	}
+        return str;
+    }
 
     void Controller::createUserImpl(const std::string& userName_,
                                     const std::string& password_,
@@ -67,7 +88,10 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //create new session record and add to db
         SantiagoDBTables::SessionsRec sessionsRec;
         sessionsRec._userName = userName_;
-        sessionsRec._cookieString = "12345";//TODO: make this unique
+        //  sessionsRec._cookieString = "12345";//TODO: make this unique
+        //   srand ( time(NULL) );
+        sessionsRec._cookieString = generateUniqueCookie();
+        
         sessionsRec._loginTime = boost::posix_time::second_clock::universal_time();
         sessionsRec._lastActiveTime = sessionsRec._loginTime;
 

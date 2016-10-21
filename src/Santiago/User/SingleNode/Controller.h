@@ -5,6 +5,9 @@
 #include <map>
 #include <system_error>
 #include <vector>
+#include <string>
+#include <cstdlib>
+#include <ctime>
 
 #include "Santiago/SantiagoDBTables/MariaDBConnectionV1.h"
 
@@ -22,6 +25,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
         Controller(SantiagoDBTables::MariaDBConnection& databaseConnection_,
                    boost::asio::io_service& ioService_,
                    const boost::property_tree::ptree& config_);
+        
+        std::string generateUniqueCookie();
 
         virtual void createUserImpl(const std::string& userName_,
                                     const std::string& password_,
