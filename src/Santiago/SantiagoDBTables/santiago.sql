@@ -23,4 +23,4 @@ CREATE TABLE `permissions` (
   `user_name` varchar(20) DEFAULT NULL,
   `permission` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-)
+);
