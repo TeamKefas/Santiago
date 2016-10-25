@@ -47,6 +47,7 @@ namespace Santiago{ namespace SantiagoDBTables
                          <<" port = " << config_.get<unsigned>("Santiago.SantiagoDBTables.port") << std::endl);
 
             error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+	    BOOST_ASSERT(false);
         }
         
         ST_LOG_INFO("mysql_real_connect() succeeded." << config_.get<const char*>("Santiago.SantiagoDBTables.host")
