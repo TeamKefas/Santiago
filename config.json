@@ -4,9 +4,9 @@
 	"SantiagoDBTables" :
    	{
             "host" : "localhost",
-       	    "user" : "wilson",
+       	    "user" : "root",
 	    "password" : "password",
-	    "db" : "SantiagoTest",
+	    "db" : "santiago_test",
 	    "port" : 3306
     	},
 	"AppServer" :
@@ -15,4 +15,3 @@
         }
     }	
 }	
-

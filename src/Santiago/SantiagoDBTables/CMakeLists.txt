@@ -10,4 +10,4 @@ if(WIN32)
 endif(WIN32)
 
 add_library(SantiagoDBTables STATIC ${SantiagoDBTables_SRCS})
-target_link_libraries(SantiagoDBTables Fastcgi mariadbclient ${Boost_LIBRARIES})
+target_link_libraries(SantiagoDBTables Fastcgi mariadbclient Santiago ${Boost_LIBRARIES})
