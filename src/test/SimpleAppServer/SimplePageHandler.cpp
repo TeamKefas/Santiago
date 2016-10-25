@@ -93,7 +93,8 @@ namespace SimpleAppServer
         {
             request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
         }
-        
+        request_->out()<<"InBuffer:\n";
+        request_->out()<<request_->getStdinBuffer()<<std::endl;
 //    std::cout<<request_->getFCGIParams()[REQUEST_URI];
         
         request_->setAppStatus(0);

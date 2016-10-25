@@ -19,14 +19,14 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::string str;
         static const char alphanum[] =
             "0123456789"
-            "!@#$%^&*"
+            "!@#$%^*"
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             "abcdefghijklmnopqrstuvwxyz";
         
         int stringLength = sizeof(alphanum) - 1;
 	
         //return alphanum[rand() % stringLength];
-	for(unsigned int i = 0; i < 200; ++i)
+	for(unsigned int i = 0; i < 19; ++i)
 	{
             str += alphanum[rand() % stringLength];
 	}

@@ -143,7 +143,7 @@ namespace SimpleAppServer
             Santiago::HTTPCookieData cookieData;
             cookieData._name = "SID";
             cookieData._value = *cookieString_;
-            cookieData._expiryTime = boost::posix_time::second_clock::local_time() + boost::posix_time::seconds(900);
+            cookieData._expiryTime = boost::posix_time::second_clock::universal_time() + boost::posix_time::seconds(240);
             bool flag = request_->responseHTTPCookies().insert(cookieData).second;
             BOOST_ASSERT(flag);
 

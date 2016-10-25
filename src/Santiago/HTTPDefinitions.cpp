@@ -77,7 +77,7 @@ namespace Santiago
     std::string HTTPCookieData::getSetCookieHeaderString() const
     {
         std::string cookieString;
-        cookieString.append("Set-cookie: ");
+        cookieString.append("Set-cookie:");
         cookieString.append(_name);
         cookieString.append("=");
         cookieString.append(_value);

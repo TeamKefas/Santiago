@@ -9,6 +9,7 @@ namespace SimpleAppServer
         if(request_->getHTTPCookiesReceived().end() == iter)
         {
             handleNonVerifiedRequest(request_);
+            return;
         }
 
         MyBase::Ptr thisBasePtr = this->shared_from_this();
