@@ -12,13 +12,10 @@ namespace SimpleAppServer
             return;
         }
 
-        MyBase::Ptr thisBasePtr = this->shared_from_this();
-        Ptr thisPtr(std::static_pointer_cast<RequestHandlerBase>(thisBasePtr));
-        
         _userController.verifyCookieAndGetUserName(
             iter->second,
             std::bind(&RequestHandlerBase::handleVerifyCookieAndGetUserName,
-                      thisPtr,
+                      this->sharedFromThis<RequestHandlerBase>(),
                       request_,
                       iter->second,
                       std::placeholders::_1,

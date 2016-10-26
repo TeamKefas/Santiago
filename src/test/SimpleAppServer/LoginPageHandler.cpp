@@ -108,14 +108,11 @@ namespace SimpleAppServer
         }
         else
         {
-            MyBase::MyBase::Ptr thisBasePtr = this->shared_from_this();
-            Ptr thisPtr(std::static_pointer_cast<LoginPageHandler>(thisBasePtr));
-            
             _userController.loginUser(
                 userNameIter->second,
                 passwordIter->second,
                 std::bind(&LoginPageHandler::handleLoginUser,
-                          thisPtr,
+                          this->sharedFromThis<LoginPageHandler>(),
                           request_,
                           userNameIter->second,
                           std::placeholders::_1,

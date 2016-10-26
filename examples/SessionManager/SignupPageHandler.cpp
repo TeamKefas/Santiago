@@ -45,14 +45,11 @@ namespace SimpleAppServer
         }
         else
         {
-            MyBase::MyBase::Ptr thisBasePtr = this->shared_from_this();
-            Ptr thisPtr(std::static_pointer_cast<SignupPageHandler>(thisBasePtr));
-            
             _userController.createUser(
                 userNameIter->second,
                 passwordIter->second,
                 std::bind(&SignupPageHandler::handleSignupUser,
-                          thisPtr,
+                          this->sharedFromThis<SignupPageHandler>(),
                           request_,
                           userNameIter->second,
                           std::placeholders::_1));
