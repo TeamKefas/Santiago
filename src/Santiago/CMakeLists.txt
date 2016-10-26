@@ -16,3 +16,4 @@ endif(WIN32)
 
 add_library(Santiago STATIC ${Santiago_SRCS})
 target_link_libraries(Santiago Fastcgi fastcgi_devkit SantiagoDBTables SantiagoUser Utils)
+install(TARGETS Santiago DESTINATION /usr/local/lib)

@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 project (Santiago)
 
+#install(DIRECTORY build/src/Santiago DESTINATION /usr/local/lib
+#	FILES_MATCHING PATTERN "*.a")
+
+install(DIRECTORY src/Santiago DESTINATION /usr/local/include
+        FILES_MATCHING PATTERN "*.h")
+
+
+set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules")
 
 if (WIN32)
