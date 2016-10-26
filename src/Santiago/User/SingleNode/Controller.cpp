@@ -26,7 +26,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         int stringLength = sizeof(alphanum) - 1;
 	
         //return alphanum[rand() % stringLength];
-	for(unsigned int i = 0; i < 19; ++i)
+	for(unsigned int i = 0; i < 45; ++i)
 	{
             str += alphanum[rand() % stringLength];
 	}

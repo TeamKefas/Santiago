@@ -9,7 +9,7 @@ CREATE TABLE `user_profiles` (
 CREATE TABLE `sessions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(20) DEFAULT NULL,
-  `cookie_string` varchar(20) DEFAULT NULL,
+  `cookie_string` varchar(46) DEFAULT NULL,
   `login_time` datetime DEFAULT NULL,
   `logout_time` datetime DEFAULT NULL,
   `last_active_time` datetime DEFAULT NULL,
