@@ -1,394 +1,295 @@
+#include "../Utils/PTimeUtils.h"
+#include "../Utils/STLog.h"
+
 #include "MariaDBConnection.h"
 
 namespace Santiago{ namespace SantiagoDBTables
 {
-    std::error_code MariaDBConnection::connect()
-    {       
+        //take db ip, port, username, password from config
+    MariaDBConnection::MariaDBConnection(const boost::property_tree::ptree& config_):
+        _config(config_)
+    {
+        std::error_code error;
+        connect(error);
+    }
+
+    MariaDBConnection::~MariaDBConnection()
+    {
+        std::error_code error;
+        disconnect(error);
+    }
+
+    void MariaDBConnection::connect(std::error_code& error_)
+    {
         _mysql = mysql_init(NULL);
 
-        if(_mysql == NULL) 
+        BOOST_ASSERT(_mysql != NULL); //This should be very rare. hence BOOST_ASSERT.
+
+        mysql_options(_mysql, MYSQL_OPT_RECONNECT, (void *)"1"); //set auto reconnect.
+        std::string host = _config.get<std::string>("Santiago.SantiagoDBTables.host");
+        std::string user = _config.get<std::string>("Santiago.SantiagoDBTables.user");
+        std::string password = _config.get<std::string>("Santiago.SantiagoDBTables.password");
+        std::string db = _config.get<std::string>("Santiago.SantiagoDBTables.db");
+
+        if(mysql_real_connect(_mysql,
+                              host.c_str(),
+                              user.c_str(),
+                              password.c_str(),
+                              db.c_str(),
+                              _config.get<unsigned>("Santiago.SantiagoDBTables.port"),
+                              NULL,
+                              0) == NULL)
         {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            ST_LOG_ERROR("mysql_real_connect() failed. host = " 
+                         << config_.get<const char*>("Santiago.SantiagoDBTables.host")
+                         <<" user = " << config_.get<const char*>("Santiago.SantiagoDBTables.user")
+                         <<" db = " << config_.get<const char*>("Santiago.SantiagoDBTables.db")
+                         <<" port = " << config_.get<unsigned>("Santiago.SantiagoDBTables.port") << std::endl);
+
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+	    BOOST_ASSERT(false);
         }
         
-        if(mysql_real_connect(_mysql,_host,_user,_passwd,
-           _db,_port,_unixSocket,_flags) == NULL)
-        {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-        }
+        ST_LOG_INFO("mysql_real_connect() succeeded." << config_.get<const char*>("Santiago.SantiagoDBTables.host")
+                    <<" user = " << config_.get<const char*>("Santiago.SantiagoDBTables.user")
+                    <<" db = " << config_.get<const char*>("Santiago.SantiagoDBTables.db") << std::endl);
        
-        return std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
     }
 
-    bool MariaDBConnection::isConnected()
+    void MariaDBConnection::disconnect(std::error_code& error_)
     {
-        if(_mysql == NULL)
-        {
-            return 0;
-        }
-        else
-        {
-            return 1;
-        }
-    }
-
-    std::error_code MariaDBConnection::disconnect()
-    {
+        ST_LOG_INFO("Closing db connection..." << std::endl);
         mysql_close(_mysql);
-        return std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
     }
-    
-    std::error_code MariaDBConnection::addUserProfilesRec(UserProfilesRec& userProfilesRec_)
-    {
-        if(isConnected())
-        {
-             boost::optional<UserProfilesRec> userProfilesRecord = UserProfilesRec();
 
-             if(getUserProfilesRec(userProfilesRec_._userName, userProfilesRecord))
-             {
-                std::string addUserProfilesRecQuery = "INSERT INTO USER_PROFILE(USERNAME,PASSWORD) VALUES('" +
-                    userProfilesRec_._userName + "', '" + userProfilesRec_._password + "')";
-                
-                if(mysql_query(_mysql, addUserProfilesRecQuery.c_str()))
+    void MariaDBConnection::runQueryImpl(const std::string& queryString_, std::error_code& error_)
+    {
+        ST_LOG_INFO("Running query:" << std::endl
+                    << queryString_ << std::endl);
+
+        if(mysql_query(_mysql, queryString_.c_str()) ||
+           (0 != mysql_errno(_mysql)))
+        {
+            ST_LOG_DEBUG("Db error:"<< mysql_error(_mysql) << std::endl);
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            return;
+        }
+
+        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        return;
+    }
+
+    int MariaDBConnection::runInsertQuery(const std::string& queryString_, std::error_code& error_)
+    {    
+        ST_LOG_INFO("Running insert query:" << std::endl);
+        runQueryImpl(queryString_, error_);
+        if(error_)
+        {
+            return INVALID_DATABASE_ID;
+        }
+
+        if(0 == mysql_affected_rows(_mysql))
+        {
+            ST_LOG_DEBUG("mysql_affected_rows() returns 0.");
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            return INVALID_DATABASE_ID;
+        }
+
+        int ret = mysql_insert_id(_mysql);
+        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        ST_LOG_INFO("Insert query successful." << std::endl);
+
+        return ret;
+    }
+
+    void MariaDBConnection::runSelectQuery(const std::string& queryString_,
+                                           const std::function<void(MYSQL_RES *, std::error_code&)>& postQueryFn_,
+                                           std::error_code& error_)
+    {
+        ST_LOG_INFO("Running select query:" << std::endl);
+        runQueryImpl(queryString_, error_);
+        if(error_)
+        {
+            return;
+        }
+
+        MYSQL_RES *result = mysql_store_result(_mysql);
+        if(result == NULL)
+        {
+            ST_LOG_DEBUG("mysql_store_result() returned null." << std::endl);
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            return;
+        }
+
+        if(0 != mysql_num_rows(result))
+        {
+            ST_LOG_INFO("Results found for select query." << std::endl);
+            postQueryFn_(result, error_); //error code to be set inside the postQueryFn
+        }
+        else
+        {
+            ST_LOG_DEBUG("mysql_num_rows() returned 0." << std::endl);
+            error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        }
+        mysql_free_result(result);
+        return;
+    }
+
+    void MariaDBConnection::runUpdateQuery(const std::string& queryString_, std::error_code& error_)
+    {
+        ST_LOG_INFO("Running update query:" << std::endl);
+        runQueryImpl(queryString_, error_);
+        if(error_)
+        {
+            return;
+        }
+
+        if(0 == mysql_affected_rows(_mysql))
+        {
+            ST_LOG_DEBUG("mysql_affected_rows() returns 0." << std::endl);
+//            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+//            return;
+        }
+
+        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        ST_LOG_INFO("Update query successful." << std::endl);
+        return;
+    }
+
+    void MariaDBConnection::runDeleteQuery(const std::string& queryString_, std::error_code& error_)
+    {
+        ST_LOG_INFO("Running delete query:" << std::endl);
+        runQueryImpl(queryString_, error_);
+        if(error_)
+        {
+            return;
+        }
+
+        if(0 == mysql_affected_rows(_mysql))
+        {
+            ST_LOG_DEBUG("mysql_affected_rows() returns 0." << std::endl);
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            return;
+        }
+
+        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        ST_LOG_INFO("Delete query successful." << std::endl);
+        return;
+    }
+
+    void MariaDBConnection::addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_)
+    {
+        std::string addUserProfilesRecQuery = "INSERT INTO ST_users(user_name, password) VALUES('" +
+            userProfilesRec_._userName + "', '" + userProfilesRec_._password + "')";
+
+        userProfilesRec_._id = runInsertQuery(addUserProfilesRecQuery, error_);
+    }
+
+    boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRec(const std::string& userName_,
+                                                                           std::error_code& error_)
+    {
+        std::string getUserProfilesRecQuery = "SELECT * FROM ST_users WHERE user_name = '" + userName_ + "'";
+        boost::optional<UserProfilesRec> userProfilesRec = UserProfilesRec();
+        runSelectQuery(
+            getUserProfilesRecQuery,
+            [&userProfilesRec](MYSQL_RES* mysqlResult_, std::error_code& error_)
+            {
+                if(mysql_num_rows(mysqlResult_) > 1)
                 {
-                    return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                }
-             }
-             else
-             {
-                return std::error_code(ERR_USERNAME_ALREADY_EXISTS, ErrorCategory::GetInstance());
-             }
-            
-             return std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
-        }
-        else
-        {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-        }
-    }
-
-    std::error_code MariaDBConnection::getUserProfilesRec(const std::string& userName_,
-                                                          boost::optional<UserProfilesRec>& userProfilesRec_)
-    {
-        if(isConnected())
-        {
-            std::string getUserProfilesRecQuery = "SELECT * FROM USER_PROFILE WHERE USERNAME = '" + userName_ + "'";
-            
-            if(mysql_query(_mysql, getUserProfilesRecQuery.c_str()))
-            {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
-        
-            MYSQL_RES *result = mysql_store_result(_mysql);
-            
-            if(result == NULL) 
-            {
-                return  std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
-        
-           if(mysql_num_rows(result))
-            {
-                MYSQL_ROW row;
-            
-                while((row = mysql_fetch_row(result))) 
-                { 
-                    userProfilesRec_->_id = atoi(row[0]);
-                    userProfilesRec_->_userName = row[1];
-                    userProfilesRec_->_password = row[2];
+                    ST_LOG_DEBUG("More than 1 records with same username in the ST_users table"
+                                 << std::endl);
+                    error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    BOOST_ASSERT(false);                    
                 }
                 
-                mysql_free_result(result);
-                                
-                return std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
-            }
-            else
-            {
-                return std::error_code(ERR_DATABASE_QUERY_FAILED, ErrorCategory::GetInstance());
-            }
-        }
-        else
-        {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-        }
+                MYSQL_ROW row = mysql_fetch_row(mysqlResult_);
+                BOOST_ASSERT(NULL != row);
+                
+                userProfilesRec->_id = atoi(row[0]);
+                userProfilesRec->_userName = row[1];
+                userProfilesRec->_password = row[2];
+                error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+            },
+            error_);
+
+        return userProfilesRec;
     }
-       
-    std::error_code MariaDBConnection::updateUserProfilesRec(UserProfilesRec& userProfilesRec_,
-                                                             const std::string& newPassword_)
+
+    void MariaDBConnection::updateUserProfilesRec(UserProfilesRec& newUserProfilesRec_, std::error_code& error_)
     {
-        if(isConnected())
-        {
-            std::string retrieveOldPassword = "SELECT PASSWORD FROM USER_PROFILE WHERE USERNAME = '"
-                + userProfilesRec_._userName + "'";
-        
-            if(mysql_query(_mysql, retrieveOldPassword.c_str()))
-            {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
+        std::string updateUserProfilesRecQuery = "UPDATE ST_users SET password ='" +
+            newUserProfilesRec_._password + "' WHERE user_name = '" + newUserProfilesRec_._userName +"'";
+        runUpdateQuery(updateUserProfilesRecQuery,error_);
+    }
+
+    void MariaDBConnection::deleteUserProfilesRec(const std::string& userName_,std::error_code& error_)
+    {
+        std::string deleteUserProfilesRecQuery = "DELETE FROM ST_users WHERE user_name = '" +
+            userName_ + "'";
+        runDeleteQuery(deleteUserProfilesRecQuery, error_);
+    }
+
+    void MariaDBConnection::addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_)
+    {
+        std::string addSessionsRecQuery =
+            "INSERT INTO ST_sessions(user_name, cookie_string, login_time, logout_time, last_active_time) values('" +
+            sessionsRec_._userName + "', '" +
+            sessionsRec_._cookieString + "', '" +
+            Utils::ConvertPtimeToString(sessionsRec_._loginTime) + "', '" +
+            (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', '" +
+            Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) + "')";
             
-            MYSQL_RES *result = mysql_store_result(_mysql);
-            
-            if(result == NULL) 
+        sessionsRec_._id = runInsertQuery(addSessionsRecQuery,error_);
+    }
+
+    boost::optional<SessionsRec> MariaDBConnection::getSessionsRec(const std::string& cookieString_,
+                                                                   std::error_code& error_)
+    {
+        std::string getSessionsRecQuery = "SELECT * FROM ST_sessions WHERE cookie_string = '" + cookieString_ + "'";
+        boost::optional<SessionsRec> sessionsRec = SessionsRec();
+
+        runSelectQuery(
+            getSessionsRecQuery,
+            [&sessionsRec](MYSQL_RES* mysqlResult_, std::error_code& error_)
             {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
-                    
-            if(mysql_num_rows(result))
-            {
-                MYSQL_ROW row;
-                row = mysql_fetch_row(result);
-                        
-                if(userProfilesRec_._password != row[0])
+                if(mysql_num_rows(mysqlResult_) > 1)
                 {
-                    return std::error_code(ERR_INVALID_USERNAME_PASSWORD, ErrorCategory::GetInstance());
+                    ST_LOG_DEBUG("More than 1 records with same cookie_string in the ST_sessions table "
+                                 << std::endl);
+                    error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    BOOST_ASSERT(false);
                 }
                 
-                else
-                {                   
-                    if(isConnected())
-                    {
-                        std::string updateUserProfilesRecQuery = "UPDATE USER_PROFILE SET PASSWORD='" +
-                            newPassword_ + "' WHERE USERNAME = '" + userProfilesRec_._userName +"'";
-                        
-                        if(mysql_query(_mysql, updateUserProfilesRecQuery.c_str()))
-                        {              
-                            return  std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                        }
-                        
-                        return  std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
-                    }
-                    else
-                    {
-                        return  std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                    }
-                }
-            }
-            else
-            {
-                return std::error_code(ERR_DATABASE_QUERY_FAILED, ErrorCategory::GetInstance());
-            }
-        }
-        else
-        {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-        }  
-    }
+                MYSQL_ROW row = mysql_fetch_row(mysqlResult_);
+                BOOST_ASSERT(NULL != row);
 
-    std::error_code MariaDBConnection::deleteUserProfilesRec(const std::string& userName_)
-    {
-        if(isConnected())
-        {
-            boost::optional<UserProfilesRec> userProfilesRecord = UserProfilesRec();
-            if(!getUserProfilesRec(userName_, userProfilesRecord))
-            {
-                std::string deleteUserProfilesRecQuery = "DELETE FROM USER_PROFILE WHERE USERNAME = '" +
-                    userName_ + "'";
-                    
-                if(mysql_query(_mysql, deleteUserProfilesRecQuery.c_str()))
+                sessionsRec->_id = atoi(row[0]);
+                sessionsRec->_userName = row[1];
+                sessionsRec->_cookieString = row[2];
+                sessionsRec->_loginTime = Utils::ConvertStringToPtime(row[3]);
+
+                if(NULL != row[4])
                 {
-                    return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    sessionsRec->_logoutTime = Utils::ConvertStringToPtime(row[4]);
                 }
-            
-                return std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
-            }
-            else
-            {
-                return std::error_code(ERR_INVALID_USERNAME_PASSWORD, ErrorCategory::GetInstance());
-            }
-        }
-        else
-        {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-        }
-    }
-        
-    std::error_code MariaDBConnection::addSessionsRec(SessionsRec& sessionsRec_)
-    {
-        if(isConnected())
-        {
-            std::stringstream loginTime;
-            loginTime << sessionsRec_._loginTime;
-            std::string login = loginTime.str().substr(0, 5);
-            auto searchLogin = alphabetDigit.find(loginTime.str().substr(5, 3));
-            login += searchLogin->second + loginTime.str().substr(8,12);
-            
-            std::string addSessionsRecQuery = "INSERT INTO SESSION(USERNAME,COOKIE_ID,LOGIN_TIME) VALUES('" +
-                sessionsRec_._userName + "', '" +
-                sessionsRec_._cookieId + "', '" + login + "')";
-            
-            if(mysql_query(_mysql, addSessionsRecQuery.c_str()))
-            {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
-            
-            return std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
-        }
-        else
-        {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-        }
-    }
-      
-    std::error_code MariaDBConnection::getSessionsRec(const std::string& userName_,
-                                                      boost::optional<SessionsRec>& sessionsRec_)
-    {
-        if(isConnected())
-        {
-            std::string getSessionsRecQuery = "SELECT * FROM SESSION WHERE USERNAME = '" + userName_ + "'";
-            
-            if(mysql_query(_mysql, getSessionsRecQuery.c_str()))
-            {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
-            
-            MYSQL_RES *result = mysql_store_result(_mysql);
-            
-            if(result == NULL) 
-            {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
 
-            if(mysql_num_rows(result))
-            {            
-                MYSQL_ROW row;
-                       
-                while((row = mysql_fetch_row(result))) 
-                { 
-                    sessionsRec_->_id = atoi(row[0]);
-                    sessionsRec_->_userName = row[1];
-                    sessionsRec_->_cookieId = row[2];
-                    
-                    std::stringstream loginTime;
-                    loginTime << row[3];
-                    std::string login = loginTime.str().substr(0, 5);
-                    auto searchLogin = digitAlphabet.find(loginTime.str().substr(5, 2));
-                    login += searchLogin->second + loginTime.str().substr(7,12);
-                    loginTime.str("");
-                    loginTime << login;
-                    loginTime >> sessionsRec_->_loginTime;
-                    
-                    std::stringstream logoutTime;
-                    logoutTime << row[4];
-                    std::string logout = logoutTime.str().substr(0, 5);
-                    auto searchLogout = digitAlphabet.find(logoutTime.str().substr(5, 2));
-                    logout += searchLogout->second + logoutTime.str().substr(7,12);
-                    logoutTime.str("");
-                    logoutTime << logout;
-                    logoutTime >> sessionsRec_->_logoutTime;  
-                }
-                
-                mysql_free_result(result);
-                
-                return std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
-            }
-            else
-            {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
-        }
-        else
-        {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-        }
-    }
+                sessionsRec->_lastActiveTime = Utils::ConvertStringToPtime(row[5]);
 
-    std::error_code MariaDBConnection::updateSessionsRec(SessionsRec& sessionsRec_)
-    {
-        if(isConnected())
-        {        
-            std::stringstream logoutTime;
-            logoutTime << sessionsRec_._logoutTime;
-            std::string logout = logoutTime.str().substr(0, 5);
-            auto searchLogout = alphabetDigit.find(logoutTime.str().substr(5, 3));
-            logout += searchLogout->second + logoutTime.str().substr(8, 12);
-            std::string updateSessionsRecQuery = "UPDATE SESSION SET LOGOUT_TIME='" +
-                logout + "' WHERE USERNAME='" + sessionsRec_._userName + "'";
-            
-            if(mysql_query(_mysql, updateSessionsRecQuery.c_str()))
-            {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
-            
-            return std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
-        }
-        else
-        {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-        }
+                error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+            },
+            error_);
+
+        return sessionsRec;
     }
-    
-    std::error_code MariaDBConnection::addPermissionsRec(PermissionsRec& permissionsRec_)
+    void MariaDBConnection::updateSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_)
     {
-        if(isConnected())
-        {
-            std::stringstream resId;
-            resId << permissionsRec_._resId;
-            auto search = userPermissionString.find(permissionsRec_._userPermission);
-            
-            std::string addPermissionsRecQuery = "INSERT INTO PERMISSION(RES_ID,USERNAME,PERMISSION) VALUES(" +
-                resId.str() + ", '" + permissionsRec_._userName + "', '" + search->second + "')";
-            
-            if(mysql_query(_mysql, addPermissionsRecQuery.c_str()))
-            {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
-            
-            return std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
-        }
-        else
-        {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-        }
+        std::string updateSessionsRecQuery = "UPDATE ST_sessions SET logout_time = '" +
+            (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', " + 
+            "last_active_time = '" + Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) +
+            "' WHERE cookie_string ='" +
+            sessionsRec_._cookieString + "'";
+        runUpdateQuery(updateSessionsRecQuery,error_);
     }
-  
-    std::error_code MariaDBConnection::getPermissionsRec(const std::string& userName_,
-                                                         boost::optional<PermissionsRec>& permissionsRec_)
-    {
-        if(isConnected())
-        {
-            std::string getPermissionsRecQuery = "SELECT * FROM PERMISSION WHERE USERNAME = '" + userName_ + "'";
-            
-            if(mysql_query(_mysql, getPermissionsRecQuery.c_str()))
-            {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
-            
-            MYSQL_RES *result = mysql_store_result(_mysql);
-            
-            if(result == NULL) 
-            {
-                return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-            }
-            
-            if(mysql_num_rows(result))
-            {
-                MYSQL_ROW row;
-            
-                while((row = mysql_fetch_row(result))) 
-                { 
-                    permissionsRec_->_id = atoi(row[0]);
-                    permissionsRec_->_resId = atoi(row[1]);
-                    permissionsRec_->_userName = row[2];
-                    std::string permissionString = row[3];
-                    auto search = stringUserPermission.find(permissionString);
-                    if(search != stringUserPermission.end())
-                    {
-                        permissionsRec_->_userPermission = search->second;
-                    }
-                }
-                
-                mysql_free_result(result);
-                        
-                return std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
-            }
-            else
-            {
-                return std::error_code(ERR_DATABASE_QUERY_FAILED, ErrorCategory::GetInstance());
-            }
-        }
-        else
-        {
-            return std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-        }
-    }
-    
 }}
