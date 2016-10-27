@@ -1,7 +1,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "Santiago/SantiagoDBTables/MariaDBConnectionV1.h"
+#include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 
 using namespace Santiago::SantiagoDBTables;
 
