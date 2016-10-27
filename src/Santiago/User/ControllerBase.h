@@ -25,7 +25,7 @@ namespace Santiago{ namespace User
 
         ControllerBase(boost::asio::io_service& ioService_, const boost::property_tree::ptree& config_);
 
-    protected:
+        //  protected:
         
         virtual void createUser(const std::string& userName_,
                                 const std::string& password_,
@@ -52,7 +52,8 @@ namespace Santiago{ namespace User
         virtual void deleteUser(const std::string& cookieString_,
                                 const ErrorCodeCallbackFn& onDeleteUserCallbackFn_) = 0;
 
-
+    protected:
+        
         boost::asio::io_service         &_ioService;
         boost::asio::strand              _strand;
         boost::property_tree::ptree      _config;

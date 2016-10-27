@@ -52,7 +52,7 @@ namespace SimpleAppServer
 
         boost::property_tree::ptree                         _config;
         Santiago::SantiagoDBTables::MariaDBConnection       _databaseConnection;
-        Santiago::User::SingleNode::Controller                        _userController;
+        Santiago::User::SingleNode::Controller              _userController;
     };
 
 }

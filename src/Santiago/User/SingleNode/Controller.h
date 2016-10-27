@@ -38,7 +38,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                                 const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_);
 
         virtual void logoutUserForCookie(const std::string& cookieString_,
-                                         const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_) = 0;
+                                         const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
 
         virtual void logoutUserForAllCookies(const std::string& currentCookieString_,
                                              const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_);
