@@ -9,7 +9,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "Santiago/SantiagoDBTables/MariaDBConnectionV1.h"
+#include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 
 #include "Santiago/User/ControllerBase.h"
 #include "Santiago/Utils/STLog.h"
@@ -25,6 +25,31 @@ namespace Santiago{ namespace User{ namespace SingleNode
         Controller(SantiagoDBTables::MariaDBConnection& databaseConnection_,
                    boost::asio::io_service& ioService_,
                    const boost::property_tree::ptree& config_);
+
+        virtual void createUser(const std::string& userName_,
+                                const std::string& password_,
+                                const ErrorCodeCallbackFn& onCreateUserCallbackFn_);
+
+        virtual void loginUser(const std::string& userName_,
+                               const std::string& passworld_,
+                               const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_);
+
+        virtual void verifyCookieAndGetUserName(const std::string& cookieString_,
+                                                const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_);
+
+        virtual void logoutUserForCookie(const std::string& cookieString_,
+                                         const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_) = 0;
+
+        virtual void logoutUserForAllCookies(const std::string& currentCookieString_,
+                                             const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_);
+
+        virtual void changeUserPassword(const std::string& cookieString_,
+                                        const std::string& oldPassword_,
+                                        const std::string& newPassword_,
+                                        const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
+
+        virtual void deleteUser(const std::string& cookieString_,
+                                const ErrorCodeCallbackFn& onDeleteUserCallbackFn_);
         
         std::string generateUniqueCookie();
 
