@@ -1,22 +1,20 @@
 #ifndef SANTIAGO_SANTIAGODBTABLES_MARIADBCONNECTION_H
 #define SANTIAGO_SANTIAGODBTABLES_MARIADBCONNECTION_H
 
-#include <mysql.h>
+#include <functional>
 #include <iostream>
 #include <vector>
 #include <sstream>
 
 #include <boost/optional.hpp>
+#include <boost/property_tree/ptree.hpp>
+
+#include <mysql.h>
 
 #include "../ErrorCategory.h"
 
 #include "DatabaseRecords.h"
 #include "Definitions.h"
-
-#include <boost/property_tree/ptree.hpp>
-
-//using boost::property_tree::ptree;
-
 
 namespace Santiago{ namespace SantiagoDBTables
 {
@@ -24,63 +22,40 @@ namespace Santiago{ namespace SantiagoDBTables
     {
     public:
 
-        //take db ip, port, username, password from config
-        MariaDBConnection(const boost::property_tree::ptree& config_)
-        {
-            /*  MYSQL *_mysql = config_.get<MYSQL*>("Santiago.SantiagoDBTables.mysql");
-            const char *_host = config_.get<const char*>("Santiago.SantiagoDBTables.host");
-            const char *_user = config_.get<const char*>("Santiago.SantiagoDBTables.user");
-            const char *_passwd = config_.get<const char*>("Santiago.SantiagoDBTables.passwd");
-            const char *_db = config_.get<const char*>("Santiago.SantiagoDBTables.db");
-            unsigned int _port = config_.get<unsigned int>("Santiago.SantiagoDBTables.port");
-            const char * _unixSocket = config_.get<const char*>("Santiago.SantiagoDBTables.unix_socket");
-            unsigned long _flags = config_.get<unsigned long>("Santiago.SantiagoDBTables.flags");*/
-	    
-            connect();
-         }
+        MariaDBConnection(const boost::property_tree::ptree& config_);
 
-        ~MariaDBConnection()
-        {
-            disconnect();
-        }
+        virtual ~MariaDBConnection();
         
 
         // possible error_code returns for the following fns
         // SUCCESS, DATABASE_EXCEPTION, DATABASE_QUERY_FAILED
         
-        // set userProfilesRec_._id to the auto generated id from db
-        std::error_code addUserProfilesRec(UserProfilesRec& userProfilesRec_);
-        std::error_code getUserProfilesRec(const std::string& userName_,
-                                          boost::optional<UserProfilesRec>& userProfilesRec_);
-        std::error_code updateUserProfilesRec(UserProfilesRec& userProfilesRec_, const std::string& newPassword_);
-        std::error_code deleteUserProfilesRec(const std::string& userName_);
+        void addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_);
+        boost::optional<UserProfilesRec> getUserProfilesRec(const std::string& userName_, std::error_code& error_);
+        void updateUserProfilesRec(UserProfilesRec& newUserProfilesRec_, std::error_code& error_);
+        void deleteUserProfilesRec(const std::string& userName_, std::error_code& error_);
+        
+        void addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_);
+        boost::optional<SessionsRec> getSessionsRec(const std::string& cookieString_, std::error_code& error_);
+        void updateSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_);
 
-        // set sessionsRec_._id to the auto generated id from db
-        std::error_code addSessionsRec(SessionsRec& sessionsRec_);
-        std::error_code getSessionsRec(const std::string& userName_, boost::optional<SessionsRec>& sessionsRec_);
-        std::error_code updateSessionsRec(SessionsRec& userProfilesRec_);
+    protected:
+     
+        void connect(std::error_code& error_);
+        void disconnect(std::error_code& error_);
 
-        // set permissionsRec_._id to the auto generated id from db
-        std::error_code addPermissionsRec(PermissionsRec& permissionsRec_);
-        std::error_code getPermissionsRec(const std::string& userName_,
-                                          boost::optional<PermissionsRec>& permissionsRec_);
-        
-    private:
-        
-        MYSQL *_mysql;
-        const char *_host;
-        const char *_user;
-        const char *_passwd;
-        const char *_db;
-        unsigned int _port;
-        const char *_unixSocket;
-        unsigned long _flags;
-        
-        
-        //attempt to connect 5 times before return DATABASE_EXCEPTION
-        std::error_code connect();
-        bool isConnected();
-        std::error_code disconnect();        
+
+        void runQueryImpl(const std::string& queryString_, std::error_code& error_);
+        int runInsertQuery(const std::string& queryString_, std::error_code& error_);
+        void runSelectQuery(const std::string& queryString_,
+                            const std::function<void(MYSQL_RES *, std::error_code&)>& postQueryFn_,
+                            std::error_code& error_);
+        void runUpdateQuery(const std::string& queryString_, std::error_code& error_);
+        void runDeleteQuery(const std::string& queryString_, std::error_code& error_);        
+
+        boost::property_tree::ptree   _config;
+        MYSQL                        *_mysql;
+
     };
 }}
 
