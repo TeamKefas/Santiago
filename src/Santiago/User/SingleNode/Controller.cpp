@@ -392,7 +392,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::map<std::string,std::vector<std::string> >::iterator userNameCookieListMapIter =
             _userNameCookieListMap.find(userName_);
         BOOST_ASSERT(userNameCookieListMapIter != _userNameCookieListMap.end());
-
+        
         while(userNameCookieListMapIter->second.begin() != userNameCookieListMapIter->second.end())
         {
             cleanupCookieDataAndUpdateSessionRecord(*userNameCookieListMapIter->second.begin());
