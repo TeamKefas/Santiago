@@ -15,23 +15,21 @@ namespace Santiago{ namespace User{ namespace SingleNode
     }
 
      void Controller::createUser(const std::string& userName_,
-                                    const std::string& password_,
-
-
-                                    const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
+                                 const std::string& password_,
+                                 const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
         _strand.post(std::bind(&Controller::createUserImpl,this,userName_,password_,onCreateUserCallbackFn_));
     }
 
     void Controller::loginUser(const std::string& userName_,
-                                   const std::string& password_,
-                                   const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_)
+                               const std::string& password_,
+                               const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_)
     {
         _strand.post(std::bind(&Controller::loginUserImpl,this,userName_,password_,onLoginUserCallbackFn_));
     }
 
     void Controller::verifyCookieAndGetUserName(const std::string& cookieString_,
-                                                    const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_)
+                                                const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_)
     {
         _strand.post(std::bind(&Controller::verifyCookieAndGetUserNameImpl,
                                this,
@@ -40,13 +38,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
     }
 
     void Controller::logoutUserForCookie(const std::string& cookieString_,
-                                             const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
+                                         const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
     {
         _strand.post(std::bind(&Controller::logoutUserForCookieImpl,this,cookieString_,onLogoutCookieCallbackFn_));
     }
 
     void Controller::logoutUserForAllCookies(const std::string& currentCookieString_,
-                                                 const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
+                                             const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
     {
         _strand.post(std::bind(&Controller::logoutUserForAllCookiesImpl,
                                this,
@@ -55,9 +53,9 @@ namespace Santiago{ namespace User{ namespace SingleNode
     }
 
     void Controller::changeUserPassword(const std::string& cookieString_,
-                                            const std::string& oldPassword_,
-                                            const std::string& newPassword_,
-                                            const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
+                                        const std::string& oldPassword_,
+                                        const std::string& newPassword_,
+                                        const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
     {
         _strand.post(std::bind(&Controller::changeUserPasswordImpl,
                                this,
@@ -68,7 +66,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
     }
 
     void Controller::deleteUser(const std::string& cookieString_,
-                                    const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
+                                const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
         _strand.post(std::bind(&Controller::deleteUserImpl,this,cookieString_,onDeleteUserCallbackFn_));
     }
