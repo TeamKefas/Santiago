@@ -292,4 +292,9 @@ namespace Santiago{ namespace SantiagoDBTables
             sessionsRec_._cookieString + "'";
         runUpdateQuery(updateSessionsRecQuery,error_);
     }
+
+    MariaDBConnection* CreateMariaDBConnection(const boost::property_tree::ptree& config_)
+    {
+        return new MariaDBConnection(config_);
+    }
 }}

@@ -57,6 +57,10 @@ namespace Santiago{ namespace SantiagoDBTables
         MYSQL                        *_mysql;
 
     };
+
+    //Factory function for use in ThreadSpecificVar
+    MariaDBConnection* CreateMariaDBConnection(const boost::property_tree::ptree& config_);
+
 }}
 
 #endif

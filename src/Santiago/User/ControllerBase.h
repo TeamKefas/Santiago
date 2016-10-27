@@ -25,8 +25,6 @@ namespace Santiago{ namespace User
 
         ControllerBase(boost::asio::io_service& ioService_, const boost::property_tree::ptree& config_);
 
-        //  protected:
-        
         virtual void createUser(const std::string& userName_,
                                 const std::string& password_,
                                 const ErrorCodeCallbackFn& onCreateUserCallbackFn_) = 0;

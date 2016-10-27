@@ -5,6 +5,8 @@
 
 #include "Santiago/AppServer/ServerBase.h"
 #include "Santiago/User/SingleNode/Controller.h"
+#include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
+#include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "LoginPageHandler.h"
 #include "SimplePageHandler.h"
 
@@ -12,15 +14,17 @@ namespace SimpleAppServer
 {
     class Server:public Santiago::AppServer::ServerBase<boost::asio::ip::tcp>
     {
-
     public:
+
+        typedef Santiago::ThreadSpecificVar::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection>
+        SantiagoDBConnection;
 
         typedef Santiago::AppServer::ServerBase<boost::asio::ip::tcp> MyBase;
 
         Server(const boost::property_tree::ptree& config_):
             MyBase(getServerLocalEndpoint(config_)),
             _config(config_),
-            _databaseConnection(config_),
+            _databaseConnection(std::bind(Santiago::SantiagoDBTables::CreateMariaDBConnection,config_)),
             _userController(_databaseConnection,MyBase::_ioService,config_)
         {
         }
@@ -51,7 +55,7 @@ namespace SimpleAppServer
         }
 
         boost::property_tree::ptree                         _config;
-        Santiago::SantiagoDBTables::MariaDBConnection       _databaseConnection;
+        SantiagoDBConnection                                _databaseConnection;
         Santiago::User::SingleNode::Controller              _userController;
     };
 
