@@ -14,7 +14,8 @@ namespace Santiago{ namespace ThreadSpecificVar
 
     public:
 
-        ThreadSpecificVar(const ConstructorFn& constructorFn_)
+        ThreadSpecificVar(const ConstructorFn& constructorFn_):
+            _constructorFn(constructorFn_)
 	{}
         
         ThreadSpecificVar(const ThreadSpecificVar&) = delete;
@@ -22,14 +23,14 @@ namespace Santiago{ namespace ThreadSpecificVar
 
         T& get()
         {
-            if(_dataPtr.get())
+            if(!_dataPtr.get())
             {
                 _dataPtr.reset(_constructorFn());
             }
-
+            
             return (*_dataPtr.get());
         }
-
+        
     protected:
 
         boost::thread_specific_ptr<T>   _dataPtr;

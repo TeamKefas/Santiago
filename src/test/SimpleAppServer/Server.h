@@ -24,7 +24,7 @@ namespace SimpleAppServer
         Server(const boost::property_tree::ptree& config_):
             MyBase(getServerLocalEndpoint(config_)),
             _config(config_),
-            _databaseConnection(std::bind(Santiago::SantiagoDBTables::CreateMariaDBConnection,config_)),
+	    _databaseConnection(std::bind(Santiago::SantiagoDBTables::CreateMariaDBConnection,_config)),
             _userController(_databaseConnection,MyBase::_ioService,config_)
         {
         }

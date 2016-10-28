@@ -7,7 +7,9 @@ namespace Santiago
         std::map<MIMEType,std::string>  mimeTypeStringMap
         {
             {MIMEType::TEXT,"text/plain"},
-            {MIMEType::HTML,"text/html"}
+            {MIMEType::HTML,"text/html"},
+            {MIMEType::XML,"application/xml"},
+            {MIMEType::JSON,"application/json"}
         };
 
         std::pair<std::string, std::string> MakeNameValuePairs(const std::string &inString_,
