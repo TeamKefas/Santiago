@@ -14,8 +14,9 @@ namespace Santiago{ namespace ThreadSpecificVar
 
     public:
 
-        ThreadSpecificVar(const ConstructorFn& constructorFn_);
-
+        ThreadSpecificVar(const ConstructorFn& constructorFn_)
+	{}
+        
         ThreadSpecificVar(const ThreadSpecificVar&) = delete;
         ThreadSpecificVar operator=(const ThreadSpecificVar&) = delete;
 
