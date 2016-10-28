@@ -10,6 +10,7 @@
 #include <ctime>
 
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
+#include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
 
 #include "Santiago/User/ControllerBase.h"
 #include "Santiago/Utils/STLog.h"
@@ -22,7 +23,9 @@ namespace Santiago{ namespace User{ namespace SingleNode
     {
     public:
 
-        Controller(SantiagoDBTables::MariaDBConnection& databaseConnection_,
+        typedef ThreadSpecificVar::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
+
+        Controller(ThreadSpecificDbConnection& databaseConnection_,
                    boost::asio::io_service& ioService_,
                    const boost::property_tree::ptree& config_);
 
@@ -89,7 +92,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         void cleanupCookieDataAndUpdateSessionRecord(const std::string& cookieString_);
         void cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const std::string& userName_);
 
-        SantiagoDBTables::MariaDBConnection                  &_databaseConnection;
+        ThreadSpecificDbConnection                           &_databaseConnection;
 
         std::map<std::string,SantiagoDBTables::SessionsRec>   _cookieStringSessionsRecMap;
         std::map<std::string,std::vector<std::string> >       _userNameCookieListMap;

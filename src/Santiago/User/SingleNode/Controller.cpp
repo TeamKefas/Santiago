@@ -5,7 +5,7 @@
 namespace Santiago{ namespace User{ namespace SingleNode
 {
 
-    Controller::Controller(SantiagoDBTables::MariaDBConnection& databaseConnection_,
+    Controller::Controller(ThreadSpecificDbConnection& databaseConnection_,
                            boost::asio::io_service& ioService_,
                            const boost::property_tree::ptree& config_)
         :User::ControllerBase(ioService_,config_)
@@ -114,7 +114,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         SantiagoDBTables::UserProfilesRec userProfilesRec;
         userProfilesRec._userName = userName_;
         userProfilesRec._password = password_;
-        _databaseConnection.addUserProfilesRec(userProfilesRec,error);
+        _databaseConnection.get().addUserProfilesRec(userProfilesRec,error);
         if(error)
         {
             onCreateUserCallbackFn_(error);
@@ -152,7 +152,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         sessionsRec._loginTime = boost::posix_time::second_clock::universal_time();
         sessionsRec._lastActiveTime = sessionsRec._loginTime;
 
-        _databaseConnection.addSessionsRec(sessionsRec,error);
+        _databaseConnection.get().addSessionsRec(sessionsRec,error);
         if(error)
         {
             onLoginUserCallbackFn_(error,boost::optional<std::string>());
@@ -201,7 +201,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         {
             cookieStringSessionsRecMapIter->second._lastActiveTime = boost::posix_time::second_clock::universal_time();
 //            std::error_code error; //calling db for every verify is very inefficient. So commenting out
-//            _databaseConnection.updateSessionsRec(*cookieStringSessionsRecMapIter->second,error_);
+//            _databaseConnection.get().updateSessionsRec(*cookieStringSessionsRecMapIter->second,error_);
         }
 
         ST_LOG_INFO("Verify cookie successfull. cookieString:"<<cookieString_<<std::endl);
@@ -271,7 +271,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
             
         //change and update the password
         userProfilesRecOpt->_password = newPassword_;
-        _databaseConnection.updateUserProfilesRec(*userProfilesRecOpt,error);
+        _databaseConnection.get().updateUserProfilesRec(*userProfilesRecOpt,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
         onChangePasswordCallbackFn_(error);
         return;
@@ -300,7 +300,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         }
 
         BOOST_ASSERT(userProfilesRecOpt);
-        _databaseConnection.deleteUserProfilesRec(userProfilesRecOpt->_userName,error);
+        _databaseConnection.get().deleteUserProfilesRec(userProfilesRecOpt->_userName,error);
         if(error)
         {
             onDeleteUserCallbackFn_(error);
@@ -319,7 +319,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //get the UserProfilesRec from db
         std::error_code error;
         boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt = 
-            _databaseConnection.getUserProfilesRec(userName_,error);
+            _databaseConnection.get().getUserProfilesRec(userName_,error);
         if(error)//TODO
         {
             return std::make_pair(error,userProfilesRecOpt);
@@ -364,7 +364,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //update the db
         cookieStringSessionsRecMapIter->second._logoutTime = boost::posix_time::second_clock::universal_time();
         std::error_code error;
-        _databaseConnection.updateSessionsRec(cookieStringSessionsRecMapIter->second,error);
+        _databaseConnection.get().updateSessionsRec(cookieStringSessionsRecMapIter->second,error);
         if(error)
         {
             ST_LOG_INFO("updateSessionsRec failed. Logging out without writing to db. SessionsRec:"
