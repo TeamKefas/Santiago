@@ -175,10 +175,10 @@ int main(int argc, char *argv[])
           std::cout << "\nInvalid User Id or Password.\n";
           }*/
     
-        boost::optional<UserProfilesRec> userProfileRec = UserProfilesRec();
+        boost::optional<UserProfilesRec> userProfileRec;
 
         userProfileRec = connection.getUserProfilesRec("junais", error);
-        if(!error)
+        if(!error && (userProfileRec->_id > 0))
         { 
             std::cout << "\n" << userProfileRec->_id << "\t"
                       << userProfileRec->_userName << "\t"
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
         }
 
         userProfileRec = connection.getUserProfilesRec("vinay", error);
-        if(!error)
+        if(!error && (userProfileRec->_id > 0)) 
         {
             std::cout << "\n" << userProfileRec->_id << "\t"
                       << userProfileRec->_userName << "\t"
@@ -201,10 +201,9 @@ int main(int argc, char *argv[])
             std::cout << "\nInvalid User Id.\n";
         }
 
-        boost::optional<SessionsRec> sessionRec = SessionsRec();
-
+        boost::optional<SessionsRec> sessionRec;
         sessionRec = connection.getSessionsRec("kefas", error);
-        if(!error)
+        if(!error && (sessionRec->_id > 0))
         {
             std::cout << "\n" << sessionRec->_id << "\t"
                       << sessionRec->_userName << "\t"
@@ -219,7 +218,7 @@ int main(int argc, char *argv[])
         }
 
         sessionRec = connection.getSessionsRec("safek", error);
-        if(!error)
+        if(!error && (sessionRec->_id > 0))
         {
             std::cout << "\n" << sessionRec->_id << "\t"
                       << sessionRec->_userName << "\t"
