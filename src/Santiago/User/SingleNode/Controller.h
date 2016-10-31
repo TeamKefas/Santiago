@@ -28,6 +28,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
         Controller(ThreadSpecificDbConnection& databaseConnection_,
                    boost::asio::io_service& ioService_,
                    const boost::property_tree::ptree& config_);
+	virtual ~Controller()
+	{}
 
         virtual void createUser(const std::string& userName_,
                                 const std::string& password_,

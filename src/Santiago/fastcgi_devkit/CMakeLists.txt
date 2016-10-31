@@ -5,3 +5,4 @@ if(WIN32)
 endif(WIN32)
 
 add_library(fastcgi_devkit STATIC ${fastcgi_devkit_SRCS})
+install(TARGETS fastcgi_devkit DESTINATION /usr/local/lib)

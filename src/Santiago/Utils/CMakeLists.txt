@@ -7,5 +7,6 @@ if(WIN32)
     PTimeUtils.h)
 endif(WIN32)
 
-add_library(Utils STATIC ${Utils_SRCS})
-target_link_libraries(Utils boost_date_time ${Boost_LIBRARIES})
+add_library(SantiagoUtils STATIC ${Utils_SRCS})
+target_link_libraries(SantiagoUtils boost_date_time ${Boost_LIBRARIES})
+install(TARGETS SantiagoUtils DESTINATION /usr/local/lib)

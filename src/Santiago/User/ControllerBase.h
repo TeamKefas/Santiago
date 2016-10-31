@@ -24,6 +24,8 @@ namespace Santiago{ namespace User
         ControllerBase& operator=(const ControllerBase&) = delete;
 
         ControllerBase(boost::asio::io_service& ioService_, const boost::property_tree::ptree& config_);
+	virtual ~ControllerBase()
+	{}
 
         virtual void createUser(const std::string& userName_,
                                 const std::string& password_,

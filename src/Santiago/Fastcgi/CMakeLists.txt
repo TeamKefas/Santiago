@@ -15,5 +15,6 @@ if(WIN32)
     RecordSocket.h)
 endif(WIN32)
 
-add_library(Fastcgi STATIC ${Fastcgi_SRCS})
-target_link_libraries(Fastcgi ${Boost_LIBRARIES})
+add_library(SantiagoFastcgi STATIC ${Fastcgi_SRCS})
+target_link_libraries(SantiagoFastcgi ${Boost_LIBRARIES})
+install(TARGETS SantiagoFastcgi DESTINATION /usr/local/lib)

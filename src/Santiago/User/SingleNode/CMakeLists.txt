@@ -7,3 +7,4 @@ endif(WIN32)
 
 add_library(SantiagoUserSingleNode STATIC ${SantiagoUserSingleNode_SRCS})
 target_link_libraries(SantiagoUserSingleNode SantiagoDBTables)
+install(TARGETS SantiagoUserSingleNode  DESTINATION /usr/local/lib)

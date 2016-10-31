@@ -35,5 +35,6 @@ if(WIN32)
   RemovedCookieFromAppserverRequestHandler.h)
 endif(WIN32)
 
-add_library(UserServer STATIC ${UserServer_SRCS})
-target_link_libraries(UserServer Fastcgi ${Boost_LIBRARIES})
+add_library(SantiagoUserServer STATIC ${UserServer_SRCS})
+target_link_libraries(SantiagoUserServer Fastcgi ${Boost_LIBRARIES})
+install(TARGETS SantiagoUserServer DESTINATION /usr/local/lib)
