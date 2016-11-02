@@ -11,10 +11,10 @@ namespace SimpleAppServer
             handleNonVerifiedRequest(request_);
             return;
         }
-
-        _userController.verifyCookieAndGetUserName(
+     
+        _userController.verifyCookieAndGetUserInfo(
             iter->second,
-            std::bind(&RequestHandlerBase::handleVerifyCookieAndGetUserName,
+            std::bind(&RequestHandlerBase::handleVerifyCookieAndGetUserInfo,
                       this->sharedFromThis<RequestHandlerBase>(),
                       request_,
                       iter->second,
@@ -23,10 +23,10 @@ namespace SimpleAppServer
 
     }
     
-    void RequestHandlerBase::handleVerifyCookieAndGetUserName(const RequestPtr& request_,
+    void RequestHandlerBase::handleVerifyCookieAndGetUserInfo(const RequestPtr& request_,
                                                               const std::string& cookieString_,
                                                               std::error_code error_,
-                                                              const boost::optional<std::string>& userName_)
+                                                              const boost::optional<Santiago::User::UserInfo>& userInfo_)
     {
         if(error_)
         {
@@ -34,9 +34,10 @@ namespace SimpleAppServer
         }
         else
         {
-            BOOST_ASSERT(userName_);
+            BOOST_ASSERT(userInfo_);
             handleVerifiedRequest(request_,
-                                  *userName_,
+                                  userInfo_->_userName,
+                                  userInfo_->_emailAddress,
                                   cookieString_);
         }
     }

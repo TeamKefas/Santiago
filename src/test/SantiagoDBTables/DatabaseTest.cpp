@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
     
         boost::optional<UserProfilesRec> userProfileRec;
 
-        userProfileRec = connection.getUserProfilesRec("junais", error);
+        userProfileRec = connection.getUserProfilesRecForUserName("junais", error);
         if(!error && (userProfileRec->_id > 0))
         { 
             std::cout << "\n" << userProfileRec->_id << "\t"
@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
             std::cout << "\nInvalid User Id.\n";
         }
 
-        userProfileRec = connection.getUserProfilesRec("vinay", error);
+        userProfileRec = connection.getUserProfilesRecForUserName("vinay", error);
         if(!error && (userProfileRec->_id > 0)) 
         {
             std::cout << "\n" << userProfileRec->_id << "\t"

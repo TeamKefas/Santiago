@@ -41,7 +41,9 @@ namespace Santiago
              {ERR_DATABASE_EXCEPTION,              "Database exception."},
 //             {ERR_DATABASE_QUERY_FAILED,           "Database query failed."},
              {ERR_USERNAME_ALREADY_EXISTS,         "Username already exists."},
-             {ERR_INVALID_USERNAME_PASSWORD,       "Invalid username-password."},
+             {ERR_EMAIL_ADDRESS_ALREADY_EXISTS,    "Email id already exists."},
+             {ERR_INVALID_USERNAME_PASSWORD,       "Invalid username password."},
+             {ERR_INVALID_EMAIL_ADDRESS_PASSWORD,  "Invalid email-id password."},
              {ERR_INVALID_SESSION_COOKIE,          "Invalid session cookie."},
              {ERR_INVALID_FASTCGI_REQUEST,         "Invalid fastcgi request."},
              {ERR_FASTCGI_REQUEST_ALREADY_REPLIED, "Fastcgi request already replied"}

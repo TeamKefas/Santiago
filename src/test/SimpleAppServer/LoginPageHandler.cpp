@@ -5,6 +5,7 @@ namespace SimpleAppServer
 
     void LoginPageHandler::handleVerifiedRequest(const RequestPtr& request_,
                                                  const std::string& userName_,
+                                                 const std::string& emailAddress_,
                                                  const std::string& cookieString_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
@@ -110,6 +111,7 @@ namespace SimpleAppServer
         {
             _userController.loginUser(
                 userNameIter->second,
+                true,
                 passwordIter->second,
                 std::bind(&LoginPageHandler::handleLoginUser,
                           this->sharedFromThis<LoginPageHandler>(),
@@ -125,7 +127,7 @@ namespace SimpleAppServer
     void LoginPageHandler::handleLoginUser(const RequestPtr& request_,
                                            const std::string& userName_,
                                            std::error_code error_,
-                                           const boost::optional<std::string>& cookieString_)
+                                           const boost::optional<std::pair<Santiago::User::UserInfo,std::string> >& userInfoCookieStringPair_)
     {
         if(error_)
         {
@@ -137,9 +139,10 @@ namespace SimpleAppServer
         }
         else
         {
+            BOOST_ASSERT(userInfoCookieStringPair_);
             Santiago::HTTPCookieData cookieData;
             cookieData._name = "SID";
-            cookieData._value = *cookieString_;
+            cookieData._value = userInfoCookieStringPair_->second;
             cookieData._expiryTime = boost::posix_time::second_clock::universal_time() + boost::posix_time::seconds(240);
             bool flag = request_->responseHTTPCookies().insert(cookieData).second;
             BOOST_ASSERT(flag);

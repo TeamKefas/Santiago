@@ -31,7 +31,8 @@ namespace Santiago{ namespace SantiagoDBTables
         // SUCCESS, DATABASE_EXCEPTION, DATABASE_QUERY_FAILED
         
         void addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_);
-        boost::optional<UserProfilesRec> getUserProfilesRec(const std::string& userName_, std::error_code& error_);
+        boost::optional<UserProfilesRec> getUserProfilesRecForUserName(const std::string& userName_, std::error_code& error_);
+        boost::optional<UserProfilesRec> getUserProfilesRecForEmailAddress(const std::string& userName_, std::error_code& error_);
         void updateUserProfilesRec(UserProfilesRec& newUserProfilesRec_, std::error_code& error_);
         void deleteUserProfilesRec(const std::string& userName_, std::error_code& error_);
         
@@ -44,6 +45,8 @@ namespace Santiago{ namespace SantiagoDBTables
         void connect(std::error_code& error_);
         void disconnect(std::error_code& error_);
 
+        boost::optional<UserProfilesRec> getUserProfilesRecImpl(
+            const std::string& queryString_, std::error_code& error_);
 
         void runQueryImpl(const std::string& queryString_, std::error_code& error_);
         int runInsertQuery(const std::string& queryString_, std::error_code& error_);

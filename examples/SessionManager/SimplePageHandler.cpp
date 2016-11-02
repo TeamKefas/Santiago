@@ -5,6 +5,7 @@ namespace SimpleAppServer
 
     void SimplePageHandler::handleVerifiedRequest(const RequestPtr& request_,
                                                   const std::string& userName_,
+                                                  const std::string& emailAddress_,
                                                   const std::string& cookieString_)
     {
         if(_documentURI == "/")

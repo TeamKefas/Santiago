@@ -187,13 +187,28 @@ namespace Santiago{ namespace SantiagoDBTables
         userProfilesRec_._id = runInsertQuery(addUserProfilesRecQuery, error_);
     }
 
-    boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRec(const std::string& userName_,
-                                                                           std::error_code& error_)
+    boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRecForUserName(
+        const std::string& userName_,
+        std::error_code& error_)
     {
         std::string getUserProfilesRecQuery = "SELECT * FROM ST_users WHERE user_name = '" + userName_ + "'";
+        return getUserProfilesRecImpl(getUserProfilesRecQuery,error_); 
+    }
+
+    boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRecForEmailAddress(
+        const std::string& userName_,
+        std::error_code& error_)
+    {
+        std::string getUserProfilesRecQuery = "SELECT * FROM ST_users WHERE email_address = '" + userName_ + "'";
+        return getUserProfilesRecImpl(getUserProfilesRecQuery,error_); 
+    }
+
+    boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRecImpl(const std::string& queryString_,
+                                                                               std::error_code& error_)
+    {
         boost::optional<UserProfilesRec> userProfilesRec = UserProfilesRec();
         runSelectQuery(
-            getUserProfilesRecQuery,
+            queryString_,
             [&userProfilesRec](MYSQL_RES* mysqlResult_, std::error_code& error_)
             {
                 if(mysql_num_rows(mysqlResult_) > 1)
@@ -209,7 +224,8 @@ namespace Santiago{ namespace SantiagoDBTables
                 
                 userProfilesRec->_id = atoi(row[0]);
                 userProfilesRec->_userName = row[1];
-                userProfilesRec->_password = row[2];
+                userProfilesRec->_emailAddress = row[2];
+                userProfilesRec->_password = row[3];
                 error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
             },
             error_);

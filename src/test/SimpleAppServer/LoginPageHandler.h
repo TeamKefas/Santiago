@@ -23,10 +23,11 @@ namespace SimpleAppServer
        void handleLoginUser(const RequestPtr& request_,
                             const std::string& userName_,
                             std::error_code error_,
-                            const boost::optional<std::string>& cookieString_);
+                            const boost::optional<std::pair<Santiago::User::UserInfo,std::string> >& userInfoCookieStringPair_);
 
        virtual void handleVerifiedRequest(const RequestPtr& request_,
                                           const std::string& userName_,
+                                          const std::string& emailAddress_,
                                           const std::string& cookieString_);
 
        virtual void handleNonVerifiedRequest(const RequestPtr& request_);

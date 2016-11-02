@@ -4,6 +4,7 @@ namespace SimpleAppServer
 {
     void SignupPageHandler::handleVerifiedRequest(const RequestPtr& request_,
                                                   const std::string& userName_,
+                                                  const std::string& emailAddress_,
                                                   const std::string& cookieString_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::HTML);
@@ -47,11 +48,13 @@ namespace SimpleAppServer
         {
             _userController.createUser(
                 userNameIter->second,
+                "example@example.com",
                 passwordIter->second,
                 std::bind(&SignupPageHandler::handleSignupUser,
                           this->sharedFromThis<SignupPageHandler>(),
                           request_,
                           userNameIter->second,
+                          "example@example.com",
                           std::placeholders::_1));
         }
     }
@@ -59,6 +62,7 @@ namespace SimpleAppServer
 
     void SignupPageHandler::handleSignupUser(const RequestPtr& request_,
                                              const std::string& userName_,
+                                             const std::string& emailAddress_,
                                              std::error_code error_)
                                              
     {

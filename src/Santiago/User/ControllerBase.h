@@ -11,13 +11,28 @@
 
 namespace Santiago{ namespace User
 {
+    struct UserInfo
+    {
+        UserInfo(const std::string& userName_,const std::string& emailAddress_):
+            _userName(userName_),
+            _emailAddress(emailAddress_)
+        {}
+
+        std::string  _userName;
+        std::string  _emailAddress;
+    };
 
     class ControllerBase
     {
     public:
 
-        typedef std::function<void(const std::error_code&,const boost::optional<std::string>&)>
-        ErrorCodeStringCallbackFn;
+        typedef std::function<void(const std::error_code&,const boost::optional<UserInfo>&)>
+        ErrorCodeUserInfoCallbackFn;
+
+        typedef std::function<void(const std::error_code&,const boost::optional<std::pair<UserInfo,std::string> >&)>
+        ErrorCodeUserInfoStringPairCallbackFn;
+
+
         typedef std::function<void(const std::error_code&)> ErrorCodeCallbackFn;
 
         ControllerBase(const ControllerBase&) = delete;
@@ -28,15 +43,18 @@ namespace Santiago{ namespace User
 	{}
 
         virtual void createUser(const std::string& userName_,
+                                const std::string& emailAddress_,
                                 const std::string& password_,
                                 const ErrorCodeCallbackFn& onCreateUserCallbackFn_) = 0;
 
-        virtual void loginUser(const std::string& userName_,
-                               const std::string& passworld_,
-                               const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_) = 0;
+        virtual void loginUser(const std::string& userNameOrEmailAddress_,
+                               bool isUserNameNotEmailAddress_,
+                               const std::string& password_,
+                               const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_) = 0;
 
-        virtual void verifyCookieAndGetUserName(const std::string& cookieString_,
-                                                const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_) = 0;
+        virtual void verifyCookieAndGetUserInfo(
+            const std::string& cookieString_,
+            const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_) = 0;
 
         virtual void logoutUserForCookie(const std::string& cookieString_,
                                          const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_) = 0;

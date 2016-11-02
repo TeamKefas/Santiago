@@ -18,6 +18,7 @@ namespace Santiago{ namespace SantiagoDBTables
 
         int         _id;
         std::string _userName;
+        std::string _emailAddress;
         std::string _password;
     };
     

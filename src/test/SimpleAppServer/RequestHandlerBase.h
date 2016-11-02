@@ -26,13 +26,14 @@ namespace SimpleAppServer
 
     protected:
 
-        virtual void handleVerifyCookieAndGetUserName(const RequestPtr& request_,
+        virtual void handleVerifyCookieAndGetUserInfo(const RequestPtr& request_,
                                                       const std::string& cookieString_,
                                                       std::error_code error_,
-                                                      const boost::optional<std::string>& userName_);
+                                                      const boost::optional<Santiago::User::UserInfo>& userInfo_);
 
         virtual void handleVerifiedRequest(const RequestPtr& request_,
                                            const std::string& userName_,
+                                           const std::string& emailAddress_,
                                            const std::string& cookieString_) = 0;
         virtual void handleNonVerifiedRequest(const RequestPtr& request_) = 0;
 

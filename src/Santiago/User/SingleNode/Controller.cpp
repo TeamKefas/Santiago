@@ -15,23 +15,35 @@ namespace Santiago{ namespace User{ namespace SingleNode
     }
 
      void Controller::createUser(const std::string& userName_,
+                                 const std::string& emailAddress_,
                                  const std::string& password_,
                                  const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
-        _strand.post(std::bind(&Controller::createUserImpl,this,userName_,password_,onCreateUserCallbackFn_));
+        _strand.post(std::bind(&Controller::createUserImpl,
+                               this,
+                               userName_,
+                               emailAddress_,
+                               password_,
+                               onCreateUserCallbackFn_));
     }
 
-    void Controller::loginUser(const std::string& userName_,
+    void Controller::loginUser(const std::string& userNameOrEmailAddress_,
+                               bool isUserNameNotEmailAddress_,
                                const std::string& password_,
-                               const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_)
+                               const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
     {
-        _strand.post(std::bind(&Controller::loginUserImpl,this,userName_,password_,onLoginUserCallbackFn_));
+        _strand.post(std::bind(&Controller::loginUserImpl,
+                               this,
+                               userNameOrEmailAddress_,
+                               isUserNameNotEmailAddress_,
+                               password_,
+                               onLoginUserCallbackFn_));
     }
 
-    void Controller::verifyCookieAndGetUserName(const std::string& cookieString_,
-                                                const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_)
+    void Controller::verifyCookieAndGetUserInfo(const std::string& cookieString_,
+                                                const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {
-        _strand.post(std::bind(&Controller::verifyCookieAndGetUserNameImpl,
+        _strand.post(std::bind(&Controller::verifyCookieAndGetUserInfoImpl,
                                this,
                                cookieString_,
                                onVerifyUserCallbackFn_));
@@ -91,21 +103,38 @@ namespace Santiago{ namespace User{ namespace SingleNode
     }
 
     void Controller::createUserImpl(const std::string& userName_,
+                                    const std::string& emailAddress_,
                                     const std::string& password_,
                                     const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
-        //check for existing accounts with same userName
+
         boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
         std::error_code error;
+
+        //check for existing accounts with same userName
         std::tie(error,userProfilesRecOpt) = verifyUserNamePasswordAndGetUserProfilesRec(userName_,password_);
         if(ErrorCode::ERR_DATABASE_EXCEPTION == error.value())
         {
             onCreateUserCallbackFn_(error);
             return;
         }
-        else if(ErrorCode::ERR_INVALID_USERNAME_PASSWORD != error.value())
+        else if(userProfilesRecOpt)
         {
             onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_USERNAME_ALREADY_EXISTS,
+                                                    ErrorCategory::GetInstance()));
+            return;
+        }
+
+        //check for existing accounts with same emailAddress
+        std::tie(error,userProfilesRecOpt) = verifyEmailAddressPasswordAndGetUserProfilesRec(emailAddress_,password_);
+        if(ErrorCode::ERR_DATABASE_EXCEPTION == error.value())
+        {
+            onCreateUserCallbackFn_(error);
+            return;
+        }
+        else if(userProfilesRecOpt)
+        {
+            onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
                                                     ErrorCategory::GetInstance()));
             return;
         }
@@ -113,6 +142,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //create new userProfilesRec and add to db
         SantiagoDBTables::UserProfilesRec userProfilesRec;
         userProfilesRec._userName = userName_;
+        userProfilesRec._emailAddress = emailAddress_;
         userProfilesRec._password = password_;
         _databaseConnection.get().addUserProfilesRec(userProfilesRec,error);
         if(error)
@@ -126,25 +156,39 @@ namespace Santiago{ namespace User{ namespace SingleNode
         return;
     }
 
-    void Controller::loginUserImpl(const std::string& userName_,
+    void Controller::loginUserImpl(const std::string& userNameOrEmailAddress_,
+                                   bool isUserNameNotEmailAddress_,
                                    const std::string& password_,
-                                   const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_)
+                                   const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
     {
         //verify username-password
         boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
         std::error_code error;
-        std::tie(error,userProfilesRecOpt) = verifyUserNamePasswordAndGetUserProfilesRec(userName_,
-                                                                                         password_);
-                                                                                         //,userProfilesRecOpt);
+
+        if(isUserNameNotEmailAddress_)
+        {
+            std::tie(error,userProfilesRecOpt) =
+                verifyUserNamePasswordAndGetUserProfilesRec(userNameOrEmailAddress_,
+                                                            password_);
+        }
+        else
+        {
+            std::tie(error,userProfilesRecOpt) =
+                verifyEmailAddressPasswordAndGetUserProfilesRec(userNameOrEmailAddress_,
+                                                                password_);
+        }
+
         if(error)
         {
-            onLoginUserCallbackFn_(error,boost::optional<std::string>());
+            onLoginUserCallbackFn_(error,boost::none);
             return;
         }
+        BOOST_ASSERT(userProfilesRecOpt);
+
 
         //create new session record and add to db
         SantiagoDBTables::SessionsRec sessionsRec;
-        sessionsRec._userName = userName_;
+        sessionsRec._userName = userProfilesRecOpt->_userName;
         //  sessionsRec._cookieString = "12345";//TODO: make this unique
         //   srand ( time(NULL) );
         sessionsRec._cookieString = generateUniqueCookie();
@@ -155,31 +199,46 @@ namespace Santiago{ namespace User{ namespace SingleNode
         _databaseConnection.get().addSessionsRec(sessionsRec,error);
         if(error)
         {
-            onLoginUserCallbackFn_(error,boost::optional<std::string>());
+            onLoginUserCallbackFn_(error,boost::none);
             return;
         }
         
-        //update the maps
+        //update the _cookieStringSessionsRecMap;
         bool isInsertionSuccessfulFlag =
             _cookieStringSessionsRecMap.insert(std::make_pair(sessionsRec._cookieString,sessionsRec)).second;
         BOOST_ASSERT(isInsertionSuccessfulFlag);
-        _userNameCookieListMap[userName_].push_back(sessionsRec._cookieString);
+        
+        //update the _userNameUserSessionsInfoMap;
+        std::map<std::string,UserData>::iterator iter =
+            _userNameUserDataMap.find(userProfilesRecOpt->_userName);
+        if(_userNameUserDataMap.end() == iter)
+        {
+            std::tie(iter,isInsertionSuccessfulFlag) =
+                _userNameUserDataMap.insert(std::make_pair(userProfilesRecOpt->_userName,
+                                                           UserData(userProfilesRecOpt->_emailAddress)));
+            BOOST_ASSERT(isInsertionSuccessfulFlag);
+            BOOST_ASSERT(iter != _userNameUserDataMap.end());
+        }
+        iter->second._cookieList.push_back(sessionsRec._cookieString);
+
 
         onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
                                                ErrorCategory::GetInstance()),
-                               sessionsRec._cookieString);
+                               std::make_pair(UserInfo(userProfilesRecOpt->_userName,
+                                                       userProfilesRecOpt->_emailAddress),
+                                              sessionsRec._cookieString));
         return;
     }
 
-    void Controller::verifyCookieAndGetUserNameImpl(const std::string& cookieString_,
-                                                    const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_)
+    void Controller::verifyCookieAndGetUserInfoImpl(const std::string& cookieString_,
+                                                    const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {
         std::map<std::string,SantiagoDBTables::SessionsRec>::iterator cookieStringSessionsRecMapIter;
         std::error_code error;
         std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
         if(error)
         {
-            onVerifyUserCallbackFn_(error,boost::optional<std::string>());
+            onVerifyUserCallbackFn_(error,boost::none);
         }
 
         //check if the lastActiveTime older than MAX_SESSION_DURATION. If yes then logout
@@ -194,7 +253,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
             onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,
                                                     ErrorCategory::GetInstance()),
-                                    boost::optional<std::string>());
+                                    boost::none);
             return;
         }
         else //set the lastActiveTime to now
@@ -206,8 +265,15 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
         ST_LOG_INFO("Verify cookie successfull. cookieString:"<<cookieString_<<std::endl);
 
+        //update the _userNameUserSessionsInfoMap;
+        std::map<std::string,UserData>::iterator userNameUserDataMapIter =
+            _userNameUserDataMap.find(cookieStringSessionsRecMapIter->second._userName);
+        BOOST_ASSERT(_userNameUserDataMap.end() != userNameUserDataMapIter);
+
+
         onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
-                                cookieStringSessionsRecMapIter->second._userName);
+                                UserInfo(cookieStringSessionsRecMapIter->second._userName,
+                                         userNameUserDataMapIter->second._emailAddress));
         return;
     }
 
@@ -319,7 +385,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //get the UserProfilesRec from db
         std::error_code error;
         boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt = 
-            _databaseConnection.get().getUserProfilesRec(userName_,error);
+            _databaseConnection.get().getUserProfilesRecForUserName(userName_,error);
         if(error)//TODO
         {
             return std::make_pair(error,userProfilesRecOpt);
@@ -337,6 +403,33 @@ namespace Santiago{ namespace User{ namespace SingleNode
         ST_LOG_INFO("Username password verified for userName:"<<userName_<<std::endl);
         return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),userProfilesRecOpt);
     }
+
+    std::pair<std::error_code,boost::optional<SantiagoDBTables::UserProfilesRec> > 
+    Controller::verifyEmailAddressPasswordAndGetUserProfilesRec(const std::string& emailAddress_,
+                                                                const std::string& password_)
+    {
+        //get the UserProfilesRec from db
+        std::error_code error;
+        boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt = 
+            _databaseConnection.get().getUserProfilesRecForEmailAddress(emailAddress_,error);
+        if(error)//TODO
+        {
+            return std::make_pair(error,userProfilesRecOpt);
+        }
+
+        //check if the username/password matches
+        if(!userProfilesRecOpt || (userProfilesRecOpt->_password != password_))
+        {
+            ST_LOG_INFO("Wrong emailaddress_password. emailAddress:"<<emailAddress_<<std::endl);
+            return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_PASSWORD,
+                                                  ErrorCategory::GetInstance()),
+                                  userProfilesRecOpt);
+        }
+
+        ST_LOG_INFO("EmailAddress password verified for emailAddress:"<<emailAddress_<<std::endl);
+        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),userProfilesRecOpt);
+    }
+
 
     std::pair<std::error_code,std::map<std::string,Santiago::SantiagoDBTables::SessionsRec>::iterator > 
     Controller::checkForCookieInMapAndGetSessionsRecIter(const std::string& cookieString_)
@@ -371,14 +464,21 @@ namespace Santiago{ namespace User{ namespace SingleNode
                      <<std::endl << cookieStringSessionsRecMapIter->second <<std::endl);
         }
 
-        //remove from _userNameCookieListMap
-        std::map<std::string,std::vector<std::string> >::iterator userNameCookieListMapIter =
-            _userNameCookieListMap.find(cookieStringSessionsRecMapIter->second._userName);
-        BOOST_ASSERT(userNameCookieListMapIter != _userNameCookieListMap.end());
+        //remove from _userNameUserDataMap
+        std::map<std::string,UserData>::iterator userNameUserDataMapIter =
+            _userNameUserDataMap.find(cookieStringSessionsRecMapIter->second._userName);
+        BOOST_ASSERT(userNameUserDataMapIter != _userNameUserDataMap.end());
         std::vector<std::string>::iterator cookieListIter =
-            std::find(userNameCookieListMapIter->second.begin(),userNameCookieListMapIter->second.end(),cookieString_);
-        BOOST_ASSERT(cookieListIter != userNameCookieListMapIter->second.end());
-        userNameCookieListMapIter->second.erase(cookieListIter);
+            std::find(userNameUserDataMapIter->second._cookieList.begin(),
+                      userNameUserDataMapIter->second._cookieList.end(),
+                      cookieString_);
+        BOOST_ASSERT(cookieListIter != userNameUserDataMapIter->second._cookieList.end());
+        userNameUserDataMapIter->second._cookieList.erase(cookieListIter);
+        //if all cookie are removed for a user, remove the use from the userNameUserDataMap
+        if(0 == userNameUserDataMapIter->second._cookieList.size())
+        {
+            _userNameUserDataMap.erase(userNameUserDataMapIter);
+        }
 
         //remove from _cookieStringSessionsRecMap
         _cookieStringSessionsRecMap.erase(cookieStringSessionsRecMapIter);
@@ -389,14 +489,19 @@ namespace Santiago{ namespace User{ namespace SingleNode
     void Controller:: cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const std::string& userName_)
     {
         //internal fn. the username should exist.
-        std::map<std::string,std::vector<std::string> >::iterator userNameCookieListMapIter =
-            _userNameCookieListMap.find(userName_);
-        BOOST_ASSERT(userNameCookieListMapIter != _userNameCookieListMap.end());
+        std::map<std::string,UserData >::iterator userNameUserDataMapIter =
+            _userNameUserDataMap.find(userName_);
+        BOOST_ASSERT(userNameUserDataMapIter != _userNameUserDataMap.end());
         
-        while(userNameCookieListMapIter->second.begin() != userNameCookieListMapIter->second.end())
+        while(userNameUserDataMapIter->second._cookieList.size() > 1)
         {
-            cleanupCookieDataAndUpdateSessionRecord(*userNameCookieListMapIter->second.begin());
+            cleanupCookieDataAndUpdateSessionRecord(userNameUserDataMapIter->second._cookieList[0]);
         }
+
+        BOOST_ASSERT(userNameUserDataMapIter->second._cookieList.size() == 1);
+        cleanupCookieDataAndUpdateSessionRecord(userNameUserDataMapIter->second._cookieList[0]);
+        BOOST_ASSERT(userNameUserDataMapIter == _userNameUserDataMap.end());
+
         return;
     }
 

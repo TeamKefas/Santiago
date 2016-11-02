@@ -23,6 +23,17 @@ namespace Santiago{ namespace User{ namespace SingleNode
     {
     public:
 
+        struct UserData
+        {
+            UserData(const std::string& emailAddress_):
+                _emailAddress(emailAddress_),
+                _cookieList()
+            {}
+
+            std::string                  _emailAddress;
+            std::vector<std::string>     _cookieList;
+        };
+
         typedef ThreadSpecificVar::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
 
         Controller(ThreadSpecificDbConnection& databaseConnection_,
@@ -32,15 +43,17 @@ namespace Santiago{ namespace User{ namespace SingleNode
 	{}
 
         virtual void createUser(const std::string& userName_,
+                                const std::string& emailAddress_,
                                 const std::string& password_,
                                 const ErrorCodeCallbackFn& onCreateUserCallbackFn_);
 
-        virtual void loginUser(const std::string& userName_,
-                               const std::string& passworld_,
-                               const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_);
+        virtual void loginUser(const std::string& userNameOrEmailAddress_,
+                               bool isUserNameNotEmailAddress_,
+                               const std::string& password_,
+                               const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);
 
-        virtual void verifyCookieAndGetUserName(const std::string& cookieString_,
-                                                const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_);
+        virtual void verifyCookieAndGetUserInfo(const std::string& cookieString_,
+                                                const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_);
 
         virtual void logoutUserForCookie(const std::string& cookieString_,
                                          const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
@@ -59,15 +72,17 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::string generateUniqueCookie();
 
         virtual void createUserImpl(const std::string& userName_,
+                                    const std::string& emailAddress_,
                                     const std::string& password_,
                                     const ErrorCodeCallbackFn& onCreateUserCallbackFn_);
 
-        virtual void loginUserImpl(const std::string& userName_,
+        virtual void loginUserImpl(const std::string& userNameOrEmailAddress_,
+                                   bool isUserNameNotEmailAddress_,
                                    const std::string& password_,
-                                   const ErrorCodeStringCallbackFn& onLoginUserCallbackFn_);
+                                   const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);
 
-        virtual void verifyCookieAndGetUserNameImpl(const std::string& cookieString_,
-                                                    const ErrorCodeStringCallbackFn& onVerifyUserCallbackFn_);
+        virtual void verifyCookieAndGetUserInfoImpl(const std::string& cookieString_,
+                                                    const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_);
 
         virtual void logoutUserForCookieImpl(const std::string& cookieString_,
                                              const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
@@ -88,6 +103,9 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //helper fns
         std::pair<std::error_code,boost::optional<SantiagoDBTables::UserProfilesRec> > 
         verifyUserNamePasswordAndGetUserProfilesRec(const std::string& userName_, const std::string& password_);
+        std::pair<std::error_code,boost::optional<SantiagoDBTables::UserProfilesRec> > 
+        verifyEmailAddressPasswordAndGetUserProfilesRec(const std::string& userName_, const std::string& password_);
+
         std::pair<std::error_code,std::map<std::string,Santiago::SantiagoDBTables::SessionsRec>::iterator > 
         checkForCookieInMapAndGetSessionsRecIter(const std::string& cookieString_);
 
@@ -97,7 +115,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         ThreadSpecificDbConnection                           &_databaseConnection;
 
         std::map<std::string,SantiagoDBTables::SessionsRec>   _cookieStringSessionsRecMap;
-        std::map<std::string,std::vector<std::string> >       _userNameCookieListMap;
+        std::map<std::string,UserData>                        _userNameUserDataMap;
         
     };
 
