@@ -181,8 +181,8 @@ namespace Santiago{ namespace SantiagoDBTables
 
     void MariaDBConnection::addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_)
     {
-        std::string addUserProfilesRecQuery = "INSERT INTO ST_users(user_name, password) VALUES('" +
-            userProfilesRec_._userName + "', '" + userProfilesRec_._password + "')";
+        std::string addUserProfilesRecQuery = "INSERT INTO ST_users(user_name, email_address, password) VALUES('" +
+            userProfilesRec_._userName + "', '" + userProfilesRec_._emailAddress + "', '" + userProfilesRec_._password + "')";
 
         userProfilesRec_._id = runInsertQuery(addUserProfilesRecQuery, error_);
     }
@@ -196,10 +196,10 @@ namespace Santiago{ namespace SantiagoDBTables
     }
 
     boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRecForEmailAddress(
-        const std::string& userName_,
+        const std::string& emailAddress_,
         std::error_code& error_)
     {
-        std::string getUserProfilesRecQuery = "SELECT * FROM ST_users WHERE email_address = '" + userName_ + "'";
+        std::string getUserProfilesRecQuery = "SELECT * FROM ST_users WHERE email_address = '" + emailAddress_ + "'";
         return getUserProfilesRecImpl(getUserProfilesRecQuery,error_); 
     }
 
