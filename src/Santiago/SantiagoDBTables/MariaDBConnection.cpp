@@ -149,8 +149,8 @@ namespace Santiago{ namespace SantiagoDBTables
         if(0 == mysql_affected_rows(_mysql))
         {
             ST_LOG_DEBUG("mysql_affected_rows() returns 0." << std::endl);
-//            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-//            return;
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            return;
         }
 
         error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
