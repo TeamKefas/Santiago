@@ -86,8 +86,7 @@ int main(int argc, char *argv[])
         sessionRecord._cookieString = "kefas";
         ptime loginTime(from_iso_string("20160612T120000"));
         sessionRecord._loginTime = loginTime;
-        ptime lastActiveTime(from_iso_string("20160612T120506"));
-        sessionRecord._lastActiveTime = lastActiveTime;
+        sessionRecord._lastActiveTime = loginTime;
 
         connection.addSessionsRec(sessionRecord, error);
         if(!error)
