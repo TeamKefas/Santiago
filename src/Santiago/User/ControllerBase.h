@@ -38,7 +38,12 @@ namespace Santiago{ namespace User
         ControllerBase(const ControllerBase&) = delete;
         ControllerBase& operator=(const ControllerBase&) = delete;
 
-        ControllerBase(boost::asio::io_service& ioService_, const boost::property_tree::ptree& config_);
+        ControllerBase(boost::asio::io_service& ioService_, const boost::property_tree::ptree& config_):
+            _ioService(ioService_),
+            _strand(_ioService),
+            _config(config_)
+        {}
+
 	virtual ~ControllerBase()
 	{}
 

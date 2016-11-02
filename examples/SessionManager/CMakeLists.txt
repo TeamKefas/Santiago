@@ -23,4 +23,4 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(SessionManager ${SessionManager_SRCS}) 
-target_link_libraries(SessionManager Santiago ${Boost_LIBRARIES})
+target_link_libraries(SessionManager Santiago mariadbclient ${Boost_LIBRARIES})

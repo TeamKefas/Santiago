@@ -209,17 +209,17 @@ namespace Santiago{ namespace User{ namespace SingleNode
         BOOST_ASSERT(isInsertionSuccessfulFlag);
         
         //update the _userNameUserSessionsInfoMap;
-        std::map<std::string,UserData>::iterator iter =
+        std::map<std::string,UserData>::iterator userNameUserDataMapIter =
             _userNameUserDataMap.find(userProfilesRecOpt->_userName);
-        if(_userNameUserDataMap.end() == iter)
+        if(_userNameUserDataMap.end() == userNameUserDataMapIter)
         {
-            std::tie(iter,isInsertionSuccessfulFlag) =
+            std::tie(userNameUserDataMapIter,isInsertionSuccessfulFlag) =
                 _userNameUserDataMap.insert(std::make_pair(userProfilesRecOpt->_userName,
                                                            UserData(userProfilesRecOpt->_emailAddress)));
             BOOST_ASSERT(isInsertionSuccessfulFlag);
-            BOOST_ASSERT(iter != _userNameUserDataMap.end());
+            BOOST_ASSERT(userNameUserDataMapIter != _userNameUserDataMap.end());
         }
-        iter->second._cookieList.push_back(sessionsRec._cookieString);
+        userNameUserDataMapIter->second._cookieList.push_back(sessionsRec._cookieString);
 
 
         onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
@@ -497,7 +497,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         {
             cleanupCookieDataAndUpdateSessionRecord(userNameUserDataMapIter->second._cookieList[0]);
         }
-
+        //now there is 1 cookie remaining in the cookieList vector
         BOOST_ASSERT(userNameUserDataMapIter->second._cookieList.size() == 1);
         cleanupCookieDataAndUpdateSessionRecord(userNameUserDataMapIter->second._cookieList[0]);
         BOOST_ASSERT(userNameUserDataMapIter == _userNameUserDataMap.end());

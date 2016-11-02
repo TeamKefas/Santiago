@@ -31,7 +31,7 @@ endif (UNIX)
 include_directories (${CMAKE_SOURCE_DIR})
 
 #find the boost library
-find_package(Boost COMPONENTS thread system REQUIRED)
+find_package(Boost COMPONENTS thread system date_time REQUIRED)
 include_directories( ${Boost_INCLUDE_DIR}/../ )
 set(Boost_LIBRARIES ${Boost_LIBRARIES} pthread)
 

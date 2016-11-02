@@ -1,12 +1,11 @@
-add_subdirectory(Fastcgi)
-add_subdirectory(fastcgi_devkit)
-add_subdirectory(User)
-add_subdirectory(Utils)
-add_subdirectory(SantiagoDBTables)
-#add_subdirectory(Server)
-#TODO move LocalEndpoint.h to somewhere else
-
-set(Santiago_SRCS ErrorCategory.cpp HTTPDefinitions.cpp)
+set(Santiago_SRCS
+  ErrorCategory.cpp
+  HTTPDefinitions.cpp
+  SantiagoDBTables/Definitions.cpp
+  SantiagoDBTables/MariaDBConnection.cpp
+  User/SingleNode/Controller.cpp
+  Utils/PTimeUtils.cpp
+  )
 
 if(WIN32)
   set(Santiago_SRCS ${Santiago_SRCS}
@@ -15,5 +14,5 @@ if(WIN32)
 endif(WIN32)
 
 add_library(Santiago STATIC ${Santiago_SRCS})
-target_link_libraries(Santiago SantiagoFastcgi fastcgi_devkit SantiagoDBTables SantiagoUser SantiagoUtils ${Boost_LIBRARIES})
+target_link_libraries(Santiago ${Boost_LIBRARIES})
 install(TARGETS Santiago DESTINATION /usr/local/lib)
