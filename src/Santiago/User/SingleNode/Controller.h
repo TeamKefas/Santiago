@@ -66,11 +66,18 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                         const std::string& newPassword_,
                                         const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
 
+        virtual void changeUserEmailAddress(const std::string& cookieString_,
+                                            const std::string& newEmailAddress_,
+                                            const std::string& password_,
+                                            const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
+
         virtual void deleteUser(const std::string& cookieString_,
                                 const ErrorCodeCallbackFn& onDeleteUserCallbackFn_);
         
-        std::string generateUniqueCookie();
 
+    protected:
+
+        //implementation functions to implement in strand
         virtual void createUserImpl(const std::string& userName_,
                                     const std::string& emailAddress_,
                                     const std::string& password_,
@@ -95,10 +102,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                             const std::string& newPassword_,
                                             const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
 
+        virtual void changeUserEmailAddressImpl(const std::string& cookieString_,
+                                                const std::string& newEmailAddress_,
+                                                const std::string& password_,
+                                                const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
+
         virtual void deleteUserImpl(const std::string& cookieString_,
                                     const ErrorCodeCallbackFn& onDeleteUserCallbackFn_);
-
-    protected:
 
         //helper fns
         std::pair<std::error_code,boost::optional<SantiagoDBTables::UserProfilesRec> > 
@@ -111,6 +121,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
         void cleanupCookieDataAndUpdateSessionRecord(const std::string& cookieString_);
         void cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const std::string& userName_);
+        std::string generateUniqueCookie();
 
         ThreadSpecificDbConnection                           &_databaseConnection;
 

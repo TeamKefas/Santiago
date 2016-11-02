@@ -77,29 +77,23 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                onChangePasswordCallbackFn_));
     }
 
+    void Controller::changeUserEmailAddress(const std::string& cookieString_,
+                                            const std::string& newEmailAddress_,
+                                            const std::string& password_,
+                                            const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
+    {
+        _strand.post(std::bind(&Controller::changeUserEmailAddressImpl,
+                               this,
+                               cookieString_,
+                               newEmailAddress_,
+                               password_,
+                               onChangeEmailAddressCallbackFn_));
+    }
+
     void Controller::deleteUser(const std::string& cookieString_,
                                 const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
         _strand.post(std::bind(&Controller::deleteUserImpl,this,cookieString_,onDeleteUserCallbackFn_));
-    }
-
-    std::string Controller::generateUniqueCookie()
-    {
-        std::string str;
-        static const char alphanum[] =
-            "0123456789"
-            "!@#$%^*"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-        
-        int stringLength = sizeof(alphanum) - 1;
-	
-        //return alphanum[rand() % stringLength];
-	for(unsigned int i = 0; i < 45; ++i)
-	{
-            str += alphanum[rand() % stringLength];
-	}
-        return str;
     }
 
     void Controller::createUserImpl(const std::string& userName_,
@@ -112,7 +106,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::error_code error;
 
         //check for existing accounts with same userName
-        std::tie(error,userProfilesRecOpt) = verifyUserNamePasswordAndGetUserProfilesRec(userName_,password_);
+        std::tie(error,userProfilesRecOpt) = verifyUserNamePasswordAndGetUserProfilesRec(userName_,"");
         if(ErrorCode::ERR_DATABASE_EXCEPTION == error.value())
         {
             onCreateUserCallbackFn_(error);
@@ -126,7 +120,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         }
 
         //check for existing accounts with same emailAddress
-        std::tie(error,userProfilesRecOpt) = verifyEmailAddressPasswordAndGetUserProfilesRec(emailAddress_,password_);
+        std::tie(error,userProfilesRecOpt) = verifyEmailAddressPasswordAndGetUserProfilesRec(emailAddress_,"");
         if(ErrorCode::ERR_DATABASE_EXCEPTION == error.value())
         {
             onCreateUserCallbackFn_(error);
@@ -344,6 +338,57 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
     }
 
+    void Controller::changeUserEmailAddressImpl(const std::string& cookieString_,
+                                                const std::string& newEmailAddress_,
+                                                const std::string& password_,
+                                                const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
+    {
+        std::map<std::string,SantiagoDBTables::SessionsRec>::iterator cookieStringSessionsRecMapIter;
+        std::error_code error;
+        std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
+        if(error)
+        {
+            onChangeEmailAddressCallbackFn_(error);
+        }
+
+        std::string userName = cookieStringSessionsRecMapIter->second._userName;
+        //verify password
+        boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
+        std::tie(error,userProfilesRecOpt) =
+            verifyUserNamePasswordAndGetUserProfilesRec(cookieStringSessionsRecMapIter->second._userName,password_);
+        if(error)
+        {
+            onChangeEmailAddressCallbackFn_(error);
+            return;
+        }
+        BOOST_ASSERT(userProfilesRecOpt);
+
+        SantiagoDBTables::UserProfilesRec newUserProfilesRec = *userProfilesRecOpt;
+
+        //verify no other existing user with same email address
+        std::tie(error,userProfilesRecOpt) =
+            verifyEmailAddressPasswordAndGetUserProfilesRec(newEmailAddress_,"");
+        if(ErrorCode::ERR_DATABASE_EXCEPTION == error.value())
+        {
+            onChangeEmailAddressCallbackFn_(error);
+            return;
+        }
+        else if(userProfilesRecOpt)
+        {
+            onChangeEmailAddressCallbackFn_(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
+                                                            ErrorCategory::GetInstance()));
+            return;
+        }
+
+        //change and update the password
+        newUserProfilesRec._emailAddress = newEmailAddress_;
+        _databaseConnection.get().updateUserProfilesRec(newUserProfilesRec,error);
+        //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
+        onChangeEmailAddressCallbackFn_(error);
+        return;
+
+    }
+
     void Controller::deleteUserImpl(const std::string& cookieString_,
                                     const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
@@ -503,6 +548,25 @@ namespace Santiago{ namespace User{ namespace SingleNode
         BOOST_ASSERT(userNameUserDataMapIter == _userNameUserDataMap.end());
 
         return;
+    }
+
+    std::string Controller::generateUniqueCookie()
+    {
+        std::string str;
+        static const char alphanum[] =
+            "0123456789"
+            "!@#$%^*"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
+        
+        int stringLength = sizeof(alphanum) - 1;
+	
+        //return alphanum[rand() % stringLength];
+	for(unsigned int i = 0; i < 45; ++i)
+	{
+            str += alphanum[rand() % stringLength];
+	}
+        return str;
     }
 
 }}}

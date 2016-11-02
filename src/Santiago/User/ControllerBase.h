@@ -72,6 +72,11 @@ namespace Santiago{ namespace User
                                         const std::string& newPassword_,
                                         const ErrorCodeCallbackFn& onChangePasswordCallbackFn_) = 0;
 
+        virtual void changeUserEmailAddress(const std::string& cookieString_,
+                                            const std::string& newEmailAddress_,
+                                            const std::string& password_,
+                                            const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_) = 0;
+
         virtual void deleteUser(const std::string& cookieString_,
                                 const ErrorCodeCallbackFn& onDeleteUserCallbackFn_) = 0;
 

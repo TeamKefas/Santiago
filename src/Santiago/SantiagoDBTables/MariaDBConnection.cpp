@@ -66,10 +66,13 @@ namespace Santiago{ namespace SantiagoDBTables
 
     void MariaDBConnection::runQueryImpl(const std::string& queryString_, std::error_code& error_)
     {
+        std::shared_ptr<char> escapedQueryString(new char[queryString_.size()*2 + 1]);
+        mysql_real_escape_string(_mysql,escapedQueryString.get(),queryString_.c_str(),queryString_.size());
+
         ST_LOG_INFO("Running query:" << std::endl
                     << queryString_ << std::endl);
 
-        if(mysql_query(_mysql, queryString_.c_str()) ||
+        if(mysql_query(_mysql, escapedQueryString.get()) ||
            (0 != mysql_errno(_mysql)))
         {
             ST_LOG_DEBUG("Db error:"<< mysql_error(_mysql) << std::endl);
@@ -235,7 +238,8 @@ namespace Santiago{ namespace SantiagoDBTables
     void MariaDBConnection::updateUserProfilesRec(UserProfilesRec& newUserProfilesRec_, std::error_code& error_)
     {
         std::string updateUserProfilesRecQuery = "UPDATE ST_users SET password ='" +
-            newUserProfilesRec_._password + "' WHERE user_name = '" + newUserProfilesRec_._userName +"'";
+            newUserProfilesRec_._password + "', email_address = '" + newUserProfilesRec_._emailAddress +
+            "' WHERE user_name = '" + newUserProfilesRec_._userName +"'";
         runUpdateQuery(updateUserProfilesRecQuery,error_);
     }
 
