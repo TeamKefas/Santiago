@@ -183,7 +183,6 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         std::string addUserProfilesRecQuery = "INSERT INTO ST_users(user_name, email_address, password) VALUES('" +
             userProfilesRec_._userName + "', '" + userProfilesRec_._emailAddress + "', '" + userProfilesRec_._password + "')";
-
         userProfilesRec_._id = runInsertQuery(addUserProfilesRecQuery, error_);
     }
 

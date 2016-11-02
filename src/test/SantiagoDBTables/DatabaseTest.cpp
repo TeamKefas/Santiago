@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
        
         UserProfilesRec userProfileRecord;
         userProfileRecord._userName = "junais";
+        userProfileRecord._emailAddress = "junais@gmail.com";
         userProfileRecord._password = "pakistan";
 
         connection.addUserProfilesRec(userProfileRecord, error);
@@ -36,6 +37,7 @@ int main(int argc, char *argv[])
         }
 
         userProfileRecord._userName = "vinay";
+        userProfileRecord._emailAddress = "vinay@hotmail.com";
         userProfileRecord._password = "india";
 
         connection.addUserProfilesRec(userProfileRecord, error);
@@ -49,8 +51,7 @@ int main(int argc, char *argv[])
         }
 
         userProfileRecord._userName = "junais";
-        userProfileRecord._password = "india";
-
+       
         connection.addUserProfilesRec(userProfileRecord, error);
         if(!error)
         {
