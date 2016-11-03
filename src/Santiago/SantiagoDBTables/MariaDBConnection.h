@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <cstring>
+#include <algorithm>
 
 #include <boost/optional.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -15,9 +17,6 @@
 
 #include "DatabaseRecords.h"
 #include "Definitions.h"
-
-#include <cstring>
-#include <algorithm> 
 
 namespace Santiago{ namespace SantiagoDBTables
 {
