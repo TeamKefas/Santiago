@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            std::cout << "\nInvalid User Id.\n";
+            std::cout << "\nInvalid Username.\n";
         }
     
         connection.deleteUserProfilesRec("bineesh", error);
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            std::cout << "\nInvalid User Id.\n";
+            std::cout << "\nInvalid Username.\n";
         }
 
         SessionsRec sessionRecord;
@@ -138,6 +138,7 @@ int main(int argc, char *argv[])
           }*/
     
         userProfileRecord._userName = "junais";
+        userProfileRecord._emailAddress = "junais@gmail.com";
         userProfileRecord._password = "india";
 
         connection.updateUserProfilesRec(userProfileRecord, error);
@@ -147,7 +148,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            std::cout << "\nInvalid User Id or Password.\n";
+            std::cout << "\nInvalid Username or Password.\n";
         }
 
         userProfileRecord._userName = "vinay";
@@ -160,7 +161,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            std::cout << "\nInvalid User Id or Password.\n";
+            std::cout << "\nInvalid Username or Password.\n";
         }
 
         /*userProfileRecord._userName = "junais";
@@ -186,7 +187,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            std::cout << "\nInvalid User Id.\n";
+            std::cout << "\nInvalid Username.\n";
         }
 
         userProfileRec = connection.getUserProfilesRecForUserName("vinay", error);
@@ -198,7 +199,31 @@ int main(int argc, char *argv[])
         }
         else
         {
-            std::cout << "\nInvalid User Id.\n";
+            std::cout << "\nInvalid Username.\n";
+        }
+
+        userProfileRec = connection.getUserProfilesRecForEmailAddress("junais@gmail.com", error);
+        if(!error && (userProfileRec->_id > 0))
+        { 
+            std::cout << "\n" << userProfileRec->_id << "\t"
+                      << userProfileRec->_userName << "\t"
+                      << userProfileRec->_password << "\n";
+        }
+        else
+        {
+            std::cout << "\nInvalid Email Id.\n";
+        }
+
+        userProfileRec = connection.getUserProfilesRecForEmailAddress("vinay@gmail.com", error);
+        if(!error && (userProfileRec->_id > 0)) 
+        {
+            std::cout << "\n" << userProfileRec->_id << "\t"
+                      << userProfileRec->_userName << "\t"
+                      << userProfileRec->_password << "\n";
+        }
+        else
+        {
+            std::cout << "\nInvalid Email Id.\n";
         }
 
         boost::optional<SessionsRec> sessionRec;

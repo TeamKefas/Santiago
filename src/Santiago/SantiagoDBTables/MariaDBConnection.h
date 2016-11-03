@@ -16,6 +16,9 @@
 #include "DatabaseRecords.h"
 #include "Definitions.h"
 
+#include <cstring>
+#include <algorithm> 
+
 namespace Santiago{ namespace SantiagoDBTables
 {
     class MariaDBConnection
@@ -29,7 +32,8 @@ namespace Santiago{ namespace SantiagoDBTables
 
         // possible error_code returns for the following fns
         // SUCCESS, DATABASE_EXCEPTION, DATABASE_QUERY_FAILED
-        
+
+        void escCharCheck(std::string userInput_);
         void addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_);
         boost::optional<UserProfilesRec> getUserProfilesRecForUserName(const std::string& userName_, std::error_code& error_);
         boost::optional<UserProfilesRec> getUserProfilesRecForEmailAddress(const std::string& userName_, std::error_code& error_);

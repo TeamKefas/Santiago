@@ -66,13 +66,10 @@ namespace Santiago{ namespace SantiagoDBTables
 
     void MariaDBConnection::runQueryImpl(const std::string& queryString_, std::error_code& error_)
     {
-        std::shared_ptr<char> escapedQueryString(new char[queryString_.size()*2 + 1]);
-        mysql_real_escape_string(_mysql,escapedQueryString.get(),queryString_.c_str(),queryString_.size());
-
         ST_LOG_INFO("Running query:" << std::endl
                     << queryString_ << std::endl);
-
-        if(mysql_query(_mysql, escapedQueryString.get()) ||
+        
+        if(mysql_query(_mysql, queryString_.c_str()) ||
            (0 != mysql_errno(_mysql)))
         {
             ST_LOG_DEBUG("Db error:"<< mysql_error(_mysql) << std::endl);
@@ -182,8 +179,23 @@ namespace Santiago{ namespace SantiagoDBTables
         return;
     }
 
+    void MariaDBConnection::escCharCheck(std::string userInput_)
+    {
+        std::string inputString = userInput_;
+        char chars[] = "\"';";
+
+        for(unsigned int i = 0; i < strlen(chars); ++i)
+        {
+            userInput_.erase(std::remove(userInput_.begin(), userInput_.end(), chars[i]), userInput_.end());
+        }
+        BOOST_ASSERT(userInput_ == inputString);        
+    }
+
     void MariaDBConnection::addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_)
     {
+        escCharCheck(userProfilesRec_._userName);
+        escCharCheck(userProfilesRec_._emailAddress);
+        escCharCheck(userProfilesRec_._password);
         std::string addUserProfilesRecQuery = "INSERT INTO ST_users(user_name, email_address, password) VALUES('" +
             userProfilesRec_._userName + "', '" + userProfilesRec_._emailAddress + "', '" + userProfilesRec_._password + "')";
         userProfilesRec_._id = runInsertQuery(addUserProfilesRecQuery, error_);
@@ -193,6 +205,7 @@ namespace Santiago{ namespace SantiagoDBTables
         const std::string& userName_,
         std::error_code& error_)
     {
+        escCharCheck(userName_);
         std::string getUserProfilesRecQuery = "SELECT * FROM ST_users WHERE user_name = '" + userName_ + "'";
         return getUserProfilesRecImpl(getUserProfilesRecQuery,error_); 
     }
@@ -201,6 +214,7 @@ namespace Santiago{ namespace SantiagoDBTables
         const std::string& emailAddress_,
         std::error_code& error_)
     {
+        escCharCheck(emailAddress_);
         std::string getUserProfilesRecQuery = "SELECT * FROM ST_users WHERE email_address = '" + emailAddress_ + "'";
         return getUserProfilesRecImpl(getUserProfilesRecQuery,error_); 
     }
@@ -237,6 +251,9 @@ namespace Santiago{ namespace SantiagoDBTables
 
     void MariaDBConnection::updateUserProfilesRec(UserProfilesRec& newUserProfilesRec_, std::error_code& error_)
     {
+        escCharCheck(newUserProfilesRec_._password);
+        escCharCheck(newUserProfilesRec_._emailAddress);
+        escCharCheck(newUserProfilesRec_._userName);
         std::string updateUserProfilesRecQuery = "UPDATE ST_users SET password ='" +
             newUserProfilesRec_._password + "', email_address = '" + newUserProfilesRec_._emailAddress +
             "' WHERE user_name = '" + newUserProfilesRec_._userName +"'";
@@ -245,6 +262,7 @@ namespace Santiago{ namespace SantiagoDBTables
 
     void MariaDBConnection::deleteUserProfilesRec(const std::string& userName_,std::error_code& error_)
     {
+        escCharCheck(userName_);
         std::string deleteUserProfilesRecQuery = "DELETE FROM ST_users WHERE user_name = '" +
             userName_ + "'";
         runDeleteQuery(deleteUserProfilesRecQuery, error_);
@@ -252,6 +270,8 @@ namespace Santiago{ namespace SantiagoDBTables
 
     void MariaDBConnection::addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_)
     {
+        escCharCheck(sessionsRec_._userName);
+        escCharCheck(sessionsRec_._cookieString);
         std::string addSessionsRecQuery =
             "INSERT INTO ST_sessions(user_name, cookie_string, login_time, logout_time, last_active_time) values('" +
             sessionsRec_._userName + "', '" +
@@ -266,6 +286,7 @@ namespace Santiago{ namespace SantiagoDBTables
     boost::optional<SessionsRec> MariaDBConnection::getSessionsRec(const std::string& cookieString_,
                                                                    std::error_code& error_)
     {
+        escCharCheck(cookieString_);
         std::string getSessionsRecQuery = "SELECT * FROM ST_sessions WHERE cookie_string = '" + cookieString_ + "'";
         boost::optional<SessionsRec> sessionsRec = SessionsRec();
 
@@ -304,6 +325,7 @@ namespace Santiago{ namespace SantiagoDBTables
     }
     void MariaDBConnection::updateSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_)
     {
+        escCharCheck(sessionsRec_._cookieString);
         std::string updateSessionsRecQuery = "UPDATE ST_sessions SET logout_time = '" +
             (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', " + 
             "last_active_time = '" + Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) +
