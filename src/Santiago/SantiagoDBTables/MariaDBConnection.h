@@ -32,7 +32,6 @@ namespace Santiago{ namespace SantiagoDBTables
         // possible error_code returns for the following fns
         // SUCCESS, DATABASE_EXCEPTION, DATABASE_QUERY_FAILED
 
-        void checkEscChar(std::string userInput_);
         void addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_);
         boost::optional<UserProfilesRec> getUserProfilesRecForUserName(const std::string& userName_, std::error_code& error_);
         boost::optional<UserProfilesRec> getUserProfilesRecForEmailAddress(const std::string& userName_, std::error_code& error_);
@@ -50,6 +49,9 @@ namespace Santiago{ namespace SantiagoDBTables
 
         boost::optional<UserProfilesRec> getUserProfilesRecImpl(
             const std::string& queryString_, std::error_code& error_);
+
+        std::string getEscapedString(const std::string& nonEscapedString_);
+        bool isUserInputClean(const std::string& userInput_);
 
         void runQueryImpl(const std::string& queryString_, std::error_code& error_);
         int runInsertQuery(const std::string& queryString_, std::error_code& error_);

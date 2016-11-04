@@ -107,7 +107,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
         //check for existing accounts with same userName
         std::tie(error,userProfilesRecOpt) = verifyUserNamePasswordAndGetUserProfilesRec(userName_,"");
-        if(ErrorCode::ERR_DATABASE_EXCEPTION == error.value())
+        if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
+           (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
             onCreateUserCallbackFn_(error);
             return;
@@ -121,7 +122,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
         //check for existing accounts with same emailAddress
         std::tie(error,userProfilesRecOpt) = verifyEmailAddressPasswordAndGetUserProfilesRec(emailAddress_,"");
-        if(ErrorCode::ERR_DATABASE_EXCEPTION == error.value())
+        if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
+           (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
             onCreateUserCallbackFn_(error);
             return;
@@ -368,7 +370,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //verify no other existing user with same email address
         std::tie(error,userProfilesRecOpt) =
             verifyEmailAddressPasswordAndGetUserProfilesRec(newEmailAddress_,"");
-        if(ErrorCode::ERR_DATABASE_EXCEPTION == error.value())
+        if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
+           (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
             onChangeEmailAddressCallbackFn_(error);
             return;
@@ -405,7 +408,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
         boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
         std::tie(error,userProfilesRecOpt) =
             verifyUserNamePasswordAndGetUserProfilesRec(cookieStringSessionsRecMapIter->second._userName,"");
-        if(ErrorCode::ERR_DATABASE_EXCEPTION == error.value())
+        if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
+           (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
             onDeleteUserCallbackFn_(error);
         }
