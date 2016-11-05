@@ -246,7 +246,7 @@ namespace Santiago{ namespace SantiagoDBTables
     boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRecImpl(const std::string& queryString_,
                                                                                std::error_code& error_)
     {
-        boost::optional<UserProfilesRec> userProfilesRec = UserProfilesRec();
+        boost::optional<UserProfilesRec> userProfilesRec;
         runSelectQuery(
             queryString_,
             [&userProfilesRec](MYSQL_RES* mysqlResult_, std::error_code& error_)
@@ -261,7 +261,8 @@ namespace Santiago{ namespace SantiagoDBTables
                 
                 MYSQL_ROW row = mysql_fetch_row(mysqlResult_);
                 BOOST_ASSERT(NULL != row);
-                
+
+                userProfilesRec = UserProfilesRec();
                 userProfilesRec->_id = atoi(row[0]);
                 userProfilesRec->_userName = row[1];
                 userProfilesRec->_emailAddress = row[2];
@@ -332,7 +333,7 @@ namespace Santiago{ namespace SantiagoDBTables
         }
 
         std::string getSessionsRecQuery = "SELECT * FROM ST_sessions WHERE cookie_string = '" + cookieString_ + "'";
-        boost::optional<SessionsRec> sessionsRec = SessionsRec();
+        boost::optional<SessionsRec> sessionsRec;
 
         runSelectQuery(
             getSessionsRecQuery,
@@ -349,6 +350,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 MYSQL_ROW row = mysql_fetch_row(mysqlResult_);
                 BOOST_ASSERT(NULL != row);
 
+                sessionsRec = SessionsRec();
                 sessionsRec->_id = atoi(row[0]);
                 sessionsRec->_userName = row[1];
                 sessionsRec->_cookieString = row[2];

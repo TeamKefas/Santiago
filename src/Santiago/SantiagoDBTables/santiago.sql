@@ -1,19 +1,20 @@
 CREATE TABLE `ST_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_name` varchar(20) DEFAULT NULL,
-  `email_address` varchar(30) DEFAULT NULL,
-  `password` varchar(20) DEFAULT NULL,
+  `user_name` varchar(20) NOT NULL,
+  `email_address` varchar(30) NOT NULL,
+  `password` varchar(20) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_name` (`user_name`)
+  UNIQUE KEY `user_name` (`user_name`),
+  UNIQUE KEY `email_address` (`email_address`)
 );
 
 CREATE TABLE `ST_sessions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_name` varchar(20) DEFAULT NULL,
-  `cookie_string` varchar(46) DEFAULT NULL,
-  `login_time` datetime DEFAULT NULL,
+  `user_name` varchar(20) NOT NULL,
+  `cookie_string` varchar(46) NOT NULL,
+  `login_time` datetime NOT NULL,
   `logout_time` datetime DEFAULT NULL,
-  `last_active_time` datetime DEFAULT NULL,
+  `last_active_time` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `cookie_string` (`cookie_string`)
 );

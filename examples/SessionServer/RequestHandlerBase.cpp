@@ -46,6 +46,7 @@ namespace SessionServer
     {
         const std::map<std::string,std::string>& fcgiParams = request_->getFCGIParams(); 
         
+        request_->out()<<"-----------ECHO------------"<<std::endl;
         for(std::map<std::string,std::string>::const_iterator iter = fcgiParams.begin();iter != fcgiParams.end();iter++)
         {
             request_->out()<<iter->first<<" \t"<<iter->second<<"\n";

@@ -27,11 +27,15 @@ namespace SessionServer
         std::map<std::string,std::string>::const_iterator passwordIter =  
             request_->getPostData().find("password");
 
+        std::map<std::string,std::string>::const_iterator emailAddressIter =  
+            request_->getPostData().find("email_address");
+
         //Check username is already in the database
         if(request_->getPostData().end() == userNameIter ||
-           request_->getPostData().end() == passwordIter)
+           request_->getPostData().end() == passwordIter ||
+           request_->getPostData().end() == emailAddressIter)
         {
-            request_->out() << "This username is not available..." << std::endl;        
+            request_->out() << "Invalid arguments from browser..." << std::endl;        
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);        
@@ -40,13 +44,13 @@ namespace SessionServer
         {
             _userController.createUser(
                 userNameIter->second,
-                "example@example.com",
+                emailAddressIter->second,
                 passwordIter->second,
                 std::bind(&SignupHandler::handleSignupUser,
                           this->sharedFromThis<SignupHandler>(),
                           request_,
                           userNameIter->second,
-                          "example@example.com",
+                          emailAddressIter->second,
                           std::placeholders::_1));
         }
     }
@@ -69,7 +73,7 @@ namespace SessionServer
         }
         else
         {
-            request_->out() << "Signup successfull.";
+            request_->out() << "Signup successfull."<<std::endl;
             printEcho(request_);
             request_->setAppStatus(0);
             std::error_code error;

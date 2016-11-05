@@ -187,12 +187,19 @@ namespace Santiago{ namespace User{ namespace SingleNode
         sessionsRec._userName = userProfilesRecOpt->_userName;
         //  sessionsRec._cookieString = "12345";//TODO: make this unique
         //   srand ( time(NULL) );
-        sessionsRec._cookieString = generateUniqueCookie();
-        
         sessionsRec._loginTime = boost::posix_time::second_clock::universal_time();
         sessionsRec._lastActiveTime = sessionsRec._loginTime;
 
-        _databaseConnection.get().addSessionsRec(sessionsRec,error);
+        for(unsigned i=0;i<5;i++)
+        { //5 attempts with different cookie strings
+            sessionsRec._cookieString = generateUniqueCookie();
+            _databaseConnection.get().addSessionsRec(sessionsRec,error);
+            if(!error)
+            {
+                break;
+            }
+        }
+
         if(error)
         {
             onLoginUserCallbackFn_(error,boost::none);
@@ -559,14 +566,14 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::string str;
         static const char alphanum[] =
             "0123456789"
-            "!@#$%^*"
+            "@#$%^*"
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             "abcdefghijklmnopqrstuvwxyz";
         
         int stringLength = sizeof(alphanum) - 1;
 	
         //return alphanum[rand() % stringLength];
-	for(unsigned int i = 0; i < 45; ++i)
+	for(unsigned int i = 0; i < 46; ++i)
 	{
             str += alphanum[rand() % stringLength];
 	}
