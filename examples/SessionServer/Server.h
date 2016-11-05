@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_EXAMPLES_SESSIOMANAGER_SERVER_H
-#define SANTIAGO_EXAMPLES_SESSIOMANAGER_SERVER_H
+#ifndef SANTIAGO_EXAMPLES_SESSIONSERVER_SERVER_H
+#define SANTIAGO_EXAMPLES_SESSIONSERVER_SERVER_H
 
 #include <boost/asio.hpp>
 
@@ -7,12 +7,13 @@
 #include "Santiago/User/SingleNode/Controller.h"
 #include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
-#include "LoginPageHandler.h"
-#include "SimplePageHandler.h"
-#include "ErrorPageHandler.h"
-#include "SignupPageHandler.h"
 
-namespace SimpleAppServer
+#include "ErrorPageHandler.h"
+#include "LoginHandler.h"
+#include "LogoutHandler.h"
+#include "SignupHandler.h"
+
+namespace SessionServer
 {
     class Server:public Santiago::AppServer::ServerBase<boost::asio::ip::tcp>
     {
@@ -39,19 +40,15 @@ namespace SimpleAppServer
             RequestHandlerBasePtr ret;
             if(documentURI_ == "/login.fcgi")
             {
-                ret.reset(new LoginPageHandler(_userController));
+                ret.reset(new LoginHandler(_userController));
+            }
+            else if(documentURI_ == "/logout.fcgi")
+            {
+                ret.reset(new LogoutHandler(_userController, "/"));
             }
             else if(documentURI_ == "/signup.fcgi")
             {
-                ret.reset(new SignupPageHandler(_userController));
-            }
-            else if(documentURI_ == "/")
-            {
-                ret.reset(new SimplePageHandler(_userController, "/"));
-            }
-            else if(documentURI_ == "/signup.html")
-            {
-                ret.reset(new SimplePageHandler(_userController, "signup.html"));
+                ret.reset(new SignupHandler(_userController));
             }
             else //random url
             {

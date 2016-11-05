@@ -1,9 +1,9 @@
-#ifndef SANTIAGO_EXAMPLES_SESSIOMANAGER_ERRORPAGEHANDLER_H
-#define SANTIAGO_EXAMPLES_SESSIOMANAGER_ERRORPAGEHANDLER_H
+#ifndef SANTIAGO_EXAMPLES_SESSIONSERVER_ERRORPAGEHANDLER_H
+#define SANTIAGO_EXAMPLES_SESSIONSERVER_ERRORPAGEHANDLER_H
 
 #include "RequestHandlerBase.h"
 
-namespace SimpleAppServer
+namespace SessionServer
 {
    class ErrorPageHandler:public RequestHandlerBase
    {
@@ -28,9 +28,10 @@ namespace SimpleAppServer
                                                  const std::string& emailAddress_,
                                                  const std::string& cookieString_)
     {
-        request_->setContentMIMEType(Santiago::MIMEType::HTML);
-        request_->setContentMIMEType(Santiago::MIMEType::HTML);
-        request_->out() << "Page not found... " << std::endl;         
+        request_->setContentMIMEType(Santiago::MIMEType::TEXT);
+        request_->out() << "Page not found... " << std::endl;
+        request_->out() << "username ="<<userName_<<std::endl;
+        printEcho();
         request_->setAppStatus(0);
         std::error_code error;
         request_->commit(error);
@@ -38,8 +39,9 @@ namespace SimpleAppServer
 
     void ErrorPageHandler::handleNonVerifiedRequest(const RequestPtr& request_)
     {
-        request_->setContentMIMEType(Santiago::MIMEType::HTML);
-        request_->out() << "Page not found... " << std::endl;        
+        request_->setContentMIMEType(Santiago::MIMEType::TEXT);
+        request_->out() << "Page not found... " << std::endl;
+        printEcho();
         request_->setAppStatus(0);
         std::error_code error;
         request_->commit(error);

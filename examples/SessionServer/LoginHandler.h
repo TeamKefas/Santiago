@@ -1,20 +1,17 @@
-#ifndef SANTIAGO_EXAMPLES_SESSIOMANAGER_LOGINPAGEHANDLER_H
-#define SANTIAGO_EXAMPLES_SESSIOMANAGER_LOGINPAGEHANDLER_H
+#ifndef SANTIAGO_EXAMPLES_SESSIONSERVER_LOGINHANDLER_H
+#define SANTIAGO_EXAMPLES_SESSIONSERVER_LOGINHANDLER_H
 
 #include <memory>
 
 #include "RequestHandlerBase.h"
 
-namespace SimpleAppServer
+namespace SessionServer
 {
-   class LoginPageHandler:public RequestHandlerBase
+   class LoginHandler:public RequestHandlerBase
    {
    public:
 
-       typedef RequestHandlerBase MyBase;
-       typedef std::shared_ptr<LoginPageHandler> Ptr;
-
-       LoginPageHandler(Santiago::User::ControllerBase& userController_):
+       LoginHandler(Santiago::User::ControllerBase& userController_):
             RequestHandlerBase(userController_)
        {}
 
@@ -33,7 +30,6 @@ namespace SimpleAppServer
        virtual void handleNonVerifiedRequest(const RequestPtr& request_);
 
    };
-
 }
 
 #endif

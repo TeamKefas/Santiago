@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_TEST_SIMPLEAPPSERVER_REQUESTHANDLERBASE_H
-#define SANTIAGO_TEST_SIMPLEAPPSERVER_REQUESTHANDLERBASE_H
+#ifndef SANTIAGO_TEST_SESSIONSERVER_REQUESTHANDLERBASE_H
+#define SANTIAGO_TEST_SESSIONSERVER_REQUESTHANDLERBASE_H
 
 #include <memory>
 
@@ -8,9 +8,8 @@
 #include "Santiago/AppServer/RequestHandlerBase.h"
 #include "Santiago/User/SingleNode/Controller.h"
 
-namespace SimpleAppServer
+namespace SessionServer
 {
-
     class RequestHandlerBase:public Santiago::AppServer::RequestHandlerBase<boost::asio::ip::tcp>
     {
     public:
@@ -37,6 +36,7 @@ namespace SimpleAppServer
                                            const std::string& cookieString_) = 0;
         virtual void handleNonVerifiedRequest(const RequestPtr& request_) = 0;
 
+        virtual void printEcho(const RequestPtr& request_);
         
         Santiago::User::ControllerBase                  &_userController;
     };

@@ -1,6 +1,6 @@
 #include "RequestHandlerBase.h"
 
-namespace SimpleAppServer
+namespace SessionServer
 {
     void RequestHandlerBase::handleRequest(const RequestPtr& request_)
     {
@@ -39,6 +39,43 @@ namespace SimpleAppServer
                                   userInfo_->_userName,
                                   userInfo_->_emailAddress,
                                   cookieString_);
+        }
+    }
+
+    void RequestHandlerBase::printEcho(const RequestPtr& request_)
+    {
+        const std::map<std::string,std::string>& fcgiParams = request_->getFCGIParams(); 
+        
+        for(std::map<std::string,std::string>::const_iterator iter = fcgiParams.begin();iter != fcgiParams.end();iter++)
+        {
+            request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
+        }
+        
+        request_->out()<<"Cookies:\n";
+        
+        const std::map<std::string,std::string>& cookies = request_->getHTTPCookiesReceived(); 
+        
+        for(std::map<std::string,std::string>::const_iterator iter = cookies.begin();iter != cookies.end();iter++)
+        {
+            request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
+        }
+        
+        request_->out()<<"Get query data:\n";
+        
+        const std::map<std::string,std::string>& getData = request_->getGetData(); 
+        
+        for(std::map<std::string,std::string>::const_iterator iter = getData.begin();iter != getData.end();iter++)
+        {
+            request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
+        }
+        
+        request_->out()<<"Post data:\n";
+        
+        const std::map<std::string,std::string>& postData = request_->getPostData(); 
+        
+        for(std::map<std::string,std::string>::const_iterator iter = postData.begin();iter != postData.end();iter++)
+        {
+            request_->out()<<iter->first<<" \t"<<iter->second<<"\n";
         }
     }
 }

@@ -1,19 +1,16 @@
-#ifndef SANTIAGO_EXAMPLES_SESSIONMANAGER_SIGNUPPAGEHANDLER_H
-#define SANTIAGO_EXAMPLES_SESSIONMANAGER_SIGNUPPAGEHANDLER_H
+#ifndef SANTIAGO_EXAMPLES_SESSIONSERVER_SIGNUPHANDLER_H
+#define SANTIAGO_EXAMPLES_SESSIONSERVER_SIGNUPHANDLER_H
 
 #include <memory>
 #include "RequestHandlerBase.h"
 
-namespace SimpleAppServer
+namespace SessionServer
 {
-   class SignupPageHandler:public RequestHandlerBase
+   class SignupHandler:public RequestHandlerBase
    {
    public:
 
-       typedef RequestHandlerBase MyBase;
-       typedef std::shared_ptr<SignupPageHandler> Ptr;
-
-       SignupPageHandler(Santiago::User::ControllerBase& userController_):
+       SignupHandler(Santiago::User::ControllerBase& userController_):
             RequestHandlerBase(userController_)
        {}
 
