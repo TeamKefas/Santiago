@@ -31,7 +31,7 @@ namespace SessionServer
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out() << "Page not found... " << std::endl;
         request_->out() << "username ="<<userName_<<std::endl;
-        printEcho();
+        printEcho(request_);
         request_->setAppStatus(0);
         std::error_code error;
         request_->commit(error);
@@ -41,7 +41,7 @@ namespace SessionServer
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out() << "Page not found... " << std::endl;
-        printEcho();
+        printEcho(request_);
         request_->setAppStatus(0);
         std::error_code error;
         request_->commit(error);

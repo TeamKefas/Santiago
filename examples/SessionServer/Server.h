@@ -44,7 +44,7 @@ namespace SessionServer
             }
             else if(documentURI_ == "/logout.fcgi")
             {
-                ret.reset(new LogoutHandler(_userController, "/"));
+                ret.reset(new LogoutHandler(_userController));
             }
             else if(documentURI_ == "/signup.fcgi")
             {

@@ -11,7 +11,7 @@ namespace SessionServer
         request_->out()<<"User already logged in. Please logout(logout.fcgi) before trying again."<<std::endl;
         request_->out()<<"User name: "<<userName_<<std::endl;
         
-        printEcho();
+        printEcho(request_);
         request_->setAppStatus(0);
         std::error_code error;
         request_->commit(error);
@@ -29,7 +29,7 @@ namespace SessionServer
         {
             request_->out()<<"user_name/password not send in the post data."<<std::endl;
 
-            printEcho();
+            printEcho(request_);
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);        
@@ -60,7 +60,7 @@ namespace SessionServer
         {
             request_->out()<<"User authentication failed. \n";
             request_->out()<<error_.message()<<std::endl;
-            printEcho();
+            printEcho(request_);
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);
@@ -76,7 +76,7 @@ namespace SessionServer
             BOOST_ASSERT(flag);
 
             request_->out()<<"User login successfull. \n";
-            printEcho();
+            printEcho(request_);
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);

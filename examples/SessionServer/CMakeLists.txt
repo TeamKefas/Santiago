@@ -8,7 +8,7 @@ Main.cpp
 RequestHandlerBase.cpp
 LoginHandler.cpp
 LogoutHandler.cpp
-SignupPage.cpp)
+SignupHandler.cpp)
 
 if(WIN32)
   set(SessionServer_SRCS 

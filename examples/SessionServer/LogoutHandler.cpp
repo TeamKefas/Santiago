@@ -11,7 +11,7 @@ namespace SessionServer
         request_->out()<<"Logging out "<<userName_<<"..."<<std::endl;
 
         _userController.logoutUserForCookie(
-            cookieString_
+            cookieString_,
             std::bind(&LogoutHandler::handleLogoutUser,
                       this->sharedFromThis<LogoutHandler>(),
                       request_,
@@ -23,7 +23,7 @@ namespace SessionServer
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out()<<"User not logged in. Please login(login.fcgi) before trying again."<<std::endl;
         
-        printEcho();
+        printEcho(request_);
         request_->setAppStatus(0);
         std::error_code error;
         request_->commit(error);        
@@ -36,7 +36,7 @@ namespace SessionServer
         {
             request_->out()<<"Logging out failed. \n";
             request_->out()<<error_.message()<<std::endl;
-            printEcho();
+            printEcho(request_);
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);
@@ -51,7 +51,7 @@ namespace SessionServer
             BOOST_ASSERT(flag);
 
             request_->out()<<"User logout successfull. \n";
-            printEcho();
+            printEcho(request_);
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);
