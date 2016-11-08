@@ -9,3 +9,5 @@
 build/
 testbin/
 bin/
+examplesbin/
+config.json

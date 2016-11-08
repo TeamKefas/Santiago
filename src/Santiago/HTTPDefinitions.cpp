@@ -67,6 +67,15 @@ namespace Santiago
                     str2ReplacePos = str2.find(it->first, start);
                 }
             }
+
+            if(str1[0]==' ')
+            {
+		str1.erase(0,1);
+            }
+            if(str2[0]==' ')
+            {
+                str2.erase(0,1);
+            }
             return make_pair(str1, str2);   
         }
 
