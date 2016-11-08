@@ -32,11 +32,11 @@ namespace Santiago{ namespace SantiagoDBTables
         // possible error_code returns for the following fns
         // SUCCESS, DATABASE_EXCEPTION, DATABASE_QUERY_FAILED
 
-        void addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_);
-        boost::optional<UserProfilesRec> getUserProfilesRecForUserName(const std::string& userName_, std::error_code& error_);
-        boost::optional<UserProfilesRec> getUserProfilesRecForEmailAddress(const std::string& userName_, std::error_code& error_);
-        void updateUserProfilesRec(UserProfilesRec& newUserProfilesRec_, std::error_code& error_);
-        void deleteUserProfilesRec(const std::string& userName_, std::error_code& error_);
+        void addUsersRec(UsersRec& usersRec_, std::error_code& error_);
+        boost::optional<UsersRec> getUsersRecForUserName(const std::string& userName_, std::error_code& error_);
+        boost::optional<UsersRec> getUsersRecForEmailAddress(const std::string& userName_, std::error_code& error_);
+        void updateUsersRec(UsersRec& newUsersRec_, std::error_code& error_);
+        void deleteUsersRec(const std::string& userName_, std::error_code& error_);
         
         void addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_);
         boost::optional<SessionsRec> getSessionsRec(const std::string& cookieString_, std::error_code& error_);
@@ -47,7 +47,7 @@ namespace Santiago{ namespace SantiagoDBTables
         void connect(std::error_code& error_);
         void disconnect(std::error_code& error_);
 
-        boost::optional<UserProfilesRec> getUserProfilesRecImpl(
+        boost::optional<UsersRec> getUsersRecImpl(
             const std::string& queryString_, std::error_code& error_);
 
         std::string getEscapedString(const std::string& nonEscapedString_);

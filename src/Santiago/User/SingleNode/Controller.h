@@ -111,10 +111,10 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                     const ErrorCodeCallbackFn& onDeleteUserCallbackFn_);
 
         //helper fns
-        std::pair<std::error_code,boost::optional<SantiagoDBTables::UserProfilesRec> > 
-        verifyUserNamePasswordAndGetUserProfilesRec(const std::string& userName_, const std::string& password_);
-        std::pair<std::error_code,boost::optional<SantiagoDBTables::UserProfilesRec> > 
-        verifyEmailAddressPasswordAndGetUserProfilesRec(const std::string& userName_, const std::string& password_);
+        std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
+        verifyUserNamePasswordAndGetUsersRec(const std::string& userName_, const std::string& password_);
+        std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
+        verifyEmailAddressPasswordAndGetUsersRec(const std::string& userName_, const std::string& password_);
 
         std::pair<std::error_code,std::map<std::string,Santiago::SantiagoDBTables::SessionsRec>::iterator > 
         checkForCookieInMapAndGetSessionsRecIter(const std::string& cookieString_);

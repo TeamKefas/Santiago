@@ -200,22 +200,22 @@ namespace Santiago{ namespace SantiagoDBTables
         return;
     }
 
-    void MariaDBConnection::addUserProfilesRec(UserProfilesRec& userProfilesRec_, std::error_code& error_)
+    void MariaDBConnection::addUsersRec(UsersRec& usersRec_, std::error_code& error_)
     {
-        if(!isUserInputClean(userProfilesRec_._userName) ||
-           !isUserInputClean(userProfilesRec_._emailAddress) ||
-           !isUserInputClean(userProfilesRec_._password))
+        if(!isUserInputClean(usersRec_._userName) ||
+           !isUserInputClean(usersRec_._emailAddress) ||
+           !isUserInputClean(usersRec_._password))
         {
             error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
             return;
         }
 
-        std::string addUserProfilesRecQuery = "INSERT INTO ST_users(user_name, email_address, password) VALUES('" +
-            userProfilesRec_._userName + "', '" + userProfilesRec_._emailAddress + "', '" + userProfilesRec_._password + "')";
-        userProfilesRec_._id = runInsertQuery(addUserProfilesRecQuery, error_);
+        std::string addUsersRecQuery = "INSERT INTO ST_users(user_name, email_address, password) VALUES('" +
+            usersRec_._userName + "', '" + usersRec_._emailAddress + "', '" + usersRec_._password + "')";
+        usersRec_._id = runInsertQuery(addUsersRecQuery, error_);
     }
 
-    boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRecForUserName(
+    boost::optional<UsersRec> MariaDBConnection::getUsersRecForUserName(
         const std::string& userName_,
         std::error_code& error_)
     {
@@ -225,11 +225,11 @@ namespace Santiago{ namespace SantiagoDBTables
             return boost::none;
         }
 
-        std::string getUserProfilesRecQuery = "SELECT * FROM ST_users WHERE user_name = '" + userName_ + "'";
-        return getUserProfilesRecImpl(getUserProfilesRecQuery,error_); 
+        std::string getUsersRecQuery = "SELECT * FROM ST_users WHERE user_name = '" + userName_ + "'";
+        return getUsersRecImpl(getUsersRecQuery,error_); 
     }
 
-    boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRecForEmailAddress(
+    boost::optional<UsersRec> MariaDBConnection::getUsersRecForEmailAddress(
         const std::string& emailAddress_,
         std::error_code& error_)
     {
@@ -239,17 +239,17 @@ namespace Santiago{ namespace SantiagoDBTables
             return boost::none;
         }
 
-        std::string getUserProfilesRecQuery = "SELECT * FROM ST_users WHERE email_address = '" + emailAddress_ + "'";
-        return getUserProfilesRecImpl(getUserProfilesRecQuery,error_); 
+        std::string getUsersRecQuery = "SELECT * FROM ST_users WHERE email_address = '" + emailAddress_ + "'";
+        return getUsersRecImpl(getUsersRecQuery,error_); 
     }
 
-    boost::optional<UserProfilesRec> MariaDBConnection::getUserProfilesRecImpl(const std::string& queryString_,
+    boost::optional<UsersRec> MariaDBConnection::getUsersRecImpl(const std::string& queryString_,
                                                                                std::error_code& error_)
     {
-        boost::optional<UserProfilesRec> userProfilesRec;
+        boost::optional<UsersRec> usersRec;
         runSelectQuery(
             queryString_,
-            [&userProfilesRec](MYSQL_RES* mysqlResult_, std::error_code& error_)
+            [&usersRec](MYSQL_RES* mysqlResult_, std::error_code& error_)
             {
                 if(mysql_num_rows(mysqlResult_) > 1)
                 {
@@ -262,35 +262,35 @@ namespace Santiago{ namespace SantiagoDBTables
                 MYSQL_ROW row = mysql_fetch_row(mysqlResult_);
                 BOOST_ASSERT(NULL != row);
 
-                userProfilesRec = UserProfilesRec();
-                userProfilesRec->_id = atoi(row[0]);
-                userProfilesRec->_userName = row[1];
-                userProfilesRec->_emailAddress = row[2];
-                userProfilesRec->_password = row[3];
+                usersRec = UsersRec();
+                usersRec->_id = atoi(row[0]);
+                usersRec->_userName = row[1];
+                usersRec->_emailAddress = row[2];
+                usersRec->_password = row[3];
                 error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
             },
             error_);
 
-        return userProfilesRec;
+        return usersRec;
     }
 
-    void MariaDBConnection::updateUserProfilesRec(UserProfilesRec& newUserProfilesRec_, std::error_code& error_)
+    void MariaDBConnection::updateUsersRec(UsersRec& newUsersRec_, std::error_code& error_)
     {
-        if(!isUserInputClean(newUserProfilesRec_._userName) ||
-           !isUserInputClean(newUserProfilesRec_._emailAddress) ||
-           !isUserInputClean(newUserProfilesRec_._password))
+        if(!isUserInputClean(newUsersRec_._userName) ||
+           !isUserInputClean(newUsersRec_._emailAddress) ||
+           !isUserInputClean(newUsersRec_._password))
         {
             error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
             return;
         }
 
-        std::string updateUserProfilesRecQuery = "UPDATE ST_users SET password ='" +
-            newUserProfilesRec_._password + "', email_address = '" + newUserProfilesRec_._emailAddress +
-            "' WHERE user_name = '" + newUserProfilesRec_._userName +"'";
-        runUpdateQuery(updateUserProfilesRecQuery,error_);
+        std::string updateUsersRecQuery = "UPDATE ST_users SET password ='" +
+            newUsersRec_._password + "', email_address = '" + newUsersRec_._emailAddress +
+            "' WHERE user_name = '" + newUsersRec_._userName +"'";
+        runUpdateQuery(updateUsersRecQuery,error_);
     }
 
-    void MariaDBConnection::deleteUserProfilesRec(const std::string& userName_,std::error_code& error_)
+    void MariaDBConnection::deleteUsersRec(const std::string& userName_,std::error_code& error_)
     {
         if(!isUserInputClean(userName_))
         {
@@ -298,9 +298,9 @@ namespace Santiago{ namespace SantiagoDBTables
             return;
         }
 
-        std::string deleteUserProfilesRecQuery = "DELETE FROM ST_users WHERE user_name = '" +
+        std::string deleteUsersRecQuery = "DELETE FROM ST_users WHERE user_name = '" +
             userName_ + "'";
-        runDeleteQuery(deleteUserProfilesRecQuery, error_);
+        runDeleteQuery(deleteUsersRecQuery, error_);
     }
 
     void MariaDBConnection::addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_)

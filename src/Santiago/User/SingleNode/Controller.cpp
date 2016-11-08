@@ -102,18 +102,18 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                     const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
 
-        boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::error_code error;
 
         //check for existing accounts with same userName
-        std::tie(error,userProfilesRecOpt) = verifyUserNamePasswordAndGetUserProfilesRec(userName_,"");
+        std::tie(error,usersRecOpt) = verifyUserNamePasswordAndGetUsersRec(userName_,"");
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
             onCreateUserCallbackFn_(error);
             return;
         }
-        else if(userProfilesRecOpt)
+        else if(usersRecOpt)
         {
             onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_USERNAME_ALREADY_EXISTS,
                                                     ErrorCategory::GetInstance()));
@@ -121,26 +121,26 @@ namespace Santiago{ namespace User{ namespace SingleNode
         }
 
         //check for existing accounts with same emailAddress
-        std::tie(error,userProfilesRecOpt) = verifyEmailAddressPasswordAndGetUserProfilesRec(emailAddress_,"");
+        std::tie(error,usersRecOpt) = verifyEmailAddressPasswordAndGetUsersRec(emailAddress_,"");
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
             onCreateUserCallbackFn_(error);
             return;
         }
-        else if(userProfilesRecOpt)
+        else if(usersRecOpt)
         {
             onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
                                                     ErrorCategory::GetInstance()));
             return;
         }
 
-        //create new userProfilesRec and add to db
-        SantiagoDBTables::UserProfilesRec userProfilesRec;
-        userProfilesRec._userName = userName_;
-        userProfilesRec._emailAddress = emailAddress_;
-        userProfilesRec._password = password_;
-        _databaseConnection.get().addUserProfilesRec(userProfilesRec,error);
+        //create new usersRec and add to db
+        SantiagoDBTables::UsersRec usersRec;
+        usersRec._userName = userName_;
+        usersRec._emailAddress = emailAddress_;
+        usersRec._password = password_;
+        _databaseConnection.get().addUsersRec(usersRec,error);
         if(error)
         {
             onCreateUserCallbackFn_(error);
@@ -158,19 +158,19 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                    const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
     {
         //verify username-password
-        boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::error_code error;
 
         if(isUserNameNotEmailAddress_)
         {
-            std::tie(error,userProfilesRecOpt) =
-                verifyUserNamePasswordAndGetUserProfilesRec(userNameOrEmailAddress_,
+            std::tie(error,usersRecOpt) =
+                verifyUserNamePasswordAndGetUsersRec(userNameOrEmailAddress_,
                                                             password_);
         }
         else
         {
-            std::tie(error,userProfilesRecOpt) =
-                verifyEmailAddressPasswordAndGetUserProfilesRec(userNameOrEmailAddress_,
+            std::tie(error,usersRecOpt) =
+                verifyEmailAddressPasswordAndGetUsersRec(userNameOrEmailAddress_,
                                                                 password_);
         }
 
@@ -179,12 +179,12 @@ namespace Santiago{ namespace User{ namespace SingleNode
             onLoginUserCallbackFn_(error,boost::none);
             return;
         }
-        BOOST_ASSERT(userProfilesRecOpt);
+        BOOST_ASSERT(usersRecOpt);
 
 
         //create new session record and add to db
         SantiagoDBTables::SessionsRec sessionsRec;
-        sessionsRec._userName = userProfilesRecOpt->_userName;
+        sessionsRec._userName = usersRecOpt->_userName;
         //  sessionsRec._cookieString = "12345";//TODO: make this unique
         //   srand ( time(NULL) );
         sessionsRec._loginTime = boost::posix_time::second_clock::universal_time();
@@ -213,12 +213,12 @@ namespace Santiago{ namespace User{ namespace SingleNode
         
         //update the _userNameUserSessionsInfoMap;
         std::map<std::string,UserData>::iterator userNameUserDataMapIter =
-            _userNameUserDataMap.find(userProfilesRecOpt->_userName);
+            _userNameUserDataMap.find(usersRecOpt->_userName);
         if(_userNameUserDataMap.end() == userNameUserDataMapIter)
         {
             std::tie(userNameUserDataMapIter,isInsertionSuccessfulFlag) =
-                _userNameUserDataMap.insert(std::make_pair(userProfilesRecOpt->_userName,
-                                                           UserData(userProfilesRecOpt->_emailAddress)));
+                _userNameUserDataMap.insert(std::make_pair(usersRecOpt->_userName,
+                                                           UserData(usersRecOpt->_emailAddress)));
             BOOST_ASSERT(isInsertionSuccessfulFlag);
             BOOST_ASSERT(userNameUserDataMapIter != _userNameUserDataMap.end());
         }
@@ -227,8 +227,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
         onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
                                                ErrorCategory::GetInstance()),
-                               std::make_pair(UserInfo(userProfilesRecOpt->_userName,
-                                                       userProfilesRecOpt->_emailAddress),
+                               std::make_pair(UserInfo(usersRecOpt->_userName,
+                                                       usersRecOpt->_emailAddress),
                                               sessionsRec._cookieString));
         return;
     }
@@ -328,19 +328,19 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
         std::string userName = cookieStringSessionsRecMapIter->second._userName;
         //verify username-password
-        boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
-        std::tie(error,userProfilesRecOpt) =
-            verifyUserNamePasswordAndGetUserProfilesRec(cookieStringSessionsRecMapIter->second._userName,oldPassword_);
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
+        std::tie(error,usersRecOpt) =
+            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,oldPassword_);
         if(error)
         {
             onChangePasswordCallbackFn_(error);
             return;
         }
-        BOOST_ASSERT(userProfilesRecOpt);
+        BOOST_ASSERT(usersRecOpt);
             
         //change and update the password
-        userProfilesRecOpt->_password = newPassword_;
-        _databaseConnection.get().updateUserProfilesRec(*userProfilesRecOpt,error);
+        usersRecOpt->_password = newPassword_;
+        _databaseConnection.get().updateUsersRec(*usersRecOpt,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
         onChangePasswordCallbackFn_(error);
         return;
@@ -362,28 +362,28 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
         std::string userName = cookieStringSessionsRecMapIter->second._userName;
         //verify password
-        boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
-        std::tie(error,userProfilesRecOpt) =
-            verifyUserNamePasswordAndGetUserProfilesRec(cookieStringSessionsRecMapIter->second._userName,password_);
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
+        std::tie(error,usersRecOpt) =
+            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,password_);
         if(error)
         {
             onChangeEmailAddressCallbackFn_(error);
             return;
         }
-        BOOST_ASSERT(userProfilesRecOpt);
+        BOOST_ASSERT(usersRecOpt);
 
-        SantiagoDBTables::UserProfilesRec newUserProfilesRec = *userProfilesRecOpt;
+        SantiagoDBTables::UsersRec newUsersRec = *usersRecOpt;
 
         //verify no other existing user with same email address
-        std::tie(error,userProfilesRecOpt) =
-            verifyEmailAddressPasswordAndGetUserProfilesRec(newEmailAddress_,"");
+        std::tie(error,usersRecOpt) =
+            verifyEmailAddressPasswordAndGetUsersRec(newEmailAddress_,"");
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
             onChangeEmailAddressCallbackFn_(error);
             return;
         }
-        else if(userProfilesRecOpt)
+        else if(usersRecOpt)
         {
             onChangeEmailAddressCallbackFn_(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
                                                             ErrorCategory::GetInstance()));
@@ -391,8 +391,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
         }
 
         //change and update the password
-        newUserProfilesRec._emailAddress = newEmailAddress_;
-        _databaseConnection.get().updateUserProfilesRec(newUserProfilesRec,error);
+        newUsersRec._emailAddress = newEmailAddress_;
+        _databaseConnection.get().updateUsersRec(newUsersRec,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
         onChangeEmailAddressCallbackFn_(error);
         return;
@@ -412,17 +412,17 @@ namespace Santiago{ namespace User{ namespace SingleNode
         }
 
         //delete from db
-        boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt;
-        std::tie(error,userProfilesRecOpt) =
-            verifyUserNamePasswordAndGetUserProfilesRec(cookieStringSessionsRecMapIter->second._userName,"");
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
+        std::tie(error,usersRecOpt) =
+            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,"");
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
             onDeleteUserCallbackFn_(error);
         }
 
-        BOOST_ASSERT(userProfilesRecOpt);
-        _databaseConnection.get().deleteUserProfilesRec(userProfilesRecOpt->_userName,error);
+        BOOST_ASSERT(usersRecOpt);
+        _databaseConnection.get().deleteUsersRec(usersRecOpt->_userName,error);
         if(error)
         {
             onDeleteUserCallbackFn_(error);
@@ -435,55 +435,55 @@ namespace Santiago{ namespace User{ namespace SingleNode
     }
 
 
-    std::pair<std::error_code,boost::optional<SantiagoDBTables::UserProfilesRec> > 
-    Controller::verifyUserNamePasswordAndGetUserProfilesRec(const std::string& userName_, const std::string& password_)
+    std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
+    Controller::verifyUserNamePasswordAndGetUsersRec(const std::string& userName_, const std::string& password_)
     {
-        //get the UserProfilesRec from db
+        //get the UsersRec from db
         std::error_code error;
-        boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt = 
-            _databaseConnection.get().getUserProfilesRecForUserName(userName_,error);
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt = 
+            _databaseConnection.get().getUsersRecForUserName(userName_,error);
         if(error)//TODO
         {
-            return std::make_pair(error,userProfilesRecOpt);
+            return std::make_pair(error,usersRecOpt);
         }
 
         //check if the username/password matches
-        if(!userProfilesRecOpt || (userProfilesRecOpt->_password != password_))
+        if(!usersRecOpt || (usersRecOpt->_password != password_))
         {
             ST_LOG_INFO("Wrong username_password. userName:"<<userName_<<std::endl);
             return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_USERNAME_PASSWORD,
                                                   ErrorCategory::GetInstance()),
-                                  userProfilesRecOpt);
+                                  usersRecOpt);
         }
 
         ST_LOG_INFO("Username password verified for userName:"<<userName_<<std::endl);
-        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),userProfilesRecOpt);
+        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),usersRecOpt);
     }
 
-    std::pair<std::error_code,boost::optional<SantiagoDBTables::UserProfilesRec> > 
-    Controller::verifyEmailAddressPasswordAndGetUserProfilesRec(const std::string& emailAddress_,
+    std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
+    Controller::verifyEmailAddressPasswordAndGetUsersRec(const std::string& emailAddress_,
                                                                 const std::string& password_)
     {
-        //get the UserProfilesRec from db
+        //get the UsersRec from db
         std::error_code error;
-        boost::optional<SantiagoDBTables::UserProfilesRec> userProfilesRecOpt = 
-            _databaseConnection.get().getUserProfilesRecForEmailAddress(emailAddress_,error);
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt = 
+            _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
         if(error)//TODO
         {
-            return std::make_pair(error,userProfilesRecOpt);
+            return std::make_pair(error,usersRecOpt);
         }
 
         //check if the username/password matches
-        if(!userProfilesRecOpt || (userProfilesRecOpt->_password != password_))
+        if(!usersRecOpt || (usersRecOpt->_password != password_))
         {
             ST_LOG_INFO("Wrong emailaddress_password. emailAddress:"<<emailAddress_<<std::endl);
             return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_PASSWORD,
                                                   ErrorCategory::GetInstance()),
-                                  userProfilesRecOpt);
+                                  usersRecOpt);
         }
 
         ST_LOG_INFO("EmailAddress password verified for emailAddress:"<<emailAddress_<<std::endl);
-        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),userProfilesRecOpt);
+        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),usersRecOpt);
     }
 
 

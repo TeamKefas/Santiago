@@ -11,9 +11,9 @@ namespace Santiago{ namespace SantiagoDBTables
 {
     using namespace boost::posix_time;
             
-    struct UserProfilesRec
+    struct UsersRec
     {
-        UserProfilesRec():_id(INVALID_DATABASE_ID)
+        UsersRec():_id(INVALID_DATABASE_ID)
         {}
 
         int         _id;
