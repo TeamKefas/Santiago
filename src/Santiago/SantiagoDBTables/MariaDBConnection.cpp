@@ -256,7 +256,16 @@ namespace Santiago{ namespace SantiagoDBTables
                     ST_LOG_DEBUG("More than 1 records with same username in the ST_users table"
                                  << std::endl);
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                    BOOST_ASSERT(false);                    
+                    BOOST_ASSERT(false);
+                    return;
+                }
+
+                if(4 != mysql_num_fields(mysqlResult_))
+                {
+                    ST_LOG_DEBUG("Mismatch in number of fields in the ST_users table");
+                    error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    BOOST_ASSERT(false);
+                    return;
                 }
                 
                 MYSQL_ROW row = mysql_fetch_row(mysqlResult_);
@@ -345,6 +354,15 @@ namespace Santiago{ namespace SantiagoDBTables
                                  << std::endl);
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
                     BOOST_ASSERT(false);
+                    return;
+                }
+
+                if(5 != mysql_num_fields(mysqlResult_))
+                {
+                    ST_LOG_DEBUG("Mismatch in number of fields in the ST_sessions table");
+                    error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    BOOST_ASSERT(false);
+                    return;
                 }
                 
                 MYSQL_ROW row = mysql_fetch_row(mysqlResult_);
