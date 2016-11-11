@@ -242,6 +242,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if(error)
         {
             onVerifyUserCallbackFn_(error,boost::none);
+            return;
         }
 
         //check if the lastActiveTime older than MAX_SESSION_DURATION. If yes then logout
@@ -288,6 +289,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if(error)
         {
             onLogoutCookieCallbackFn_(error);
+            return;
         }
 
         cleanupCookieDataAndUpdateSessionRecord(cookieString_);
@@ -306,6 +308,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if(error)
         {
             onLogoutAllCookiesCallbackFn_(error);
+            return;
         }
 
         cleanupCookieDataAndUpdateSessionRecordsForAllCookies(cookieStringSessionsRecMapIter->second._userName);
@@ -324,6 +327,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if(error)
         {
             onChangePasswordCallbackFn_(error);
+            return;
         }
 
         std::string userName = cookieStringSessionsRecMapIter->second._userName;
@@ -358,6 +362,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if(error)
         {
             onChangeEmailAddressCallbackFn_(error);
+            return;
         }
 
         std::string userName = cookieStringSessionsRecMapIter->second._userName;
@@ -409,6 +414,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if(error)
         {
             onDeleteUserCallbackFn_(error);
+            return;
         }
 
         //delete from db
@@ -419,6 +425,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
             onDeleteUserCallbackFn_(error);
+            return;
         }
 
         BOOST_ASSERT(usersRecOpt);
@@ -426,6 +433,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if(error)
         {
             onDeleteUserCallbackFn_(error);
+            return;
         }
 
         //remove from memory

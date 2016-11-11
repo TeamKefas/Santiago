@@ -99,6 +99,7 @@ namespace Santiago{namespace Fastcgi
          */
         void commit(std::error_code& error_)
         {
+            error_ = std::error_code(ERR_SUCCESS,ErrorCategory::GetInstance());
             std::lock_guard<std::mutex> lock(_commitMutex);
             ConnectionPtr connectionPtr = checkRequestValidityAndGetConnectionPtr(error_);
 
@@ -118,6 +119,7 @@ namespace Santiago{namespace Fastcgi
          */
         void cancel(std::error_code& error_)
         {
+            error_ = std::error_code(ERR_SUCCESS,ErrorCategory::GetInstance());
             std::lock_guard<std::mutex> lock(_commitMutex);
             ConnectionPtr connectionPtr = checkRequestValidityAndGetConnectionPtr(error_);
 

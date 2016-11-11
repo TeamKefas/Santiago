@@ -161,6 +161,7 @@ namespace Santiago{ namespace AppServer
          */
         void commit(std::error_code& error_)
         {
+            error_ = std::error_code(ERR_SUCCESS,ErrorCategory::GetInstance());
             _fastcgiRequest->commit(error_);
             _onCompletedCallbackFn();
         }
@@ -172,6 +173,7 @@ namespace Santiago{ namespace AppServer
          */
         void cancel(std::error_code& error_)
         {
+            error_ = std::error_code(ERR_SUCCESS,ErrorCategory::GetInstance());
             _fastcgiRequest->cancel(error_);
             _onCompletedCallbackFn();
         }
