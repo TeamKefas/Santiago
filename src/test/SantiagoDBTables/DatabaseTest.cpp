@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
         connection.updateUsersRec(userRecord, error);
         if(!error)
         {
-            std::cout<< "\nPassword updated.\n";
+            std::cout<< "\nUser Record updated.\n";
         }
         else
         {
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
         connection.updateUsersRec(userRecord, error);
         if(!error)
         {
-            std::cout<< "\nPassword updated.\n";
+            std::cout<< "\nUser Record updated.\n";
         }
         else
         {
@@ -169,11 +169,11 @@ int main(int argc, char *argv[])
     
           if(!connection.updateUserProfilesRec(userProfileRecord,"india", error))
           {
-          std::cout<< "\nPassword updated.\n";
+          std::cout<< "\nUser Record updated.\n";
           }
           else
           {
-          std::cout << "\nInvalid User Id or Password.\n";
+          std::cout << "\nInvalid Username or Password.\n";
           }*/
     
         boost::optional<UsersRec> userRec;
@@ -181,18 +181,6 @@ int main(int argc, char *argv[])
         userRec = connection.getUsersRecForUserName("junais", error);
         if(!error && (userRec->_id > 0))
         { 
-            std::cout << "\n" << userRec->_id << "\t"
-                      << userRec->_userName << "\t"
-                      << userRec->_password << "\n";
-        }
-        else
-        {
-            std::cout << "\nInvalid Username.\n";
-        }
-
-        userRec = connection.getUsersRecForUserName("vinay", error);
-        if(!error && (userRec->_id > 0)) 
-        {
             std::cout << "\n" << userRec->_id << "\t"
                       << userRec->_userName << "\t"
                       << userRec->_password << "\n";
@@ -214,35 +202,8 @@ int main(int argc, char *argv[])
             std::cout << "\nInvalid Email Id.\n";
         }
 
-        userRec = connection.getUsersRecForEmailAddress("vinay@gmail.com", error);
-        if(!error && (userRec->_id > 0)) 
-        {
-            std::cout << "\n" << userRec->_id << "\t"
-                      << userRec->_userName << "\t"
-                      << userRec->_password << "\n";
-        }
-        else
-        {
-            std::cout << "\nInvalid Email Id.\n";
-        }
-
         boost::optional<SessionsRec> sessionRec;
         sessionRec = connection.getSessionsRec("kefas", error);
-        if(!error && (sessionRec->_id > 0))
-        {
-            std::cout << "\n" << sessionRec->_id << "\t"
-                      << sessionRec->_userName << "\t"
-                      << sessionRec->_cookieString << "\t"
-                      << sessionRec->_loginTime << "\t"
-                      << sessionRec->_logoutTime << "\t"
-                      << sessionRec->_lastActiveTime << "\n";
-        }
-        else
-        {
-            std::cout << "\nInvalid Cookie String.\n";
-        }
-
-        sessionRec = connection.getSessionsRec("safek", error);
         if(!error && (sessionRec->_id > 0))
         {
             std::cout << "\n" << sessionRec->_id << "\t"
@@ -270,18 +231,7 @@ int main(int argc, char *argv[])
           {
           std::cout << "\nInvalid User Id.\n";
           }
-
-          if(!connection.getPermissionsRec("vinay", permissionRec))
-          {
-          std::cout << "\n" << permissionRec->_id << "\t"
-          << permissionRec->_resId << "\t"
-          << permissionRec->_userName << "\t"
-          << userPermissionString.find(permissionRec->_userPermission)->second << "\n";
-          }
-          else
-          {
-          std::cout << "\nInvalid User Id.\n";
-          }*/
+        */
 
     }
     catch(std::exception& e)

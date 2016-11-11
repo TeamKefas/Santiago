@@ -357,7 +357,7 @@ namespace Santiago{ namespace SantiagoDBTables
                     return;
                 }
 
-                if(5 != mysql_num_fields(mysqlResult_))
+                if(6 != mysql_num_fields(mysqlResult_))
                 {
                     ST_LOG_DEBUG("Mismatch in number of fields in the ST_sessions table");
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
