@@ -12,6 +12,22 @@ namespace Santiago{ namespace User{ namespace SingleNode
         ,_databaseConnection(databaseConnection_)
     {
         srand ( time(NULL) );
+        std::error_code error;
+        std::vector<SantiagoDBTables::SessionsRec> activeSessionsRec =
+            _databaseConnection.get().getActiveSessions(error);
+        for(std::vector<SantiagoDBTables::SessionsRec>::iterator it = activeSessionsRec.begin();
+            it != activeSessionsRec.end();++it)
+        {
+            _cookieStringSessionsRecMap.insert(std::make_pair(it->_cookieString,*it));
+            boost::optional<SantiagoDBTables::UsersRec> userRec =
+                _databaseConnection.get().getUsersRecForUserName(it->_userName,error);
+            _userNameUserDataMap.insert(std::make_pair(it->_userName,UserData(userRec->_emailAddress)));
+            if(boost::posix_time::second_clock::universal_time() - it->_loginTime >=
+               boost::posix_time::time_duration(MAX_SESSION_DURATION,0,0,0))
+            {
+                cleanupCookieDataAndUpdateSessionRecord(it->_cookieString);
+            }
+        }
     }
 
      void Controller::createUser(const std::string& userName_,
