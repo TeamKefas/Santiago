@@ -438,7 +438,6 @@ namespace Santiago{ namespace SantiagoDBTables
                 error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
             },
             error_);
-
         return sessionsRecs;
     }
 

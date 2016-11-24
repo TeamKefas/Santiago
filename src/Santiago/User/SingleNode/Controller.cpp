@@ -22,7 +22,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
             boost::optional<SantiagoDBTables::UsersRec> userRec =
                 _databaseConnection.get().getUsersRecForUserName(it->_userName,error);
             _userNameUserDataMap.insert(std::make_pair(it->_userName,UserData(userRec->_emailAddress)));
-            if(boost::posix_time::second_clock::universal_time() - it->_loginTime >=
+            if(boost::posix_time::second_clock::universal_time() - it->_lastActiveTime >=
                boost::posix_time::time_duration(MAX_SESSION_DURATION,0,0,0))
             {
                 cleanupCookieDataAndUpdateSessionRecord(it->_cookieString);
