@@ -325,8 +325,8 @@ namespace Santiago{ namespace SantiagoDBTables
             "INSERT INTO ST_sessions(user_name, cookie_string, login_time, logout_time, last_active_time) values('" +
             sessionsRec_._userName + "', '" +
             sessionsRec_._cookieString + "', '" +
-            Utils::ConvertPtimeToString(sessionsRec_._loginTime) + "', '" +
-            (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', '" +
+            Utils::ConvertPtimeToString(sessionsRec_._loginTime) + "', " +
+            (sessionsRec_._logoutTime? "'" + Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) + "'" : "NULL") + ", '" +
             Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) + "')";
             
         sessionsRec_._id = runInsertQuery(addSessionsRecQuery,error_);
@@ -395,8 +395,8 @@ namespace Santiago{ namespace SantiagoDBTables
             return;
         }
 
-        std::string updateSessionsRecQuery = "UPDATE ST_sessions SET logout_time = '" +
-            (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', " + 
+        std::string updateSessionsRecQuery = "UPDATE ST_sessions SET logout_time = " +
+            (sessionsRec_._logoutTime? "'" + Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) + "'" : "NULL") + ", " + 
             "last_active_time = '" + Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) +
             "' WHERE cookie_string ='" +
             sessionsRec_._cookieString + "'";
@@ -405,7 +405,8 @@ namespace Santiago{ namespace SantiagoDBTables
 
     std::vector<SessionsRec> MariaDBConnection::getActiveSessions(std::error_code& error_)
     {
-        std::string getActiveSessionsQuery = "SELECT * FROM ST_sessions WHERE logout_time = NULL";
+        // ptime logoutTime;//(from_iso_string("00000000T000000"));
+        std::string getActiveSessionsQuery =  "SELECT * FROM ST_sessions WHERE logout_time IS NULL";
         std::vector<SessionsRec> sessionsRecs;
         runSelectQuery(
             getActiveSessionsQuery,

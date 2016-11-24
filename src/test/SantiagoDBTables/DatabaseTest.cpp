@@ -22,13 +22,9 @@ int main(int argc, char *argv[])
         std::error_code error;
         std::vector<SessionsRec> rec;
         rec = connection.getActiveSessions(error);
-        std::cout<<"here";
         for(auto it = rec.begin(); it != rec.end(); ++it)
         {
-            std::cout<<"in loop";
-            std::cout<<it->_id<<"\n";
-            std::cout<<it->_userName<<"\n";
-            std::cout<<it->_logoutTime;
+            std::cout<<it->_id<<"\t"<<it->_userName<<std::endl;
         }
             
        
