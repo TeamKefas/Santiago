@@ -27,6 +27,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
                boost::posix_time::time_duration(MAX_SESSION_DURATION,0,0,0))
             {
                 cleanupCookieDataAndUpdateSessionRecord(it->_cookieString);
+                /* it->_logoutTime = boost::posix_time::second_clock::universal_time();
+                   _databaseConnection.get().updateSessionsRec(*it,error);*/
             }
         }
     }
