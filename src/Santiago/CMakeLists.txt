@@ -5,6 +5,7 @@ set(Santiago_SRCS
   SantiagoDBTables/MariaDBConnection.cpp
   User/SingleNode/Controller.cpp
   Utils/PTimeUtils.cpp
+  Utils/STLogV1.cpp
   )
 
 if(WIN32)
