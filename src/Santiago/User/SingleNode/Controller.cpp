@@ -524,8 +524,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
         _databaseConnection.get().updateSessionsRec(cookieStringSessionsRecMapIter->second,error);
         if(error)
         {
-            ST_LOG_INFO("updateSessionsRec failed. Logging out without writing to db. SessionsRec:"
-                     <<std::endl << cookieStringSessionsRecMapIter->second <<std::endl);
+            ST_LOG_INFO("updateSessionsRec failed. Logging out without writing to db. CookieString:"
+                     <<std::endl << cookieStringSessionsRecMapIter->first <<std::endl);
         }
 
         //remove from _userNameUserDataMap

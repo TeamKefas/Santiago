@@ -2,7 +2,7 @@
 
 #include <boost/assert.hpp>
 
-#include "STLogV1.h"
+#include "STLog.h"
 
 namespace Santiago{ namespace Utils
 {
