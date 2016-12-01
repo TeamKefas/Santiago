@@ -19,10 +19,23 @@ namespace Santiago{ namespace User{ namespace SingleNode
             it != activeSessionsRec.end();++it)
         {
             _cookieStringSessionsRecMap.insert(std::make_pair(it->_cookieString,*it));
-            boost::optional<SantiagoDBTables::UsersRec> userRec =
+            boost::optional<SantiagoDBTables::UsersRec> usersRecOpt =
                 _databaseConnection.get().getUsersRecForUserName(it->_userName,error);
-            BOOST_ASSERT(userRec);
-            _userNameUserDataMap.insert(std::make_pair(it->_userName,UserData(userRec->_emailAddress)));
+            BOOST_ASSERT(usersRecOpt);
+            // _userNameUserDataMap.insert(std::make_pair(it->_userName,UserData(userRec->_emailAddress)));
+            std::map<std::string,UserData>::iterator userNameUserDataMapIter =
+                _userNameUserDataMap.find(usersRecOpt->_userName);
+            if(_userNameUserDataMap.end() == userNameUserDataMapIter)
+            {
+                bool isInsertionSuccessfulFlag;
+                std::tie(userNameUserDataMapIter,isInsertionSuccessfulFlag) =
+                    _userNameUserDataMap.insert(std::make_pair(usersRecOpt->_userName,
+                                                               UserData(usersRecOpt->_emailAddress)));
+                BOOST_ASSERT(isInsertionSuccessfulFlag);
+                BOOST_ASSERT(userNameUserDataMapIter != _userNameUserDataMap.end());
+            }    
+            userNameUserDataMapIter->second._cookieList.push_back(it->_cookieString);
+            
             if(boost::posix_time::second_clock::universal_time() - it->_lastActiveTime >=
                boost::posix_time::time_duration(MAX_SESSION_DURATION,0,0,0))
             {
