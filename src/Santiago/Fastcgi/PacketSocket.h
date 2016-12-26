@@ -43,7 +43,7 @@ namespace Santiago{ namespace Fastcgi
         typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;
 
-        typedef std::function<void(boost::system::error_code,uint,uchar,uint,const char*)> NewPacketCallbackFn;
+        typedef std::function<void(const std::error_code&,uint,uchar,uint,const char*)> NewPacketCallbackFn;
 
         /**
          * Deleting the copy constructor to make the class non copyable
@@ -92,9 +92,17 @@ namespace Santiago{ namespace Fastcgi
          * @param content
          * @param ec- error code to be returned as reference
          */
-        void writePacket(uint requestId_,uchar headerType_,unsigned int contentLength_,const char* content_,boost::system::error_code &ec_)
+        void writePacket(uint requestId_,
+                         uchar headerType_,
+                         unsigned int contentLength_,
+                         const char* content_,
+                         std::error_code &error_)
         {
             BOOST_ASSERT(_state != CLOSED);
+            error_ = std::error_code(ERR_SUCCESS,ErrorCategory::GetInstance());
+
+            ST_LOG_DEBUG("Writing packet to socket. requestId = "<< requestId_ << ", headerType = "<<headerType_ 
+                         << std::endl);
 
             std::string padding;
             padding.append(256,0);
@@ -118,10 +126,13 @@ namespace Santiago{ namespace Fastcgi
                 bufferSequence.push_back(boost::asio::buffer(reinterpret_cast<const char*>(&header), sizeof(header)));
                 bufferSequence.push_back(boost::asio::buffer(content_+n,written));
                 bufferSequence.push_back(boost::asio::buffer(padding.data(),header.paddingLength));
-                boost::asio::write(*_protocolSocketPtr,bufferSequence,ec_);
-                if(ec_)
+                boost::system::error_code ec;
+                boost::asio::write(*_protocolSocketPtr,bufferSequence,ec);
+                if(ec)
                 {
-                    std::cout<<"Connection disconnected"<<std::endl;
+                    error_ = std::error_code(ERR_SOCKET_ERROR,ErrorCategory::GetInstance());
+                    ST_LOG_INFO("Connection disconnected. Packet write failed. requestId = "
+                                << requestId_ << ", headerType = "<<headerType_<<std::endl);
                     close();
                     return;
                 }
@@ -132,6 +143,9 @@ namespace Santiago{ namespace Fastcgi
                     break;
                 }
             }
+
+            ST_LOG_DEBUG("Packet write succeeded. requestId = "<< requestId_ << ", headerType = "<<headerType_ 
+                         << std::endl);
         }
 
         /**
@@ -142,10 +156,11 @@ namespace Santiago{ namespace Fastcgi
             if(_state == CLOSED)
             {
                 //already closed do nothing
-                return;                
+                return;
             }
             else
             {
+                ST_LOG_DEBUG("Closing socket"<<std::endl);
                 _protocolSocketPtr->cancel(); //cancel all remaining events
                 boost::system::error_code ec;
                 _protocolSocketPtr->shutdown(ProtocolSocket::shutdown_both,ec);
@@ -182,11 +197,14 @@ namespace Santiago{ namespace Fastcgi
 
             if(error_)
             {
-                std::cout<<"Connection disconnected"<<std::endl;
+                ST_LOG_INFO("Connection disconnected. handleRead called with error"<<std::endl);
+//                std::cout<<"Connection disconnected"<<std::endl;
                 close();
-                _newPacketCallbackFn(error_,0,0,0,NULL);
+                _newPacketCallbackFn(std::error_code(ERR_SOCKET_ERROR,ErrorCategory::GetInstance()) ,0,0,0,NULL);
                 return;
             }
+
+            ST_LOG_DEBUG("In handleRead. bytesTransferred = "<<bytesTransferred_<<std::endl);
 
             while (_inputBuffer.size() >= FCGI_HEADER_LEN)
             {
@@ -195,21 +213,33 @@ namespace Santiago{ namespace Fastcgi
                 const FCGI_Header& header = *reinterpret_cast<const FCGI_Header*>(inputBufferData);
                 uint requestId = (header.requestIdB1 << 8) + header.requestIdB0;
                 unsigned contentLength = (header.contentLengthB1 << 8) + header.contentLengthB0;
+
+                if (header.version != FCGI_VERSION_1)
+                {
+                    ST_LOG_ERROR("Invalid FCGI_VERSION in fastcgi header. header.version ="<<header.version
+                                 <<" Closing connection.."<<std::endl);
+                    close();
+                    _newPacketCallbackFn(std::error_code(ERR_INVALID_FASTCGI_VERSION,ErrorCategory::GetInstance()),
+                                         0,
+                                         0,
+                                         0,
+                                         NULL);
+                    return;
+                }
+
+                if (_inputBuffer.size() < FCGI_HEADER_LEN + contentLength + header.paddingLength)
+                {
+                    break;
+                }
+
                 try
                 {
-                    if (header.version != FCGI_VERSION_1)
-                    {
-                        throw std::runtime_error("Unsupported FCGI verison");
-                        break;
-                    }
-
-                    if (_inputBuffer.size() < FCGI_HEADER_LEN + contentLength + header.paddingLength)
-                    {
-                        break;
-                    }
-                    
                     const char* content = inputBufferData + FCGI_HEADER_LEN;
-                    _newPacketCallbackFn(error_,requestId,header.type,contentLength,content); 
+                    _newPacketCallbackFn(std::error_code(ERR_SUCCESS,ErrorCategory::GetInstance()),
+                                         requestId,
+                                         header.type,
+                                         contentLength,
+                                         content); 
                     _inputBuffer.consume(FCGI_HEADER_LEN + contentLength + header.paddingLength);                    
                     if(_state == CLOSED)
                     {
@@ -218,9 +248,9 @@ namespace Santiago{ namespace Fastcgi
                 }
                 catch(std::exception &e)
                 {
-                    std::cerr<<e.what();
+                    ST_LOG_ERROR("Caught exception:"<<e.what()<<std::endl);
                     _inputBuffer.consume(FCGI_HEADER_LEN + contentLength + header.paddingLength);
-                }                
+                }
                 //_inputBuffer.consume(FCGI_HEADER_LEN + contentLength + header.paddingLength);          
             }
         }
@@ -231,6 +261,7 @@ namespace Santiago{ namespace Fastcgi
          */
         void flushProtocolSocket()
         {
+            ST_LOG_DEBUG("in flushProtocolSocket"<<std::endl);
             BOOST_ASSERT(_state == CLOSED);
             boost::system::error_code ec;
             std::cout<<"extra unused input data in socket:<";

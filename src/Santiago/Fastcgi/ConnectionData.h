@@ -76,8 +76,10 @@ namespace Santiago{ namespace Fastcgi
          */
         void handleBeginRequest(uint requestId_)
         {
+            ST_LOG_DEBUG("Beginning request. requestId_ ="<<requestId_<<std::endl);
             if(_requestMap.find(requestId_) != _requestMap.end())
             {
+                ST_LOG_ERROR("Begin request requestId already exists. requestId_ ="<<requestId_<<std::endl);
                 throw std::runtime_error("requestId already exists");
             }
 
@@ -96,9 +98,11 @@ namespace Santiago{ namespace Fastcgi
          */
         void handleAbortRequest(uint requestId_)
         {
+            ST_LOG_DEBUG("Aborting request. requestId_ ="<<requestId_<<std::endl);
             RequestMap::iterator iter = _requestMap.find(requestId_); 
             if(iter == _requestMap.end())
             {
+                ST_LOG_ERROR("Abort request requestId does not exist. requestId_ ="<<requestId_<<std::endl);
                 throw std::runtime_error("abort requestId does not exist");
             }
 
@@ -112,13 +116,17 @@ namespace Santiago{ namespace Fastcgi
          */
         void handleStdin(uint requestId_,const char* inBuffer_,uint size_)
         {
+            ST_LOG_DEBUG("Handling stdin request. requestId_ ="<<requestId_<<std::endl);
+
             RequestMap::iterator iter = _requestMap.find(requestId_); 
             if(iter == _requestMap.end())
             {
+                ST_LOG_ERROR("Stdin request id does not exist. requestId_="<<requestId_<<std::endl);
                 throw std::runtime_error("stdin requestId does not exist");
             }
             if((iter->second.first._requestStateFlags & IN_COMPLETED) != 0)
             {
+                ST_LOG_ERROR("Stdin already closed. requestId_="<<requestId_<<std::endl);
                 throw std::runtime_error("stdin already closed");
             }
 
@@ -143,13 +151,17 @@ namespace Santiago{ namespace Fastcgi
          */
         void handleParams(uint requestId_,const char* inBuffer_,uint size_)
         {
+            ST_LOG_DEBUG("Handling params request. requestId_ ="<<requestId_<<std::endl);
+
             RequestMap::iterator iter = _requestMap.find(requestId_); 
             if(iter == _requestMap.end())
             {
+                ST_LOG_ERROR("Params request id does not exist. requestId_="<<requestId_<<std::endl);
                 throw std::runtime_error("params requestId does not exist");
             }
             if((iter->second.first._requestStateFlags & PARAMS_COMPLETED) != 0)
             {
+                ST_LOG_ERROR("Params already closed. requestId_="<<requestId_<<std::endl);
                 throw std::runtime_error("params already closed");
             }
 
@@ -170,11 +182,13 @@ namespace Santiago{ namespace Fastcgi
          * Cleans up a request
          * @param requestId
          */
-        void cleanupRequest(uint _requestId)
+        void cleanupRequest(uint requestId_)
         {
-            RequestMap::iterator iter = _requestMap.find(_requestId);
+            ST_LOG_DEBUG("Cleaning up request. requestId_="<<requestId_<<std::endl);
+            RequestMap::iterator iter = _requestMap.find(requestId_);
             if(iter == _requestMap.end())
             {
+                ST_LOG_ERROR("Cleanup request requestId_ does not exist. requestId_="<<requestId_<<std::endl);
                 throw std::runtime_error("requestId does not exist");
             }
 
@@ -229,6 +243,7 @@ namespace Santiago{ namespace Fastcgi
         {
             if(_requestMap.size() == 0)
             {
+                ST_LOG_DEBUG("_requestMap empty. calling _emptyCallbackFn()"<<std::endl);
                 _emptyCallbackFn();
             }
         }
@@ -242,6 +257,7 @@ namespace Santiago{ namespace Fastcgi
             if((iter_->second.first._requestStateFlags & PARAMS_COMPLETED) != 0 && 
                (iter_->second.first._requestStateFlags & IN_COMPLETED) != 0)
             {
+                ST_LOG_DEBUG("Request is ready empty. calling _emptyCallbackFn().requestId="<<iter_->first<<std::endl);
                 _requestReadyCallbackFn(iter_->first,iter_->second.second);
             }
         }

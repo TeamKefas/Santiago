@@ -51,7 +51,7 @@ strrchr(__FILE__, '\\') + 1 : __FILE__)
         std::lock_guard<std::mutex> guard(Santiago::Utils::STLog::GetInstance().mutex());\
         Santiago::Utils::STLog::GetInstance().stream()\
             << SOURCE_FILE << "(LineNo:" << __LINE__ << ") ThreadNo:"<<std::this_thread::get_id() << " ["\
-            << boost::posix_time::to_simple_string(now)<<"] "<< log_type << statement << std::endl; \
+            << boost::posix_time::to_simple_string(now)<<"] "<< log_type<<": "<< statement << std::endl; \
     }\
 
 #define ST_LOG_DEBUG(statement) ST_LOG_IMPL(statement,"DEBUG")

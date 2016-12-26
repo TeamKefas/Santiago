@@ -56,6 +56,7 @@ namespace Santiago{ namespace Fastcgi
               _newRequestCallbackFn(newRequestCallbackFn_),
               _nextConnectionId(0)
         {
+            ST_LOG_DEBUG("Starting acceptor"<<std::endl);
             ProtocolSocketPtr newProtocolSocket(new ProtocolSocket(_ioService));
 
             //listen for new connection. Make sure the callback is called in the
@@ -81,6 +82,7 @@ namespace Santiago{ namespace Fastcgi
          */
         ~Acceptor()
         {
+            ST_LOG_DEBUG("Closing acceptor"<<std::endl);
             _acceptor.cancel();
             _acceptor.close();
         }
@@ -97,9 +99,12 @@ namespace Santiago{ namespace Fastcgi
         {
             if(error_)
             {//TODO: end connections and make a callback fn 
+                ST_LOG_DEBUG("Acceptor returned error. closing acceptor. error_code="<<error_.value()<<std::endl);
                 return; 
             }
+
             //start new connection
+            ST_LOG_DEBUG("Received new connection."<<std::endl);
             uint newConnectionId = _nextConnectionId++;
             BOOST_ASSERT(_activeConnections.find(newConnectionId) == _activeConnections.end());
             ConnectionPtr newConnection(new Connection<Protocol>(
@@ -131,6 +136,7 @@ namespace Santiago{ namespace Fastcgi
          */
         void handleConnectionClose(uint connectionId_)
         {
+            ST_LOG_DEBUG("Connection close callback received."<<std::endl);
             BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             //call the close connection in the acceptor's strand
             _strand.post(std::bind(&Acceptor::closeConnection,this,connectionId_));
@@ -157,6 +163,8 @@ namespace Santiago{ namespace Fastcgi
          */
         void handleNewRequest(uint connectionId_,uint newRequestId_,const std::shared_ptr<RequestData>& newRequestData_)
         {
+            ST_LOG_DEBUG("New request ready to handle. requestId_ ="<<newRequestId_<<std::endl);
+
             BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             std::shared_ptr<Request<Protocol> > newRequest(new Request<Protocol>(_ioService,newRequestId_,newRequestData_,connectionId_,ConnectionWeakPtr(_activeConnections[connectionId_])));
             //post it in the acceptor's strand

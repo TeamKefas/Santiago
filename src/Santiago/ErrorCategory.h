@@ -17,7 +17,9 @@ namespace Santiago
         ERR_INVALID_EMAIL_ADDRESS_PASSWORD = 6,
         ERR_INVALID_SESSION_COOKIE = 7,
         ERR_INVALID_FASTCGI_REQUEST = 8,
-        ERR_FASTCGI_REQUEST_ALREADY_REPLIED = 9
+        ERR_FASTCGI_REQUEST_ALREADY_REPLIED = 9,
+        ERR_INVALID_FASTCGI_VERSION = 10,
+        ERR_SOCKET_ERROR = 11
     };
 
     class ErrorCategory:public std::error_category
