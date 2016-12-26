@@ -325,8 +325,8 @@ namespace Santiago{ namespace SantiagoDBTables
             "INSERT INTO ST_sessions(user_name, cookie_string, login_time, logout_time, last_active_time) values('" +
             sessionsRec_._userName + "', '" +
             sessionsRec_._cookieString + "', '" +
-            Utils::ConvertPtimeToString(sessionsRec_._loginTime) + "', '" +
-            (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', '" +
+            Utils::ConvertPtimeToString(sessionsRec_._loginTime) + "', " +
+            (sessionsRec_._logoutTime? "'" + Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) + "'" : "NULL") + ", '" +
             Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) + "')";
             
         sessionsRec_._id = runInsertQuery(addSessionsRecQuery,error_);
@@ -395,12 +395,51 @@ namespace Santiago{ namespace SantiagoDBTables
             return;
         }
 
-        std::string updateSessionsRecQuery = "UPDATE ST_sessions SET logout_time = '" +
-            (sessionsRec_._logoutTime? Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) : "NULL") + "', " + 
+        std::string updateSessionsRecQuery = "UPDATE ST_sessions SET logout_time = " +
+            (sessionsRec_._logoutTime? "'" + Utils::ConvertPtimeToString(*(sessionsRec_._logoutTime)) + "'" : "NULL") + ", " + 
             "last_active_time = '" + Utils::ConvertPtimeToString(sessionsRec_._lastActiveTime) +
             "' WHERE cookie_string ='" +
             sessionsRec_._cookieString + "'";
         runUpdateQuery(updateSessionsRecQuery,error_);
+    }
+
+    std::vector<SessionsRec> MariaDBConnection::getActiveSessions(std::error_code& error_)
+    {
+        // ptime logoutTime;//(from_iso_string("00000000T000000"));
+        std::string getActiveSessionsQuery =  "SELECT * FROM ST_sessions WHERE logout_time IS NULL";
+        std::vector<SessionsRec> sessionsRecs;
+        runSelectQuery(
+            getActiveSessionsQuery,
+            [&sessionsRecs](MYSQL_RES* mysqlResult_, std::error_code& error_)
+            {
+                if(6 != mysql_num_fields(mysqlResult_))
+                {
+                    ST_LOG_DEBUG("Mismatch in number of fields in the ST_sessions table."<< std::endl);
+                    error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    BOOST_ASSERT(false);
+                    return;
+                }
+                
+                MYSQL_ROW row;
+                while ((row = mysql_fetch_row(mysqlResult_)))
+                {
+                    BOOST_ASSERT(NULL != row);
+                    SessionsRec sessionsRec;
+                    sessionsRec = SessionsRec();
+                    sessionsRec._id = atoi(row[0]);
+                    sessionsRec._userName = row[1];
+                    sessionsRec._cookieString = row[2];
+                    sessionsRec._loginTime = Utils::ConvertStringToPtime(row[3]);
+                    if(row[4])
+                        sessionsRec._logoutTime = Utils::ConvertStringToPtime(row[4]);
+                    if(row[5])
+                        sessionsRec._lastActiveTime = Utils::ConvertStringToPtime(row[5]);
+                    sessionsRecs.push_back(sessionsRec);
+                }
+                error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+            },
+            error_);
+        return sessionsRecs;
     }
 
     MariaDBConnection* CreateMariaDBConnection(const boost::property_tree::ptree& config_)

@@ -39,6 +39,8 @@ namespace Santiago{ namespace SantiagoDBTables
         void addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_);
         boost::optional<SessionsRec> getSessionsRec(const std::string& cookieString_, std::error_code& error_);
         void updateSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_);
+        std::vector<SessionsRec> getActiveSessions(std::error_code& error_);
+        
 
     protected:
      

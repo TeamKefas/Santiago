@@ -20,8 +20,15 @@ int main(int argc, char *argv[])
         MariaDBConnection connection(config);
         //UserPermission permission = READ_WRITE;
         std::error_code error;
+        std::vector<SessionsRec> rec;
+        rec = connection.getActiveSessions(error);
+        for(auto it = rec.begin(); it != rec.end(); ++it)
+        {
+            std::cout<<it->_id<<"\t"<<it->_userName<<std::endl;
+        }
+            
        
-        UsersRec userRecord;
+        /*UsersRec userRecord;
         userRecord._userName = "junais";
         userRecord._emailAddress = "junais@gmail.com";
         userRecord._password = "pakistan";
@@ -137,7 +144,7 @@ int main(int argc, char *argv[])
           std::cout << "\nPermission Add Error.\n"; 
           }*/
     
-        userRecord._userName = "junais";
+        /* userRecord._userName = "junais";
         userRecord._emailAddress = "junais@gmail.com";
         userRecord._password = "india";
 
@@ -176,7 +183,7 @@ int main(int argc, char *argv[])
           std::cout << "\nInvalid Username or Password.\n";
           }*/
     
-        boost::optional<UsersRec> userRec;
+        /*boost::optional<UsersRec> userRec;
 
         userRec = connection.getUsersRecForUserName("junais", error);
         if(!error && (userRec->_id > 0))
