@@ -128,6 +128,32 @@ namespace Santiago{ namespace User{ namespace SingleNode
         _strand.post(std::bind(&Controller::deleteUserImpl,this,cookieString_,onDeleteUserCallbackFn_));
     }
 
+    void Controller::postCallbackFn(const ErrorCodeUserInfoCallbackFn& errorCodeUserInfoCallbackFn_,
+                                    const std::error_code& error_,
+                                    const boost::optional<UserInfo>& userInfoOpt_)
+    {
+        std::function<void()> errorCodeUserInfoCallbackFnImpl =
+            std::bind(errorCodeUserInfoCallbackFn_,error_, userInfoOpt_);
+        _ioService.post(errorCodeUserInfoCallbackFnImpl);
+    }
+
+    void Controller::postCallbackFn(
+        const ErrorCodeUserInfoStringPairCallbackFn& errorCodeUserInfoStringPairCallbackFn_,
+        const std::error_code& error_,
+        const boost::optional<std::pair<UserInfo,std::string> >& userInfoStringPair_)
+    {
+        std::function<void()> errorCodeUserInfoStringPairCallbackFnImpl = 
+            std::bind(errorCodeUserInfoStringPairCallbackFn_, error_, userInfoStringPair_);
+        _ioService.post(errorCodeUserInfoStringPairCallbackFnImpl);
+    }
+
+    void Controller::postCallbackFn(const ErrorCodeCallbackFn& errorCodeCallbackFn_,
+                                    const std::error_code& error_)
+    {
+        std::function<void()> errorCodeCallbackFnImpl = std::bind(errorCodeCallbackFn_,error_);
+        _ioService.post(errorCodeCallbackFnImpl);
+    }
+
     void Controller::createUserImpl(const std::string& userName_,
                                     const std::string& emailAddress_,
                                     const std::string& password_,
@@ -142,13 +168,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
-            onCreateUserCallbackFn_(error);
+            postCallbackFn(onCreateUserCallbackFn_,error);
             return;
         }
         else if(usersRecOpt)
         {
-            onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_USERNAME_ALREADY_EXISTS,
-                                                    ErrorCategory::GetInstance()));
+            postCallbackFn(onCreateUserCallbackFn_,std::error_code(ErrorCode::ERR_USERNAME_ALREADY_EXISTS,
+                                                                   ErrorCategory::GetInstance()));
             return;
         }
 
@@ -157,13 +183,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
-            onCreateUserCallbackFn_(error);
+            postCallbackFn(onCreateUserCallbackFn_,error);
             return;
         }
         else if(usersRecOpt)
         {
-            onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
-                                                    ErrorCategory::GetInstance()));
+            postCallbackFn(onCreateUserCallbackFn_,std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
+                                                                   ErrorCategory::GetInstance()));
             return;
         }
 
@@ -175,12 +201,12 @@ namespace Santiago{ namespace User{ namespace SingleNode
         _databaseConnection.get().addUsersRec(usersRec,error);
         if(error)
         {
-            onCreateUserCallbackFn_(error);
+            postCallbackFn(onCreateUserCallbackFn_,error);
             return;
         }
 
         ST_LOG_INFO("Create user successfull for userName:"<<userName_<<std::endl);
-        onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        postCallbackFn(onCreateUserCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
         return;
     }
 

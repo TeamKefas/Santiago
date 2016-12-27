@@ -77,6 +77,16 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
     protected:
 
+        void postCallbackFn(const ErrorCodeUserInfoCallbackFn& errorCodeUserInfoCallbackFn_,
+                            const std::error_code& error_,
+                            const boost::optional<UserInfo>& userInfoOpt_);
+
+        void postCallbackFn(const ErrorCodeUserInfoStringPairCallbackFn& errorCodeUserInfoStringPairCallbackFn_,
+                            const std::error_code& error_,
+                            const boost::optional<std::pair<UserInfo,std::string> >& userInfoStringPair_);
+
+        void postCallbackFn(const ErrorCodeCallbackFn& errorCodeCallbackFn_,const std::error_code& error_);
+
         //implementation functions to implement in strand
         virtual void createUserImpl(const std::string& userName_,
                                     const std::string& emailAddress_,
