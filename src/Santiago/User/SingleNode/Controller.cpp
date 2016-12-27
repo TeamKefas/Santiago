@@ -223,18 +223,18 @@ namespace Santiago{ namespace User{ namespace SingleNode
         {
             std::tie(error,usersRecOpt) =
                 verifyUserNamePasswordAndGetUsersRec(userNameOrEmailAddress_,
-                                                            password_);
+                                                     password_);
         }
         else
         {
             std::tie(error,usersRecOpt) =
                 verifyEmailAddressPasswordAndGetUsersRec(userNameOrEmailAddress_,
-                                                                password_);
+                                                         password_);
         }
 
         if(error)
         {
-            onLoginUserCallbackFn_(error,boost::none);
+            postCallbackFn(onLoginUserCallbackFn_,error,boost::none);
             return;
         }
         BOOST_ASSERT(usersRecOpt);
@@ -260,7 +260,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
         if(error)
         {
-            onLoginUserCallbackFn_(error,boost::none);
+            postCallbackFn(onLoginUserCallbackFn_,error,boost::none);
             return;
         }
         
@@ -283,11 +283,11 @@ namespace Santiago{ namespace User{ namespace SingleNode
         userNameUserDataMapIter->second._cookieList.push_back(sessionsRec._cookieString);
 
 
-        onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
-                                               ErrorCategory::GetInstance()),
-                               std::make_pair(UserInfo(usersRecOpt->_userName,
-                                                       usersRecOpt->_emailAddress),
-                                              sessionsRec._cookieString));
+        postCallbackFn(onLoginUserCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,
+                                                              ErrorCategory::GetInstance()),
+                       std::make_pair(UserInfo(usersRecOpt->_userName,
+                                               usersRecOpt->_emailAddress),
+                                      sessionsRec._cookieString));
         return;
     }
 
@@ -299,7 +299,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
         if(error)
         {
-            onVerifyUserCallbackFn_(error,boost::none);
+            postCallbackFn(onVerifyUserCallbackFn_,error,boost::none);
             return;
         }
 
@@ -313,9 +313,9 @@ namespace Santiago{ namespace User{ namespace SingleNode
                      <<cookieString_<<std::endl);            
             cleanupCookieDataAndUpdateSessionRecord(cookieString_);
 
-            onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,
-                                                    ErrorCategory::GetInstance()),
-                                    boost::none);
+            postCallbackFn(onVerifyUserCallbackFn_,std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,
+                                                                   ErrorCategory::GetInstance()),
+                           boost::none);
             return;
         }
         else //set the lastActiveTime to now
@@ -333,9 +333,9 @@ namespace Santiago{ namespace User{ namespace SingleNode
         BOOST_ASSERT(_userNameUserDataMap.end() != userNameUserDataMapIter);
 
 
-        onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
-                                UserInfo(cookieStringSessionsRecMapIter->second._userName,
-                                         userNameUserDataMapIter->second._emailAddress));
+        postCallbackFn(onVerifyUserCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
+                       UserInfo(cookieStringSessionsRecMapIter->second._userName,
+                                userNameUserDataMapIter->second._emailAddress));
         return;
     }
 
@@ -346,13 +346,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::tie(error,std::ignore) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
         if(error)
         {
-            onLogoutCookieCallbackFn_(error);
+            postCallbackFn(onLogoutCookieCallbackFn_,error);
             return;
         }
 
         cleanupCookieDataAndUpdateSessionRecord(cookieString_);
 
-        onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        postCallbackFn(onLogoutCookieCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
         return;        
     }
 
@@ -365,12 +365,12 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
         if(error)
         {
-            onLogoutAllCookiesCallbackFn_(error);
+            postCallbackFn(onLogoutAllCookiesCallbackFn_,error);
             return;
         }
 
         cleanupCookieDataAndUpdateSessionRecordsForAllCookies(cookieStringSessionsRecMapIter->second._userName);
-        onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        postCallbackFn(onLogoutAllCookiesCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
         return;
     }
 
@@ -384,7 +384,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
         if(error)
         {
-            onChangePasswordCallbackFn_(error);
+            postCallbackFn(onChangePasswordCallbackFn_,error);
             return;
         }
 
@@ -395,7 +395,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
             verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,oldPassword_);
         if(error)
         {
-            onChangePasswordCallbackFn_(error);
+            postCallbackFn(onChangePasswordCallbackFn_,error);
             return;
         }
         BOOST_ASSERT(usersRecOpt);
@@ -404,7 +404,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         usersRecOpt->_password = newPassword_;
         _databaseConnection.get().updateUsersRec(*usersRecOpt,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
-        onChangePasswordCallbackFn_(error);
+        postCallbackFn(onChangePasswordCallbackFn_,error);
         return;
 
     }
@@ -430,7 +430,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
             verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,password_);
         if(error)
         {
-            onChangeEmailAddressCallbackFn_(error);
+            postCallbackFn(onChangeEmailAddressCallbackFn_,error);
             return;
         }
         BOOST_ASSERT(usersRecOpt);
@@ -443,13 +443,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
-            onChangeEmailAddressCallbackFn_(error);
+            postCallbackFn(onChangeEmailAddressCallbackFn_,error);
             return;
         }
         else if(usersRecOpt)
         {
-            onChangeEmailAddressCallbackFn_(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
-                                                            ErrorCategory::GetInstance()));
+            postCallbackFn(onChangeEmailAddressCallbackFn_,std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
+                                                                           ErrorCategory::GetInstance()));
             return;
         }
 
@@ -457,7 +457,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         newUsersRec._emailAddress = newEmailAddress_;
         _databaseConnection.get().updateUsersRec(newUsersRec,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
-        onChangeEmailAddressCallbackFn_(error);
+        postCallbackFn(onChangeEmailAddressCallbackFn_,error);
         return;
 
     }
@@ -471,7 +471,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
         if(error)
         {
-            onDeleteUserCallbackFn_(error);
+            postCallbackFn(onDeleteUserCallbackFn_,error);
             return;
         }
 
@@ -482,7 +482,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
-            onDeleteUserCallbackFn_(error);
+            postCallbackFn(onDeleteUserCallbackFn_,error);
             return;
         }
 
@@ -490,13 +490,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
         _databaseConnection.get().deleteUsersRec(usersRecOpt->_userName,error);
         if(error)
         {
-            onDeleteUserCallbackFn_(error);
+            postCallbackFn(onDeleteUserCallbackFn_,error);
             return;
         }
 
         //remove from memory
         cleanupCookieDataAndUpdateSessionRecordsForAllCookies(cookieStringSessionsRecMapIter->second._userName);
-        onDeleteUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        postCallbackFn(onDeleteUserCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
         return;
     }
 
@@ -508,7 +508,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         std::error_code error;
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt = 
             _databaseConnection.get().getUsersRecForUserName(userName_,error);
-        if(error)//TODO
+        if(error)
         {
             return std::make_pair(error,usersRecOpt);
         }
