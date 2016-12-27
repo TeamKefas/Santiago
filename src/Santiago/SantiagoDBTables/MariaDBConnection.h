@@ -32,9 +32,11 @@ namespace Santiago{ namespace SantiagoDBTables
 
         void addUsersRec(UsersRec& usersRec_, std::error_code& error_);
         boost::optional<UsersRec> getUsersRecForUserName(const std::string& userName_, std::error_code& error_);
-        boost::optional<UsersRec> getUsersRecForEmailAddress(const std::string& userName_, std::error_code& error_);
+        boost::optional<UsersRec> getUsersRecForEmailAddress(const std::string& emailAddress_, std::error_code& error_);
         void updateUsersRec(UsersRec& newUsersRec_, std::error_code& error_);
         void deleteUsersRec(const std::string& userName_, std::error_code& error_);
+        void recoverPasswordForUserName(const std::string& userName_, std::error_code& error_);
+        void recoverPasswordForEmailAddress(const std::string& emailAddress_, std::error_code& error_);
         
         void addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_);
         boost::optional<SessionsRec> getSessionsRec(const std::string& cookieString_, std::error_code& error_);

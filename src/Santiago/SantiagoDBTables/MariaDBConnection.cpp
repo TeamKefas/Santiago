@@ -3,6 +3,9 @@
 
 #include "MariaDBConnection.h"
 
+#include <cstdlib>
+#include <ctime>
+
 namespace Santiago{ namespace SantiagoDBTables
 {
         //take db ip, port, username, password from config
@@ -311,6 +314,85 @@ namespace Santiago{ namespace SantiagoDBTables
             userName_ + "'";
         runDeleteQuery(deleteUsersRecQuery, error_);
     }
+
+    void MariaDBConnection::recoverPasswordForUserName(const std::string& userName_, std::error_code& error_)
+    {
+        if(!isUserInputClean(userName_))
+        {
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            return;
+        }
+        
+        boost::optional<UsersRec> usersRec = getUsersRecForUserName(userName_, error_);
+        
+        if(usersRec.is_initialized())
+        {
+            static const char alphanum[] =
+                "0123456789"
+                "!@#$%^&*"
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                "abcdefghijklmnopqrstuvwxyz";
+            int stringLength = sizeof(alphanum) - 1;
+            srand(time(0));
+            std::string password;
+            // Make a random password string
+            for(unsigned int i = 0; i < 10; ++i)
+            {
+                password += alphanum[rand() % stringLength];
+            }
+            
+            UsersRec newUsersRec;
+            newUsersRec._id = usersRec->_id;
+            newUsersRec._userName = usersRec->_userName;
+            newUsersRec._emailAddress = usersRec->_emailAddress;
+            newUsersRec._password = password;
+            
+            updateUsersRec(newUsersRec, error_);      // The new password to be sent to usersRec->emailAddress
+        }
+        else
+        {
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+        }
+    }
+
+    void MariaDBConnection::recoverPasswordForEmailAddress(const std::string& emailAddress_, std::error_code& error_)
+    {
+        if(!isUserInputClean(emailAddress_))
+        {
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            return;
+        }
+        
+        boost::optional<UsersRec> usersRec = getUsersRecForEmailAddress(emailAddress_, error_);
+        
+        if(usersRec.is_initialized())
+        {
+            static const char alphanum[] =
+                "0123456789"
+                "!@#$%^&*"
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                "abcdefghijklmnopqrstuvwxyz";
+            int stringLength = sizeof(alphanum) - 1;
+            srand(time(0));
+            std::string password;
+            for(unsigned int i = 0; i < 10; ++i)
+            {
+                password += alphanum[rand() % stringLength];
+            }
+
+            UsersRec newUsersRec;
+            newUsersRec._id = usersRec->_id;
+            newUsersRec._userName = usersRec->_userName;
+            newUsersRec._emailAddress = usersRec->_emailAddress;
+            newUsersRec._password = password;
+            
+            updateUsersRec(newUsersRec, error_);
+        }
+        else
+        {
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+        }
+    }    
 
     void MariaDBConnection::addSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_)
     {
