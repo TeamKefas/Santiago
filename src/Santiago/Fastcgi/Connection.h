@@ -129,7 +129,7 @@ namespace Santiago{ namespace Fastcgi
          */
         void handleTransceiverEvent(TransceiverEventInfo eventInfo_)
         {
-            BOOST_ASSERT(_state != CLOSED);
+            ST_ASSERT(_state != CLOSED);
 
             if(eventInfo_ == SOCKET_CLOSED)
             {
@@ -148,7 +148,7 @@ namespace Santiago{ namespace Fastcgi
             }
             else
             {
-                BOOST_ASSERT(false);
+                ST_ASSERT(false);
             }
         }
 

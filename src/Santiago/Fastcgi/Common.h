@@ -10,7 +10,7 @@
 
 #include <memory>
 
-#include <boost/assert.hpp>
+//#include <boost/assert.hpp>
 #include <boost/optional.hpp>
 
 #include "../ErrorCategory.h"
