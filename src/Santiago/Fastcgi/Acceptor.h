@@ -106,7 +106,7 @@ namespace Santiago{ namespace Fastcgi
             //start new connection
             ST_LOG_DEBUG("Received new connection."<<std::endl);
             uint newConnectionId = _nextConnectionId++;
-            BOOST_ASSERT(_activeConnections.find(newConnectionId) == _activeConnections.end());
+            ST_ASSERT(_activeConnections.find(newConnectionId) == _activeConnections.end());
             ConnectionPtr newConnection(new Connection<Protocol>(
                                             _ioService,
                                             newProtocolSocket_,
@@ -137,7 +137,7 @@ namespace Santiago{ namespace Fastcgi
         void handleConnectionClose(uint connectionId_)
         {
             ST_LOG_DEBUG("Connection close callback received."<<std::endl);
-            BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
+            ST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             //call the close connection in the acceptor's strand
             _strand.post(std::bind(&Acceptor::closeConnection,this,connectionId_));
 
@@ -150,7 +150,7 @@ namespace Santiago{ namespace Fastcgi
          */
         void closeConnection(uint connectionId_)
         {
-            BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
+            ST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             _activeConnections.erase(connectionId_);                        
         }
 
@@ -165,7 +165,7 @@ namespace Santiago{ namespace Fastcgi
         {
             ST_LOG_DEBUG("New request ready to handle. requestId_ ="<<newRequestId_<<std::endl);
 
-            BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
+            ST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             std::shared_ptr<Request<Protocol> > newRequest(new Request<Protocol>(_ioService,newRequestId_,newRequestData_,connectionId_,ConnectionWeakPtr(_activeConnections[connectionId_])));
             //post it in the acceptor's strand
             _strand.post(std::bind(_newRequestCallbackFn,newRequest));

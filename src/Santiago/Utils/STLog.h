@@ -1,15 +1,15 @@
 #ifndef SANTIAGO_UTILS_STLOG_H
 #define SANTIAGO_UTILS_STLOG_H
-
 #include <string>
 #include <ostream>
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <cassert>
 
-#define BOOST_ENABLE_ASSERT_HANDLER 1
+//#define BOOST_ENABLE_ASSERT_HANDLER 1
 
-#include <boost/assert.hpp>
+//#include <boost/assert.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/optional.hpp>
 
@@ -54,9 +54,22 @@ strrchr(__FILE__, '\\') + 1 : __FILE__)
             << boost::posix_time::to_simple_string(now)<<"] "<< log_type<<": "<< statement << std::endl; \
     }\
 
+//#define NDEBUG
+#define ST_ASSERT_IMPL(statement,log_type)\
+    {\
+        boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();\
+        std::lock_guard<std::mutex> guard(Santiago::Utils::STLog::GetInstance().mutex());\
+        Santiago::Utils::STLog::GetInstance().stream()\
+            << SOURCE_FILE << "(LineNo:" << __LINE__ << ") ThreadNo:"<<std::this_thread::get_id() << " ["\
+            << boost::posix_time::to_simple_string(now)<<"] "<< log_type<<": "<< "statement" << std::endl; \
+        assert(statement);\
+    }\
+
 #define ST_LOG_DEBUG(statement) ST_LOG_IMPL(statement,"DEBUG")
 #define ST_LOG_INFO(statement) ST_LOG_IMPL(statement,"INFO")
 #define ST_LOG_ERROR(statement) ST_LOG_IMPL(statement,"ERROR")
 #define ST_LOG_CRITICAL(statement) ST_LOG_IMPL(statement,"CRITICAL")
+#define ST_ASSERT(statement) ST_ASSERT_IMPL(statement, "ASSERT")
 
+//#undef NDEBUG
 #endif
