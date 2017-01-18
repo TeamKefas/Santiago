@@ -225,7 +225,11 @@ namespace Santiago{ namespace SantiagoDBTables
             return boost::none;
         }
 
-        std::string getUsersRecQuery = "SELECT * FROM ST_users WHERE user_name = '" + userName_ + "'";
+        std::string getUsersRecQuery = "SELECT id, "
+            "user_name, "
+            "email_address, "
+            "password "
+            "FROM ST_users WHERE user_name = '" + userName_ + "'";
         return getUsersRecImpl(getUsersRecQuery,error_); 
     }
 
@@ -239,7 +243,11 @@ namespace Santiago{ namespace SantiagoDBTables
             return boost::none;
         }
 
-        std::string getUsersRecQuery = "SELECT * FROM ST_users WHERE email_address = '" + emailAddress_ + "'";
+        std::string getUsersRecQuery = "SELECT id, "
+            "user_name, "
+            "email_address, "
+            "password "
+            "FROM ST_users WHERE email_address = '" + emailAddress_ + "'";
         return getUsersRecImpl(getUsersRecQuery,error_); 
     }
 
@@ -341,7 +349,13 @@ namespace Santiago{ namespace SantiagoDBTables
             return boost::none;
         }
 
-        std::string getSessionsRecQuery = "SELECT * FROM ST_sessions WHERE cookie_string = '" + cookieString_ + "'";
+        std::string getSessionsRecQuery = "SELECT id, "
+            "user_name, "
+            "cookie_string, "
+            "login_time, "
+            "logout_time, "
+            "last_active_time "
+            "FROM ST_sessions WHERE cookie_string = '" + cookieString_ + "'";
         boost::optional<SessionsRec> sessionsRec;
 
         runSelectQuery(
@@ -406,7 +420,13 @@ namespace Santiago{ namespace SantiagoDBTables
     std::vector<SessionsRec> MariaDBConnection::getActiveSessions(std::error_code& error_)
     {
         // ptime logoutTime;//(from_iso_string("00000000T000000"));
-        std::string getActiveSessionsQuery =  "SELECT * FROM ST_sessions WHERE logout_time IS NULL";
+        std::string getActiveSessionsQuery =  "SELECT id, "
+            "user_name, "
+            "cookie_string, "
+            "login_time, "
+            "logout_time, "
+            "last_active_time "
+            "FROM ST_sessions WHERE logout_time IS NULL";
         std::vector<SessionsRec> sessionsRecs;
         runSelectQuery(
             getActiveSessionsQuery,
