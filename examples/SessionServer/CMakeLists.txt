@@ -22,4 +22,4 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(SessionServer ${SessionServer_SRCS}) 
-target_link_libraries(SessionServer Santiago mysqlclient ${Boost_LIBRARIES})
+target_link_libraries(SessionServer Santiago mariadbclient ${Boost_LIBRARIES})
