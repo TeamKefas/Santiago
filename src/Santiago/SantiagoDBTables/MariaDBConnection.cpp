@@ -41,19 +41,19 @@ namespace Santiago{ namespace SantiagoDBTables
                               0) == NULL)
         {
             ST_LOG_ERROR("mysql_real_connect() failed. host = " 
-                         << config_.get<const char*>("Santiago.SantiagoDBTables.host")
-                         <<" user = " << config_.get<const char*>("Santiago.SantiagoDBTables.user")
-                         <<" db = " << config_.get<const char*>("Santiago.SantiagoDBTables.db")
-                         <<" port = " << config_.get<unsigned>("Santiago.SantiagoDBTables.port") << std::endl);
+                         << host
+                         <<" user = " << user
+                         <<" db = " << db
+                         <<" port = " << _config.get<unsigned>("Santiago.SantiagoDBTables.port") << std::endl);
 
             error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
 	    BOOST_ASSERT(false);
         }
         
-        ST_LOG_INFO("mysql_real_connect() succeeded." << config_.get<const char*>("Santiago.SantiagoDBTables.host")
-                    <<" user = " << config_.get<const char*>("Santiago.SantiagoDBTables.user")
-                    <<" db = " << config_.get<const char*>("Santiago.SantiagoDBTables.db") << std::endl);
-       
+        ST_LOG_INFO("mysql_real_connect() succeeded. host = " << host
+                    <<" user = " << user
+                    <<" db = " << db);
+                    
         error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
     }
 
