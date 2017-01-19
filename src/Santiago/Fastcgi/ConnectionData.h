@@ -13,6 +13,7 @@
 #include <map>
 #include <utility>
 #include <stdexcept>
+#include "../Utils/STLog.h"
 
 #include "Common.h"
 #include "RequestData.h"
@@ -89,7 +90,7 @@ namespace Santiago{ namespace Fastcgi
             bool insertFlag = _requestMap.insert(
                 std::make_pair(requestId_,
                                std::make_pair(requestStateInfo,requestDataPtr))).second;
-            BOOST_ASSERT(insertFlag);
+            ST_ASSERT(insertFlag);
         }
 
         /**
@@ -192,11 +193,11 @@ namespace Santiago{ namespace Fastcgi
                 throw std::runtime_error("requestId does not exist");
             }
 
-            BOOST_ASSERT((iter->second.first._requestStateFlags & IN_COMPLETED) != 0 && 
-                         (iter->second.first._requestStateFlags & IN_COMPLETED) != 0);
-
+            ST_ASSERT((iter->second.first._requestStateFlags & IN_COMPLETED) != 0 && 
+                       (iter->second.first._requestStateFlags & PARAMS_COMPLETED) != 0);
+            
             _requestMap.erase(iter);  
-          
+            
             checkForEmptyRequestMap();
         }
 

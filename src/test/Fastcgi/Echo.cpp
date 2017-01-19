@@ -34,7 +34,7 @@ void requestHandlerStreamProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boo
     cookieData._isHTTPOnly = true;
 
     bool flag = request_->responseHTTPCookies().insert(cookieData).second;
-    BOOST_ASSERT(flag);
+    ST_ASSERT(flag);
 
     request_->setContentMIMEType(Santiago::MIMEType::TEXT);
     request_->out()<<"Echo - Unix Socket Version\n"<<"FCGI Params:\n";
@@ -90,7 +90,7 @@ void requestHandlerTcpProtocol(std::shared_ptr<Santiago::Fastcgi::Request<boost:
 //    cookieData._isHTTPOnly = true;
 
     bool flag = request_->responseHTTPCookies().insert(cookieData).second;
-    BOOST_ASSERT(flag);
+    ST_ASSERT(flag);
 
     request_->setContentMIMEType(Santiago::MIMEType::TEXT);
     request_->out()<<"Echo - Tcp Socket Version\n"<<"FCGI Params:\n";

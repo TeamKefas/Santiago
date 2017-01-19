@@ -1,7 +1,5 @@
 #include <fstream>
 
-#include <boost/assert.hpp>
-
 #include "STLog.h"
 
 namespace Santiago{ namespace Utils
@@ -55,22 +53,3 @@ namespace Santiago{ namespace Utils
     }
 
 }}
-
-
-namespace boost
-{
-    void assertion_failed(char const * expr, char const * function, char const * file, long line)
-    {
-        ST_LOG_CRITICAL("Asserted in File:" << file << " LineNo:" << line << " Function:" << function << " Expr:" 
-            << expr);
-        assert(false);
-    }
-
-    void assertion_failed_msg(char const * expr, char const * msg, char const * function, char const * file, long line)
-    {
-        ST_LOG_CRITICAL("Asserted in File:" << file << " LineNo:" << line << " Function:" << function << " Expr:" 
-                        << expr << " Msg:" << msg);
-        assert(false);
-    }
-
-} // closing namespace boost

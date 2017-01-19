@@ -98,7 +98,7 @@ namespace Santiago{ namespace Fastcgi
                          const char* content_,
                          std::error_code &error_)
         {
-            BOOST_ASSERT(_state != CLOSED);
+            ST_ASSERT(_state != CLOSED);
             error_ = std::error_code(ERR_SUCCESS,ErrorCategory::GetInstance());
 
             ST_LOG_DEBUG("Writing packet to socket. requestId = "<< requestId_ << ", headerType = "<<headerType_ 
@@ -262,7 +262,7 @@ namespace Santiago{ namespace Fastcgi
         void flushProtocolSocket()
         {
             ST_LOG_DEBUG("in flushProtocolSocket"<<std::endl);
-            BOOST_ASSERT(_state == CLOSED);
+            ST_ASSERT(_state == CLOSED);
             boost::system::error_code ec;
             std::cout<<"extra unused input data in socket:<";
             do
