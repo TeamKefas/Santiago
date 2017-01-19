@@ -46,10 +46,25 @@ namespace Santiago{ namespace User{ namespace SingleNode
         }
     }
 
-     void Controller::createUser(const std::string& userName_,
-                                 const std::string& emailAddress_,
-                                 const std::string& password_,
-                                 const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
+    std::string Controller::generateSHA256(const std::string str)
+    {
+        unsigned char hash[SHA256_DIGEST_LENGTH];
+        SHA256_CTX sha256;
+        SHA256_Init(&sha256);
+        SHA256_Update(&sha256, str.c_str(), str.size());
+        SHA256_Final(hash, &sha256);
+        std::stringstream ss;
+        for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+        {
+            ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+        }
+        return ss.str();
+    }
+    
+    void Controller::createUser(const std::string& userName_,
+                                const std::string& emailAddress_,
+                                const std::string& password_,
+                                const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
         _strand.post(std::bind(&Controller::createUserImpl,
                                this,
@@ -58,7 +73,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                password_,
                                onCreateUserCallbackFn_));
     }
-
+    
     void Controller::loginUser(const std::string& userNameOrEmailAddress_,
                                bool isUserNameNotEmailAddress_,
                                const std::string& password_,
@@ -197,7 +212,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         SantiagoDBTables::UsersRec usersRec;
         usersRec._userName = userName_;
         usersRec._emailAddress = emailAddress_;
-        usersRec._password = password_;
+        usersRec._password = generateSHA256(password_);
         _databaseConnection.get().addUsersRec(usersRec,error);
         if(error)
         {
@@ -223,13 +238,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
         {
             std::tie(error,usersRecOpt) =
                 verifyUserNamePasswordAndGetUsersRec(userNameOrEmailAddress_,
-                                                     password_);
+                                                     generateSHA256(password_));
         }
         else
         {
             std::tie(error,usersRecOpt) =
                 verifyEmailAddressPasswordAndGetUsersRec(userNameOrEmailAddress_,
-                                                         password_);
+                                                         generateSHA256(password_));
         }
 
         if(error)
@@ -392,7 +407,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //verify username-password
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::tie(error,usersRecOpt) =
-            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,oldPassword_);
+            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,generateSHA256(oldPassword_));
         if(error)
         {
             postCallbackFn(onChangePasswordCallbackFn_,error);
@@ -401,7 +416,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         ST_ASSERT(usersRecOpt);
             
         //change and update the password
-        usersRecOpt->_password = newPassword_;
+        usersRecOpt->_password = generateSHA256(newPassword_);
         _databaseConnection.get().updateUsersRec(*usersRecOpt,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
         postCallbackFn(onChangePasswordCallbackFn_,error);
@@ -427,7 +442,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //verify password
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::tie(error,usersRecOpt) =
-            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,password_);
+            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,generateSHA256(password_));
         if(error)
         {
             postCallbackFn(onChangeEmailAddressCallbackFn_,error);
@@ -514,7 +529,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         }
 
         //check if the username/password matches
-        if(!usersRecOpt || (usersRecOpt->_password != password_))
+        if(!usersRecOpt || (usersRecOpt->_password != generateSHA256(password_)))
         {
             ST_LOG_INFO("Wrong username_password. userName:"<<userName_<<std::endl);
             return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_USERNAME_PASSWORD,
@@ -540,7 +555,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         }
 
         //check if the username/password matches
-        if(!usersRecOpt || (usersRecOpt->_password != password_))
+        if(!usersRecOpt || (usersRecOpt->_password != generateSHA256(password_)))
         {
             ST_LOG_INFO("Wrong emailaddress_password. emailAddress:"<<emailAddress_<<std::endl);
             return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_PASSWORD,
