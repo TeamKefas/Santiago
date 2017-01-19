@@ -1,5 +1,14 @@
 #ifndef SANTIAGO_UTILS_STLOG_H
 #define SANTIAGO_UTILS_STLOG_H
+
+/**
+ * @file STLog.h
+ *
+ * @section DESCRIPTION
+ *
+ *  Contains STLog class which logs data.
+ */
+
 #include <string>
 #include <ostream>
 #include <memory>
@@ -20,18 +29,35 @@ namespace Santiago{ namespace Utils
     {
     public:
 
+         /**
+          * It returns an istance of STLog class. 
+          */
         static STLog& GetInstance();
-
+         /**
+          * It returns a reference to the shared pointer of ostream type.
+          */
         std::ostream& stream();
+         /**
+          *  It returns the std::mutex reference.
+          */
         std::mutex& mutex() {return _mutex;}
 
+         /**
+          *  It calls initFile if stream with the file name doesn't exist. 
+          * @param  fileName_ -  It is of string type
+          */
         void setOutputFile(const std::string& fileName_);
-
+        /**
+         * The destructor
+         */
         ~STLog()
         {}
 
     protected:
-
+        /**
+         * The constructor
+         * @param fileName_- It's of string type.
+         */
         STLog();
         void initFile(const std::string& fileName_);
 
