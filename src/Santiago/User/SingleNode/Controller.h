@@ -8,6 +8,10 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <iomanip>
+#include <sstream>
+
+#include <openssl/sha.h>
 
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
@@ -42,6 +46,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
 	virtual ~Controller()
 	{}
 
+        std::string generateSHA256(const std::string str);
+        
         virtual void createUser(const std::string& userName_,
                                 const std::string& emailAddress_,
                                 const std::string& password_,
