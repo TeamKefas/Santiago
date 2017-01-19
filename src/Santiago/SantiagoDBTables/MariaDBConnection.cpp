@@ -23,7 +23,7 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         _mysql = mysql_init(NULL);
 
-        BOOST_ASSERT(_mysql != NULL); //This should be very rare. hence BOOST_ASSERT.
+        ST_ASSERT(_mysql != NULL); //This should be very rare. hence BOOST_ASSERT.
 
         mysql_options(_mysql, MYSQL_OPT_RECONNECT, (void *)"1"); //set auto reconnect.
         std::string host = _config.get<std::string>("Santiago.SantiagoDBTables.host");
@@ -47,7 +47,7 @@ namespace Santiago{ namespace SantiagoDBTables
                          <<" port = " << _config.get<unsigned>("Santiago.SantiagoDBTables.port") << std::endl);
 
             error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-	    BOOST_ASSERT(false);
+	    ST_ASSERT(false);
         }
         
         ST_LOG_INFO("mysql_real_connect() succeeded. host = " << host
@@ -264,7 +264,7 @@ namespace Santiago{ namespace SantiagoDBTables
                     ST_LOG_DEBUG("More than 1 records with same username in the ST_users table"
                                  << std::endl);
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                    BOOST_ASSERT(false);
+                    ST_ASSERT(false);
                     return;
                 }
 
@@ -272,12 +272,12 @@ namespace Santiago{ namespace SantiagoDBTables
                 {
                     ST_LOG_DEBUG("Mismatch in number of fields in the ST_users table");
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                    BOOST_ASSERT(false);
+                    ST_ASSERT(false);
                     return;
                 }
                 
                 MYSQL_ROW row = mysql_fetch_row(mysqlResult_);
-                BOOST_ASSERT(NULL != row);
+                ST_ASSERT(NULL != row);
 
                 usersRec = UsersRec();
                 usersRec->_id = atoi(row[0]);
@@ -367,7 +367,7 @@ namespace Santiago{ namespace SantiagoDBTables
                     ST_LOG_DEBUG("More than 1 records with same cookie_string in the ST_sessions table "
                                  << std::endl);
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                    BOOST_ASSERT(false);
+                    ST_ASSERT(false);
                     return;
                 }
 
@@ -375,12 +375,12 @@ namespace Santiago{ namespace SantiagoDBTables
                 {
                     ST_LOG_DEBUG("Mismatch in number of fields in the ST_sessions table");
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                    BOOST_ASSERT(false);
+                    ST_ASSERT(false);
                     return;
                 }
                 
                 MYSQL_ROW row = mysql_fetch_row(mysqlResult_);
-                BOOST_ASSERT(NULL != row);
+                ST_ASSERT(NULL != row);
 
                 sessionsRec = SessionsRec();
                 sessionsRec->_id = atoi(row[0]);
@@ -436,14 +436,14 @@ namespace Santiago{ namespace SantiagoDBTables
                 {
                     ST_LOG_DEBUG("Mismatch in number of fields in the ST_sessions table."<< std::endl);
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                    BOOST_ASSERT(false);
+                    ST_ASSERT(false);
                     return;
                 }
                 
                 MYSQL_ROW row;
                 while ((row = mysql_fetch_row(mysqlResult_)))
                 {
-                    BOOST_ASSERT(NULL != row);
+                    ST_ASSERT(NULL != row);
                     SessionsRec sessionsRec;
                     sessionsRec = SessionsRec();
                     sessionsRec._id = atoi(row[0]);

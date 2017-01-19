@@ -5,6 +5,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#undef NDEBUG
 #include <cassert>
 
 //#define BOOST_ENABLE_ASSERT_HANDLER 1
