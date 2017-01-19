@@ -1,5 +1,7 @@
 #include "Definitions.h"
 
+
+
 namespace Santiago{ namespace SantiagoDBTables
 {
     const std::map<UserPermission, std::string> userPermissionString = 

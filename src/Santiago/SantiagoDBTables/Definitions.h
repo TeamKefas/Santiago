@@ -1,6 +1,15 @@
 #ifndef SANTIAGO_SANTIAGODBTABLES_DEFINITIONS_H
 #define SANTIAGO_SANTIAGODBTABLES_DEFINITIONS_H
 
+/**
+ * @file Definitions.h
+ *
+ * @section DESCRIPTION
+ *
+ * Contains an enum class UserPermission with different permission types. 
+ */
+
+
 #include <string>
 #include <map>
 

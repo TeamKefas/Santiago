@@ -26,7 +26,7 @@ namespace Santiago{namespace Fastcgi
 
 
 /**
- * Thic structure stores the input (from web network) and to be output (from the user
+ * This structure stores the input (from web network) and to be output (from the user
  * app) data of a request.
  */
     struct RequestData

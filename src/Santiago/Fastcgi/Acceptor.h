@@ -78,7 +78,7 @@ namespace Santiago{ namespace Fastcgi
         }
 
         /**
-         * The destrunctor
+         * The destructor
          */
         ~Acceptor()
         {
