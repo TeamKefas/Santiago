@@ -1,6 +1,13 @@
 #ifndef SANTIAGO_USER_SERVER_CONNECTIONSERVER_H
 #define SANTIAGO_USER_SERVER_CONNECTIONSERVER_H
 
+/**
+ * @file ConnectionServer.h
+ *
+ * @section DESCRIPTION
+ *
+ * Contains the ConnectionServer class  
+ */
 
 #include <boost/asio/socket_acceptor_service.hpp>
 #include <boost/asio/error.hpp>
@@ -19,23 +26,43 @@ namespace Santiago{ namespace User { namespace Server
         typedef std::function<void(const ServerMessage&)> OnNewRequestCallbackFn;
         typedef std::function<void(const ServerMessage&)> OnRequestReplyCallbackFn;
         typedef std::function<void(unsigned)> OnDisconnectCallbackFn;
-        
+        /**
+         * The constructor
+         * @param ioService_- 
+         * @param port_- ///NEED TO WRITE\\\
+         * @param onDisconnectCallbackFn_ -
+         * @param onNewRequestCallbackFn_ -
+         * @param onRequestReplyCallbackFn_ -
+         */
         ConnectionServer(boost::asio::io_service& ioService_,
                          unsigned port_,
                          const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
                          const OnNewRequestCallbackFn& onNewRequestCallbackFn_,
                          const OnRequestReplyCallbackFn& onRequestReplyCallbackFn_);
-
+       /**
+        * ///Message\\
+        */
         void start();
+       /**
+        * ///Message\\
+        * @param serverMessage_ - 
+        */
         void sendMessage(const ServerMessage& serverMessage_);
 
         unsigned                                           _nextConnectionId;
         
     protected:
-        
+       /**
+        * ///Message\\
+        * @param socketPtr_ -
+        * @param error_ - 
+        */
         void handleAccept(const ConnectionMessageSocket::MySocketPtr& socketPtr_,
                           const boost::system::error_code& error_);
-
+       /**
+        * ///Message\\
+        * @param connectionId_ - 
+        */
         void handleDisconnect(unsigned connectionId_);
 
        

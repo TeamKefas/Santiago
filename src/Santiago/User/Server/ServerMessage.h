@@ -1,6 +1,14 @@
 #ifndef SANTIAGO_USER_SERVER_SERVER_MESSAGE_H
 #define SANTIAGO_USER_SERVER_SERVER_MESSAGE_H
 
+/**
+ * @file ServerMessage.h
+ *
+ * @section DESCRIPTION
+ *
+ * Contains the RequestId ServerMessageType ServerMessage class  
+ */
+
 #include <boost/optional.hpp>
 #include "ConnectionMessage.h"
 
@@ -9,6 +17,11 @@ namespace Santiago{ namespace User { namespace Server
 {
     struct RequestId 
     {
+        /**
+         * The constructor
+         * @param _initiatingConnectionId - 
+         * @param _requestNo -
+         */
         RequestId(unsigned _initiatingConnectionId,unsigned _requestNo);
         bool operator<(const RequestId& rhs_) const;
         
@@ -26,6 +39,13 @@ namespace Santiago{ namespace User { namespace Server
 
     struct ServerMessage
     {
+        /**
+         * The constructor
+         * @param connectionId_ - 
+         * @param requestId_ -
+         * @param type_ -
+         * @param connectionMessage_ -
+         */
         ServerMessage(unsigned connectionId_,
                       const RequestId& requestId_,
                       ServerMessageType type_,

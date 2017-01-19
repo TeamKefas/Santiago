@@ -43,8 +43,8 @@ namespace Santiago{ namespace Utils
         std::mutex& mutex() {return _mutex;}
 
          /**
-          *  It calls initFile if stream with the file name doesn't exist. 
-          * @param  fileName_ -  It is of string type
+          * It creates a new file
+          * @param  fileName_ -  It is used to create a new Log file.
           */
         void setOutputFile(const std::string& fileName_);
         /**
@@ -56,9 +56,13 @@ namespace Santiago{ namespace Utils
     protected:
         /**
          * The constructor
-         * @param fileName_- It's of string type.
          */
         STLog();
+        /**
+         *  It creates a new Log file with the file name we provided. 
+         * @param  fileName_ - It is used to create new Log file.
+         */
+
         void initFile(const std::string& fileName_);
 
         typedef std::shared_ptr<std::ostream> OStreamPtr;
