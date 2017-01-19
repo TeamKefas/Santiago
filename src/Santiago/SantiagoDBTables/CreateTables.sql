@@ -2,7 +2,7 @@ CREATE TABLE `ST_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(20) NOT NULL,
   `email_address` varchar(30) NOT NULL,
-  `password` varchar(20) NOT NULL,
+  `password` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name` (`user_name`),
   UNIQUE KEY `email_address` (`email_address`)
