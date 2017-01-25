@@ -83,7 +83,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                 const ErrorCodeCallbackFn& onCreateUserCallbackFn_);
         /**
          * This function is used to perform user login with the user credentials
-         * @param userNameOrEmailAddress_ - username used by the user for login.
+         * @param userNameOrEmailAddress_ - Username/Email address used by the user for login.
          * @param isUserNameNotEmailAddress_ - true for username and false for email address.
          * @param password_ - Password used by the user for login.
          * @param onLoginUserCallbackFn_ - Call back function for loginUser
@@ -215,7 +215,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         virtual void logoutUserForAllCookiesImpl(const std::string& currentCookieString_,
                                                  const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_);
         /**
-         * This function is used to change the 
+         * This function is the implementation function for the changeUserPassword function.
          * @param cookieString_ - Cookie from the user.
          * @param oldPassword_ - Old password of the user.
          * @param newPassword_ - New password of the user.
@@ -226,7 +226,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                             const std::string& newPassword_,
                                             const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
         /**
-         * ///Message\\
+         * This function is the implementation function for the changeUserEmailAddress function. 
          * @param cookieString_ - Cookie from the user.
          * @param newEmailAddress_ - New email address that is to be updated.
          * @param password_ - Password of the user account.
@@ -237,7 +237,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                                 const std::string& password_,
                                                 const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
         /**
-         * ///Message\\
+         *  This function is the implementation function for the deleteUser function.
          * @param cookieString_ - Cookie from the user.
          * @param onDeleteUserCallbackFn_ - Call back function for delete user operations.
          */
