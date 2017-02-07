@@ -3,6 +3,7 @@ set(Santiago_SRCS
   HTTPDefinitions.cpp
   SantiagoDBTables/Definitions.cpp
   SantiagoDBTables/MariaDBConnection.cpp
+  Thread/ThreadSpecificVarImpl.cpp
   User/SingleNode/Controller.cpp
   Utils/PTimeUtils.cpp
   )
