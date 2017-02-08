@@ -9,6 +9,8 @@
 #include <boost/any.hpp>
 #include <boost/optional.hpp>
 
+#include "Santiago/Utils/STLog.h"
+
 namespace Santiago{ namespace Thread
 {
     class ThreadLocalStore;

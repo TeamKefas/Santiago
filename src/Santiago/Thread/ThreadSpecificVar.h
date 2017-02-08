@@ -4,8 +4,6 @@
 #include <functional>
 #include <memory>
 
-#include "Santiago/Utils/STLog.h"
-
 #include "ThreadSpecificVarImpl.h"
 
 namespace Santiago{ namespace Thread

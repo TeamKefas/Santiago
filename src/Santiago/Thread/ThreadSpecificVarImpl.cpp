@@ -1,8 +1,6 @@
 #include <functional>
 #include <thread>
 
-#include "Santiago/Utils/STLog.h"
-
 #include "ThreadSpecificVarImpl.h"
 
 namespace Santiago{ namespace Thread
@@ -37,14 +35,14 @@ namespace Santiago{ namespace Thread
             bool flag =
                 _varPtrThreadEndCallbackFnMap.insert(std::make_pair(varPtr_,
                                                                     threadEndCallbackFn_)).second;
-            BOOST_ASSERT(flag);
+            ST_ASSERT(flag);
         }
 
         void removeVar(void* varPtr_)
         {
             std::lock_guard<std::mutex> guard(_mutex);
             size_t noOfElementsRemoved = _varPtrThreadEndCallbackFnMap.erase(varPtr_);
-            BOOST_ASSERT(1 == noOfElementsRemoved);
+            ST_ASSERT(1 == noOfElementsRemoved);
         }
 
     protected:
@@ -72,7 +70,7 @@ namespace Santiago{ namespace Thread
 
         std::lock_guard<std::mutex> guard(_mutex);
         ThreadIdThreadDataMap::iterator iter = _threadIdThreadDataMap.find(threadId);
-        BOOST_ASSERT(_threadIdThreadDataMap.end() == iter);
+        ST_ASSERT(_threadIdThreadDataMap.end() == iter);
         if(!ThreadLocalStorePtr)
         {
             ThreadLocalStorePtr.reset(new ThreadLocalStore());
@@ -82,13 +80,13 @@ namespace Santiago{ namespace Thread
             std::make_pair(threadId,
                            PerThreadDataType{tData_,std::weak_ptr<ThreadLocalStore>(ThreadLocalStorePtr)})).second;
 
-        BOOST_ASSERT(flag);
+        ST_ASSERT(flag);
         ThreadLocalStorePtr->addVar(reinterpret_cast<void*>(this),
-                                        std::bind(&ThreadSpecificVarImpl::removeThreadData,
-                                                  this->shared_from_this(),
-                                                  std::placeholders::_1));
+                                    std::bind(&ThreadSpecificVarImpl::removeThreadData,
+                                              this->shared_from_this(),
+                                              std::placeholders::_1));
     }
-
+    
     void ThreadSpecificVarImpl::removeAllReachableThreadData()
     {
         std::lock_guard<std::mutex> guard(_mutex);
@@ -110,14 +108,14 @@ namespace Santiago{ namespace Thread
 
     ThreadSpecificVarImpl::~ThreadSpecificVarImpl()
     {
-        BOOST_ASSERT(0 == _threadIdThreadDataMap.size());
+        ST_ASSERT(0 == _threadIdThreadDataMap.size());
     }
 
     void ThreadSpecificVarImpl::removeThreadData(const std::thread::id& threadId_)
     {
         std::lock_guard<std::mutex> guard(_mutex);
         size_t noOfElementsRemoved = _threadIdThreadDataMap.erase(threadId_);
-        BOOST_ASSERT(1 == noOfElementsRemoved);
+        ST_ASSERT(1 == noOfElementsRemoved);
     }
 
 }}

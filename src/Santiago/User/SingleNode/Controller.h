@@ -10,7 +10,8 @@
 #include <ctime>
 
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
-#include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
+//#include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
+#include "Santiago/Thread/ThreadSpecificVar.h"
 
 #include "Santiago/User/ControllerBase.h"
 #include "Santiago/Utils/STLog.h"
@@ -34,7 +35,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
             std::vector<std::string>     _cookieList;
         };
 
-        typedef ThreadSpecificVar::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
+        typedef Thread::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
 
         Controller(ThreadSpecificDbConnection& databaseConnection_,
                    boost::asio::io_service& ioService_,
