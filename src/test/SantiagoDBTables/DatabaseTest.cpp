@@ -18,17 +18,9 @@ int main(int argc, char *argv[])
         boost::property_tree::ptree config;
         boost::property_tree::read_json(argv[1],config);
         MariaDBConnection connection(config);
-        //UserPermission permission = READ_WRITE;
-        std::error_code error;
-        std::vector<SessionsRec> rec;
-        rec = connection.getActiveSessions(error);
-        for(auto it = rec.begin(); it != rec.end(); ++it)
-        {
-            std::cout<<it->_id<<"\t"<<it->_userName<<std::endl;
-        }
-            
+        std::error_code error;          
        
-        /*UsersRec userRecord;
+        UsersRec userRecord;
         userRecord._userName = "junais";
         userRecord._emailAddress = "junais@gmail.com";
         userRecord._password = "pakistan";
@@ -130,21 +122,7 @@ int main(int argc, char *argv[])
             std::cout << "\nSession Updation Error.\n"; 
         }
 
-        /*PermissionsRec permissionRecord;
-          permissionRecord._resId = 34;
-          permissionRecord._userName = "junais";
-          permissionRecord._userPermission = permission;
-    
-          if(!connection.addPermissionsRec(permissionRecord, error))
-          {
-          std::cout << "\nPermission Added.\n"; 
-          }
-          else
-          {
-          std::cout << "\nPermission Add Error.\n"; 
-          }*/
-    
-        /* userRecord._userName = "junais";
+        userRecord._userName = "junais";
         userRecord._emailAddress = "junais@gmail.com";
         userRecord._password = "india";
 
@@ -171,25 +149,17 @@ int main(int argc, char *argv[])
             std::cout << "\nInvalid Username or Password.\n";
         }
 
-        /*userProfileRecord._userName = "junais";
-          userProfileRecord._password = "pakistan";
-    
-          if(!connection.updateUserProfilesRec(userProfileRecord,"india", error))
-          {
-          std::cout<< "\nUser Record updated.\n";
-          }
-          else
-          {
-          std::cout << "\nInvalid Username or Password.\n";
-          }*/
-    
-        /*boost::optional<UsersRec> userRec;
+        userRecord._userName = "junais";
+        userRecord._password = "pakistan";
+      
+        boost::optional<UsersRec> userRec;
 
         userRec = connection.getUsersRecForUserName("junais", error);
         if(!error && (userRec->_id > 0))
         { 
             std::cout << "\n" << userRec->_id << "\t"
                       << userRec->_userName << "\t"
+                      << userRec->_emailAddress << "\t"
                       << userRec->_password << "\n";
         }
         else
@@ -202,6 +172,7 @@ int main(int argc, char *argv[])
         { 
             std::cout << "\n" << userRec->_id << "\t"
                       << userRec->_userName << "\t"
+                      << userRec->_emailAddress << "\t"
                       << userRec->_password << "\n";
         }
         else
@@ -225,21 +196,12 @@ int main(int argc, char *argv[])
             std::cout << "\nInvalid Cookie String.\n";
         }
 
-        /*boost::optional<PermissionsRec> permissionRec = PermissionsRec();
-        
-          if(!connection.getPermissionsRec("junais", permissionRec))
-          {
-          std::cout << "\n" << permissionRec->_id << "\t"
-          << permissionRec->_resId << "\t"
-          << permissionRec->_userName << "\t"
-          << userPermissionString.find(permissionRec->_userPermission)->second << "\n";
-          }
-          else
-          {
-          std::cout << "\nInvalid User Id.\n";
-          }
-        */
-
+        std::vector<SessionsRec> rec;
+        rec = connection.getActiveSessions(error);
+        for(auto it = rec.begin(); it != rec.end(); ++it)
+        {
+            std::cout << "\n" << it->_id << "\t" << it->_userName << std::endl;
+        }
     }
     catch(std::exception& e)
     {

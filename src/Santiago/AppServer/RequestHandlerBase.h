@@ -163,6 +163,8 @@ namespace Santiago{ namespace AppServer
 
         friend class Server<Protocol>;
 
+    protected:
+
         StrandPtr                 _strand;
     };
 

@@ -1,6 +1,14 @@
 #ifndef SANTIAGO_USER_SERVER_SERVERDATA_H
 #define SANTIAGO_USER_SERVER_SERVERDATA_H
 
+/**
+ * @file ServerData.h
+ *
+ * @section DESCRIPTION
+ *
+ * Contains the ResourceData CookieData UserIdData ServerData
+ */
+
 #include <map>
 #include <string>
 #include <vector>

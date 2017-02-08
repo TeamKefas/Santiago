@@ -1,6 +1,14 @@
 #ifndef SANTIAGO_USER_SERVER_CONNECTIONMESSAGESOCKET_H
 #define SANTIAGO_USER_SERVER_CONNECTIONMESSAGESOCKET_H
 
+/**
+ * @file ConnectionMessageSocket.h
+ *
+ * @section DESCRIPTION
+ *
+ * Contains the ConnectionMessageSocket class and ConnectionMessageType class 
+ */
+
 #include <memory>
 #include <string>
 #include <cstdlib>
@@ -31,19 +39,48 @@ namespace Santiago{ namespace User { namespace Server
 
         typedef std::function<void(unsigned)> OnDisconnectCallbackFn;
         typedef std::function<void(const RequestId&,const ConnectionMessage&)> OnMessageCallbackFn;
-
+        /**
+         * The constructor
+         * @param socketPtr_- 
+         * @param onDisconnectCallbackFn_- ///NEED TO WRITE\\\
+         * @param onMessageCallbackFn_ - 
+         */
         ConnectionMessageSocket(const MySocketPtr& socketPtr_,
                                 const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
                                 const OnMessageCallbackFn& onMessageCallbackFn_);
-
+        
+       /**
+        * ///Message\\
+        * @param requestId_ -
+        * @param message_ - 
+        */
         void sendMessage(const RequestId& requestId_,const ConnectionMessage& message_);
+        /**
+         * ///Message\\
+         */
         void start();
+        /**
+         * ///Message\\
+         */
         void close();
 
     private:
-
+        /**
+         * ///Message\\
+         * @param error_ -
+         * @param bytesTransferred_ - 
+         */
         void handleRead(const boost::system::error_code& error_,size_t bytesTransferred_);
+        /**
+         * ///Message\\
+         * @param bytesTransferred_ -
+         */
         void parseMessage(size_t bytesTransferred_);
+         /**
+         * ///Message\\
+         * @param requestId_ -
+         * @param message_ - 
+         */
         void sendMessageImpl(const RequestId& requestId_,const ConnectionMessage& message_);
 
         MySocketPtr                             _socketPtr;

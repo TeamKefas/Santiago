@@ -1,6 +1,14 @@
 #ifndef SANTIAGO_USER_SERVER_CONNECTION_MESSAGE_H
 #define SANTIAGO_USER_SERVER_CONNECTION_MESSAGE_H
 
+/**
+ * @file ConnectionMessage.h
+ *
+ * @section DESCRIPTION
+ *
+ * Contains the ConnectionMessage class and ConnectionMessageType class 
+ */
+
 #include <string>
 #include <vector>
 #include <map>
@@ -40,11 +48,27 @@ namespace Santiago{ namespace User { namespace Server
 
     struct ConnectionMessage
     {
+        /**
+         * The constructor
+         * @param content_- 
+         * @param size_- ///NEED TO WRITE\\\
+         */
         ConnectionMessage(const char* content_,unsigned size_);         
-
+        /**
+         * The constructor
+         * @param type_- 
+         * @param parameters_- ///NEED TO WRITE\\\
+         */
         ConnectionMessage(ConnectionMessageType type_,const std::vector<std::string>& parameters_);
 
+        /**
+         * ///Message\\
+         * @param outStream_ -
+         */
         std::ostream& writeToStream(std::ostream& outStream_) const;
+        /**
+         * ///Message\\
+         */
         unsigned getSize() const;
 
         ConnectionMessageType     _type;

@@ -6,6 +6,7 @@ set(Santiago_SRCS
   Thread/ThreadSpecificVarImpl.cpp
   User/SingleNode/Controller.cpp
   Utils/PTimeUtils.cpp
+  Utils/STLog.cpp
   )
 
 if(WIN32)
@@ -15,5 +16,5 @@ if(WIN32)
 endif(WIN32)
 
 add_library(Santiago STATIC ${Santiago_SRCS})
-target_link_libraries(Santiago ${Boost_LIBRARIES})
+target_link_libraries(Santiago ${Boost_LIBRARIES} ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY})
 install(TARGETS Santiago DESTINATION /usr/local/lib)

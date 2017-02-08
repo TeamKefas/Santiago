@@ -43,6 +43,7 @@ namespace Santiago{ namespace Fastcgi
             CLOSING,
             CLOSED
         };
+
     public:
         /**
          * The constructor
@@ -87,6 +88,7 @@ namespace Santiago{ namespace Fastcgi
          */
         void commitReply(uint requestId_,RequestDataPtr requestData_)
         {
+            ST_LOG_DEBUG("commitReply called."<<std::endl);
             _strandPtr->post(std::bind(&Connection::commitReplyImpl,this,requestId_,requestData_));
         }
 
@@ -115,6 +117,7 @@ namespace Santiago{ namespace Fastcgi
         void handleRequestReady(uint requestId_,RequestDataPtr newRequest_)
         {
 //            BOOST_ASSERT(_state == OPEN);
+            ST_LOG_DEBUG("New request ready to be processed. requestId_ ="<<requestId_<<std::endl);
             _newRequestCallbackFn(requestId_,newRequest_);
 //            _ioService.post(boost::bind(_newRequestCallbackFn,requestId_,newRequest_)); 
         }
@@ -126,19 +129,26 @@ namespace Santiago{ namespace Fastcgi
          */
         void handleTransceiverEvent(TransceiverEventInfo eventInfo_)
         {
-            BOOST_ASSERT(_state != CLOSED);
+            ST_ASSERT(_state != CLOSED);
 
             if(eventInfo_ == SOCKET_CLOSED)
             {
+                ST_LOG_DEBUG("Received SOCKET_CLOSED transceiverEvent."<<std::endl);
                 closeAndCleanup(); 
             }
-            if(eventInfo_ == CONNECTION_WIND_DOWN)
+            else if(eventInfo_ == CONNECTION_WIND_DOWN)
             {
+                ST_LOG_DEBUG("Received CONNECTION_WIND_DOWN transceiverEvent."<<std::endl);
                 _state = CLOSING;
                 if(_data.size() == 0)
                 {
+                    ST_LOG_DEBUG("Since no more requests..closing connection."<<std::endl);
                     closeAndCleanup();
-                }                
+                }
+            }
+            else
+            {
+                ST_ASSERT(false);
             }
         }
 
@@ -148,8 +158,10 @@ namespace Santiago{ namespace Fastcgi
          */
         void handleOnEmpty()
         {
+            ST_LOG_DEBUG("In handleOnEmpty callback."<<std::endl);
             if(_state == CLOSING)
             {
+                ST_LOG_DEBUG("Closing since CONNECTION_WIND_DOWN already received."<<std::endl);
                 closeAndCleanup();
             }
         }
@@ -159,6 +171,7 @@ namespace Santiago{ namespace Fastcgi
          */
         void closeAndCleanup()
         {
+            ST_LOG_DEBUG("In closeAndCleanup()"<<std::endl);
             _data.clear(); //note: clear() does not callback the emptyHandler.bu cleanupRequest() does.            
             _recordSocket.close();
             _state = CLOSED;
@@ -172,27 +185,32 @@ namespace Santiago{ namespace Fastcgi
          */
         void commitReplyImpl(uint requestId_,RequestDataPtr requestData_)
         {
+            ST_LOG_DEBUG("In commitReplyImpl"<<std::endl);
             if(!_data.isValidRequest(requestId_,requestData_))
             {
+                ST_LOG_INFO("Unable to commitReply. Request already closed in between."<<std::endl);
                 return;
             }
-            boost::system::error_code ec;
+
             boost::asio::streambuf httpHeaderOutBuffer;
             std::ostream httpHeaderOut(&httpHeaderOutBuffer);
             requestData_->fillHTTPHeaderData(httpHeaderOut);
 
-            _recordSocket.sendReply(requestId_,
-                                    httpHeaderOutBuffer,
-                                    requestData_->_outBuffer,
-                                    requestData_->_errBuffer,
-                                    requestData_->_appStatus,
+            std::error_code ec;
+           _recordSocket.sendReply(requestId_,
+                                   httpHeaderOutBuffer,
+                                   requestData_->_outBuffer,
+                                   requestData_->_errBuffer,
+                                   requestData_->_appStatus,
                                     ec);
             if(!ec) 
             {
+                ST_LOG_DEBUG("sendReply succeeded. Cleaning up request. requestId_="<<requestId_<<std::endl);
                 _data.cleanupRequest(requestId_);
             }
             else
             {
+                ST_LOG_INFO("sendReply failed. Cleaning up all requests and closing connection"<<std::endl);
                 closeAndCleanup();
             }
         }  
