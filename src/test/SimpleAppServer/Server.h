@@ -5,7 +5,7 @@
 
 #include "Santiago/AppServer/ServerBase.h"
 #include "Santiago/User/SingleNode/Controller.h"
-#include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
+#include "Santiago/Thread/ThreadSpecificVar.h"
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "LoginPageHandler.h"
 #include "SimplePageHandler.h"
@@ -16,7 +16,7 @@ namespace SimpleAppServer
     {
     public:
 
-        typedef Santiago::ThreadSpecificVar::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection>
+        typedef Santiago::Thread::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection>
         SantiagoDBConnection;
 
         typedef Santiago::AppServer::ServerBase<boost::asio::ip::tcp> MyBase;
