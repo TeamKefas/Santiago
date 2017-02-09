@@ -22,6 +22,7 @@ namespace Santiago{ namespace User { namespace Server
     {
     public:
         typedef std::function<void(const RequestId&)> OnCompletedCallbackFn;
+        typedef std::functions<void(const ServerMessage&)> SendMessageCallbackFn;
         /**
          * The constructor
          * @param connectionServer_- 
@@ -29,11 +30,11 @@ namespace Santiago{ namespace User { namespace Server
          * @param initiatingMessage_ -
          */
         RequestHandlerBase(ServerData& serverData_,
-                           ConnectionServer& connectionServer_,
+                           const SendMessageCallbackFn& sendMessageCallbackFn_,
                            const OnCompletedCallbackFn& onCompletedCallbackFn_,
                            const ServerMessage& initiatingMessage_)
             :_serverData(serverData_)
-            ,_connectionServer(connectionServer_)
+            ,_sendMessageCallbackFn(sendMessageCallbackFn_)
             ,_onCompletedCallbackFn(onCompletedCallbackFn_)
             ,_initiatingMessage(initiatingMessage_)
         {}
@@ -49,13 +50,10 @@ namespace Santiago{ namespace User { namespace Server
 
     protected:
 
-        ConnectionServer&              &_connectionServer;
+        SendMessageCallbackFn          _sendMessageCallbackFn;
         OnCompletedCallbackFn          _onCompletedCallbackFn;
         ServerMessage                  _initiatingMessage;
-        ServerData                     &_serverData;
-
-        DatabaseInterface              _databaseInterface;
-        
+        ServerData                    &_serverData;       
 
     };
 
