@@ -2,15 +2,15 @@
 
 namespace Santiago{ namespace User { namespace Server
 {
-    Server::Server(boost::asio::io_service& ioService_,unsigned port_)
-        :_ioService(ioService_)
-        ,_port(port_)
-        ,_connectionMessage(nullptr,0)
-        ,_connectionServer(_ioService
-                           ,_port
-                           ,std::bind(&Server::handleDisconnect,this,std::placeholders::_1)
-                           ,std::bind(&Server::handleRequestNew,this,std::placeholders::_1)
-                           ,std::bind(&Server::handleRequestReply,this,std::placeholders::_1))
+    Server::Server(const boost::property_tree::ptree& config_):
+        _ioService(),
+        _config(config_),
+        _databaseConnection(std::bind(Santiago::SantiagoDBTables::CreateMariaDBConnection,config_)),
+        _connectionServer(_ioService,
+                          config_.get<unsigned>("Santiago.UserServer.port"),
+                          std::bind(&Server::handleDisconnect,this,std::placeholders::_1),
+                          std::bind(&Server::handleRequestNew,this,std::placeholders::_1),
+                          std::bind(&Server::handleRequestReply,this,std::placeholders::_1))
     {}
 
     void Server::start()
@@ -33,6 +33,7 @@ namespace Santiago{ namespace User { namespace Server
         case ConnectionMessageType::CR_CREATE_USER:
             requestHandlerPtr.reset(new CreateUserRequestHandler(
                                         _serverData,
+                                        _databaseConnection,
                                         std::bind(&ConnectionServer::sendMessage,
                                                   _connectionServer,
                                                   std::placeholders::_1),
