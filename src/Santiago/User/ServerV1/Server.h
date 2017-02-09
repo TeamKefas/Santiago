@@ -13,11 +13,15 @@
 #include <boost/asio/socket_acceptor_service.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/optional.hpp>
+#include <boost/property_tree/ptree.hpp>
 
-#include "../../Thread/ThreadSpecificVar.h"
+#include "../../ThreadSpecificVar/ThreadSpecificVar.h"
 
 #include "ConnectionServer.h"
 #include "ServerData.h"
+#include "ServerMessage.h"
+#include "CreateUserRequestHandler.h"
+#include "../../SantiagoDBTables/MariaDBConnection.h"
 
 using boost::asio::ip::tcp;
 
@@ -27,7 +31,7 @@ namespace Santiago{ namespace User { namespace Server
     {
     public:
 
-        typedef Thread::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection> SantiagoDBConnection;
+        typedef ThreadSpecificVar::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection> SantiagoDBConnection;
         typedef std::shared_ptr<RequestHandlerBase> RequestHandlerBasePtr;
         
         /**
@@ -63,7 +67,7 @@ namespace Santiago{ namespace User { namespace Server
         */
         void handleRequestCompleted(const RequestId& requestId_);
 
-        boost::asio::io_service&                    _ioService;
+        boost::asio::io_service                     _ioService;
         boost::property_tree::ptree                 _config;
         SantiagoDBConnection                        _databaseConnection;
 

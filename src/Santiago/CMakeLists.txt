@@ -3,7 +3,14 @@ set(Santiago_SRCS
   HTTPDefinitions.cpp
   SantiagoDBTables/Definitions.cpp
   SantiagoDBTables/MariaDBConnection.cpp
-  User/SingleNode/Controller.cpp
+  #User/SingleNode/Controller.cpp
+  User/ServerV1/ConnectionMessage.cpp
+  User/ServerV1/ServerMessage.cpp
+  User/ServerV1/Server.cpp
+  User/ServerV1/ConnectionServer.cpp
+  User/ServerV1/ConnectionRequestsController.cpp
+  User/ServerV1/ConnectionMessageSocket.cpp
+  User/ServerV1/CreateUserRequestHandler.cpp
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp
   )

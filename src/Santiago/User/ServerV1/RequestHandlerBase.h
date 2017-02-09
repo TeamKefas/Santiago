@@ -12,10 +12,11 @@
 #include <functional>
 #include <algorithm>
 
-#include "../../Thread/ThreadSpecificVar.h"
+#include "../../ThreadSpecificVar/ThreadSpecificVar.h"
 
 #include "ServerMessage.h"
-#include "DatabaseInterface.h"
+//#include "DatabaseInterface.h"
+#include "../../SantiagoDBTables/MariaDBConnection.h"
 #include "ServerData.h"
 #include "ConnectionServer.h"
 
@@ -25,9 +26,9 @@ namespace Santiago{ namespace User { namespace Server
     {
     public:
         
-        typedef Thread::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection> SantiagoDBConnection;
+        typedef ThreadSpecificVar::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection> SantiagoDBConnection;
         typedef std::function<void(const RequestId&)> OnCompletedCallbackFn;
-        typedef std::functions<void(const ServerMessage&)> SendMessageCallbackFn;
+        typedef std::function<void(const ServerMessage&)> SendMessageCallbackFn;
         /**
          * The constructor
          * @param connectionServer_- 
@@ -58,7 +59,7 @@ namespace Santiago{ namespace User { namespace Server
     protected:
 
         ServerData                    &_serverData;       
-        SantiagoDBConnection&         &_databaseConnection;
+        SantiagoDBConnection          &_databaseConnection;
         SendMessageCallbackFn          _sendMessageCallbackFn;
         OnCompletedCallbackFn          _onCompletedCallbackFn;
         ServerMessage                  _initiatingMessage;

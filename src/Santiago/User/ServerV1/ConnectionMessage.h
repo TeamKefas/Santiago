@@ -67,6 +67,7 @@ namespace Santiago{ namespace User { namespace Server
 
         ConnectionMessageType     _type;
         std::vector<std::string>  _parameters;
+
     };
 
     inline std::ostream& operator<<(std::ostream& ostream_, const ConnectionMessage& connectionMessage_)
