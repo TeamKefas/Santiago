@@ -36,7 +36,6 @@ namespace Santiago{ namespace User { namespace Server
                                      ,std::bind(&Server::handleRequestCompleted
                                                 ,this,std::placeholders::_1)
                                      ,message_));
-            
             break;
         case ConnectionMessageType::CR_LOGIN_USER:
             requestHandlerPtr.reset(new LoginUserRequestHandler

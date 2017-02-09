@@ -1,4 +1,4 @@
-#include "ServerV1.h"
+#include "Server.h"
 
 namespace Santiago{ namespace User { namespace Server
 {
@@ -35,7 +35,7 @@ namespace Santiago{ namespace User { namespace Server
                                         _serverData,
                                         _databaseConnection,
                                         std::bind(&ConnectionServer::sendMessage,
-                                                  _connectionServer,
+                                                  &_connectionServer,
                                                   std::placeholders::_1),
                                         std::bind(&Server::handleRequestCompleted,this,std::placeholders::_1),
                                         message_));
@@ -46,7 +46,7 @@ namespace Santiago{ namespace User { namespace Server
 
         }
         
-        _activeRequestHandlersList.insert(std::make_pair(message_._requestId,requestHandlerPtr));
+        _activeRequestHandlersList.insert(std::make_pair(message_._requestId, requestHandlerPtr));
         requestHandlerPtr->start();
     }
 
