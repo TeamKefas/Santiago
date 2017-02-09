@@ -46,7 +46,8 @@ namespace Santiago{ namespace User { namespace Server
          * @param content_- 
          * @param size_- ///NEED TO WRITE\\\
          */
-        ConnectionMessage(const char* content_,unsigned size_);         
+        ConnectionMessage(const char* content_,unsigned size_);
+
         /**
          * The constructor
          * @param type_- 

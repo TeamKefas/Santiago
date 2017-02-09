@@ -2,15 +2,15 @@
 
 namespace Santiago{ namespace User { namespace Server
 {
-    Server::Server(boost::asio::io_service& ioService_,unsigned port_)
-        :_ioService(ioService_)
-        ,_port(port_)
-        ,_connectionMessage(nullptr,0)
-        ,_connectionServer(_ioService
-                           ,_port
-                           ,std::bind(&Server::handleDisconnect,this,std::placeholders::_1)
-                           ,std::bind(&Server::handleRequestNew,this,std::placeholders::_1)
-                           ,std::bind(&Server::handleRequestReply,this,std::placeholders::_1))
+    Server::Server(const boost::property_tree::ptree& config_):
+        _ioService(),
+        _config(config_),
+        _databaseConnection(std::bind(Santiago::SantiagoDBTables::CreateMariaDBConnection,config_)),
+        _connectionServer(_ioService,
+                          config_.get<unsigned>("Santiago.UserServer.port"),
+                          std::bind(&Server::handleDisconnect,this,std::placeholders::_1),
+                          std::bind(&Server::handleRequestNew,this,std::placeholders::_1),
+                          std::bind(&Server::handleRequestReply,this,std::placeholders::_1))
     {}
 
     void Server::start()
@@ -29,77 +29,21 @@ namespace Santiago{ namespace User { namespace Server
         RequestHandlerBasePtr requestHandlerPtr;
         switch(message_._connectionMessage->_type)
         {
-            
+            //Below is a non working example
         case ConnectionMessageType::CR_CREATE_USER:
-            requestHandlerPtr.reset(new CreateUserRequestHandler
-                                    (_connectionServer
-                                     ,std::bind(&Server::handleRequestCompleted
-                                                ,this,std::placeholders::_1)
-                                     ,message_));
-            
+            requestHandlerPtr.reset(new CreateUserRequestHandler(
+                                        _serverData,
+                                        _databaseConnection,
+                                        std::bind(&ConnectionServer::sendMessage,
+                                                  _connectionServer,
+                                                  std::placeholders::_1),
+                                        std::bind(&Server::handleRequestCompleted,this,std::placeholders::_1),
+                                        message_));
             break;
-        case ConnectionMessageType::CR_LOGIN_USER:
-            requestHandlerPtr.reset(new LoginUserRequestHandler
-                                    (_connectionServer
-                                     ,std::bind(&Server::handleRequestCompleted
-                                                ,this,std::placeholders::_1)
-                                     ,message_));
-            break;
-            
-        case ConnectionMessageType::CR_VERIFY_USER_FOR_COOKIE:
-            requestHandlerPtr.reset(new VerifyUserForCookieRequestHandler
-                                    (_connectionServer
-                                     ,std::bind(&Server::handleRequestCompleted
-                                                ,this,std::placeholders::_1)
-                                     ,message_));
-            break;
-            
-        case ConnectionMessageType::CR_LOGOUT_USER_FOR_COOKIE:
-            requestHandlerPtr.reset(new LogoutUserForCookieRequestHandler
-                                    (_connectionServer
-                                     ,std::bind(&Server::handleRequestCompleted
-                                                ,this,std::placeholders::_1)
-                                     ,message_));
-            break;
-            
-        case ConnectionMessageType::CR_LOGOUT_USER_FOR_ALL_COOKIES:
-            requestHandlerPtr.reset(new LogoutUserForAllCookiesRequestHandler
-                                    (_connectionServer
-                                     ,std::bind(&Server::handleRequestCompleted
-                                                ,this,std::placeholders::_1)
-                                     ,message_));
-            break;
-            
-        case  ConnectionMessageType::CR_CHANGE_USER_PASSWORD:
-            requestHandlerPtr.reset(new ChangeUserPasswordRequestHandler
-                                    (_connectionServer
-                                     ,std::bind(&Server::handleRequestCompleted
-                                                ,this,std::placeholders::_1)
-                                     ,message_));
-            break;
-        case ConnectionMessageType::CR_REMOVED_COOKIE_FROM_APPSERVER:
-            requestHandlerPtr.reset(new RemovedCookieFromAppserverRequestHandler
-                                    (_connectionServer
-                                     ,std::bind(&Server::handleRequestCompleted
-                                                ,this,std::placeholders::_1)
-                                     ,message_));
-            break;
-            
-        case ConnectionMessageType::CR_ADD_RESOURCE:
-            requestHandlerPtr.reset(new AddResourceRequestHandler
-                                    (_connectionServer
-                                     ,std::bind(&Server::handleRequestCompleted
-                                                ,this,std::placeholders::_1)
-                                     ,message_));
-            break;
-             
-        case ConnectionMessageType::SR_LOGOUT_USER_FOR_COOKIE:
+        default:
             BOOST_ASSERT(false);
             break;
-            
-        case  ConnectionMessageType::SR_LOGOUT_USER_FOR_ALL_COOKIES:
-            BOOST_ASSERT(false);
-            break;
+
         }
         
         _activeRequestHandlersList.insert(std::make_pair(message_._requestId,requestHandlerPtr));
@@ -108,8 +52,11 @@ namespace Santiago{ namespace User { namespace Server
 
     void Server::handleRequestReply(const ServerMessage& message_)
     {
+
         std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
             _activeRequestHandlersList.find(message_._requestId);
+        BOOST_ASSERT(iter != _activeRequestHandlersList.end());
+        
     }
 
     void Server::handleRequestCompleted(const RequestId& requestId_)

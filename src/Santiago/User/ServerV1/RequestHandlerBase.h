@@ -11,6 +11,9 @@
 
 #include <functional>
 #include <algorithm>
+
+#include "../../Thread/ThreadSpecificVar.h"
+
 #include "ServerMessage.h"
 #include "DatabaseInterface.h"
 #include "ServerData.h"
@@ -21,7 +24,10 @@ namespace Santiago{ namespace User { namespace Server
     class RequestHandlerBase
     {
     public:
+        
+        typedef Thread::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection> SantiagoDBConnection;
         typedef std::function<void(const RequestId&)> OnCompletedCallbackFn;
+        typedef std::functions<void(const ServerMessage&)> SendMessageCallbackFn;
         /**
          * The constructor
          * @param connectionServer_- 
@@ -29,11 +35,13 @@ namespace Santiago{ namespace User { namespace Server
          * @param initiatingMessage_ -
          */
         RequestHandlerBase(ServerData& serverData_,
-                           ConnectionServer& connectionServer_,
+                           SantiagoDBConnection& databaseConnection_,
+                           const SendMessageCallbackFn& sendMessageCallbackFn_,
                            const OnCompletedCallbackFn& onCompletedCallbackFn_,
                            const ServerMessage& initiatingMessage_)
             :_serverData(serverData_)
-            ,_connectionServer(connectionServer_)
+            ,_databaseConnection(databaseConnection_)
+            ,_sendMessageCallbackFn(sendMessageCallbackFn_)
             ,_onCompletedCallbackFn(onCompletedCallbackFn_)
             ,_initiatingMessage(initiatingMessage_)
         {}
@@ -49,13 +57,11 @@ namespace Santiago{ namespace User { namespace Server
 
     protected:
 
-        ConnectionServer&              &_connectionServer;
+        ServerData                    &_serverData;       
+        SantiagoDBConnection&         &_databaseConnection;
+        SendMessageCallbackFn          _sendMessageCallbackFn;
         OnCompletedCallbackFn          _onCompletedCallbackFn;
         ServerMessage                  _initiatingMessage;
-        ServerData                     &_serverData;
-
-        DatabaseInterface              _databaseInterface;
-        
 
     };
 
