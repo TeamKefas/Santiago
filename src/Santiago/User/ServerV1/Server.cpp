@@ -40,6 +40,15 @@ namespace Santiago{ namespace User { namespace Server
                                         std::bind(&Server::handleRequestCompleted,this,std::placeholders::_1),
                                         message_));
             break;
+        case ConnectionMessageType::CR_CHANGE_USER_EMAIL_ADDRESS:
+            requestHandlerPtr.reset(new ChangeUserEmailAddressRequestHandler(
+                                        _serverData,
+                                        _databaseConnection,
+                                        std::bind(&ConnectionServer::sendMessage,
+                                                  &_connectionServer,
+                                                  std::placeholders::_1),
+                                        std::bind(&Server::handleRequestCompleted, this, std::placeholders::_1),
+                                        message_));
         default:
             BOOST_ASSERT(false);
             break;

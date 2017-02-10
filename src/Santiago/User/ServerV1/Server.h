@@ -21,6 +21,7 @@
 #include "ServerData.h"
 #include "ServerMessage.h"
 #include "CreateUserRequestHandler.h"
+#include "ChangeUserEmailAddressRequestHandler.h"
 #include "../../SantiagoDBTables/MariaDBConnection.h"
 
 using boost::asio::ip::tcp;
