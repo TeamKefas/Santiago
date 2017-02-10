@@ -15,9 +15,9 @@ namespace Santiago{namespace User { namespace Server
     {
         SantiagoDBTables::SessionsRec sessionsRec;
          std::error_code error;
-        std::string cookie = _initiatingMessage._connectionMessage->_parameters[0];
-        sessionsRec._cookieString = cookie;
-        sessionsRec._loginTime = boost::posix_time::second_clock::local_time();
+         std::string cookie = _initiatingMessage._connectionMessage->_parameters[0];
+         sessionsRec._cookieString = cookie;
+         sessionsRec._loginTime = boost::posix_time::second_clock::local_time();
    
         bool match = (_serverData._cookieCookieDataMap.find(cookie) != _serverData._cookieCookieDataMap.end());
         
@@ -28,8 +28,11 @@ namespace Santiago{namespace User { namespace Server
                                         _initiatingMessage._requestId,
                                         ServerMessageType::CONNECTION_MESSAGE_REPLY,
                                         connectionMessage);
+            _serverData._cookieCookieDataMap.find(cookie)->second._connectionIds.push_back(_initiatingMessage._connectionId);
+            // std::string userName = _serverData._cookieCookieDataMap.find(cookie)->second._userName;
             
-             _sendMessageCallbackFn(serverMessage);
+            // _serverData._cookieCookieDataMap.second.
+            _sendMessageCallbackFn(serverMessage);
             _onCompletedCallbackFn(_initiatingMessage._requestId);
         }
         else
@@ -37,6 +40,7 @@ namespace Santiago{namespace User { namespace Server
             _databaseConnection.get().addSessionsRec(sessionsRec, error);
             if(!error)
             {
+                
                 ConnectionMessage connectionMessage(ConnectionMessageType::SUCCEEDED,std::vector<std::string>()); 
                 ServerMessage serverMessage(_initiatingMessage._connectionId,
                                             _initiatingMessage._requestId,
