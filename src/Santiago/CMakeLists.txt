@@ -11,6 +11,10 @@ set(Santiago_SRCS
   User/ServerV1/ConnectionRequestsController.cpp
   User/ServerV1/ConnectionMessageSocket.cpp
   User/ServerV1/CreateUserRequestHandler.cpp
+  User/ServerV1/ChangeUserEmailAddressRequestHandler.cpp
+  User/ServerV1/ChangeUserPasswordRequestHandler.cpp
+  User/ServerV1/LoginUserRequestHandler.cpp
+  User/ServerV1/VerifyUserForCookieRequestHandler.cpp
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp
   )

@@ -1,3 +1,4 @@
+
 #include "Server.h"
 
 namespace Santiago{ namespace User { namespace Server
@@ -40,9 +41,50 @@ namespace Santiago{ namespace User { namespace Server
                                         std::bind(&Server::handleRequestCompleted,this,std::placeholders::_1),
                                         message_));
             break;
+        case ConnectionMessageType::CR_CHANGE_USER_EMAIL_ADDRESS:
+            requestHandlerPtr.reset(new ChangeUserEmailAddressRequestHandler(
+                                        _serverData,
+                                        _databaseConnection,
+                                        std::bind(&ConnectionServer::sendMessage,
+                                                  &_connectionServer,
+                                                  std::placeholders::_1),
+                                        std::bind(&Server::handleRequestCompleted, this, std::placeholders::_1),
+                                        message_));
+            break;  
+        case ConnectionMessageType::CR_CHANGE_USER_PASSWORD:
+            requestHandlerPtr.reset(new ChangeUserPasswordRequestHandler(
+                                        _serverData,
+                                        _databaseConnection,
+                                        std::bind(&ConnectionServer::sendMessage,
+                                                  &_connectionServer,
+                                                  std::placeholders::_1),
+                                        std::bind(&Server::handleRequestCompleted, this, std::placeholders::_1),
+                                        message_));
+            break;
+        case ConnectionMessageType::CR_VERIFY_COOKIE_AND_GET_USER_INFO:
+             requestHandlerPtr.reset(new VerifyUserForCookieRequestHandler(
+                                        _serverData,
+                                        _databaseConnection,
+                                        std::bind(&ConnectionServer::sendMessage,
+                                                  &_connectionServer,
+                                                  std::placeholders::_1),
+                                        std::bind(&Server::handleRequestCompleted, this, std::placeholders::_1),
+                                        message_));
+             break;
+        case ConnectionMessageType::CR_LOGIN_USER:
+             requestHandlerPtr.reset(new LoginUserRequestHandler(
+                                        _serverData,
+                                        _databaseConnection,
+                                        std::bind(&ConnectionServer::sendMessage,
+                                                  &_connectionServer,
+                                                  std::placeholders::_1),
+                                        std::bind(&Server::handleRequestCompleted, this, std::placeholders::_1),
+                                        message_));
+             break;
         default:
             BOOST_ASSERT(false);
             break;
+            
 
         }
         

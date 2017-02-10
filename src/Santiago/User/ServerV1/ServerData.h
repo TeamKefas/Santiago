@@ -17,7 +17,7 @@ namespace Santiago{ namespace User { namespace Server
 {
     struct CookieData
     {
-        std::string            _userId;
+        std::string            _userName;
         std::vector<unsigned>  _connectionIds;
     };
     

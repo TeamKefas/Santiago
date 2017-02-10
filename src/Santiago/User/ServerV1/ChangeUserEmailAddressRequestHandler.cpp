@@ -1,9 +1,9 @@
-#include "CreateUserRequestHandler.h"
+#include "ChangeUserEmailAddressRequestHandler.h"
 
 
 namespace Santiago{namespace User { namespace Server
 {
-    CreateUserRequestHandler::CreateUserRequestHandler(ServerData& serverData_,
+    ChangeUserEmailAddressRequestHandler::ChangeUserEmailAddressRequestHandler(ServerData& serverData_,
                                                        SantiagoDBConnection& databaseConnection_,
                                                        const SendMessageCallbackFn& sendMessageCallbackFn_,
                                                        const OnCompletedCallbackFn& onCompletedCallbackFn_,
@@ -11,7 +11,7 @@ namespace Santiago{namespace User { namespace Server
         :RequestHandlerBase(serverData_, databaseConnection_, sendMessageCallbackFn_, onCompletedCallbackFn_, initiatingMessage_)
     {}
 
-    void CreateUserRequestHandler::start()
+    void ChangeUserEmailAddressRequestHandler::start()
     {
         SantiagoDBTables::UsersRec userRec;
         std::error_code error;
@@ -19,7 +19,7 @@ namespace Santiago{namespace User { namespace Server
         userRec._emailAddress = _initiatingMessage._connectionMessage->_parameters[1];
         userRec._password = _initiatingMessage._connectionMessage->_parameters[2];
         
-        _databaseConnection.get().addUsersRec(userRec, error);
+        _databaseConnection.get().updateUsersRec(userRec, error);
 
         if(!error)
         {
@@ -44,7 +44,7 @@ namespace Santiago{namespace User { namespace Server
         }   
     }
 
-    void CreateUserRequestHandler::handleReplyMessage(const ServerMessage& serverMessage)
+    void ChangeUserEmailAddressRequestHandler::handleReplyMessage(const ServerMessage& serverMessage)
     {
         BOOST_ASSERT(false);
     }
