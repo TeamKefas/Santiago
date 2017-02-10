@@ -23,6 +23,7 @@
 #include "CreateUserRequestHandler.h"
 #include "ChangeUserEmailAddressRequestHandler.h"
 #include "ChangeUserPasswordRequestHandler.h"
+#include "VerifyUserForCookieRequestHandler.h"
 #include "../../SantiagoDBTables/MariaDBConnection.h"
 
 using boost::asio::ip::tcp;
