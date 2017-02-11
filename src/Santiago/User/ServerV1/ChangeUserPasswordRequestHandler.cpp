@@ -24,10 +24,10 @@ namespace Santiago{namespace User { namespace Server
         if(!error)
         {
             ConnectionMessage connectionMessage(ConnectionMessageType::SUCCEEDED,std::vector<std::string>()); 
-            ServerMessage serverMessage(_initiatingMessage._connectionId
-                                        ,_initiatingMessage._requestId
-                                        ,ServerMessageType::CONNECTION_MESSAGE_REPLY
-                                        ,connectionMessage);
+            ServerMessage serverMessage(_initiatingMessage._connectionId,
+                                        _initiatingMessage._requestId,
+                                        ServerMessageType::CONNECTION_MESSAGE_REPLY,
+                                        connectionMessage);
             
             _sendMessageCallbackFn(serverMessage);
             _onCompletedCallbackFn(_initiatingMessage._requestId);
@@ -35,10 +35,10 @@ namespace Santiago{namespace User { namespace Server
         else
         {
             ConnectionMessage connectionMessage(ConnectionMessageType::FAILED,std::vector<std::string>()); 
-            ServerMessage serverMessage(_initiatingMessage._connectionId
-                                        ,_initiatingMessage._requestId
-                                        ,ServerMessageType::CONNECTION_MESSAGE_REPLY
-                                        ,connectionMessage);
+            ServerMessage serverMessage(_initiatingMessage._connectionId,
+                                        _initiatingMessage._requestId,
+                                        ServerMessageType::CONNECTION_MESSAGE_REPLY,
+                                        connectionMessage);
             _sendMessageCallbackFn(serverMessage);
             _onCompletedCallbackFn(_initiatingMessage._requestId);
         }   
