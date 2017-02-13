@@ -81,6 +81,16 @@ namespace Santiago{ namespace User { namespace Server
                                         std::bind(&Server::handleRequestCompleted, this, std::placeholders::_1),
                                         message_));
              break;
+        case ConnectionMessageType::CR_LOGOUT_USER_FOR_COOKIE:
+            requestHandlerPtr.reset(new LogoutUserForCookieRequestHandler(
+                                        _serverData,
+                                        _databaseConnection,
+                                        std::bind(&ConnectionServer::sendMessage,
+                                                  &_connectionServer,
+                                                  std::placeholders::_1),
+                                        std::bind(&Server::handleRequestCompleted, this, std::placeholders::_1),
+                                        message_));
+            break;
         default:
             BOOST_ASSERT(false);
             break;
