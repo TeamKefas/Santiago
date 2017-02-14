@@ -23,11 +23,16 @@ namespace Santiago{ namespace User { namespace Server
 
         if(!error)
         {
-            for(auto it = _serverData._cookieCookieDataMap.begin(); it != _serverData._cookieCookieDataMap.end(); ++it)
+            auto iter = _serverData._cookieCookieDataMap.begin();
+            while(iter != _serverData._cookieCookieDataMap.end())
             {
-                if(it->second._userName == sessionsRec._userName)
+                if(iter->second._userName == sessionsRec._userName)
                 {
-                    _serverData._cookieCookieDataMap.erase(it);   
+                    iter = _serverData._cookieCookieDataMap.erase(iter);   
+                }
+                else
+                {
+                    ++iter;
                 }
             }
             
