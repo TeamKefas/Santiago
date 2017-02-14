@@ -1,9 +1,9 @@
-#include "LogoutUserForCookieRequestHandler.h"
+#include "LogoutUserForAllCookiesRequestHandler.h"
 
 namespace Santiago{ namespace User { namespace Server
 {
 
-    LogoutUserForCookieRequestHandler::LogoutUserForCookieRequestHandler(ServerData& serverData_,
+    LoginUserRequestHandler::LoginUserRequestHandler(ServerData& serverData_,
                                                      SantiagoDBConnection& databaseConnection_,
                                                      const SendMessageCallbackFn& sendMessageCallbackFn_,
                                                      const OnCompletedCallbackFn& onCompletedCallbackFn_,
@@ -11,7 +11,7 @@ namespace Santiago{ namespace User { namespace Server
         :RequestHandlerBase(serverData_, databaseConnection_, sendMessageCallbackFn_, onCompletedCallbackFn_, initiatingMessage_)
     {}
     
-    void LogoutUserForCookieRequestHandler::start()
+    void LogoutUserForAllCookiesRequestHandler::start()
     {
         std::error_code error; 
 
@@ -23,12 +23,16 @@ namespace Santiago{ namespace User { namespace Server
 
         if(!error)
         {
-            _serverData._cookieCookieDataMap.erase(_initiatingMessage._connectionMessage->_parameters[0]);
-            _serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second.erase(_initiatingMessage._connectionId);
-            if(!_serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second.size())
+            for(auto it = _serverData._cookieCookieDataMap.begin(); it != _serverData._cookieCookieDataMap.end(); ++it)
             {
-                _serverData._userIdUserIdDataMap.erase(sessionsRec._userName);
+                if(it->second._userName == sessionsRec._userName)
+                {
+                    _serverData._cookieCookieDataMap.erase(it);   
+                }
             }
+            
+            _serverData._userIdUserIdDataMap.erase(sessionsRec._userName);
+            
             ConnectionMessage connectionMessage(ConnectionMessageType::SUCCEEDED,std::vector<std::string>()); 
             ServerMessage serverMessage(_initiatingMessage._connectionId,
                                         _initiatingMessage._requestId,
@@ -48,9 +52,9 @@ namespace Santiago{ namespace User { namespace Server
             _sendMessageCallbackFn(serverMessage);
             _onCompletedCallbackFn(_initiatingMessage._requestId);
         }   
-    }   
+    }
     
-    void LogoutUserForCookieRequestHandler::handleReplyMessage(const ServerMessage& serverMessage)
+    void LogoutUserForAllCookiesRequestHandler::handleReplyMessage(const ServerMessage& serverMessage)
     {
         BOOST_ASSERT(false);
     }

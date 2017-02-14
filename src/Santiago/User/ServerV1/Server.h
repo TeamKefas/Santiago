@@ -26,6 +26,7 @@
 #include "VerifyUserForCookieRequestHandler.h"
 #include "LoginUserRequestHandler.h"
 #include "LogoutUserForCookieRequestHandler.h"
+#include "LogoutUserForAllCookiesRequestHandler.h"
 #include "../../SantiagoDBTables/MariaDBConnection.h"
 
 using boost::asio::ip::tcp;
