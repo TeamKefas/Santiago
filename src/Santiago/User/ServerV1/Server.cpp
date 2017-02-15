@@ -112,7 +112,7 @@ namespace Santiago{ namespace User { namespace Server
                                         message_));
             break;
         default:
-            BOOST_ASSERT(false);
+            ST_ASSERT(false);
             break;
             
 

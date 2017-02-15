@@ -86,7 +86,7 @@ namespace Santiago{ namespace User { namespace Server
     
     void ConnectionRequestsController::sendMessage(const ServerMessage& message_)
     {
-        BOOST_ASSERT(message_._connectionMessage);
+        ST_ASSERT(message_._connectionMessage);
         if(ServerMessageType::CONNECTION_MESSAGE_NEW == message_._type)
         {
             std::map<RequestId,unsigned>::iterator iter = _replyPendingRequestList.find(message_._requestId);

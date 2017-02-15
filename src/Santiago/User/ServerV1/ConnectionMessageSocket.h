@@ -24,6 +24,7 @@
 #include <boost/function.hpp>
 
 #include "ServerMessage.h"
+#include "../../Utils/STLog.h"
 
 namespace Santiago{ namespace User { namespace Server
 {

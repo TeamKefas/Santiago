@@ -25,6 +25,11 @@ namespace Santiago{ namespace User { namespace Server
                                            boost::asio::placeholders::error));
     }
 
+    void ConnectionServer::sendMessage(const ServerMessage& serverMessage_)
+    {
+        _idConnectionPtrMap.find(_nextConnectionId)->second->sendMessage(serverMessage_);
+    }
+
     void ConnectionServer::handleAccept(const ConnectionMessageSocket::MySocketPtr& socketPtr_,
                                         const boost::system::error_code& error_)
     {
@@ -34,7 +39,7 @@ namespace Santiago{ namespace User { namespace Server
                                                           ,_onDisconnectCallbackFn
                                                           ,_onNewRequestCallbackFn
                                                           ,_onRequestReplyCallbackFn));
-        BOOST_ASSERT(_idConnectionPtrMap.find(_nextConnectionId) == _idConnectionPtrMap.end());
+        ST_ASSERT(_idConnectionPtrMap.find(_nextConnectionId) == _idConnectionPtrMap.end());
         _idConnectionPtrMap.insert(std::make_pair(_nextConnectionId,newConnection));
         //_idConnectionPtrMap[_nextConnectionId] = newConnection;
         // newConnection->start();
@@ -46,7 +51,7 @@ namespace Santiago{ namespace User { namespace Server
         std::map<unsigned,ConnectionRequestsControllerPtr>::iterator iter =
             _idConnectionPtrMap.find(connectionId_);
         
-        BOOST_ASSERT(iter == _idConnectionPtrMap.end());
+        ST_ASSERT(iter == _idConnectionPtrMap.end());
         _idConnectionPtrMap.erase(iter);
     }
     

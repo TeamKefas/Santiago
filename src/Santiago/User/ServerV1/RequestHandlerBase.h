@@ -19,6 +19,8 @@
 #include "../../SantiagoDBTables/MariaDBConnection.h"
 #include "ServerData.h"
 #include "ConnectionServer.h"
+#include "../../Utils/STLog.h"
+#include "../../Utils/PTimeUtils.h"
 
 namespace Santiago{ namespace User { namespace Server
 {

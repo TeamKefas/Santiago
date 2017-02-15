@@ -11,7 +11,7 @@
 
 #include <boost/asio/socket_acceptor_service.hpp>
 #include <boost/asio/error.hpp>
-
+#include "../../Utils/STLog.h"
 #include "ConnectionRequestsController.h"
 #include "ConnectionMessageSocket.h"
 using boost::asio::ip::tcp;

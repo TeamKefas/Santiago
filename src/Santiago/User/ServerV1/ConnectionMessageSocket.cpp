@@ -106,7 +106,7 @@ namespace Santiago{ namespace User { namespace Server
         unsigned size = boost::asio::write(*_socketPtr,outputBuffer,errorCode);
         if(!errorCode)
         {
-            BOOST_ASSERT(message_.getSize() == size);
+            ST_ASSERT(message_.getSize() == size);
         }
         else
         {

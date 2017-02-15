@@ -3,12 +3,12 @@
 namespace Santiago{ namespace User { namespace Server
 {
 
-    LoginUserRequestHandler::LoginUserRequestHandler(ServerData& serverData_,
-                                                     SantiagoDBConnection& databaseConnection_,
-                                                     const SendMessageCallbackFn& sendMessageCallbackFn_,
-                                                     const OnCompletedCallbackFn& onCompletedCallbackFn_,
-                                                     const ServerMessage& initiatingMessage_)
-        :RequestHandlerBase(serverData_, databaseConnection_, sendMessageCallbackFn_, onCompletedCallbackFn_, initiatingMessage_)
+    LogoutUserForAllCookiesRequestHandler::LogoutUserForAllCookiesRequestHandler(ServerData& serverData_,
+                                                                                 SantiagoDBConnection& databaseConnection_,
+                                                                                 const SendMessageCallbackFn& sendMessageCallbackFn_,
+                                                                                 const OnCompletedCallbackFn& onCompletedCallbackFn_,
+                                                                                 const ServerMessage& initiatingMessage_)
+    :RequestHandlerBase(serverData_, databaseConnection_, sendMessageCallbackFn_, onCompletedCallbackFn_, initiatingMessage_)
     {}
     
     void LogoutUserForAllCookiesRequestHandler::start()
@@ -18,7 +18,7 @@ namespace Santiago{ namespace User { namespace Server
         SantiagoDBTables::SessionsRec sessionsRec;
         sessionsRec._userName = _serverData._cookieCookieDataMap.find(_initiatingMessage._connectionMessage->_parameters[0])->second._userName;
         sessionsRec._logoutTime = boost::posix_time::second_clock::local_time();
-        sessionsRec._lastActiveTime = sessionsRec._logoutTime;
+        sessionsRec._lastActiveTime = *(sessionsRec._logoutTime);
         _databaseConnection.get().updateSessionsRec(sessionsRec, error);
 
         if(!error)
@@ -61,7 +61,7 @@ namespace Santiago{ namespace User { namespace Server
     
     void LogoutUserForAllCookiesRequestHandler::handleReplyMessage(const ServerMessage& serverMessage)
     {
-        BOOST_ASSERT(false);
+        ST_ASSERT(false);
     }
     
 }}}

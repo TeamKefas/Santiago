@@ -18,7 +18,7 @@ namespace Santiago{ namespace User { namespace Server
         SantiagoDBTables::SessionsRec sessionsRec;
         sessionsRec._userName = _initiatingMessage._connectionMessage->_parameters[0];
         sessionsRec._logoutTime = boost::posix_time::second_clock::local_time();
-        sessionsRec._lastActiveTime = sessionsRec._logoutTime;
+        sessionsRec._lastActiveTime = *(sessionsRec._logoutTime);
         _databaseConnection.get().updateSessionsRec(sessionsRec, error1);
 
         if(!error1)
