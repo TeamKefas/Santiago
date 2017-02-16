@@ -29,7 +29,7 @@ namespace Santiago{ namespace User { namespace Server
             }
             else
             {
-                BOOST_ASSERT(false);
+                ST_ASSERT(false);
             }
         }
     }

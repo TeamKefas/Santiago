@@ -68,7 +68,7 @@ namespace Santiago{ namespace User { namespace Server
     
     void DeleteUserRequestHandler::handleReplyMessage(const ServerMessage& serverMessage)
     {
-        BOOST_ASSERT(false);
+        ST_ASSERT(false);
     }
     
 }}}

@@ -12,7 +12,7 @@ namespace Santiago{ namespace User { namespace Server
         ,_onDisconnectCallbackFn(onDisconnectCallbackFn_)
         ,_onMessageCallbackFn(onMessageCallbackFn_)
     {
-        BOOST_ASSERT(_socketPtr);
+        ST_ASSERT(_socketPtr);
     }
     
     void ConnectionMessageSocket::start()
@@ -102,7 +102,7 @@ namespace Santiago{ namespace User { namespace Server
         message_.writeToStream(outStream);
 
         boost::system::error_code errorCode;
-        BOOST_ASSERT(_socketPtr);
+        ST_ASSERT(_socketPtr);
         unsigned size = boost::asio::write(*_socketPtr,outputBuffer,errorCode);
         if(!errorCode)
         {

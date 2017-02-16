@@ -127,7 +127,7 @@ namespace Santiago{ namespace User { namespace Server
 
         std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
             _activeRequestHandlersList.find(message_._requestId);
-        BOOST_ASSERT(iter != _activeRequestHandlersList.end());
+        ST_ASSERT(iter != _activeRequestHandlersList.end());
         
     }
 
@@ -137,7 +137,7 @@ namespace Santiago{ namespace User { namespace Server
             _activeRequestHandlersList.find(requestId_);
         //  _activeRequestHandlersList.find(message_._requestId);
         
-        BOOST_ASSERT(iter == _activeRequestHandlersList.end());
+        ST_ASSERT(iter == _activeRequestHandlersList.end());
 
         _activeRequestHandlersList.erase(iter);
     }

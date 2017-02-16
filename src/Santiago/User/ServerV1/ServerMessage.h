@@ -11,6 +11,7 @@
 
 #include <boost/optional.hpp>
 #include "ConnectionMessage.h"
+#include "../../Utils/STLog.h"
 
 
 namespace Santiago{ namespace User { namespace Server

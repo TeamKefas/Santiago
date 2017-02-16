@@ -56,7 +56,7 @@ namespace Santiago{ namespace User { namespace Server
             std::map<RequestId,unsigned>::iterator iter = _replyPendingRequestList.find(requestId_);
             if(_replyPendingRequestList.end() == iter)
             {
-                BOOST_ASSERT(false);
+                ST_ASSERT(false);
                 std::runtime_error("Unexpected requestId received");
             }
             

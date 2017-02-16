@@ -65,7 +65,7 @@ namespace Santiago{namespace User { namespace Server
 
     void VerifyUserForCookieRequestHandler::handleReplyMessage(const ServerMessage& serverMessage)
     {
-        BOOST_ASSERT(false);
+        ST_ASSERT(false);
     }
 
     
