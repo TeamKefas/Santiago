@@ -14,7 +14,9 @@ namespace Santiago{ namespace User { namespace Server
         ,_onNewRequestCallbackFn(onNewRequestCallbackFn_)
         ,_onRequestReplyCallbackFn(onRequestReplyCallbackFn_)
         ,_connectionMessageSocket(socketPtr_,
-                                  _onDisconnectCallbackFn,
+                                  std::bind(
+                                      &ConnectionRequestsController::handleConnectionMessageSocketDisconnect,
+                                      this),
                                   std::bind(
                                       &ConnectionRequestsController::handleConnectionMessageSocketMessage,
                                       this,
