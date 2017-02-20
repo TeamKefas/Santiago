@@ -78,8 +78,8 @@ namespace Santiago{ namespace Thread
             return (*tPtr);
         }
 
-        TFactoryFn              _tFactoryFn;
-        ImplPtr                 _implPtr;
+        TFactoryFn                               _tFactoryFn;
+        ThreadSpecificVarImplPtr                 _implPtr;
     };
 
 }}
