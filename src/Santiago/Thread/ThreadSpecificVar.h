@@ -13,7 +13,7 @@ namespace Santiago{ namespace Thread
     {
     public:
 
-        typedef std::shared_ptr<ThreadSpecificVarImpl>     ThreadSpecificVarImplPtr;
+        typedef std::shared_ptr<ThreadSpecificVarImpl>     ImplPtr;
         typedef std::function<T*()>                        TFactoryFn;
 
         ThreadSpecificVar(const TFactoryFn& tFactoryFn_):
@@ -66,10 +66,11 @@ namespace Santiago{ namespace Thread
             std::shared_ptr<T> tPtr;
             try
             {
-                tPtr = boost::any_cast<std::shared_ptr<T>&>(*tData);
+                tPtr = boost::any_cast<std::shared_ptr<T> >(*tData);
             }
-            catch(...)
+            catch(std::exception& e)
             {
+                std::cout<<e.what()<<std::endl;
                 ST_ASSERT(false);
             }
 
