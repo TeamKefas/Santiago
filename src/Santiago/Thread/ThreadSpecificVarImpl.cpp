@@ -61,7 +61,18 @@ namespace Santiago{ namespace Thread
 
         std::lock_guard<std::mutex> guard(_mutex);
         ThreadIdThreadDataMap::const_iterator iter = _threadIdThreadDataMap.find(threadId);
-        return (_threadIdThreadDataMap.end() == iter)?boost::none:iter->second._tData;
+        /* 
+         * if (_threadIdThreadDataMap.end() == iter)
+         * {
+         *     return boost::none;
+         * }
+         * else
+         * {
+         *     return iter->second._tData;
+         * }
+         */
+        
+        return (_threadIdThreadDataMap.end() == iter)?boost::none:boost::optional<boost::any>(iter->second._tData);
     }
 
     void ThreadSpecificVarImpl::setTData(const boost::any& tData_)
