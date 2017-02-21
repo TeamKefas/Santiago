@@ -13,7 +13,7 @@ namespace Santiago{ namespace Thread
     {
     public:
 
-        typedef std::shared_ptr<ThreadSpecificVarImpl>     ImplPtr;
+        typedef std::shared_ptr<ThreadSpecificVarImpl>     ThreadSpecificVarImplPtr;
         typedef std::function<T*()>                        TFactoryFn;
 
         ThreadSpecificVar(const TFactoryFn& tFactoryFn_):
