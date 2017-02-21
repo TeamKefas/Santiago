@@ -50,6 +50,14 @@ namespace Santiago{ namespace Thread
         T& getImpl() const
         {
             boost::optional<boost::any> tData = _implPtr->getTData();
+
+            /* 
+             * if(tData && !tData->empty())
+             * {
+             *     std::cout << "tData Not Empty" << std::endl;
+             * }
+             */
+            
             if(!tData)
             {
                 std::shared_ptr<T> newTPtr(_tFactoryFn());
