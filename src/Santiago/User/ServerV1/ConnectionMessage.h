@@ -36,7 +36,7 @@ namespace Santiago{ namespace User { namespace Server
         CR_DELETE_USER,
 
         SR_LOGOUT_USER_FOR_COOKIE,
-        SR_LOGOUT_USER_FOR_ALL_COOKIES,
+        SR_LOGOUT_USER_FOR_ALL_COOKIES
     };
 
     struct ConnectionMessage
