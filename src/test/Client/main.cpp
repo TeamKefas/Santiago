@@ -7,6 +7,7 @@
 int main()
 {
     unsigned port;
+    std::cout<<"enter port";
     std::cin>>port;
     boost::asio::ip::tcp::endpoint endPoint(boost::asio::ip::tcp::v4(),port);
     //port is the server listening port

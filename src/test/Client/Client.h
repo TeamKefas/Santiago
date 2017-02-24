@@ -19,9 +19,9 @@ namespace Santiago { namespace User { namespace Client
                                                                              std::bind(&Client::handleDisconnect,this),
                                                                              std::bind(
                                                                                  &Client::handleConnectionMessageSocketMessage,
-                                                                         this,
-                                                                         std::placeholders::_1,
-                                                                         std::placeholders::_2)))
+                                                                                 this,
+                                                                                 std::placeholders::_1,
+                                                                                 std::placeholders::_2)))
         {
             _connectionMessageSocketPtr->start();
         }
