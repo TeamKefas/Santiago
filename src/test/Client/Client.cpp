@@ -14,7 +14,7 @@ namespace Santiago { namespace User { namespace Client
 
         Server::ConnectionMessage message(Server::ConnectionMessageType::CR_LOGIN_USER, parameters);
         
-        _connectionMessageSocket.sendMessage(requestId, message);
+        _connectionMessageSocketPtr->sendMessage(requestId, message);
     }
 
     void Client::handleDisconnect()

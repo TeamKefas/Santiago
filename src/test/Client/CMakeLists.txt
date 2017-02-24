@@ -7,4 +7,4 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(ClientExec ${Client_SRCS}) 
-target_link_libraries(ClientExec Santiago mysqlclient ${Boost_LIBRARIES}) 
+target_link_libraries(ClientExec Santiago ${Boost_LIBRARIES}) 

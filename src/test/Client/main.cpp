@@ -7,7 +7,8 @@
 int main()
 {
     unsigned port;
-    boost::asio::ip::tcp::endpoint endPoint(boost::asio::ip::tcp::v4(),8000);
+    std::cin>>port;
+    boost::asio::ip::tcp::endpoint endPoint(boost::asio::ip::tcp::v4(),port);
     //port is the server listening port
     boost::asio::io_service ioService;
 //    boost::asio::ip::tcp::socket socket(ioService); //need to make this a socketPtr

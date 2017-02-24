@@ -15,15 +15,15 @@ namespace Santiago { namespace User { namespace Client
     public:
          typedef std::function<void(unsigned)> OnDisconnectCallbackFn;
         Client(Server::ConnectionMessageSocket::MySocketPtr socketPtr_)
-            :_connectionMessageSocket(socketPtr_,
-                                      std::bind(&Client::handleDisconnect,this),
-                                      std::bind(
-                                          &Client::handleConnectionMessageSocketMessage,
-                                          this,
-                                          std::placeholders::_1,
-                                          std::placeholders::_2))
+            :_connectionMessageSocketPtr(new Server::ConnectionMessageSocket(socketPtr_,
+                                                                             std::bind(&Client::handleDisconnect,this),
+                                                                             std::bind(
+                                                                                 &Client::handleConnectionMessageSocketMessage,
+                                                                         this,
+                                                                         std::placeholders::_1,
+                                                                         std::placeholders::_2)))
         {
-            _connectionMessageSocket.start();
+            _connectionMessageSocketPtr->start();
         }
         void start();
         
@@ -34,7 +34,7 @@ namespace Santiago { namespace User { namespace Client
         void handleConnectionMessageSocketMessage(const Server::RequestId& requestId_,
                                                   const Server::ConnectionMessage& message_);
         
-        Server::ConnectionMessageSocket                    _connectionMessageSocket;
+        std::shared_ptr<Server::ConnectionMessageSocket>    _connectionMessageSocketPtr;
         
     const std::map<std::string, Server::ConnectionMessageType> stringConnectionMessageType =
         {{"SUCCEEDED", Server::ConnectionMessageType::SUCCEEDED},
