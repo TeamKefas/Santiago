@@ -23,9 +23,10 @@ namespace Santiago { namespace User { namespace Client
                                                                                  std::placeholders::_1,
                                                                                  std::placeholders::_2)))
         {
-            _connectionMessageSocketPtr->start();
         }
-        void start();
+
+        void startReadCycle();
+        void inputMsgFromUserAndSendToServer();
         
         
     protected:

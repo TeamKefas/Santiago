@@ -13,35 +13,45 @@ int main()
     boost::asio::ip::tcp::endpoint endPoint(boost::asio::ip::tcp::v4(),port);
     //port is the server listening port
     boost::asio::io_service ioService;
-//    boost::asio::ip::tcp::socket socket(ioService); //need to make this a socketPtr
     
     try
     {
         std::shared_ptr<boost::asio::ip::tcp::socket> socketPtr(new boost::asio::ip::tcp::socket(ioService));
         socketPtr->connect(endPoint);
 
-//        std::ostringstream stream;
-//        stream<<"abcd";
-                
-//        boost::asio::write(*socketPtr,boost::asio::buffer(stream.str()));
     
         Santiago::User::Client::Client client(socketPtr);
-        client.start();
-//        ioService.run();
+        client.startReadCycle();
+        std::thread thread(std::bind(static_cast<std::size_t (boost::asio::io_service::*)()>
+                                     (&boost::asio::io_service::run),
+                                     &ioService));
         while(1)
         {
             char flag;
-            std::cout<<"exit ? Press Y to exit."<<std::endl;
+            std::cout<<"[s]end msg or [q]uit?."<<std::endl;
             std::cin>>flag;
-            if(flag == 'Y' || flag == 'y')
+            if(flag == 'q')
             {
+                std::cout<<"Exiting..."<<std::endl;
+                ioService.stop();
+                thread.join();
                 break;
+            }
+            else if(flag == 's')
+            {
+                client.inputMsgFromUserAndSendToServer();
+            }
+            else
+            {
+                std::cout<<"Please press s or q."<<std::endl;
+                continue;
             }
         }
     }
     catch(const std::exception& e)
     {
         std::cout<<"Caught exception: "<<e.what()<<std::endl;
+        std::cerr<<"Caught exception: "<<e.what()<<std::endl;
     }
 
     
