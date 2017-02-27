@@ -17,9 +17,9 @@ namespace Santiago{ namespace User { namespace Server
     void Server::start()
     {
         _connectionServer.start();
+        _ioService.run();
     }
-    
-    
+
     void Server::handleDisconnect(unsigned connectionId_)
     {
         //TODO

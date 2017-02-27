@@ -69,7 +69,7 @@ namespace Santiago{ namespace User { namespace Server
         OnNewRequestCallbackFn        _onNewRequestCallbackFn;
         OnRequestReplyCallbackFn      _onRequestReplyCallbackFn;
 
-        ConnectionMessageSocket       _connectionMessageSocket;
+        ConnectionMessageSocketPtr    _connectionMessageSocketPtr;
 
         std::map<RequestId,unsigned>  _replyPendingRequestList; //the pair.second gives the number of pending replies
 

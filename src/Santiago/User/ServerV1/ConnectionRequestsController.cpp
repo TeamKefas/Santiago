@@ -13,15 +13,16 @@ namespace Santiago{ namespace User { namespace Server
         ,_onDisconnectCallbackFn(onDisconnectCallbackFn_)
         ,_onNewRequestCallbackFn(onNewRequestCallbackFn_)
         ,_onRequestReplyCallbackFn(onRequestReplyCallbackFn_)
-        ,_connectionMessageSocket(socketPtr_,
-                                  std::bind(
-                                      &ConnectionRequestsController::handleConnectionMessageSocketDisconnect,
-                                      this),
-                                  std::bind(
-                                      &ConnectionRequestsController::handleConnectionMessageSocketMessage,
-                                      this,
-                                      std::placeholders::_1,
-                                      std::placeholders::_2))
+        ,_connectionMessageSocketPtr(new ConnectionMessageSocket(
+                                         socketPtr_,
+                                         std::bind(
+                                             &ConnectionRequestsController::handleConnectionMessageSocketDisconnect,
+                                             this),
+                                         std::bind(
+                                             &ConnectionRequestsController::handleConnectionMessageSocketMessage,
+                                             this,
+                                             std::placeholders::_1,
+                                             std::placeholders::_2)))
     {
         /* std::function<void(const ConnectionMessage)> onMessageCallbackFn = 
             std::bind(&ConnectionRequestsController::handleConnectionMessageSocketMessage,this,
@@ -30,7 +31,7 @@ namespace Santiago{ namespace User { namespace Server
                                                               (socketPtr_,_onDisconnectCallbackFn,
                                                                onMessageCallbackFn));
                                                                newConnectionMessageSocket->start();*/
-        _connectionMessageSocket.start();
+        _connectionMessageSocketPtr->start();
     } 
 
 
@@ -103,7 +104,7 @@ namespace Santiago{ namespace User { namespace Server
         }
         else
         {
-            _connectionMessageSocket.sendMessage(message_._requestId,*message_._connectionMessage);
+            _connectionMessageSocketPtr->sendMessage(message_._requestId,*message_._connectionMessage);
         }
     }
 
