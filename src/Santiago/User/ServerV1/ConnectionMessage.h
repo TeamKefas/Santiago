@@ -15,6 +15,8 @@
 #include <sstream>
 #include <string>
 
+#include "../../Utils/STLog.h"
+
 namespace Santiago{ namespace User { namespace Server
 {
     enum class ConnectionMessageType

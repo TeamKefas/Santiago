@@ -21,7 +21,8 @@ namespace Santiago { namespace User { namespace Client
                                                                                  &Client::handleConnectionMessageSocketMessage,
                                                                                  this,
                                                                                  std::placeholders::_1,
-                                                                                 std::placeholders::_2)))
+                                                                                 std::placeholders::_2),
+                                                                             1))
         {
         }
 

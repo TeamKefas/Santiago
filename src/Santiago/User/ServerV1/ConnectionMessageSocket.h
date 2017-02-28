@@ -38,7 +38,7 @@ namespace Santiago{ namespace User { namespace Server
         typedef boost::asio::ip::tcp::socket MySocket;
         typedef std::shared_ptr<MySocket> MySocketPtr;
 
-        typedef std::function<void(unsigned)> OnDisconnectCallbackFn;
+        typedef std::function<void()> OnDisconnectCallbackFn;
         typedef std::function<void(const RequestId&,const ConnectionMessage&)> OnMessageCallbackFn;
         /**
          * The constructor
@@ -48,7 +48,8 @@ namespace Santiago{ namespace User { namespace Server
          */
         ConnectionMessageSocket(const MySocketPtr& socketPtr_,
                                 const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
-                                const OnMessageCallbackFn& onMessageCallbackFn_);
+                                const OnMessageCallbackFn& onMessageCallbackFn_,
+                                unsigned connectionId_);
         
        /**
         * ///Message\\
@@ -89,6 +90,7 @@ namespace Santiago{ namespace User { namespace Server
 //        StrandPtr                               _strandPtr;
         OnDisconnectCallbackFn                  _onDisconnectCallbackFn;
         OnMessageCallbackFn                     _onMessageCallbackFn;
+        unsigned                                _connectionId;
 
         boost::asio::streambuf                  _inputBuffer;
     };

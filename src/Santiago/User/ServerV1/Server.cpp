@@ -16,6 +16,7 @@ namespace Santiago{ namespace User { namespace Server
 
     void Server::start()
     {
+        ST_LOG_INFO("Starting server"<<std::endl);
         _connectionServer.start();
         _ioService.run();
     }
@@ -27,6 +28,8 @@ namespace Santiago{ namespace User { namespace Server
 
     void Server::handleRequestNew(const ServerMessage& message_)
     {
+        ST_LOG_DEBUG("In handleRequestNew"<<std::endl);
+
         RequestHandlerBasePtr requestHandlerPtr;
         switch(message_._connectionMessage->_type)
         {
@@ -120,11 +123,11 @@ namespace Santiago{ namespace User { namespace Server
         
         _activeRequestHandlersList.insert(std::make_pair(message_._requestId, requestHandlerPtr));
         requestHandlerPtr->start();
+        ST_LOG_DEBUG("Completed handleRequestNew"<<std::endl);
     }
 
     void Server::handleRequestReply(const ServerMessage& message_)
     {
-
         std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
             _activeRequestHandlersList.find(message_._requestId);
         ST_ASSERT(iter != _activeRequestHandlersList.end());

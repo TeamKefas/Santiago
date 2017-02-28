@@ -5,19 +5,21 @@ namespace Santiago{ namespace User { namespace Server
 
     ConnectionMessageSocket::ConnectionMessageSocket(const MySocketPtr& socketPtr_,
                                                      const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
-                                                     const OnMessageCallbackFn& onMessageCallbackFn_)
+                                                     const OnMessageCallbackFn& onMessageCallbackFn_,
+                                                     unsigned connectionId_)
         :_socketPtr(socketPtr_)
         ,_ioService(_socketPtr->get_io_service())
 //        ,_strandPtr(new boost::asio::strand(_ioService))
         ,_onDisconnectCallbackFn(onDisconnectCallbackFn_)
         ,_onMessageCallbackFn(onMessageCallbackFn_)
+        ,_connectionId(connectionId_)
     {
         ST_ASSERT(_socketPtr);
     }
     
     void ConnectionMessageSocket::start()
     {
-
+        ST_LOG_DEBUG("Starting ConnectionMessageSocket listening. connectionId = "<<_connectionId<<std::endl);
         _socketPtr->async_read_some(_inputBuffer.prepare(BUFFER_INCREMENT_SIZE),
                                     /*_strandPtr->wrap(*/boost::bind(&ConnectionMessageSocket::handleRead,
                                                                      this->shared_from_this(),
@@ -27,6 +29,8 @@ namespace Santiago{ namespace User { namespace Server
 
     void ConnectionMessageSocket::parseMessage(size_t bytesTransferred_)
     {
+        ST_LOG_DEBUG("Starting parseMessage. connectionId = "<<_connectionId<<std::endl);
+
         _inputBuffer.commit(bytesTransferred_);
             
         while (_inputBuffer.size())
@@ -48,26 +52,40 @@ namespace Santiago{ namespace User { namespace Server
                 RequestId requestId(initiatingConnectionId,requestNo);
                  
                 const char* inputBufferData = boost::asio::buffer_cast<const char*>(_inputBuffer.data());
-                ConnectionMessage message(inputBufferData,messageSize-12);
-                _inputBuffer.consume(messageSize-12);
-                _onMessageCallbackFn(requestId,message);
+                try
+                {
+                    ConnectionMessage message(inputBufferData,messageSize-12);
+                    _inputBuffer.consume(messageSize-12);
+                    ST_LOG_DEBUG("Successfully parsed ConnectionMessage. connectionId = "<<_connectionId<<std::endl);
+                    _onMessageCallbackFn(requestId,message);
+                }
+                catch(std::exception& e)
+                {
+                    ST_LOG_ERROR("Exception received. connectionId ="<<_connectionId
+                                 <<", initiatingConnectionId = "<<initiatingConnectionId
+                                 <<", requestNo " <<requestNo
+                                 <<" Message = "<<e.what()<<std::endl);                    
+                    _inputBuffer.consume(messageSize-12);
+                }
             }
             else
             {
                 break;
-            }
-            
+            }            
         }
     }
     
     
     void ConnectionMessageSocket::handleRead(const boost::system::error_code& error_,size_t bytesTransferred_)
     {
-       
+        ST_LOG_DEBUG("Starting ConnectionMessageSocket handleRead. connectionId = "<<_connectionId<<std::endl);
         if(error_)
         {
-            parseMessage(bytesTransferred_);
-            close();   //check for error and do cleanup.
+            ST_LOG_INFO("Connection disconnected. connectionId = "<<_connectionId
+                        <<" Error:"<<error_.message()<<std::endl
+                        <<"closing ConnectionMessageSocket"<<std::endl);
+//            parseMessage(bytesTransferred_);
+            close();
             return;
         }
         else
@@ -75,12 +93,14 @@ namespace Santiago{ namespace User { namespace Server
             parseMessage(bytesTransferred_);
         }
         start();
+        ST_LOG_DEBUG("handleRead completed. connectionId ="<<_connectionId<<std::endl);
     }
     
     void ConnectionMessageSocket::close()
     {
+        ST_LOG_INFO("Closing socket. connectionId="<<_connectionId<<std::endl);
         _socketPtr.reset();
-        // _onDisconnectCallbackFn(1);
+        _onDisconnectCallbackFn();
     }
 
     void ConnectionMessageSocket::sendMessage(const RequestId& requestId_,const ConnectionMessage& message_)
@@ -91,6 +111,11 @@ namespace Santiago{ namespace User { namespace Server
 
     void ConnectionMessageSocket::sendMessageImpl(const RequestId& requestId_, const ConnectionMessage& message_)
     {
+        ST_LOG_DEBUG("Starting sendMessageImpl. connectionId = "<<_connectionId
+                     << ", initiatingConnectionId = "<<requestId_._initiatingConnectionId
+                     <<", requestNo = "<<requestId_._requestNo
+                     <<std::endl);
+
         unsigned bufSize = sizeof(unsigned) + sizeof(unsigned) + sizeof(unsigned)+ message_.getSize();
         boost::asio::streambuf outputBuffer;
         std::ostream outStream(&outputBuffer);
@@ -106,10 +131,15 @@ namespace Santiago{ namespace User { namespace Server
         unsigned size = boost::asio::write(*_socketPtr,outputBuffer,errorCode);
         if(!errorCode)
         {
+            ST_LOG_DEBUG("Successfully sent replied. connectionId = "<<_connectionId<<std::endl);
             ST_ASSERT(message_.getSize()+12 == size);
         }
         else
         {
+            ST_LOG_INFO("Send message failed. Closing connection. connectionId = "<<_connectionId
+                     << ", initiatingConnectionId = "<<requestId_._initiatingConnectionId
+                     <<", requestNo = "<<requestId_._requestNo
+                     <<std::endl);
             close();
         }
     }

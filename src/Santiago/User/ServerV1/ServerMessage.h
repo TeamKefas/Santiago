@@ -23,7 +23,7 @@ namespace Santiago{ namespace User { namespace Server
          * @param _initiatingConnectionId - 
          * @param _requestNo -
          */
-        RequestId(unsigned _initiatingConnectionId,unsigned _requestNo);
+        RequestId(unsigned initiatingConnectionId_,unsigned requestNo_);
         bool operator<(const RequestId& rhs_) const;
         
         unsigned  _initiatingConnectionId;

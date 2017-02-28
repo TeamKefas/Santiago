@@ -38,11 +38,11 @@ namespace Santiago{ namespace User { namespace Server
          * @param onNewRequestCallbackFn_ -
          * @param onRequestReplyCallbackFn_ -
          */
-        ConnectionRequestsController(unsigned connectionId_,
-                                     const ConnectionMessageSocket::MySocketPtr& socketPtr_,
+        ConnectionRequestsController(const ConnectionMessageSocket::MySocketPtr& socketPtr_,
                                      const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
                                      const OnNewRequestCallbackFn& onNewRequestCallbackFn_,
-                                     const OnRequestReplyCallbackFn& onRequestReplyCallbackFn_);
+                                     const OnRequestReplyCallbackFn& onRequestReplyCallbackFn_,
+                                     unsigned connectionId_);
        /**
         * ///Message\\
         * @param message_ - 
@@ -63,11 +63,12 @@ namespace Santiago{ namespace User { namespace Server
         */
         void handleConnectionMessageSocketMessage(const RequestId& requestId_, const ConnectionMessage& message_);
 
-        unsigned                      _connectionId;
+
 
         OnDisconnectCallbackFn        _onDisconnectCallbackFn;
         OnNewRequestCallbackFn        _onNewRequestCallbackFn;
         OnRequestReplyCallbackFn      _onRequestReplyCallbackFn;
+        unsigned                      _connectionId;
 
         ConnectionMessageSocketPtr    _connectionMessageSocketPtr;
 

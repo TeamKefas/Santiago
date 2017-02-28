@@ -4,6 +4,7 @@ namespace Santiago{ namespace User { namespace Server
 {
     ConnectionMessage::ConnectionMessage(const char* content_, unsigned size_)
     {
+        ST_LOG_DEBUG("Starting ConnectionMessage parse."<<std::endl);
         unsigned curPos = 0;
         //parse the type
         _type = *reinterpret_cast<const ConnectionMessageType*>(content_ + curPos);
@@ -20,6 +21,7 @@ namespace Santiago{ namespace User { namespace Server
             //check for size overflow
             if(curPos + parameterSize > size_)
             {
+                ST_LOG_ERROR("Invalid message format: Parameter size causing size overflow."<<std::endl);
                 throw std::runtime_error("Invalid message format: Parameter size causing size overflow.");
             }
 
@@ -34,8 +36,10 @@ namespace Santiago{ namespace User { namespace Server
         //check for no of parameters inconsistency.
         if(_parameters.size() != noOfParameters)
         {
+            ST_LOG_ERROR("Invalid message format: Number of parameters does not match."<<std::endl);
             throw std::runtime_error("Invalid message format: Number of parameters does not match.");
         }
+        ST_LOG_DEBUG("ConnectionMessage successfully parsed and created."<<std::endl);
     }
 
     ConnectionMessage::ConnectionMessage(ConnectionMessageType type_, const std::vector<std::string>& parameters_)

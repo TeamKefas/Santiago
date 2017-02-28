@@ -18,6 +18,7 @@ namespace Santiago{ namespace User { namespace Server
     
     void ConnectionServer::start()
     {
+        ST_LOG_DEBUG("Starting ConnectionServer"<<std::endl);
         ConnectionMessageSocket::MySocketPtr socketPtr
             (new ConnectionMessageSocket::MySocket(_acceptor.get_io_service()));
         _acceptor.async_accept(*socketPtr,
@@ -27,18 +28,22 @@ namespace Santiago{ namespace User { namespace Server
 
     void ConnectionServer::sendMessage(const ServerMessage& serverMessage_)
     {
+        ST_ASSERT(_idConnectionPtrMap.find(_nextConnectionId) != _idConnectionPtrMap.end());
         _idConnectionPtrMap.find(_nextConnectionId)->second->sendMessage(serverMessage_);
     }
 
     void ConnectionServer::handleAccept(const ConnectionMessageSocket::MySocketPtr& socketPtr_,
                                         const boost::system::error_code& error_)
     {
+        ST_LOG_DEBUG("New connection received"<<std::endl);
         ConnectionRequestsControllerPtr newConnection(new ConnectionRequestsController(
-                                                          _nextConnectionId
-                                                          ,socketPtr_
-                                                          ,_onDisconnectCallbackFn
-                                                          ,_onNewRequestCallbackFn
-                                                          ,_onRequestReplyCallbackFn));
+                                                          socketPtr_,
+                                                          std::bind(&ConnectionServer::handleDisconnect,
+                                                                    this,
+                                                                    std::placeholders::_1),
+                                                          _onNewRequestCallbackFn,
+                                                          _onRequestReplyCallbackFn,
+                                                          _nextConnectionId));
         ST_ASSERT(_idConnectionPtrMap.find(_nextConnectionId) == _idConnectionPtrMap.end());
         _idConnectionPtrMap.insert(std::make_pair(_nextConnectionId,newConnection));
         //_idConnectionPtrMap[_nextConnectionId] = newConnection;
@@ -48,11 +53,14 @@ namespace Santiago{ namespace User { namespace Server
 
     void ConnectionServer::handleDisconnect(unsigned connectionId_)
     {
+        ST_LOG_DEBUG("in handleDisconnect. connectionId ="<< connectionId_<<std::endl);
+
         std::map<unsigned,ConnectionRequestsControllerPtr>::iterator iter =
             _idConnectionPtrMap.find(connectionId_);
         
-        ST_ASSERT(iter == _idConnectionPtrMap.end());
+        ST_ASSERT(iter != _idConnectionPtrMap.end());
         _idConnectionPtrMap.erase(iter);
+        _onDisconnectCallbackFn(connectionId_);
     }
     
     

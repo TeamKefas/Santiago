@@ -3,16 +3,16 @@
 namespace Santiago{ namespace User { namespace Server
 {
 
-    ConnectionRequestsController::ConnectionRequestsController(unsigned connectionId_,
-                                                               const ConnectionMessageSocket::MySocketPtr& socketPtr_,
+    ConnectionRequestsController::ConnectionRequestsController(const ConnectionMessageSocket::MySocketPtr& socketPtr_,
                                                                const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
                                                                const OnNewRequestCallbackFn& onNewRequestCallbackFn_,
                                                                const OnRequestReplyCallbackFn&
-                                                               onRequestReplyCallbackFn_)
-        :_connectionId(connectionId_)
-        ,_onDisconnectCallbackFn(onDisconnectCallbackFn_)
+                                                               onRequestReplyCallbackFn_,
+                                                               unsigned connectionId_)
+        :_onDisconnectCallbackFn(onDisconnectCallbackFn_)
         ,_onNewRequestCallbackFn(onNewRequestCallbackFn_)
         ,_onRequestReplyCallbackFn(onRequestReplyCallbackFn_)
+        ,_connectionId(connectionId_)
         ,_connectionMessageSocketPtr(new ConnectionMessageSocket(
                                          socketPtr_,
                                          std::bind(
@@ -22,7 +22,8 @@ namespace Santiago{ namespace User { namespace Server
                                              &ConnectionRequestsController::handleConnectionMessageSocketMessage,
                                              this,
                                              std::placeholders::_1,
-                                             std::placeholders::_2)))
+                                             std::placeholders::_2),
+                                         connectionId_))
     {
         /* std::function<void(const ConnectionMessage)> onMessageCallbackFn = 
             std::bind(&ConnectionRequestsController::handleConnectionMessageSocketMessage,this,
@@ -38,6 +39,8 @@ namespace Santiago{ namespace User { namespace Server
     
     void ConnectionRequestsController::handleConnectionMessageSocketDisconnect()
     {
+        ST_LOG_DEBUG("In handleConnectionSocketDisconnect. connectionId = "<<_connectionId<<std::endl);
+
         while(_replyPendingRequestList.begin() != _replyPendingRequestList.end())
         {
             RequestId requestId = _replyPendingRequestList.begin()->first;
@@ -45,14 +48,35 @@ namespace Santiago{ namespace User { namespace Server
             
             ServerMessage serverMessage(_connectionId, requestId,
                                         ServerMessageType::CONNECTION_DISCONNECT,boost::none);
-            _onRequestReplyCallbackFn(serverMessage);
+            try
+            {
+                _onRequestReplyCallbackFn(serverMessage);
+            }
+            catch(std::exception& e)
+            {
+                ST_LOG_DEBUG("Exception on calling onRequestReplyCallbackFn. connectionId ="<<_connectionId
+                             <<" message:"<<e.what()<<std::endl);
+            }
         }
-        _onDisconnectCallbackFn(_connectionId);
+        try
+        {
+            _onDisconnectCallbackFn(_connectionId);
+        }
+        catch(std::exception& e)
+        {
+                ST_LOG_DEBUG("Exception on calling onDisconnectCallbackFn. connectionId ="<<_connectionId
+                             <<" message:"<<e.what()<<std::endl);
+        }
+        ST_LOG_DEBUG("handleConnectionSocketDisconnect completed. connectionId = "<<_connectionId<<std::endl);
     }
 
     void ConnectionRequestsController::
     handleConnectionMessageSocketMessage(const RequestId& requestId_, const ConnectionMessage& message_)
     {
+        ST_LOG_DEBUG("In handleConnectionMessageSocketMessage. connectionId = "<<_connectionId
+                     <<", initiatingConnectionId ="<<requestId_._initiatingConnectionId
+                     <<", requestNo ="<<requestId_._requestNo<<std::endl);
+
         if((ConnectionMessageType::SUCCEEDED == message_._type) ||
            (ConnectionMessageType::FAILED == message_._type))
         {
@@ -60,6 +84,10 @@ namespace Santiago{ namespace User { namespace Server
             if(_replyPendingRequestList.end() == iter)
             {
                 ST_ASSERT(false);
+                ST_LOG_ERROR("Unexpected requestId received. connectionId ="<<_connectionId
+                             <<", initialingConnectionId = "<< requestId_._initiatingConnectionId
+                             <<", requestNo ="<<requestId_._requestNo<<std::endl
+                             << std::endl);
                 std::runtime_error("Unexpected requestId received");
             }
             
@@ -74,6 +102,7 @@ namespace Santiago{ namespace User { namespace Server
                                         ServerMessageType::CONNECTION_MESSAGE_REPLY,
                                         message_);
 
+            //Note: if exception in onRequestReplyCallbackFn it will be handled in the ConnectionMessageSocket
             _onRequestReplyCallbackFn(serverMessage);
         }
         else
@@ -83,15 +112,23 @@ namespace Santiago{ namespace User { namespace Server
                                         ServerMessageType::CONNECTION_MESSAGE_NEW,
                                         message_);
 
+            //Note: if exception in onRequestReplyCallbackFn it will be handled in the ConnectionMessageSocket
             _onNewRequestCallbackFn(serverMessage);
         }
+        ST_LOG_DEBUG("handleConnectionMessageSocketMessage ended."<<std::endl);
     }
     
     void ConnectionRequestsController::sendMessage(const ServerMessage& message_)
     {
+        ST_LOG_DEBUG("in sendMessage. connectionId ="<<_connectionId
+                     <<", initiatingConnectionId ="<<message_._requestId._initiatingConnectionId
+                     <<", requestNo ="<<message_._requestId._requestNo<<std::endl);
+
         ST_ASSERT(message_._connectionMessage);
         if(ServerMessageType::CONNECTION_MESSAGE_NEW == message_._type)
         {
+            ST_LOG_DEBUG("ServerMessageType = CONNECTION_MESSAGE_NEW"<<std::endl);
+
             std::map<RequestId,unsigned>::iterator iter = _replyPendingRequestList.find(message_._requestId);
             if(_replyPendingRequestList.end() == iter)
             {
@@ -104,8 +141,10 @@ namespace Santiago{ namespace User { namespace Server
         }
         else
         {
-            _connectionMessageSocketPtr->sendMessage(message_._requestId,*message_._connectionMessage);
+            ST_LOG_DEBUG("ServerMessageType NOT CONNECTION_MESSAGE_NEW"<<std::endl);
         }
+        _connectionMessageSocketPtr->sendMessage(message_._requestId,*message_._connectionMessage);
+        ST_LOG_DEBUG("sendMessage ended"<<std::endl);
     }
 
 }}}
