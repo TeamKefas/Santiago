@@ -11,14 +11,74 @@ namespace Santiago { namespace User { namespace Client
     void Client::inputMsgFromUserAndSendToServer()
     {
         //TODO: Here take the msg from user...part it and amake the ConnectionMessageObject and send it.
-        std::cout<<"starting"<<std::endl;
-        Server::RequestId requestId(1,1);
+        unsigned initiatingConnectionId, requestNo;
+        std::cout<<"enter Initiating Connection_id and Request_no"<<std::endl;
+        std::cin>>initiatingConnectionId>>requestNo;
+        
+        Server::RequestId requestId(initiatingConnectionId, requestNo);
         
         std::vector<std::string> parameters;
-        parameters.push_back("name");
-        parameters.push_back("abcd");
+        Server::ConnectionMessageType connectionMessageType;
+        
+        std::cout<<"Enter Parameters"<<std::endl;
+        unsigned choice;
+        do{
+            std::cout<<"Connection_Message_Type"<<std::endl;
+            std::cout<<"1.CR_CREATE_USER\n" 
+                     <<"2.CR_LOGIN_USER\n"
+                     <<"3.CR_VERIFY_COOKIE_AND_GET_USER_INFO\n"
+                     <<"4.CR_LOGOUT_USER_FOR_COOKIE\n"
+                     <<"5.CR_LOGOUT_USER_FOR_ALL_COOKIES\n"
+                     <<"6.CR_CHANGE_USER_PASSWORD\n"
+                     <<"7.CR_CHANGE_USER_EMAIL_ADDRESS\n"
+                     <<"8.CR_DELETE_USER\n"<<std::endl;
+            std::cin>>choice;
+            switch(choice)
+            {
+            case 1: connectionMessageType = Server::ConnectionMessageType::CR_CREATE_USER;
+                break;
+            case 2: connectionMessageType = Server::ConnectionMessageType::CR_LOGIN_USER;
+                break;
+            case 3: connectionMessageType = Server::ConnectionMessageType::CR_VERIFY_COOKIE_AND_GET_USER_INFO;
+                break;
+            case 4: connectionMessageType = Server::ConnectionMessageType::CR_LOGOUT_USER_FOR_COOKIE;
+                break;
+            case 5: connectionMessageType = Server::ConnectionMessageType::CR_LOGOUT_USER_FOR_ALL_COOKIES;
+                break;
+            case 6: connectionMessageType = Server::ConnectionMessageType::CR_CHANGE_USER_PASSWORD;
+                break;
+            case 7: connectionMessageType = Server::ConnectionMessageType::CR_CHANGE_USER_EMAIL_ADDRESS;
+                break;
+            case 8: connectionMessageType = Server::ConnectionMessageType::CR_DELETE_USER;
+                break;
+            }
+        }while(choice > 8);
+        if (connectionMessageType == Server::ConnectionMessageType::CR_CREATE_USER)
+        {
+            std::string userName, emailAddress, password;
+            std::cout<<"user_name";
+            std::cin>>userName;
+            parameters.push_back(userName);
+            std::cout<<"email_address";
+            std::cin>>emailAddress;
+            parameters.push_back(emailAddress);
+            std::cout<<"password";
+            std::cin>>password;
+            parameters.push_back(password);
+        }
 
-        Server::ConnectionMessage message(Server::ConnectionMessageType::CR_LOGIN_USER, parameters);
+        if(connectionMessageType == Server::ConnectionMessageType::CR_LOGIN_USER)
+        {
+            std::string userNameorEmailAdress, password;
+            std::cout<<"user_name_or_email_address";
+            std::cin>>userNameorEmailAdress;
+            parameters.push_back(userNameorEmailAdress);
+            std::cout<<"password";
+            std::cin>>password;
+            parameters.push_back(password);
+        }
+        
+        Server::ConnectionMessage message(connectionMessageType, parameters);
         
         _connectionMessageSocketPtr->sendMessage(requestId, message);
     }
