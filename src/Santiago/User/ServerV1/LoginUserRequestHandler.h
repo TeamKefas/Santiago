@@ -11,7 +11,6 @@
 
 #include "RequestHandlerBase.h"
 
-#include <openssl/sha.h>
 
 namespace Santiago{ namespace User { namespace Server
 {
@@ -44,7 +43,6 @@ namespace Santiago{ namespace User { namespace Server
         virtual void handleReplyMessage(const ServerMessage& serverMessage);
 
     private:
-        std::string generateSHA256(const std::string str);
         std::string generateUniqueCookie();
     };
 

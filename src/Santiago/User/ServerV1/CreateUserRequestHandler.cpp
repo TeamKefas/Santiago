@@ -17,7 +17,7 @@ namespace Santiago{namespace User { namespace Server
         std::error_code error;
         userRec._userName = _initiatingMessage._connectionMessage->_parameters[0];
         userRec._emailAddress = _initiatingMessage._connectionMessage->_parameters[1];
-        userRec._password = _initiatingMessage._connectionMessage->_parameters[2];
+        userRec._password = generateSHA256(_initiatingMessage._connectionMessage->_parameters[2]);
         
         _databaseConnection.get().addUsersRec(userRec, error);
 
