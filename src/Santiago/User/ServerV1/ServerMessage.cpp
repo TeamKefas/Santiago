@@ -23,13 +23,9 @@ namespace Santiago{ namespace User { namespace Server
             {
                 return true;
             }
-            else if(this->_requestNo < rhs_._requestNo)
-            {
-                return false;
-            }
             else
             {
-                ST_ASSERT(false);
+                return false;
             }
         }
     }

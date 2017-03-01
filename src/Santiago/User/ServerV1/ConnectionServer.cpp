@@ -1,7 +1,5 @@
 #include "ConnectionServer.h"
 
-
-
 namespace Santiago{ namespace User { namespace Server
 {
     ConnectionServer::ConnectionServer(boost::asio::io_service& ioService_,
@@ -28,8 +26,8 @@ namespace Santiago{ namespace User { namespace Server
 
     void ConnectionServer::sendMessage(const ServerMessage& serverMessage_)
     {
-        ST_ASSERT(_idConnectionPtrMap.find(_nextConnectionId) != _idConnectionPtrMap.end());
-        _idConnectionPtrMap.find(_nextConnectionId)->second->sendMessage(serverMessage_);
+        ST_ASSERT(_idConnectionPtrMap.find(serverMessage_._connectionId) != _idConnectionPtrMap.end());
+        _idConnectionPtrMap.find(serverMessage_._connectionId)->second->sendMessage(serverMessage_);
     }
 
     void ConnectionServer::handleAccept(const ConnectionMessageSocket::MySocketPtr& socketPtr_,

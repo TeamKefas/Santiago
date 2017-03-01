@@ -1,3 +1,12 @@
+#include "CreateUserRequestHandler.h"
+#include "ChangeUserEmailAddressRequestHandler.h"
+#include "ChangeUserPasswordRequestHandler.h"
+#include "VerifyUserForCookieRequestHandler.h"
+#include "LoginUserRequestHandler.h"
+#include "LogoutUserForCookieRequestHandler.h"
+#include "LogoutUserForAllCookiesRequestHandler.h"
+#include "DeleteUserRequestHandler.h"
+#include "PingType1RequestHandler.h"
 
 #include "Server.h"
 
@@ -114,6 +123,16 @@ namespace Santiago{ namespace User { namespace Server
                                         std::bind(&Server::handleRequestCompleted, this, std::placeholders::_1),
                                         message_));
             break;
+        case ConnectionMessageType::CR_PING_TYPE1:
+            requestHandlerPtr.reset(new PingType1RequestHandler(
+                                        _serverData,
+                                        _databaseConnection,
+                                        std::bind(&ConnectionServer::sendMessage,
+                                                  &_connectionServer,
+                                                  std::placeholders::_1),
+                                        std::bind(&Server::handleRequestCompleted, this, std::placeholders::_1),
+                                        message_));
+            break;
         default:
             ST_ASSERT(false);
             break;
@@ -131,16 +150,19 @@ namespace Santiago{ namespace User { namespace Server
         std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
             _activeRequestHandlersList.find(message_._requestId);
         ST_ASSERT(iter != _activeRequestHandlersList.end());
-        
+        iter->second->handleReplyMessage(message_);        
     }
 
     void Server::handleRequestCompleted(const RequestId& requestId_)
     {
+        ST_LOG_DEBUG("Request completed received for initiatingConnectionId = "<< requestId_._initiatingConnectionId
+                     <<", requestNo = "<<requestId_._requestNo<<std::endl);
+
         std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
             _activeRequestHandlersList.find(requestId_);
         //  _activeRequestHandlersList.find(message_._requestId);
         
-        ST_ASSERT(iter == _activeRequestHandlersList.end());
+        ST_ASSERT(iter != _activeRequestHandlersList.end());
 
         _activeRequestHandlersList.erase(iter);
     }

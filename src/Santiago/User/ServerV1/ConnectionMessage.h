@@ -36,6 +36,7 @@ namespace Santiago{ namespace User { namespace Server
         CR_CHANGE_USER_PASSWORD,
         CR_CHANGE_USER_EMAIL_ADDRESS,
         CR_DELETE_USER,
+        CR_PING_TYPE1,
 
         SR_LOGOUT_USER_FOR_COOKIE,
         SR_LOGOUT_USER_FOR_ALL_COOKIES

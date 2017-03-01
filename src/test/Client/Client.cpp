@@ -31,7 +31,9 @@ namespace Santiago { namespace User { namespace Client
                      <<"5.CR_LOGOUT_USER_FOR_ALL_COOKIES\n"
                      <<"6.CR_CHANGE_USER_PASSWORD\n"
                      <<"7.CR_CHANGE_USER_EMAIL_ADDRESS\n"
-                     <<"8.CR_DELETE_USER\n"<<std::endl;
+                     <<"8.CR_DELETE_USER\n"
+                     <<"9.CR_PING_TYPE1\n"
+                     <<std::endl;
             std::cin>>choice;
             switch(choice)
             {
@@ -51,8 +53,10 @@ namespace Santiago { namespace User { namespace Client
                 break;
             case 8: connectionMessageType = Server::ConnectionMessageType::CR_DELETE_USER;
                 break;
+            case 9: connectionMessageType = Server::ConnectionMessageType::CR_PING_TYPE1;
+                break;
             }
-        }while(choice > 8);
+        }while(choice > 9);
         if (connectionMessageType == Server::ConnectionMessageType::CR_CREATE_USER)
         {
             std::string userName, emailAddress, password;

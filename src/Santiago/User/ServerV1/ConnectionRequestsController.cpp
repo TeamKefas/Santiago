@@ -64,8 +64,8 @@ namespace Santiago{ namespace User { namespace Server
         }
         catch(std::exception& e)
         {
-                ST_LOG_DEBUG("Exception on calling onDisconnectCallbackFn. connectionId ="<<_connectionId
-                             <<" message:"<<e.what()<<std::endl);
+            ST_LOG_DEBUG("Exception on calling onDisconnectCallbackFn. connectionId ="<<_connectionId
+                         <<" message:"<<e.what()<<std::endl);
         }
         ST_LOG_DEBUG("handleConnectionSocketDisconnect completed. connectionId = "<<_connectionId<<std::endl);
     }

@@ -18,6 +18,7 @@ set(Santiago_SRCS
   User/ServerV1/LogoutUserForCookieRequestHandler.cpp
   User/ServerV1/LogoutUserForAllCookiesRequestHandler.cpp
   User/ServerV1/DeleteUserRequestHandler.cpp
+  User/ServerV1/PingType1RequestHandler.cpp
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp
   )
