@@ -11,11 +11,11 @@
 
 #include <functional>
 #include <algorithm>
+#include <openssl/sha.h>
 
 #include "../../ThreadSpecificVar/ThreadSpecificVar.h"
 
 #include "ServerMessage.h"
-//#include "DatabaseInterface.h"
 #include "../../SantiagoDBTables/MariaDBConnection.h"
 #include "ServerData.h"
 #include "ConnectionServer.h"
@@ -60,6 +60,8 @@ namespace Santiago{ namespace User { namespace Server
 
     protected:
 
+        std::string generateSHA256(const std::string str);
+      
         ServerData                    &_serverData;       
         SantiagoDBConnection          &_databaseConnection;
         SendMessageCallbackFn          _sendMessageCallbackFn;

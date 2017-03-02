@@ -56,7 +56,7 @@ namespace Santiago { namespace User { namespace Client
             case 9: connectionMessageType = Server::ConnectionMessageType::CR_PING_TYPE1;
                 break;
             }
-        }while(choice > 9);
+        }while(choice > 10);   
         if (connectionMessageType == Server::ConnectionMessageType::CR_CREATE_USER)
         {
             std::string userName, emailAddress, password;
@@ -70,7 +70,7 @@ namespace Santiago { namespace User { namespace Client
             std::cin>>password;
             parameters.push_back(password);
         }
-
+        
         if(connectionMessageType == Server::ConnectionMessageType::CR_LOGIN_USER)
         {
             std::string userNameorEmailAdress, password;
@@ -82,11 +82,11 @@ namespace Santiago { namespace User { namespace Client
             parameters.push_back(password);
         }
         
-        Server::ConnectionMessage message(connectionMessageType, parameters);
-        
-        _connectionMessageSocketPtr->sendMessage(requestId, message);
+        Server::ConnectionMessage message(connectionMessageType, parameters);   
+        _connectionMessageSocketPtr->sendMessage(requestId, message);    
     }
-
+    
+    
     void Client::handleDisconnect()
     {
         std::cerr<<"Disconnected"<<std::endl;
