@@ -32,10 +32,6 @@ int main(int argc, char *argv[])
         boost::property_tree::read_json(argv[1],config);
         Santiago::User::Server::Server server(config);
         server.start();
-        while(1)
-        {
-            sleep(1000);
-        }
 //        int i;
 //        std::cin>>i;
         //  server.stop();

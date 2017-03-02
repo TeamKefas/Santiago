@@ -34,6 +34,11 @@ namespace Santiago{ namespace User { namespace Server
                                                                newConnectionMessageSocket->start();*/
         _connectionMessageSocketPtr->startRead();
     } 
+
+    ConnectionRequestsController::~ConnectionRequestsController()
+    {
+        BOOST_ASSERT( _replyPendingRequestList.size() == 0);
+    }
     
     void ConnectionRequestsController::handleConnectionMessageSocketDisconnect()
     {
