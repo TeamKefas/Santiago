@@ -50,6 +50,8 @@ namespace Santiago{ namespace User { namespace Server
         void sendMessage(const ServerMessage& message_);
         
 
+        ~ConnectionRequestsController();
+
     protected:
        /**
         * ///Message\\

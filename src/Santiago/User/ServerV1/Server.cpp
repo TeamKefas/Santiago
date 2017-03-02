@@ -18,9 +18,9 @@ namespace Santiago{ namespace User { namespace Server
         _databaseConnection(std::bind(Santiago::SantiagoDBTables::CreateMariaDBConnection,config_)),
         _connectionServer(_ioService,
                           config_.get<unsigned>("Santiago.UserServer.port"),
-                          std::bind(&Server::handleDisconnect,this,std::placeholders::_1),
-                          std::bind(&Server::handleRequestNew,this,std::placeholders::_1),
-                          std::bind(&Server::handleRequestReply,this,std::placeholders::_1))
+                          std::bind(&Server::handleConnectionDisconnect,this,std::placeholders::_1),
+                          std::bind(&Server::handleNewRequest,this,std::placeholders::_1),
+                          std::bind(&Server::handleReplyRequest,this,std::placeholders::_1))
     {}
 
     void Server::start()
@@ -30,12 +30,12 @@ namespace Santiago{ namespace User { namespace Server
         _ioService.run();
     }
 
-    void Server::handleDisconnect(unsigned connectionId_)
+    void Server::handleConnectionDisconnect(unsigned connectionId_)
     {
         //TODO
     }
 
-    void Server::handleRequestNew(const ServerMessage& message_)
+    void Server::handleNewRequest(const ServerMessage& message_)
     {
         ST_LOG_DEBUG("In handleRequestNew"<<std::endl);
 
@@ -140,12 +140,21 @@ namespace Santiago{ namespace User { namespace Server
 
         }
         
-        _activeRequestHandlersList.insert(std::make_pair(message_._requestId, requestHandlerPtr));
-        requestHandlerPtr->start();
+        bool flag = _activeRequestHandlersList.insert(std::make_pair(message_._requestId, requestHandlerPtr)).second;
+        if(!flag)
+        {
+            ST_LOG_ERROR("Incorrect requestId sent. initiatingConnectionId = "
+                         << message_._requestId._initiatingConnectionId <<", requestId = "
+                         << message_._requestId._requestNo
+                         <<". Returning" << std::endl);
+            return;
+        }
+
+        requestHandlerPtr->handleInitiatingRequest();
         ST_LOG_DEBUG("Completed handleRequestNew"<<std::endl);
     }
 
-    void Server::handleRequestReply(const ServerMessage& message_)
+    void Server::handleReplyRequest(const ServerMessage& message_)
     {
         std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
             _activeRequestHandlersList.find(message_._requestId);

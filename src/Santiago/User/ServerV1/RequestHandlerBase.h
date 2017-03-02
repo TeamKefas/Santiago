@@ -51,7 +51,7 @@ namespace Santiago{ namespace User { namespace Server
        /**
         *  Used to perform the corresponding Handler Operations.
         */
-        virtual void start() = 0;
+        virtual void handleInitiatingRequest() = 0;
        /**
         * ///Message\\
         * @param serverMessage - \

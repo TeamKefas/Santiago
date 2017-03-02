@@ -11,7 +11,7 @@ namespace Santiago{namespace User { namespace Server
         :RequestHandlerBase(serverData_, databaseConnection_, sendMessageCallbackFn_, onCompletedCallbackFn_, initiatingMessage_)
     {}
 
-    void ChangeUserEmailAddressRequestHandler::start()
+    void ChangeUserEmailAddressRequestHandler::handleInitiatingRequest()
     {
         SantiagoDBTables::UsersRec userRec;
         std::error_code error;

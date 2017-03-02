@@ -17,7 +17,7 @@ namespace Santiago{ namespace User { namespace Server
         ST_ASSERT(_socketPtr);
     }
     
-    void ConnectionMessageSocket::start()
+    void ConnectionMessageSocket::startRead()
     {
         ST_LOG_DEBUG("Starting ConnectionMessageSocket listening. connectionId = "<<_connectionId<<std::endl);
         _socketPtr->async_read_some(_inputBuffer.prepare(BUFFER_INCREMENT_SIZE),
@@ -52,21 +52,25 @@ namespace Santiago{ namespace User { namespace Server
                 RequestId requestId(initiatingConnectionId,requestNo);
                  
                 const char* inputBufferData = boost::asio::buffer_cast<const char*>(_inputBuffer.data());
+
                 try
                 {
                     ConnectionMessage message(inputBufferData,messageSize-12);
-                    _inputBuffer.consume(messageSize-12);
-                    ST_LOG_DEBUG("Successfully parsed ConnectionMessage. connectionId = "<<_connectionId<<std::endl);
-                    _onMessageCallbackFn(requestId,message);
+                    _onMessageCallbackFn(requestId,message); //Note: Ensure that _onMessageCallbackFn does not throw.
+                    //the above try-catch only meant for ConnectionMessage constructor. In other cases where
+                    //onMessageCallbackFn called...no try-catch set
                 }
                 catch(std::exception& e)
                 {
-                    ST_LOG_ERROR("Exception received. connectionId ="<<_connectionId
+                    ST_LOG_ERROR("Invalid message exception received. connectionId ="<<_connectionId
                                  <<", initiatingConnectionId = "<<initiatingConnectionId
                                  <<", requestNo " <<requestNo
-                                 <<" Message = "<<e.what()<<std::endl);                    
-                    _inputBuffer.consume(messageSize-12);
+                                 <<" Message = "<<e.what()<<std::endl);
                 }
+
+                _inputBuffer.consume(messageSize-12);
+                ST_LOG_DEBUG("Successfully parsed ConnectionMessage. connectionId = "<<_connectionId<<std::endl);
+
             }
             else
             {
@@ -92,7 +96,7 @@ namespace Santiago{ namespace User { namespace Server
         {
             parseMessage(bytesTransferred_);
         }
-        start();
+        startRead();
         ST_LOG_DEBUG("handleRead completed. connectionId ="<<_connectionId<<std::endl);
     }
     

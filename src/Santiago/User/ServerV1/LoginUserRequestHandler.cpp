@@ -13,7 +13,7 @@ namespace Santiago{ namespace User { namespace Server
         srand ( time(NULL) );
     }
     
-    void LoginUserRequestHandler::start()
+    void LoginUserRequestHandler::handleInitiatingRequest()
     {
         std::error_code error1, error2;
         boost::optional<SantiagoDBTables::UsersRec> usersRec = _databaseConnection.get().getUsersRecForUserName(_initiatingMessage._connectionMessage->_parameters[0], error1);

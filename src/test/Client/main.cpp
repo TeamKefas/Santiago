@@ -3,6 +3,19 @@
 #include <boost/asio.hpp>
 #include <memory>
 
+void RunIOService(boost::asio::io_service& ioService_)
+{
+    try
+    {
+        ioService_.run();
+    }
+    catch(std::exception& e)
+    {
+        std::cout<<"Caught exception: "<<e.what()<<std::endl;
+        std::cerr<<"Caught exception: "<<e.what()<<std::endl;
+        exit(0);
+    }
+}
 
 int main()
 {
@@ -22,9 +35,8 @@ int main()
     
         Santiago::User::Client::Client client(socketPtr);
         client.startReadCycle();
-        std::thread thread(std::bind(static_cast<std::size_t (boost::asio::io_service::*)()>
-                                     (&boost::asio::io_service::run),
-                                     &ioService));
+        std::thread thread(std::bind(RunIOService, std::ref<boost::asio::io_service>(ioService)));
+
         while(1)
         {
             char flag;
@@ -52,7 +64,6 @@ int main()
     {
         std::cout<<"Caught exception: "<<e.what()<<std::endl;
         std::cerr<<"Caught exception: "<<e.what()<<std::endl;
-    }
-
-    
+        exit(0);
+    }    
 }

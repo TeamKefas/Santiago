@@ -11,7 +11,7 @@ namespace Santiago{ namespace User { namespace Server
     :RequestHandlerBase(serverData_, databaseConnection_, sendMessageCallbackFn_, onCompletedCallbackFn_, initiatingMessage_)
     {}
     
-    void LogoutUserForAllCookiesRequestHandler::start()
+    void LogoutUserForAllCookiesRequestHandler::handleInitiatingRequest()
     {
         std::error_code error; 
 

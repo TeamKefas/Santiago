@@ -51,17 +51,17 @@ namespace Santiago{ namespace User { namespace Server
         * ///Message\\
         * @param connectionId - 
         */
-        void handleDisconnect(unsigned connectionId_);
+        void handleConnectionDisconnect(unsigned connectionId_);
        /**
         * ///Message\\
         * @param message_- 
         */
-        void handleRequestNew(const ServerMessage& message_);
+        void handleNewRequest(const ServerMessage& message_);
        /**
         * ///Message\\
         * @param message_- 
         */
-        void handleRequestReply(const ServerMessage& message_);
+        void handleReplyRequest(const ServerMessage& message_);
        /**
         * ///Message\\
         * @param requestId_- 

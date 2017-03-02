@@ -47,6 +47,7 @@ namespace Santiago{ namespace User { namespace Server
         //_idConnectionPtrMap[_nextConnectionId] = newConnection;
         // newConnection->start();
         ++_nextConnectionId;
+        start();
     }
 
     void ConnectionServer::handleDisconnect(unsigned connectionId_)

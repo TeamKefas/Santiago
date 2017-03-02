@@ -5,7 +5,7 @@ namespace Santiago { namespace User { namespace Client
 {
     void Client::startReadCycle()
     {
-        _connectionMessageSocketPtr->start();
+        _connectionMessageSocketPtr->startRead();
     }
 
     void Client::inputMsgFromUserAndSendToServer()
