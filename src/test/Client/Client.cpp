@@ -81,6 +81,14 @@ namespace Santiago { namespace User { namespace Client
             std::cin>>password;
             parameters.push_back(password);
         }
+
+        if(connectionMessageType == Server::ConnectionMessageType::CR_VERIFY_COOKIE_AND_GET_USER_INFO)
+        {
+            std::string cookieString;
+            std::cout<<"enter cookie string";
+            std::cin>>cookieString;
+            parameters.push_back(cookieString);
+        }
         
         Server::ConnectionMessage message(connectionMessageType, parameters);   
         _connectionMessageSocketPtr->sendMessage(requestId, message);    
@@ -102,12 +110,12 @@ namespace Santiago { namespace User { namespace Client
         std::cerr<<"------------------Connection Message------------------- "<<std::endl;
 
         std::cerr<<"Type = "<<static_cast<int>(message_._type)<<std::endl;
-        std::cerr<<connectionMessageTypeString.find(message_._type)->second;
+        std::cerr<<"status = "<<connectionMessageTypeString.find(message_._type)->second<<std::endl;
         for(auto it = message_._parameters.begin();
             it != message_._parameters.end();
             ++it)
         {
-            std::cerr<<*it;
+            std::cerr<<*it<<"\t";
         }       
     }
 

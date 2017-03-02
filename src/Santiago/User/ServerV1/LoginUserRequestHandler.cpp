@@ -9,7 +9,9 @@ namespace Santiago{ namespace User { namespace Server
                                                      const OnCompletedCallbackFn& onCompletedCallbackFn_,
                                                      const ServerMessage& initiatingMessage_)
         :RequestHandlerBase(serverData_, databaseConnection_, sendMessageCallbackFn_, onCompletedCallbackFn_, initiatingMessage_)
-    {}
+    {
+        srand ( time(NULL) );
+    }
     
     void LoginUserRequestHandler::start()
     {

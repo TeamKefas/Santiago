@@ -10,6 +10,7 @@
  */
 
 #include "RequestHandlerBase.h"
+#include <time.h>
 
 
 namespace Santiago{ namespace User { namespace Server

@@ -19,7 +19,15 @@ namespace Santiago{namespace User { namespace Server
         
         if(match)
         {
-            ConnectionMessage connectionMessage(ConnectionMessageType::SUCCEEDED,std::vector<std::string>()); 
+            std::error_code error;
+            std::string userName = _serverData._cookieCookieDataMap.find(cookie)->second._userName;
+            boost::optional<SantiagoDBTables::UsersRec>
+                userRec = _databaseConnection.get().getUsersRecForUserName(userName, error);
+            std::string emailAddress = userRec->_emailAddress;
+            std::vector<std::string> parameters;
+            parameters.push_back(userName);
+            parameters.push_back(emailAddress);
+            ConnectionMessage connectionMessage(ConnectionMessageType::SUCCEEDED, parameters); 
             ServerMessage serverMessage(_initiatingMessage._connectionId,
                                         _initiatingMessage._requestId,
                                         ServerMessageType::CONNECTION_MESSAGE_REPLY,
