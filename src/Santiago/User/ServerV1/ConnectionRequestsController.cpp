@@ -32,10 +32,8 @@ namespace Santiago{ namespace User { namespace Server
                                                               (socketPtr_,_onDisconnectCallbackFn,
                                                                onMessageCallbackFn));
                                                                newConnectionMessageSocket->start();*/
-        _connectionMessageSocketPtr->start();
+        _connectionMessageSocketPtr->startRead();
     } 
-
-
     
     void ConnectionRequestsController::handleConnectionMessageSocketDisconnect()
     {
@@ -48,25 +46,10 @@ namespace Santiago{ namespace User { namespace Server
             
             ServerMessage serverMessage(_connectionId, requestId,
                                         ServerMessageType::CONNECTION_DISCONNECT,boost::none);
-            try
-            {
-                _onRequestReplyCallbackFn(serverMessage);
-            }
-            catch(std::exception& e)
-            {
-                ST_LOG_DEBUG("Exception on calling onRequestReplyCallbackFn. connectionId ="<<_connectionId
-                             <<" message:"<<e.what()<<std::endl);
-            }
+            _onRequestReplyCallbackFn(serverMessage); //Note: Ensure that _onRequestReplyCallbackFn does not throw. 
         }
-        try
-        {
-            _onDisconnectCallbackFn(_connectionId);
-        }
-        catch(std::exception& e)
-        {
-            ST_LOG_DEBUG("Exception on calling onDisconnectCallbackFn. connectionId ="<<_connectionId
-                         <<" message:"<<e.what()<<std::endl);
-        }
+        _onDisconnectCallbackFn(_connectionId); //Note: Ensure that _onDisconnectCallbackFn does not throw.
+
         ST_LOG_DEBUG("handleConnectionSocketDisconnect completed. connectionId = "<<_connectionId<<std::endl);
     }
 
@@ -83,12 +66,12 @@ namespace Santiago{ namespace User { namespace Server
             std::map<RequestId,unsigned>::iterator iter = _replyPendingRequestList.find(requestId_);
             if(_replyPendingRequestList.end() == iter)
             {
-                ST_ASSERT(false);
                 ST_LOG_ERROR("Unexpected requestId received. connectionId ="<<_connectionId
                              <<", initialingConnectionId = "<< requestId_._initiatingConnectionId
                              <<", requestNo ="<<requestId_._requestNo<<std::endl
                              << std::endl);
-                std::runtime_error("Unexpected requestId received");
+                ST_ASSERT(false);
+                return;
             }
             
             --(iter->second);
@@ -102,8 +85,7 @@ namespace Santiago{ namespace User { namespace Server
                                         ServerMessageType::CONNECTION_MESSAGE_REPLY,
                                         message_);
 
-            //Note: if exception in onRequestReplyCallbackFn it will be handled in the ConnectionMessageSocket
-            _onRequestReplyCallbackFn(serverMessage);
+            _onRequestReplyCallbackFn(serverMessage); //Note: Ensure that onRequestReplyCallbackFn does not throw
         }
         else
         {
@@ -112,8 +94,17 @@ namespace Santiago{ namespace User { namespace Server
                                         ServerMessageType::CONNECTION_MESSAGE_NEW,
                                         message_);
 
-            //Note: if exception in onRequestReplyCallbackFn it will be handled in the ConnectionMessageSocket
-            _onNewRequestCallbackFn(serverMessage);
+            if(_connectionId != requestId_._initiatingConnectionId)
+            {
+                ST_LOG_ERROR("Invalid requestId given for new request. The connectionIds do not match."
+                             <<" connectionId = "<<_connectionId
+                             <<", initiatingConnectionId = "<<requestId_._initiatingConnectionId
+                             <<", requestNo = "<<requestId_._requestNo <<std::endl);
+                ST_ASSERT(false);
+                return;
+            }
+
+            _onNewRequestCallbackFn(serverMessage); //Note: Ensure that onRequestReplyCallbackFn does not throw
         }
         ST_LOG_DEBUG("handleConnectionMessageSocketMessage ended."<<std::endl);
     }
@@ -142,6 +133,7 @@ namespace Santiago{ namespace User { namespace Server
         else
         {
             ST_LOG_DEBUG("ServerMessageType NOT CONNECTION_MESSAGE_NEW"<<std::endl);
+            ST_ASSERT(_connectionId == message_._requestId._initiatingConnectionId);
         }
         _connectionMessageSocketPtr->sendMessage(message_._requestId,*message_._connectionMessage);
         ST_LOG_DEBUG("sendMessage ended"<<std::endl);

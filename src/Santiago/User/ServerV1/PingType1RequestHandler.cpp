@@ -14,7 +14,7 @@ namespace Santiago{ namespace User{ namespace Server
             initiatingMessage_)
     {}
 
-    void PingType1RequestHandler::start()
+    void PingType1RequestHandler::handleInitiatingRequest()
     {
         std::cout<<"Received test request."<<std::endl;
         ServerMessage replyMessage(_initiatingMessage._connectionId,

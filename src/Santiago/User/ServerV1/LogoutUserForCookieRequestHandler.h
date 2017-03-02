@@ -35,7 +35,7 @@ namespace Santiago{ namespace User { namespace Server
        /**
         * ///Message\\
         */
-        virtual void start();
+        virtual void handleInitiatingRequest();
        /**
         * ///Message\\
         * @param serverMessage - \

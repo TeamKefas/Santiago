@@ -60,7 +60,7 @@ namespace Santiago{ namespace User { namespace Server
         /**
          * ///Message\\
          */
-        void start();
+        void startRead();
         /**
          * ///Message\\
          */
