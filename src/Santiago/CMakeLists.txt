@@ -4,6 +4,7 @@ set(Santiago_SRCS
   SantiagoDBTables/Definitions.cpp
   SantiagoDBTables/MariaDBConnection.cpp
   User/SingleNode/Controller.cpp
+  User/ServerV1/RequestHandlerBase.cpp
   User/ServerV1/ConnectionMessage.cpp
   User/ServerV1/ServerMessage.cpp
   User/ServerV1/Server.cpp
@@ -30,6 +31,7 @@ if(WIN32)
       SantiagoDBTables/Definitions.h
       SantiagoDBTables/MariaDBConnection.h
       User/SingleNode/Controller.h
+      User/ServerV1/RequestHandlerBase.h
       User/ServerV1/ConnectionMessage.ch
       User/ServerV1/ServerMessage.h
       User/ServerV1/Server.h
