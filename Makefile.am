@@ -9,7 +9,6 @@ SantiagoDBTablesdir = $(includedir)/Santiago/SantiagoDBTables
 ThreadSpecificVardir = $(includedir)/Santiago/ThreadSpecificVar
 Userdir = $(includedir)/Santiago/User
 SingleNodedir = $(includedir)/Santiago/User/SingleNode
-UserServerdir = $(includedir)/Santiago/User/ServerV1
 Utilsdir = $(includedir)/Santiago/Utils
 
 # the list of header files that belong to the library (to be installed later)
@@ -45,22 +44,6 @@ User_HEADERS =					src/Santiago/User/ControllerBase.h
 
 SingleNode_HEADERS =         			src/Santiago/User/SingleNode/Controller.h
 
-UserServer_HEADERS =\				src/Santiago/User/ServerV1/Server.h\
-						src/Santiago/User/ServerV1/ServerData.h\
-						src/Santiago/User/ServerV1/RequestHandlerBase.h\
-						src/Santiago/User/ServerV1/ServerMessage.h\
-						src/Santiago/User/ServerV1/ConnectionMessage.h\
-						src/Santiago/User/ServerV1/ConnectionServer.h\
-						src/Santiago/User/ServerV1/ConnectionMessageSocket.h\
-						src/Santiago/User/ServerV1/ConnectionRequestController.h\
-						src/Santiago/User/ServerV1/CreateUserRequestHandler.h\
-						src/Santiago/User/ServerV1/LoginUserRequestHandler.\
-						src/Santiago/User/ServerV1/ChangeUserPasswordHandler.h\
-						src/Santiago/User/ServerV1/ChangeUserEmailAddressHandler.h\
-						src/Santiago/User/ServerV1/DeleteUserRequestHandler.h\
-						src/Santiago/User/ServerV1/LogoutUserForAllCookiesRequestHandler.h\
-						src/Santiago/User/ServerV1/LogoutUserForCookieRequestHandler.h\
-						src/Santiago/User/ServerV1/VerifyUserForCookieRequestHandler.h
 
 Utils_HEADERS = 				src/Santiago/Utils/PTimeUtils.h \
 						src/Santiago/Utils/STLog.h 
@@ -77,27 +60,12 @@ libSantiago_a_SOURCES =	\
 						$(ThreadSpecificVar_HEADERS)\
 						$(User_HEADERS)\
 						$(SingleNode_HEADERS)\
-						$(UserServer_HEADERS)\
 						$(Utils_HEADERS)\
 						src/Santiago/ErrorCategory.cpp \
 						src/Santiago/HTTPDefinitions.cpp \
 						src/Santiago/SantiagoDBTables/Definitions.cpp \
 						src/Santiago/SantiagoDBTables/MariaDBConnection.cpp \
 						src/Santiago/User/SingleNode/Controller.cpp \
-						src/Santiago/User/ServerV1/Server.cpp\
-						src/Santiago/User/ServerV1/ServerMessage.cpp\
-						src/Santiago/User/ServerV1/ConnectionMessage.cpp\
-						src/Santiago/User/ServerV1/ConnectionServer.cpp\
-						src/Santiago/User/ServerV1/ConnectionMessageSocket.cpp\
-						src/Santiago/User/ServerV1/ConnectionRequestController.cpp\
-						src/Santiago/User/ServerV1/CreateUserRequestHandler.cpp\
-						src/Santiago/User/ServerV1/LoginUserRequestHandler.cpp\
-						src/Santiago/User/ServerV1/ChangeUserPasswordHandler.cpp\
-						src/Santiago/User/ServerV1/ChangeUserEmailAddressHandler.cpp\
-						src/Santiago/User/ServerV1/DeleteUserRequestHandler.cpp\
-						src/Santiago/User/ServerV1/LogoutUserForAllCookiesRequestHandler.cpp\
-						src/Santiago/User/ServerV1/LogoutUserForCookieRequestHandler.cpp\
-						src/Santiago/User/ServerV1/VerifyUserForCookieRequestHandler.cpp\
 						src/Santiago/Utils/PTimeUtils.cpp \
 						src/Santiago/Utils/STLog.cpp
 						
