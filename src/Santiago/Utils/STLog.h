@@ -88,12 +88,15 @@ strrchr(__FILE__, '\\') + 1 : __FILE__)
 //#define NDEBUG
 #define ST_ASSERT_IMPL(statement,log_type)\
     {\
-        boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();\
-        std::lock_guard<std::mutex> guard(Santiago::Utils::STLog::GetInstance().mutex());\
-        Santiago::Utils::STLog::GetInstance().stream()\
-            << SOURCE_FILE << "(LineNo:" << __LINE__ << ") ThreadNo:"<<std::this_thread::get_id() << " ["\
-            << boost::posix_time::to_simple_string(now)<<"] "<< log_type<<": "<< "statement" << std::endl; \
-        assert(statement);\
+        if(!(statement))\
+        {\
+            boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); \
+            std::lock_guard<std::mutex> guard(Santiago::Utils::STLog::GetInstance().mutex()); \
+            Santiago::Utils::STLog::GetInstance().stream()              \
+            << SOURCE_FILE << "(LineNo:" << __LINE__ << ") ThreadNo:"<<std::this_thread::get_id() << " [" \
+            << boost::posix_time::to_simple_string(now)<<"] "<< log_type<<": "<< "Assertion failed." << std::endl; \
+            assert(statement);                                          \
+        }\
     }\
 
 #define ST_LOG_DEBUG(statement) ST_LOG_IMPL(statement,"DEBUG")

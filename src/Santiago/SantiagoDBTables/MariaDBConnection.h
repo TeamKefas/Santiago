@@ -94,10 +94,8 @@ namespace Santiago{ namespace SantiagoDBTables
  * Gets active session records from the database.
  * @param error
  */
-
         std::vector<SessionsRec> getActiveSessions(std::error_code& error_);
         
-
     protected:
 /**
  * Connects to the database.
