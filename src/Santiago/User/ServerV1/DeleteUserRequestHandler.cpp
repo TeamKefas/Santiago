@@ -16,45 +16,46 @@ namespace Santiago{ namespace User { namespace Server
         std::error_code error1, error2; 
 
         SantiagoDBTables::SessionsRec sessionsRec;
+        unsigned  cookiesErasedCount = 0;
         sessionsRec._userName = _initiatingMessage._connectionMessage->_parameters[0];
         sessionsRec._logoutTime = boost::posix_time::second_clock::local_time();
         sessionsRec._lastActiveTime = *(sessionsRec._logoutTime);
-        _databaseConnection.get().updateSessionsRec(sessionsRec, error1);
-
-        if(!error1)
+        std::vector<std::string> cookieList =
+            _serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second._cookieList;
+        auto it = cookieList.begin();
+        while(it != cookieList.end())
         {
-            auto iter = _serverData._cookieCookieDataMap.begin();
-            while(iter != _serverData._cookieCookieDataMap.end())
+            sessionsRec._cookieString = *it;
+            _databaseConnection.get().updateSessionsRec(sessionsRec, error1);
+            if(!error1)
             {
-                if(iter->second._userName == sessionsRec._userName)
-                {
-                    iter = _serverData._cookieCookieDataMap.erase(iter);   
-                }
-                else
-                {
-                    ++iter;
-                }
+                auto iter = _serverData._cookieCookieDataMap.find(*it);
+                _serverData._cookieCookieDataMap.erase(iter); 
+                ++cookiesErasedCount;
+                ++it;
             }
-            
-            _serverData._userIdUserIdDataMap.erase(sessionsRec._userName);
-
-            _databaseConnection.get().deleteUsersRec(sessionsRec._userName, error2);
-            if(!error2)
+            else
             {
-                ConnectionMessage connectionMessage(ConnectionMessageType::SUCCEEDED,std::vector<std::string>()); 
-            ServerMessage serverMessage(_initiatingMessage._connectionId,
-                                        _initiatingMessage._requestId,
-                                        ServerMessageType::CONNECTION_MESSAGE_REPLY,
-                                        connectionMessage);
-            
-            _sendMessageCallbackFn(serverMessage);
-            _onCompletedCallbackFn(_initiatingMessage._requestId);
+                ++it;
             }
-           
-             
-            
         }
-        if (error1 || error2)
+        if(cookiesErasedCount == cookieList.size())
+        {
+            _serverData._userIdUserIdDataMap.erase(sessionsRec._userName);
+            _databaseConnection.get().deleteUsersRec(sessionsRec._userName, error2);
+             if(!error2)
+             {
+                 ConnectionMessage connectionMessage(ConnectionMessageType::SUCCEEDED,std::vector<std::string>()); 
+                 ServerMessage serverMessage(_initiatingMessage._connectionId,
+                                             _initiatingMessage._requestId,
+                                             ServerMessageType::CONNECTION_MESSAGE_REPLY,
+                                             connectionMessage);
+                 
+                 _sendMessageCallbackFn(serverMessage);
+                 _onCompletedCallbackFn(_initiatingMessage._requestId);
+             }
+        }
+        else
         {
             ConnectionMessage connectionMessage(ConnectionMessageType::FAILED,std::vector<std::string>()); 
             ServerMessage serverMessage(_initiatingMessage._connectionId,

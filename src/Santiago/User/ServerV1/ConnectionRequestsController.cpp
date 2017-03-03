@@ -37,7 +37,7 @@ namespace Santiago{ namespace User { namespace Server
 
     ConnectionRequestsController::~ConnectionRequestsController()
     {
-        BOOST_ASSERT( _replyPendingRequestList.size() == 0);
+        ST_ASSERT( _replyPendingRequestList.size() == 0);
     }
     
     void ConnectionRequestsController::handleConnectionMessageSocketDisconnect()

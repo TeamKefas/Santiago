@@ -15,21 +15,21 @@ namespace Santiago{ namespace User { namespace Server
     
     void LoginUserRequestHandler::handleInitiatingRequest()
     {
-        std::error_code error1, error2;
+        std::error_code error1, error2, error3;
         boost::optional<SantiagoDBTables::UsersRec> usersRec = _databaseConnection.get().getUsersRecForUserName(_initiatingMessage._connectionMessage->_parameters[0], error1);
         if(error1)
         {
-            usersRec = _databaseConnection.get().getUsersRecForEmailAddress(_initiatingMessage._connectionMessage->_parameters[0], error1);
+            usersRec = _databaseConnection.get().getUsersRecForEmailAddress(_initiatingMessage._connectionMessage->_parameters[0], error2);
         }
       
-        if(!error1 && generateSHA256(_initiatingMessage._connectionMessage->_parameters[1]) == usersRec->_password)                                      
+        if((!error1 || !error2) && generateSHA256(_initiatingMessage._connectionMessage->_parameters[1]) == usersRec->_password)                                      
         {
             SantiagoDBTables::SessionsRec sessionsRec;
             sessionsRec._userName = usersRec->_userName;
             sessionsRec._cookieString = generateUniqueCookie();
             sessionsRec._loginTime = boost::posix_time::second_clock::local_time();
-            _databaseConnection.get().addSessionsRec(sessionsRec, error2);       
-            if(!error2)
+            _databaseConnection.get().addSessionsRec(sessionsRec, error3);       
+            if(!error3)
             {
                 CookieData cookieData;
                 cookieData._userName = sessionsRec._userName;
@@ -55,7 +55,7 @@ namespace Santiago{ namespace User { namespace Server
             }
         }
     
-        if(error1 || error2)
+        if(error1 && error2)
         {
             ConnectionMessage connectionMessage(ConnectionMessageType::FAILED,std::vector<std::string>()); 
             ServerMessage serverMessage(_initiatingMessage._connectionId,

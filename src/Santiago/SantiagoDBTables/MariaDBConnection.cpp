@@ -152,7 +152,7 @@ namespace Santiago{ namespace SantiagoDBTables
         else
         {
             ST_LOG_DEBUG("mysql_num_rows() returned 0." << std::endl);
-            error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
         }
         mysql_free_result(result);
         return;
@@ -272,7 +272,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 {
                     ST_LOG_DEBUG("Mismatch in number of fields in the ST_users table");
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
-                    ST_ASSERT(false);
+                    //  ST_ASSERT(false);
                     return;
                 }
                 

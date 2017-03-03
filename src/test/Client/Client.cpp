@@ -89,6 +89,42 @@ namespace Santiago { namespace User { namespace Client
             std::cin>>cookieString;
             parameters.push_back(cookieString);
         }
+
+        if(connectionMessageType == Server::ConnectionMessageType::CR_CHANGE_USER_PASSWORD)
+        {
+            std::string userName, emailAddress, password;
+            std::cout<<"user_name";
+            std::cin>>userName;
+            std::cout<<"email_address";
+            std::cin>>emailAddress;
+            std::cout<<"new_password";
+            std::cin>>password;
+            parameters.push_back(userName);
+            parameters.push_back(emailAddress);
+            parameters.push_back(password);
+        }
+
+        if(connectionMessageType == Server::ConnectionMessageType::CR_CHANGE_USER_EMAIL_ADDRESS)
+        {
+            std::string userName, emailAddress, password;
+            std::cout<<"user_name";
+            std::cin>>userName;
+            std::cout<<"new_email_address";
+            std::cin>>emailAddress;
+            std::cout<<"password";
+            std::cin>>password;
+            parameters.push_back(userName);
+            parameters.push_back(emailAddress);
+            parameters.push_back(password);
+        }
+
+        if(connectionMessageType == Server::ConnectionMessageType::CR_DELETE_USER)
+        {
+            std::string userName;
+            std::cout<<"user_name";
+            std::cin>>userName;
+            parameters.push_back(userName);
+        }
         
         Server::ConnectionMessage message(connectionMessageType, parameters);   
         _connectionMessageSocketPtr->sendMessage(requestId, message);    
