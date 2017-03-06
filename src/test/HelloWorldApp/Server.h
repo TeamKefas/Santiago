@@ -3,8 +3,8 @@
 
 #include <boost/asio.hpp>
 
-#include <boost/property_tree/ptree.hpp>
 #include "../../Santiago/AppServer/ServerBase.h"
+
 #include "RequestHandlerBase.h"
 #include "EchoHandler.h"
 #include "ErrorURIHandler.h"
@@ -18,9 +18,8 @@ namespace Test{ namespace AppServer
         
         typedef Santiago::AppServer::ServerBase<boost::asio::ip::tcp> MyBase;
 
-        Server(const boost::property_tree::ptree& config_):
-            MyBase(getServerLocalEndpoint(config_)),
-            _config(config_)
+         Server(Santiago::LocalEndpoint<boost::asio::ip::tcp> listenEndpoint_):
+            MyBase(listenEndpoint_)
         {
             
         }
@@ -44,20 +43,7 @@ namespace Test{ namespace AppServer
                 ret.reset(new ErrorURIHandler(_ioService));
             }
             return ret;
-        }
-
-       
-        
-        Santiago::LocalEndpoint<boost::asio::ip::tcp> 
-        getServerLocalEndpoint(const boost::property_tree::ptree& config_) const 
-        {
-            //unsigned portNo = config_.get<unsigned>("Santiago.AppServer.port");
-
-            return Santiago::LocalEndpoint<typename boost::asio::ip::tcp>
-                (config_.get<unsigned>("Santiago.AppServer.port"));
-        }
-
-        boost::property_tree::ptree                         _config;
+        }       
 
     };
 
