@@ -16,7 +16,8 @@ if(WIN32)
       SantiagoDBTables/MariaDBConnection.h
       User/SingleNode/Controller.h
       Utils/PTimeUtils.h
-      Utils/STLog.h)
+      Utils/STLog.h
+      Utils/LogLevel.h)
 endif(WIN32)
 
 add_library(Santiago STATIC ${Santiago_SRCS})
