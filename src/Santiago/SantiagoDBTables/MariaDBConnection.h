@@ -67,6 +67,12 @@ namespace Santiago{ namespace SantiagoDBTables
  */ 
         void updateUsersRec(UsersRec& newUsersRec_, std::error_code& error_);
 /**
+ * Updates the given record in users table in the database.
+ * @param newUsersRec_ : Updated user record object.
+ * @param error
+ */ 
+        void updateRecoveryStringInUsersRec(UsersRec& newUsersRec_, std::error_code& error_);
+/**
  * Deletes the record from users table in the database for the given username.
  * @param userName_
  * @param error

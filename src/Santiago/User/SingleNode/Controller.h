@@ -136,6 +136,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                             const std::string& password_,
                                             const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
         /**
+         * This function creates a recovery string for the user which is send to the given email address.
+         * @param emailAddress_ - EmailAddress from the user.
+         * @param onCreateAndReturnRecoveryStringCallbackFn_ - Call back function for create and return recovery string operations.
+         */
+        virtual void createAndReturnRecoveryString(const std::string& emailAddress_,
+                                                   const ErrorCodeCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_);
+        /**
          * This function deletes the user using the given cookie string.
          * @param cookieString_ - Cookie from the user.
          * @param onDeleteUserCallbackFn_ - Call back function for delete operations.
@@ -237,6 +244,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                                 const std::string& password_,
                                                 const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
         /**
+         *  This function is the implementation function for the createAndReturnRecoveryString function.
+         * @param emailAddress_ - Email Address from the user.
+         * @param onCreateAndReturnRecoveryStringCallbackFn_ - Call back function for create ang return recovery string operations.
+         */
+        virtual void createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
+                                                       const ErrorCodeCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_);
+        /**
          *  This function is the implementation function for the deleteUser function.
          * @param cookieString_ - Cookie from the user.
          * @param onDeleteUserCallbackFn_ - Call back function for delete user operations.
@@ -288,7 +302,8 @@ namespace Santiago{ namespace User{ namespace SingleNode
          * @return Returns the unique cookie string.
          */
         std::string generateUniqueCookie();
-
+        std::string generateRecoveryString();
+        
         ThreadSpecificDbConnection                           &_databaseConnection;
 
         std::map<std::string,SantiagoDBTables::SessionsRec>   _cookieStringSessionsRecMap;

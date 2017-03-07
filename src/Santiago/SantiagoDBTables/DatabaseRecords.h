@@ -35,6 +35,7 @@ namespace Santiago{ namespace SantiagoDBTables
         std::string _userName;
         std::string _emailAddress;
         std::string _password;
+        std::string _recoveryString;
     };
 
 /**

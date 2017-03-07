@@ -137,6 +137,15 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                onChangeEmailAddressCallbackFn_));
     }
 
+    void Controller::createAndReturnRecoveryString(const std::string& emailAddress_,
+                                                   const ErrorCodeCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
+    {
+        _strand.post(std::bind(&Controller::createAndReturnRecoveryStringImpl,
+                               this,
+                               emailAddress_,
+                               onCreateAndReturnRecoveryStringCallbackFn_));
+    }
+    
     void Controller::deleteUser(const std::string& cookieString_,
                                 const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
@@ -477,6 +486,32 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
     }
 
+    void Controller::createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
+                                                               const ErrorCodeCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
+    {
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
+        std::error_code error;
+        usersRecOpt = _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
+        if(error)
+        {
+            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error);
+            return;
+        }
+        ST_ASSERT(usersRecOpt);
+        
+        SantiagoDBTables::UsersRec newUsersRec = *usersRecOpt;
+        newUsersRec._recoveryString = generateRecoveryString();
+        _databaseConnection.get().updateRecoveryStringInUsersRec(newUsersRec,error);
+        if(error)
+        {
+            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error);
+            return;
+        }
+        ST_LOG_INFO("Created recovery string successfully for emailAddress:"<<emailAddress_<<std::endl);
+        postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        return;
+    }
+        
     void Controller::deleteUserImpl(const std::string& cookieString_,
                                     const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
@@ -657,6 +692,22 @@ namespace Santiago{ namespace User{ namespace SingleNode
 	for(unsigned int i = 0; i < 46; ++i)
 	{
             str += alphanum[rand() % stringLength];
+	}
+        return str;
+    }
+
+    std::string Controller::generateRecoveryString()
+    {
+        std::string str;
+        static const char num[] =
+            "0123456789";
+                    
+        int stringLength = sizeof(num) - 1;
+	
+        //return num[rand() % stringLength];
+	for(unsigned int i = 0; i < 6; ++i)
+	{
+            str += num[rand() % stringLength];
 	}
         return str;
     }

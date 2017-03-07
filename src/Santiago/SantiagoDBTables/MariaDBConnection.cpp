@@ -307,6 +307,20 @@ namespace Santiago{ namespace SantiagoDBTables
         runUpdateQuery(updateUsersRecQuery,error_);
     }
 
+    void MariaDBConnection::updateRecoveryStringInUsersRec(UsersRec& newUsersRec_, std::error_code& error_)
+    {
+        if(!isUserInputClean(newUsersRec_._userName) ||
+           !isUserInputClean(newUsersRec_._recoveryString))
+        {
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            return;
+        }
+
+        std::string updateUsersRecQuery = "UPDATE ST_users SET recovery_string ='" +
+            newUsersRec_._recoveryString + "' WHERE user_name = '" + newUsersRec_._userName +"'";
+        runUpdateQuery(updateUsersRecQuery,error_);
+    }
+
     void MariaDBConnection::deleteUsersRec(const std::string& userName_,std::error_code& error_)
     {
         if(!isUserInputClean(userName_))
