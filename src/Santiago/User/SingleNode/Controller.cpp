@@ -124,6 +124,15 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                onChangePasswordCallbackFn_));
     }
 
+    void Controller::getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                             const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
+    {
+        _strand.post(std::bind(&Controller::getUserForEmailAddressAndRecoveryStringImpl,
+                               this,
+                               emailAddress_,
+                               onGetUserForEmailAddressAndRecoveryStringCallbackFn_));
+    }
+
     void Controller::changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
                                                                         const std::string& recoveryString_,
                                                                         const std::string& newPassword_,
@@ -445,6 +454,22 @@ namespace Santiago{ namespace User{ namespace SingleNode
         return;
 
     }
+
+     void Controller::getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
+                                                                  const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
+     {
+          boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
+          std::error_code error;
+          usersRecOpt = _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
+          if(error)
+          {
+               postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error);
+               return;
+          }
+          std::string userName = usersRecOpt->_userName;
+          postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error);
+          return;
+     }
 
     void Controller::changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
                                                                             const std::string& recoveryString_,

@@ -122,6 +122,13 @@ namespace Santiago{ namespace User
                                         const std::string& newPassword_,
                                         const ErrorCodeCallbackFn& onChangePasswordCallbackFn_) = 0;
         /**
+         * This function is used to get user for the given email adress and calls the call back function onGetUserForEmailAddressAndRecoveryStringCallbackFn.
+         * @param emailAddress_ - Email address  received from the user.
+         * @param onGetUserForEmailAddressAndRecoveryStringCallbackFn_ -Handler function for delete operations.
+         */
+        virtual void getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                             const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_) = 0;
+        /**
          * This function is used for updating the user password using the emailaddress and recovery string provided by the user.
          * @param emailAddress_ - Email Address received from the user.
          * @param recoveryString_ - Recovery string received from the user.
@@ -149,7 +156,6 @@ namespace Santiago{ namespace User
          */
         virtual void createAndReturnRecoveryString(const std::string& emailAddress_,
                                                    const ErrorCodeCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_) = 0;
-        
         /**
          * This function is used to delete a user using the given cookie string and calls the call back function onDeleteUserCallbackFn.
          * @param cookieString_ - Cookie string received from the user.

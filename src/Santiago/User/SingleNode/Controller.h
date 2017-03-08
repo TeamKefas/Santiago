@@ -124,8 +124,15 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                         const std::string& oldPassword_,
                                         const std::string& newPassword_,
                                         const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
+        /**
+         * This function is used to get user for the given email adress.
+         * @param emailAddress_ - Email address  received from the user.
+         * @param onGetUserForEmailAddressAndRecoveryStringCallbackFn_ -Call back function for get user for email address operations.
+         */
+        virtual void getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                             const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
          /**
-         * This function is used to chnage the user password of the user.
+         * This function is used to change the user password of the user.
          * @param emailAddress_ - Email address from the user.
          * @param recoveryString_ - Recovery string from the user.
          * @param onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_ - Call back function for password change operations.
@@ -242,6 +249,13 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                             const std::string& oldPassword_,
                                             const std::string& newPassword_,
                                             const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
+        /**
+         * This function is the implementation function for the getUserForEmailAddressAndRecoveryString.
+         * @param emailAddress_ - Email address  received from the user.
+         * @param onGetUserForEmailAddressAndRecoveryStringCallbackFn_ -Call back function for get user for email address operations.
+         */
+        virtual void getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
+                                                                 const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
         /**
          * This function is the implementation function for the changeUserPasswordForEmailAddressAndRecoveryString function.
          * @param emailAddress_ - Email address from the user.
