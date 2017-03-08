@@ -122,6 +122,16 @@ namespace Santiago{ namespace User
                                         const std::string& newPassword_,
                                         const ErrorCodeCallbackFn& onChangePasswordCallbackFn_) = 0;
         /**
+         * This function is used for updating the user password using the emailaddress and recovery string provided by the user.
+         * @param emailAddress_ - Email Address received from the user.
+         * @param recoveryString_ - Recovery string received from the user.
+         * @param onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_ - Handler function for the password change using email address and recovery string operations.
+         */
+        virtual void changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                        const std::string& recoveryString_,
+                                                                        const std::string& newPassword_,
+                                                                        const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_) = 0;
+        /**
          * This function is used to update the email address using the email address provided by the user.
          * @param - cookieString_ - Cookie string received from the user.
          * @param - newEmailAddress_ - Email address received from the user.

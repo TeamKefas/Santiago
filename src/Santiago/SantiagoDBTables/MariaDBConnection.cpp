@@ -316,8 +316,12 @@ namespace Santiago{ namespace SantiagoDBTables
             return;
         }
 
-        std::string updateUsersRecQuery = "UPDATE ST_users SET recovery_string ='" +
-            newUsersRec_._recoveryString + "' WHERE user_name = '" + newUsersRec_._userName +"'";
+        std::string updateUsersRecQuery = "UPDATE ST_users SET recovery_string = ";
+        if(newUsersRec_._recoveryString == "")
+            updateUsersRecQuery += "NULL";
+        else
+            updateUsersRecQuery += "'" + newUsersRec_._recoveryString + "'";
+        updateUsersRecQuery += " WHERE user_name = '" + newUsersRec_._userName +"'";
         runUpdateQuery(updateUsersRecQuery,error_);
     }
 

@@ -124,6 +124,19 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                onChangePasswordCallbackFn_));
     }
 
+    void Controller::changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                        const std::string& recoveryString_,
+                                                                        const std::string& newPassword_,
+                                                                        const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
+    {
+        _strand.post(std::bind(&Controller::changeUserPasswordForEmailAddressAndRecoveryStringImpl,
+                               this,
+                               emailAddress_,
+                               recoveryString_,
+                               newPassword_,
+                               onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_));
+    }
+
     void Controller::changeUserEmailAddress(const std::string& cookieString_,
                                             const std::string& newEmailAddress_,
                                             const std::string& password_,
@@ -433,6 +446,34 @@ namespace Santiago{ namespace User{ namespace SingleNode
 
     }
 
+    void Controller::changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
+                                                                            const std::string& recoveryString_,
+                                                                            const std::string& newPassword_,
+                                                                            const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
+    {
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
+        std::error_code error;
+        std::tie(error,usersRecOpt) =
+            verifyEmailAddressRecoveryStringAndGetUsersRec(emailAddress_,recoveryString_);
+        if(error)
+        {
+            postCallbackFn(onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_,error);
+            return;
+        }
+        ST_ASSERT(usersRecOpt);
+            
+        //change and update the password
+        usersRecOpt->_password = generateSHA256(newPassword_);
+        _databaseConnection.get().updateUsersRec(*usersRecOpt,error);
+        //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
+        postCallbackFn(onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_,error);
+        usersRecOpt->_recoveryString = "";
+        _databaseConnection.get().updateRecoveryStringInUsersRec(*usersRecOpt,error);
+        postCallbackFn(onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_,error);
+        return;
+
+    }
+
     void Controller::changeUserEmailAddressImpl(const std::string& cookieString_,
                                                 const std::string& newEmailAddress_,
                                                 const std::string& password_,
@@ -602,6 +643,32 @@ namespace Santiago{ namespace User{ namespace SingleNode
         return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),usersRecOpt);
     }
 
+    std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
+    Controller::verifyEmailAddressRecoveryStringAndGetUsersRec(const std::string& emailAddress_,
+                                                               const std::string& recoveryString_)
+    {
+        //get the UsersRec from db
+        std::error_code error;
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt = 
+            _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
+        if(error)
+        {
+            return std::make_pair(error,usersRecOpt);
+        }
+
+        //check if the username/password matches
+        if(!usersRecOpt || (usersRecOpt->_recoveryString != recoveryString_))
+        {
+            ST_LOG_INFO("Wrong emailaddress_recoverystring. emailAddress:"<<emailAddress_<<std::endl);
+            return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_RECOVERY_STRING,
+                                                  ErrorCategory::GetInstance()),
+                                  usersRecOpt);
+        }
+
+        ST_LOG_INFO("EmailAddress recovery string verified for emailAddress:"<<emailAddress_<<std::endl);
+        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),usersRecOpt);
+    }
+
 
     std::pair<std::error_code,std::map<std::string,Santiago::SantiagoDBTables::SessionsRec>::iterator > 
     Controller::checkForCookieInMapAndGetSessionsRecIter(const std::string& cookieString_)
@@ -699,15 +766,17 @@ namespace Santiago{ namespace User{ namespace SingleNode
     std::string Controller::generateRecoveryString()
     {
         std::string str;
-        static const char num[] =
-            "0123456789";
+        static const char alphanum[] =
+            "0123456789"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
                     
-        int stringLength = sizeof(num) - 1;
+        int stringLength = sizeof(alphanum) - 1;
 	
-        //return num[rand() % stringLength];
-	for(unsigned int i = 0; i < 6; ++i)
+        //return alphanum[rand() % stringLength];
+	for(unsigned int i = 0; i < 8; ++i)
 	{
-            str += num[rand() % stringLength];
+            str += alphanum[rand() % stringLength];
 	}
         return str;
     }

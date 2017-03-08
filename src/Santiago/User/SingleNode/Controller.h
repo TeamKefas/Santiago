@@ -124,6 +124,16 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                         const std::string& oldPassword_,
                                         const std::string& newPassword_,
                                         const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
+         /**
+         * This function is used to chnage the user password of the user.
+         * @param emailAddress_ - Email address from the user.
+         * @param recoveryString_ - Recovery string from the user.
+         * @param onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_ - Call back function for password change operations.
+         */
+        virtual void changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                        const std::string& recoveryString_,
+                                                                        const std::string& newPassword_,
+                                                                        const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_);
         /**
          * This function changees user email address with the newly given email address.
          * @param cookieString_ - Cookie from the user.
@@ -233,6 +243,17 @@ namespace Santiago{ namespace User{ namespace SingleNode
                                             const std::string& newPassword_,
                                             const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
         /**
+         * This function is the implementation function for the changeUserPasswordForEmailAddressAndRecoveryString function.
+         * @param emailAddress_ - Email address from the user.
+         * @param recoveryString_ - Recovery string from the user.
+         * @param newPassword_ - New password of the user.
+         * @param onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_ - Call back function for password change for email address and recovery string operations.
+         */
+        virtual void changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
+                                                                            const std::string& recoverystring_,
+                                                                            const std::string& newPassword_,
+                                                                            const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_);
+        /**
          * This function is the implementation function for the changeUserEmailAddress function. 
          * @param cookieString_ - Cookie from the user.
          * @param newEmailAddress_ - New email address that is to be updated.
@@ -276,6 +297,15 @@ namespace Santiago{ namespace User{ namespace SingleNode
          */
         std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
         verifyEmailAddressPasswordAndGetUsersRec(const std::string& emailAddress_, const std::string& password_);
+         //helper fns
+        /**
+         * This function verifies user credentials based on the emailAddress_ and recoverystring_ and returns the pair of error code and user record. 
+         * @param userName_ - Email address from the user.
+         * @param recoveryString - Recovery string from the user.
+         * @returns This function returns a std pair of error code and UserRecord if  error is true otherwise error code alone is send.
+         */
+        std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
+        verifyEmailAddressRecoveryStringAndGetUsersRec(const std::string& emailAddress_, const std::string& recoveryString_);
         //helper fns
         /**
          * It checks for CookieString_ in map and returns pair of error code and map iterator.
