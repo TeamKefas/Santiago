@@ -125,6 +125,22 @@ namespace Santiago { namespace User { namespace Client
             std::cin>>userName;
             parameters.push_back(userName);
         }
+        if(connectionMessageType == Server::ConnectionMessageType::CR_LOGOUT_USER_FOR_COOKIE)
+        {
+            std::string cookieString;
+            std::cout<<"cookie_string";
+            std::cin>>cookieString;
+            parameters.push_back(cookieString);
+        }
+        
+        if(connectionMessageType == Server::ConnectionMessageType::CR_LOGOUT_USER_FOR_ALL_COOKIES)
+        {
+            std::string cookieString;
+            std::cout<<"cookie_string";
+            std::cin>>cookieString;
+            parameters.push_back(cookieString);
+        }
+        
         
         Server::ConnectionMessage message(connectionMessageType, parameters);   
         _connectionMessageSocketPtr->sendMessage(requestId, message);    

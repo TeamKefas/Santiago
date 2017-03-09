@@ -16,6 +16,7 @@ namespace Santiago{ namespace User { namespace Server
         std::error_code error; 
 
         SantiagoDBTables::SessionsRec sessionsRec;
+        sessionsRec._cookieString = _initiatingMessage._connectionMessage->_parameters[0];
         sessionsRec._userName = _serverData._cookieCookieDataMap.find(_initiatingMessage._connectionMessage->_parameters[0])->second._userName;
         sessionsRec._logoutTime = boost::posix_time::second_clock::local_time();
         sessionsRec._lastActiveTime = *(sessionsRec._logoutTime);
@@ -28,6 +29,12 @@ namespace Santiago{ namespace User { namespace Server
             {
                 if(iter->second._userName == sessionsRec._userName)
                 {
+                    std::error_code error1;
+                    sessionsRec._cookieString = iter->first;
+                    sessionsRec._logoutTime = boost::posix_time::second_clock::local_time();
+                    sessionsRec._lastActiveTime = *(sessionsRec._logoutTime);
+                    _databaseConnection.get().updateSessionsRec(sessionsRec, error1);
+                    
                     iter = _serverData._cookieCookieDataMap.erase(iter);   
                 }
                 else

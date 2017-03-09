@@ -16,6 +16,7 @@ namespace Santiago{ namespace User { namespace Server
         std::error_code error; 
 
         SantiagoDBTables::SessionsRec sessionsRec;
+        sessionsRec._cookieString = _initiatingMessage._connectionMessage->_parameters[0];
         sessionsRec._userName = _serverData._cookieCookieDataMap.find(_initiatingMessage._connectionMessage->_parameters[0])->second._userName;
         sessionsRec._logoutTime = boost::posix_time::second_clock::local_time();
         sessionsRec._lastActiveTime = *(sessionsRec._logoutTime);
@@ -24,7 +25,7 @@ namespace Santiago{ namespace User { namespace Server
         if(!error)
         {
             _serverData._cookieCookieDataMap.erase(_initiatingMessage._connectionMessage->_parameters[0]);
-            _serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second._cookieList.erase(std::remove(_serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second._cookieList.begin(),_serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second._cookieList.end(),_initiatingMessage._connectionMessage->_parameters[0]),_serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second._cookieList.end());
+            _serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second._cookieList.erase(std::remove(_serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second._cookieList.begin(), _serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second._cookieList.end(), _initiatingMessage._connectionMessage->_parameters[0]),_serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second._cookieList.end());
             if(!_serverData._userIdUserIdDataMap.find(sessionsRec._userName)->second._cookieList.size())
             {
                 _serverData._userIdUserIdDataMap.erase(sessionsRec._userName);
