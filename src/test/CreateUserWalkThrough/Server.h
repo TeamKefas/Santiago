@@ -8,7 +8,12 @@
 #include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "RequestHandlerBase.h"
+#include "LogoutUserHandler.h"
+#include "LoginUserHandler.h"
 #include "CreateUserHandler.h"
+#include "LogoutUserForAllCookieHandler.h"
+#include "GetUserInfoHandler.h"
+#include "DeleteUserHandler.h"
 #include "ErrorURIHandler.h"
 
 
@@ -44,7 +49,26 @@ namespace Test{ namespace AppServer
             {
                 ret.reset(new CreateUserHandler(_userController));
             }
-            
+            else if(documentURI_ == "/loginuser.fcgi")
+            {
+                ret.reset(new LoginUserHandler(_userController));
+            }
+            else if(documentURI_ == "/logoutuser.fcgi")
+            {
+                ret.reset(new LogoutUserHandler(_userController));
+            }
+            else if(documentURI_ == "/logoutuserforallcookie.fcgi")
+            {
+                ret.reset(new LogoutUserForAllCookieHandler(_userController));
+            }
+            else if(documentURI_ == "/getuserinfo.fcgi")
+            {
+                ret.reset(new GetUserInfoHandler(_userController));
+            }
+            else if(documentURI_ == "/deleteuser.fcgi")
+            {
+                ret.reset(new DeleteUserHandler(_userController));
+            }
             else
             {
                 ret.reset(new ErrorURIHandler(_userController));

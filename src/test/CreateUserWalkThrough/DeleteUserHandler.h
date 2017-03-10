@@ -1,0 +1,34 @@
+#ifndef SANTIAGO_EXAMPLES_APPSERVER_DELETEUSERHANDLER_H
+#define SANTIAGO_EXAMPLES_APPSERVER_DELETEUSERHANDLER_H
+
+#include <memory>
+
+#include "RequestHandlerBase.h"
+
+namespace Test{ namespace AppServer
+{
+   class DeleteUserHandler:public RequestHandlerBase
+   {
+   public:
+
+       DeleteUserHandler(Santiago::User::ControllerBase& userController_):
+            RequestHandlerBase(userController_)
+       {}
+
+   protected:
+
+       void handleDeleteUser(const RequestPtr& request_,
+                             std::error_code error_);
+
+       virtual void handleVerifiedRequest(const RequestPtr& request_,
+                                          const std::string& userName_,
+                                          const std::string& emailAddress_,
+                                          const std::string& cookieString_);
+
+       virtual void handleNonVerifiedRequest(const RequestPtr& request_);
+
+   };
+    }}
+
+
+#endif

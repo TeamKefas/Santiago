@@ -630,7 +630,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         }
 
         //check if the username/password matches
-        if(!usersRecOpt || (usersRecOpt->_password != generateSHA256(password_)))
+        if(!usersRecOpt || (usersRecOpt->_password != password_))
         {
             ST_LOG_INFO("Wrong username_password. userName:"<<userName_<<std::endl);
             return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_USERNAME_PASSWORD,
@@ -764,7 +764,7 @@ namespace Santiago{ namespace User{ namespace SingleNode
         //now there is 1 cookie remaining in the cookieList vector
         ST_ASSERT(userNameUserDataMapIter->second._cookieList.size() == 1);
         cleanupCookieDataAndUpdateSessionRecord(userNameUserDataMapIter->second._cookieList[0]);
-        ST_ASSERT(userNameUserDataMapIter == _userNameUserDataMap.end());
+        //ST_ASSERT(userNameUserDataMapIter == _userNameUserDataMap.end());
 
         return;
     }

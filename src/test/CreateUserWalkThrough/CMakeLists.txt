@@ -1,4 +1,11 @@
-set(CreateUserWalkThrough_SRCS  main.cpp RequestHandlerBase.cpp CreateUserHandler.cpp  )
+set(CreateUserWalkThrough_SRCS  main.cpp 
+                                RequestHandlerBase.cpp 
+                                CreateUserHandler.cpp 
+                                LogoutUserHandler.cpp 
+                                LoginUserHandler.cpp 
+                                LogoutUserForAllCookieHandler.cpp 
+                                GetUserInfoHandler.cpp
+                                DeleteUserHandler.cpp)
 
 if(WIN32)
   set(CreateUserWalkThrough_SRCS 
@@ -6,7 +13,12 @@ if(WIN32)
     Server.h
     RequestHandlerBase.h
     CreateUserHandler.h
-    ErrorURIHandler.h)
+    ErrorURIHandler.h
+    LoginUserHandler.h
+    LogoutUserHandler.h
+    LogoutUserForAllCookieHandler.h
+    GetUserInfoHandler.h
+    DeleteUserHandler.h)
 endif(WIN32)
 
 

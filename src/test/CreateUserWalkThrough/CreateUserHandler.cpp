@@ -73,7 +73,7 @@ namespace Test { namespace AppServer
         else
         {
             request_->out() << "Signup successfull."<<std::endl;
-            // printEcho(request_);
+            printEcho(request_);
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);
