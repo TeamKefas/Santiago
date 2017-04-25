@@ -9,7 +9,7 @@ namespace Test{ namespace AppServer
    {
    public:
 
-       ErrorURIHandler(Santiago::User::ControllerBase& userController_):
+       ErrorURIHandler(Santiago::Authentication::ControllerBase& userController_):
             RequestHandlerBase(userController_)
        {}
 

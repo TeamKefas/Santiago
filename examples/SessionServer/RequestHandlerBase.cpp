@@ -26,7 +26,7 @@ namespace SessionServer
     void RequestHandlerBase::handleVerifyCookieAndGetUserInfo(const RequestPtr& request_,
                                                               const std::string& cookieString_,
                                                               std::error_code error_,
-                                                              const boost::optional<Santiago::User::UserInfo>& userInfo_)
+                                                              const boost::optional<Santiago::Authentication::UserInfo>& userInfo_)
     {
         if(error_)
         {

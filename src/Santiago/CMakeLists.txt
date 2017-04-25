@@ -3,7 +3,7 @@ set(Santiago_SRCS
   HTTPDefinitions.cpp
   SantiagoDBTables/Definitions.cpp
   SantiagoDBTables/MariaDBConnection.cpp
-  User/SingleNode/Controller.cpp
+  Authentication/SingleNode/Authenticator.cpp
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp
   )
@@ -14,7 +14,7 @@ if(WIN32)
       HTTPDefinitions.h
       SantiagoDBTables/Definitions.h
       SantiagoDBTables/MariaDBConnection.h
-      User/SingleNode/Controller.h
+      Authentication/SingleNode/Authenticator.h
       Utils/PTimeUtils.h
       Utils/STLog.h
       Utils/LogLevel.h)

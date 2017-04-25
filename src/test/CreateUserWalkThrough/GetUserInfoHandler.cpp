@@ -28,7 +28,7 @@ namespace Test{ namespace AppServer
 
     void GetUserInfoHandler::handleGetUserInfo(const RequestPtr& request_,
                                                std::error_code error_,
-                                               const boost::optional<Santiago::User::UserInfo> &userInfo_)
+                                               const boost::optional<Santiago::Authentication::UserInfo> &userInfo_)
     {
         if(error_)
         {

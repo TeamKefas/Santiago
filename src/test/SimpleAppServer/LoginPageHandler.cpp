@@ -127,7 +127,7 @@ namespace SimpleAppServer
     void LoginPageHandler::handleLoginUser(const RequestPtr& request_,
                                            const std::string& userName_,
                                            std::error_code error_,
-                                           const boost::optional<std::pair<Santiago::User::UserInfo,std::string> >& userInfoCookieStringPair_)
+                                           const boost::optional<std::pair<Santiago::Authentication::UserInfo,std::string> >& userInfoCookieStringPair_)
     {
         if(error_)
         {

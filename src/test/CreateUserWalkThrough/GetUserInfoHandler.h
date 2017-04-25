@@ -11,7 +11,7 @@ namespace Test{ namespace AppServer
    {
    public:
 
-       GetUserInfoHandler(Santiago::User::ControllerBase& userController_):
+       GetUserInfoHandler(Santiago::Authentication::ControllerBase& userController_):
             RequestHandlerBase(userController_)
        {}
 
@@ -19,7 +19,7 @@ namespace Test{ namespace AppServer
 
        void handleGetUserInfo(const RequestPtr& request_,
                               std::error_code error_,
-                              const boost::optional<Santiago::User::UserInfo> &userInfo_);
+                              const boost::optional<Santiago::Authentication::UserInfo> &userInfo_);
 
        virtual void handleVerifiedRequest(const RequestPtr& request_,
                                           const std::string& userName_,

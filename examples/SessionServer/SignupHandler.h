@@ -10,7 +10,7 @@ namespace SessionServer
    {
    public:
 
-       SignupHandler(Santiago::User::ControllerBase& userController_):
+       SignupHandler(Santiago::Authentication::ControllerBase& userController_):
             RequestHandlerBase(userController_)
        {}
 
