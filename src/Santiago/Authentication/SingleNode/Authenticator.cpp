@@ -62,9 +62,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
     
     void Authenticator::createUser(const std::string& userName_,
-                                const std::string& emailAddress_,
-                                const std::string& password_,
-                                const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
+                                   const std::string& emailAddress_,
+                                   const std::string& password_,
+                                   const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::createUserImpl,
                                this,
@@ -75,9 +75,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
     
     void Authenticator::loginUser(const std::string& userNameOrEmailAddress_,
-                               bool isUserNameNotEmailAddress_,
-                               const std::string& password_,
-                               const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
+                                  bool isUserNameNotEmailAddress_,
+                                  const std::string& password_,
+                                  const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::loginUserImpl,
                                this,
@@ -88,7 +88,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::verifyCookieAndGetUserInfo(const std::string& cookieString_,
-                                                const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
+                                                   const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::verifyCookieAndGetUserInfoImpl,
                                this,
@@ -97,7 +97,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::logoutUserForCookie(const std::string& cookieString_,
-                                         const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
+                                            const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::logoutUserForCookieImpl,this,cookieString_,onLogoutCookieCallbackFn_));
     }
@@ -112,9 +112,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::changeUserPassword(const std::string& cookieString_,
-                                        const std::string& oldPassword_,
-                                        const std::string& newPassword_,
-                                        const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
+                                           const std::string& oldPassword_,
+                                           const std::string& newPassword_,
+                                           const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::changeUserPasswordImpl,
                                this,
@@ -123,9 +123,18 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                newPassword_,
                                onChangePasswordCallbackFn_));
     }
+    
+    void Authenticator::createAndReturnRecoveryString(const std::string& emailAddress_,
+                                                      const ErrorCodeCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
+    {
+        _strand.post(std::bind(&Authenticator::createAndReturnRecoveryStringImpl,
+                               this,
+                               emailAddress_,
+                               onCreateAndReturnRecoveryStringCallbackFn_));
+    }
 
     void Authenticator::getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
-                                                             const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
+                                                                const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::getUserForEmailAddressAndRecoveryStringImpl,
                                this,
@@ -134,9 +143,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
-                                                                        const std::string& recoveryString_,
-                                                                        const std::string& newPassword_,
-                                                                        const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
+                                                                           const std::string& recoveryString_,
+                                                                           const std::string& newPassword_,
+                                                                           const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::changeUserPasswordForEmailAddressAndRecoveryStringImpl,
                                this,
@@ -159,14 +168,6 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                onChangeEmailAddressCallbackFn_));
     }
 
-    void Authenticator::createAndReturnRecoveryString(const std::string& emailAddress_,
-                                                   const ErrorCodeCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
-    {
-        _strand.post(std::bind(&Authenticator::createAndReturnRecoveryStringImpl,
-                               this,
-                               emailAddress_,
-                               onCreateAndReturnRecoveryStringCallbackFn_));
-    }
     
     void Authenticator::deleteUser(const std::string& cookieString_,
                                 const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
@@ -175,8 +176,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::postCallbackFn(const ErrorCodeUserInfoCallbackFn& errorCodeUserInfoCallbackFn_,
-                                    const std::error_code& error_,
-                                    const boost::optional<UserInfo>& userInfoOpt_)
+                                       const std::error_code& error_,
+                                       const boost::optional<UserInfo>& userInfoOpt_)
     {
         std::function<void()> errorCodeUserInfoCallbackFnImpl =
             std::bind(errorCodeUserInfoCallbackFn_,error_, userInfoOpt_);
@@ -194,10 +195,19 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::postCallbackFn(const ErrorCodeCallbackFn& errorCodeCallbackFn_,
-                                    const std::error_code& error_)
+                                       const std::error_code& error_)
     {
         std::function<void()> errorCodeCallbackFnImpl = std::bind(errorCodeCallbackFn_,error_);
         _ioService.post(errorCodeCallbackFnImpl);
+    }
+
+    void Authenticator::postCallbackFn(const ErrorCodeStringCallbackFn& errorCodeStringCallbackFn_,
+                                       const std::error_code& error,
+                                       const std::string& recoveryString_)
+    {
+        std::function<void()> errorCodeStringCallbackFnImpl =
+            std::bind(errorCodeStringCallbackFn,error_,recoveryString_);
+        _ioService.post(errorCodeStringCallbackFnImpl);
     }
 
     void Authenticator::createUserImpl(const std::string& userName_,
@@ -421,9 +431,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::changeUserPasswordImpl(const std::string& cookieString_,
-                                            const std::string& oldPassword_,
-                                            const std::string& newPassword_,
-                                            const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
+                                               const std::string& oldPassword_,
+                                               const std::string& newPassword_,
+                                               const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
     {
         std::map<std::string,SantiagoDBTables::SessionsRec>::iterator cookieStringSessionsRecMapIter;
         std::error_code error;
@@ -454,9 +464,35 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         return;
 
     }
+    
+     void Authenticator::createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
+                                                           const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
+    {
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
+        std::error_code error;
+        usersRecOpt = _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
+        if(error)
+        {
+            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error);
+            return;
+        }
+        ST_ASSERT(usersRecOpt);
+        
+        SantiagoDBTables::UsersRec newUsersRec = *usersRecOpt;
+        newUsersRec._recoveryString = generateRecoveryString(); 
+        _databaseConnection.get().updateRecoveryStringInUsersRec(newUsersRec,error);
+        if(error)
+        {     
+            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error,newUsersRec._recoveryString);
+            return;
+        }
+        ST_LOG_INFO("Created recovery string successfully for emailAddress:"<<emailAddress_<<std::endl);
+        postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        return;
+    }
 
      void Authenticator::getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
-                                                                  const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
+                                                                     const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
      {
           boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
           std::error_code error;
@@ -472,9 +508,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
      }
 
     void Authenticator::changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
-                                                                            const std::string& recoveryString_,
-                                                                            const std::string& newPassword_,
-                                                                            const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
+                                                                               const std::string& recoveryString_,
+                                                                               const std::string& newPassword_,
+                                                                               const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
     {
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::error_code error;
@@ -552,32 +588,6 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 
     }
 
-    void Authenticator::createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
-                                                               const ErrorCodeCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
-    {
-        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
-        std::error_code error;
-        usersRecOpt = _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
-        if(error)
-        {
-            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error);
-            return;
-        }
-        ST_ASSERT(usersRecOpt);
-        
-        SantiagoDBTables::UsersRec newUsersRec = *usersRecOpt;
-        newUsersRec._recoveryString = generateRecoveryString();
-        _databaseConnection.get().updateRecoveryStringInUsersRec(newUsersRec,error);
-        if(error)
-        {
-            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error);
-            return;
-        }
-        ST_LOG_INFO("Created recovery string successfully for emailAddress:"<<emailAddress_<<std::endl);
-        postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
-        return;
-    }
-        
     void Authenticator::deleteUserImpl(const std::string& cookieString_,
                                     const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
