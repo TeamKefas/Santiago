@@ -115,7 +115,8 @@ namespace SimpleAppServer
                           this->sharedFromThis<PasswordRecoveryInitiateRecoveryHandler>(),
                           request_,
                           emailAddressIter->second,
-                          std::placeholders::_));
+                          std::placeholders::_1,
+                          std::placeholders::_2));
             
         }
         
@@ -123,7 +124,8 @@ namespace SimpleAppServer
     
     void PasswordRecoveryInitiateRecoveryHandler::handleInitiatePasswordRecovery(const RequestPtr& request_,
                                                                                  const std::string& emailAddress_,
-                                                                                 std::error_code error_)
+                                                                                 std::error_code& error_,
+                                                                                 std::string& recoveryString_)
     {
         if(error_)
         {
@@ -135,6 +137,13 @@ namespace SimpleAppServer
         }
         else
         {
+            std::stringstream passwordRecoverylink;
+            passwordRecoverylink<<"localhost:8080/password-recovery-receive-new-password.fcgi?recovery-string=";
+            passwordRecoverylink<<
+            passwordRecoverylink<<"&email-address=";
+            passwordRecoverylink<<emailAddress_;
+            std::string subject = "Password recovery";
+            
             request_->out()<<"password recovery url has been send to email \n";
             request_->setAppStatus(0);
             std::error_code error;
