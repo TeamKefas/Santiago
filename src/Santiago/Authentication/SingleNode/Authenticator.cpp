@@ -504,10 +504,12 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error);
                return;
           }
-          if(usersRecOpt->_recoveryString == recoveryString_)
+          if(usersRecOpt->_recoveryString != recoveryString_)
           {
-              std::string userName = usersRecOpt->_userName;
+               postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error);
+               return;
           }
+          std::string userName = usersRecOpt->_userName;
           postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error);
           return;
      }
