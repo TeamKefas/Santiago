@@ -6,6 +6,7 @@ set(Santiago_SRCS
   Authentication/SingleNode/Authenticator.cpp
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp
+  Utils/Email.cpp
   )
 
 if(WIN32)
@@ -17,7 +18,8 @@ if(WIN32)
       Authentication/SingleNode/Authenticator.h
       Utils/PTimeUtils.h
       Utils/STLog.h
-      Utils/LogLevel.h)
+      Utils/LogLevel.h
+      Utils/Email.h)
 endif(WIN32)
 
 add_library(Santiago STATIC ${Santiago_SRCS})

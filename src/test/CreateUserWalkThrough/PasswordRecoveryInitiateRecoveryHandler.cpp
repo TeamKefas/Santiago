@@ -1,6 +1,6 @@
 #include "PasswordRecoveryInitiateRecoveryHandler.h"
 
-namespace SimpleAppServer
+namespace Test{ namespace AppServer
 {
 
     void PasswordRecoveryInitiateRecoveryHandler::handleVerifiedRequest(const RequestPtr& request_,
@@ -124,7 +124,7 @@ namespace SimpleAppServer
     
     void PasswordRecoveryInitiateRecoveryHandler::handleInitiatePasswordRecovery(const RequestPtr& request_,
                                                                                  const std::string& emailAddress_,
-                                                                                 std::error_code error_,
+                                                                                 const std::error_code& error_,
                                                                                  const std::string& recoveryString_)
     {
         if(error_)
@@ -155,4 +155,4 @@ namespace SimpleAppServer
 
 
 
-}
+}}

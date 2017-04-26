@@ -9,6 +9,8 @@
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "LoginPageHandler.h"
 #include "SimplePageHandler.h"
+#include "SignupHandler.h"
+#include "PasswordRecoveryInitiateRecoveryHandler.h"
 
 namespace SimpleAppServer
 {
@@ -37,6 +39,14 @@ namespace SimpleAppServer
             if(documentURI_ == "/login.fcgi")
             {
                 ret.reset(new LoginPageHandler(_userController));
+            }
+            else if(documentURI_ == "/signup.fcgi")
+            {
+                ret.reset(new SignupHandler(_userController));
+            }
+            else if(documentURI_ == "/password-recovery-initiate.fcgi")
+            {
+                ret.reset(new PasswordRecoveryInitiateRecoveryHandler(_userController));
             }
             else
             {

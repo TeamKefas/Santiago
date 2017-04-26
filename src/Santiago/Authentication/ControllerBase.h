@@ -158,7 +158,7 @@ namespace Santiago{ namespace Authentication
          * @param onCreateAndReturnRecoveryStringCallbackFn_ - Handler function for create and return recovery string operations.
          */
         virtual void createAndReturnRecoveryString(const std::string& emailAddress_,
-                                                   const ErrorCodeCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_) = 0;
+                                                   const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_) = 0;
         /**
          * This function is used to delete a user using the given cookie string and calls the call back function onDeleteUserCallbackFn.
          * @param cookieString_ - Cookie string received from the user.

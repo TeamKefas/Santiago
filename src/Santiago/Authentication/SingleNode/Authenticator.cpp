@@ -6,8 +6,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 {
 
     Authenticator::Authenticator(ThreadSpecificDbConnection& databaseConnection_,
-                           boost::asio::io_service& ioService_,
-                           const boost::property_tree::ptree& config_)
+                                 boost::asio::io_service& ioService_,
+                                 const boost::property_tree::ptree& config_)
         :Authentication::ControllerBase(ioService_,config_)
         ,_databaseConnection(databaseConnection_)
     {
@@ -125,7 +125,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
     
     void Authenticator::createAndReturnRecoveryString(const std::string& emailAddress_,
-                                                      const ErrorCodeCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
+                                                      const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::createAndReturnRecoveryStringImpl,
                                this,
@@ -170,7 +170,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 
     
     void Authenticator::deleteUser(const std::string& cookieString_,
-                                const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
+                                   const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::deleteUserImpl,this,cookieString_,onDeleteUserCallbackFn_));
     }
@@ -202,18 +202,18 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::postCallbackFn(const ErrorCodeStringCallbackFn& errorCodeStringCallbackFn_,
-                                       const std::error_code& error,
+                                       const std::error_code& error_,
                                        const std::string& recoveryString_)
     {
         std::function<void()> errorCodeStringCallbackFnImpl =
-            std::bind(errorCodeStringCallbackFn,error_,recoveryString_);
+            std::bind(errorCodeStringCallbackFn_,error_,recoveryString_);
         _ioService.post(errorCodeStringCallbackFnImpl);
     }
 
     void Authenticator::createUserImpl(const std::string& userName_,
-                                    const std::string& emailAddress_,
-                                    const std::string& password_,
-                                    const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
+                                       const std::string& emailAddress_,
+                                       const std::string& password_,
+                                       const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
 
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
@@ -473,7 +473,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         usersRecOpt = _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
         if(error)
         {
-            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error);
+            
+            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error,std::string());
             return;
         }
         ST_ASSERT(usersRecOpt);
@@ -483,11 +484,11 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         _databaseConnection.get().updateRecoveryStringInUsersRec(newUsersRec,error);
         if(error)
         {     
-            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error,newUsersRec._recoveryString);
+            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error,std::string());
             return;
         }
         ST_LOG_INFO("Created recovery string successfully for emailAddress:"<<emailAddress_<<std::endl);
-        postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()), newUsersRec._recoveryString);
         return;
     }
 

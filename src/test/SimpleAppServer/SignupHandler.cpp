@@ -11,7 +11,7 @@ namespace SimpleAppServer
         request_->out()<<"User already logged in. Please logout(logout.fcgi) before trying again."<<std::endl;
         request_->out()<<"User name: "<<userName_<<std::endl;
         
-        printEcho(request_);
+        
         request_->setAppStatus(0);
         std::error_code error;
         request_->commit(error);
@@ -66,7 +66,6 @@ namespace SimpleAppServer
         {
             //assuming it is always username already exist exception...
             request_->out() <<error_.message()<<std::endl;
-            printEcho(request_);
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);
@@ -74,7 +73,6 @@ namespace SimpleAppServer
         else
         {
             request_->out() << "Signup successfull."<<std::endl;
-            printEcho(request_);
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);

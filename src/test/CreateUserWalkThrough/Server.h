@@ -15,6 +15,7 @@
 #include "GetUserInfoHandler.h"
 #include "DeleteUserHandler.h"
 #include "ErrorURIHandler.h"
+#include "PasswordRecoveryInitiateRecoveryHandler.h"
 
 
 namespace Test{ namespace AppServer
@@ -68,6 +69,10 @@ namespace Test{ namespace AppServer
             else if(documentURI_ == "/deleteuser.fcgi")
             {
                 ret.reset(new DeleteUserHandler(_userController));
+            }
+            else if(documentURI_ == "/password-recovery-initiate.fcgi")
+            {
+                ret.reset(new PasswordRecoveryInitiateRecoveryHandler(_userController));
             }
             else
             {
