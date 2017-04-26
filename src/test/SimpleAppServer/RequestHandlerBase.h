@@ -18,7 +18,7 @@ namespace SimpleAppServer
         typedef Santiago::AppServer::RequestHandlerBase<boost::asio::ip::tcp> MyBase;
         typedef std::shared_ptr<RequestHandlerBase> Ptr;
 
-        RequestHandlerBase(Santiago::Authentication::ControllerBase& userController_):
+        RequestHandlerBase(Santiago::Authentication::AuthenticatorBase& userController_):
             _userController(userController_)
         {}
 
@@ -38,7 +38,7 @@ namespace SimpleAppServer
         virtual void handleNonVerifiedRequest(const RequestPtr& request_) = 0;
 
         
-        Santiago::Authentication::ControllerBase                  &_userController;
+        Santiago::Authentication::AuthenticatorBase                  &_userController;
     };
 
 }

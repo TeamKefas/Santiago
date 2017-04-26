@@ -130,7 +130,18 @@ namespace Santiago{ namespace Authentication
          * @param onGetUserForEmailAddressAndRecoveryStringCallbackFn_ -Handler function for delete operations.
          */
         virtual void getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
-                                                             const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_) = 0;
+                                                             const std::string& recoverystring_,
+                                                             const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_) = 0;
+        
+        /**
+         * This function is used to create and return a recovery string for the  user using the given email address and calls the call back function onCreateAndReturnRecoveryStringCallbackFn.
+         * @param emailAddress_ - EmailAddress received from the user.
+         * @param onCreateAndReturnRecoveryStringCallbackFn_ - Handler function for create and return recovery string operations.
+         */
+        virtual void createAndReturnRecoveryString(const std::string& emailAddress_,
+                                                   const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_) = 0;
+
+        
         /**
          * This function is used for updating the user password using the emailaddress and recovery string provided by the user.
          * @param emailAddress_ - Email Address received from the user.
@@ -152,13 +163,6 @@ namespace Santiago{ namespace Authentication
                                             const std::string& newEmailAddress_,
                                             const std::string& password_,
                                             const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_) = 0;
-        /**
-         * This function is used to create and return a recovery string for the  user using the given email address and calls the call back function onCreateAndReturnRecoveryStringCallbackFn.
-         * @param emailAddress_ - EmailAddress received from the user.
-         * @param onCreateAndReturnRecoveryStringCallbackFn_ - Handler function for create and return recovery string operations.
-         */
-        virtual void createAndReturnRecoveryString(const std::string& emailAddress_,
-                                                   const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_) = 0;
         /**
          * This function is used to delete a user using the given cookie string and calls the call back function onDeleteUserCallbackFn.
          * @param cookieString_ - Cookie string received from the user.

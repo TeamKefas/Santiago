@@ -12,7 +12,7 @@ namespace Test{namespace AppServer{
         typedef RequestHandlerBase MyBase;
         typedef std::shared_ptr<PasswordRecoveryReceiveNewPasswordHandler> Ptr;
         
-        PasswordRecoveryReceiveNewPasswordHandler(Santiago::Authentication::ControllerBase& userController_):
+        PasswordRecoveryReceiveNewPasswordHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
         {}
         
@@ -20,8 +20,9 @@ namespace Test{namespace AppServer{
         
         void handleReceiveNewPassword(const RequestPtr& request_,
                                       const std::string& emailAddress_,
+                                      const std::string& recoveryString_,
                                       std::error_code error_,
-                                      const std::string& recoveryString_);
+                                      const std::string& userName_);
         
         virtual void handleVerifiedRequest(const RequestPtr& request_,
                                            const std::string& userName_,

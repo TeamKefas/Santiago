@@ -9,7 +9,7 @@ namespace Test{ namespace AppServer
     {
     public:
              
-        CreateUserHandler(Santiago::Authentication::ControllerBase& userController_):
+        CreateUserHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
        {}
         

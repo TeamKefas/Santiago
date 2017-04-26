@@ -13,7 +13,7 @@ namespace SimpleAppServer{
         typedef RequestHandlerBase MyBase;
         typedef std::shared_ptr<PasswordRecoveryInitiateRecoveryHandler> Ptr;
         
-        PasswordRecoveryInitiateRecoveryHandler(Santiago::Authentication::ControllerBase& userController_):
+        PasswordRecoveryInitiateRecoveryHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
         {}
         

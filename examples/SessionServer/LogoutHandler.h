@@ -11,7 +11,7 @@ namespace SessionServer
    {
    public:
 
-       LogoutHandler(Santiago::Authentication::ControllerBase& userController_):
+       LogoutHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
        {}
 

@@ -14,7 +14,7 @@ namespace SimpleAppServer
         typedef RequestHandlerBase MyBase;
         typedef std::shared_ptr<LoginPageHandler> Ptr;
 
-        LoginPageHandler(Santiago::Authentication::ControllerBase& userController_):
+        LoginPageHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
         {}
         

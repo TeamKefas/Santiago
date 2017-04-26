@@ -11,7 +11,7 @@ namespace Test{ namespace AppServer
    {
    public:
 
-       GetUserInfoHandler(Santiago::Authentication::ControllerBase& userController_):
+       GetUserInfoHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
        {}
 

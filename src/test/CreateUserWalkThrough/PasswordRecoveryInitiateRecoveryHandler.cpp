@@ -67,6 +67,10 @@ namespace Test{ namespace AppServer
             passwordRecoverylink<<emailAddress_;
             std::string subject = "Password recovery";
             
+            Santiago::Utils::Email::sendEmail(emailAddress_,
+                                              subject,
+                                              passwordRecoverylink.str());
+            
             request_->out()<<"password recovery url has been send to email \n";
             request_->setAppStatus(0);
             std::error_code error;

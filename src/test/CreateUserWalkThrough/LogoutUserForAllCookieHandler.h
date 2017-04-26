@@ -11,7 +11,7 @@ namespace Test{ namespace AppServer
    {
    public:
        
-       LogoutUserForAllCookieHandler(Santiago::Authentication::ControllerBase& userController_):
+       LogoutUserForAllCookieHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
        {}
 

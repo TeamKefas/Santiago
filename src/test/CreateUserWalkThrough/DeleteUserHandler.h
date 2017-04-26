@@ -11,7 +11,7 @@ namespace Test{ namespace AppServer
    {
    public:
 
-       DeleteUserHandler(Santiago::Authentication::ControllerBase& userController_):
+       DeleteUserHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
        {}
 

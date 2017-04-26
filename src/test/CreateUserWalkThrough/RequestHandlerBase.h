@@ -16,7 +16,7 @@ namespace Test { namespace AppServer
             typedef Santiago::AppServer::RequestHandlerBase<boost::asio::ip::tcp> MyBase;
             typedef std::shared_ptr<RequestHandlerBase> Ptr;
             
-            RequestHandlerBase(Santiago::Authentication::ControllerBase& userController_):
+            RequestHandlerBase(Santiago::Authentication::AuthenticatorBase& userController_):
                 _userController(userController_)
         {}
             
@@ -37,7 +37,7 @@ namespace Test { namespace AppServer
             
         virtual void printEcho(const RequestPtr& request_);
             
-            Santiago::Authentication::ControllerBase                  &_userController;
+            Santiago::Authentication::AuthenticatorBase                  &_userController;
         };
         
     }}        

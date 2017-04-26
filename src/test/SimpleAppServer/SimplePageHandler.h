@@ -9,7 +9,7 @@ namespace SimpleAppServer
    {
    public:
 
-       SimplePageHandler(Santiago::Authentication::ControllerBase& userController_):
+       SimplePageHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
        {}
 

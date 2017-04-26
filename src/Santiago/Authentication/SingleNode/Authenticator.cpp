@@ -8,7 +8,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     Authenticator::Authenticator(ThreadSpecificDbConnection& databaseConnection_,
                                  boost::asio::io_service& ioService_,
                                  const boost::property_tree::ptree& config_)
-        :Authentication::ControllerBase(ioService_,config_)
+        :Authentication::AuthenticatorBase(ioService_,config_)
         ,_databaseConnection(databaseConnection_)
     {
         srand ( time(NULL) );
@@ -134,11 +134,13 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
-                                                                const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
+                                                                const std::string& recoveryString_,
+                                                                const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::getUserForEmailAddressAndRecoveryStringImpl,
                                this,
                                emailAddress_,
+                               recoveryString_,
                                onGetUserForEmailAddressAndRecoveryStringCallbackFn_));
     }
 
@@ -156,9 +158,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::changeUserEmailAddress(const std::string& cookieString_,
-                                            const std::string& newEmailAddress_,
-                                            const std::string& password_,
-                                            const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
+                                               const std::string& newEmailAddress_,
+                                               const std::string& password_,
+                                               const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::changeUserEmailAddressImpl,
                                this,
@@ -184,10 +186,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         _ioService.post(errorCodeUserInfoCallbackFnImpl);
     }
 
-    void Authenticator::postCallbackFn(
-        const ErrorCodeUserInfoStringPairCallbackFn& errorCodeUserInfoStringPairCallbackFn_,
-        const std::error_code& error_,
-        const boost::optional<std::pair<UserInfo,std::string> >& userInfoStringPair_)
+    void Authenticator::postCallbackFn(const ErrorCodeUserInfoStringPairCallbackFn& errorCodeUserInfoStringPairCallbackFn_,
+                                       const std::error_code& error_,
+                                       const boost::optional<std::pair<UserInfo,std::string> >& userInfoStringPair_)
     {
         std::function<void()> errorCodeUserInfoStringPairCallbackFnImpl = 
             std::bind(errorCodeUserInfoStringPairCallbackFn_, error_, userInfoStringPair_);
@@ -203,10 +204,10 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 
     void Authenticator::postCallbackFn(const ErrorCodeStringCallbackFn& errorCodeStringCallbackFn_,
                                        const std::error_code& error_,
-                                       const std::string& recoveryString_)
+                                       const std::string& string_)
     {
         std::function<void()> errorCodeStringCallbackFnImpl =
-            std::bind(errorCodeStringCallbackFn_,error_,recoveryString_);
+            std::bind(errorCodeStringCallbackFn_,error_,string_);
         _ioService.post(errorCodeStringCallbackFnImpl);
     }
 
@@ -267,9 +268,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::loginUserImpl(const std::string& userNameOrEmailAddress_,
-                                   bool isUserNameNotEmailAddress_,
-                                   const std::string& password_,
-                                   const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
+                                      bool isUserNameNotEmailAddress_,
+                                      const std::string& password_,
+                                      const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
     {
         //verify username-password
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
@@ -494,23 +495,23 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 
      void Authenticator::getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
                                                                      const std::string& recoveryString_,
-                                                                     const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
+                                                                     const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
      {
           boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
           std::error_code error;
           usersRecOpt = _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
           if(error)
           {
-               postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error);
+              postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error,std::string());
                return;
           }
           if(usersRecOpt->_recoveryString != recoveryString_)
           {
-               postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error);
+              postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error,std::string());
                return;
           }
           std::string userName = usersRecOpt->_userName;
-          postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error);
+          postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),userName);
           return;
      }
 

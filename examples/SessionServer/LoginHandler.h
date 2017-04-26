@@ -11,7 +11,7 @@ namespace SessionServer
    {
    public:
 
-       LoginHandler(Santiago::Authentication::ControllerBase& userController_):
+       LoginHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
        {}
 

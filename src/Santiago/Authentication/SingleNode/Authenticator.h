@@ -124,13 +124,23 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                         const std::string& oldPassword_,
                                         const std::string& newPassword_,
                                         const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
+
+         /**
+         * This function creates a recovery string for the user which is send to the given email address.
+         * @param emailAddress_ - EmailAddress from the user.
+         * @param onCreateAndReturnRecoveryStringCallbackFn_ - Call back function for create and return recovery string operations.
+         */
+        virtual void createAndReturnRecoveryString(const std::string& emailAddress_,
+                                                   const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_);
+        
         /**
          * This function is used to get user for the given email adress.
          * @param emailAddress_ - Email address  received from the user.
          * @param onGetUserForEmailAddressAndRecoveryStringCallbackFn_ -Call back function for get user for email address operations.
          */
         virtual void getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
-                                                             const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
+                                                             const std::string& recoverystring_,
+                                                             const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
          /**
          * This function is used to change the user password of the user.
          * @param emailAddress_ - Email address from the user.
@@ -152,13 +162,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                             const std::string& newEmailAddress_,
                                             const std::string& password_,
                                             const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
-        /**
-         * This function creates a recovery string for the user which is send to the given email address.
-         * @param emailAddress_ - EmailAddress from the user.
-         * @param onCreateAndReturnRecoveryStringCallbackFn_ - Call back function for create and return recovery string operations.
-         */
-        virtual void createAndReturnRecoveryString(const std::string& emailAddress_,
-                                                   const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_);
+   
         /**
          * This function deletes the user using the given cookie string.
          * @param cookieString_ - Cookie from the user.
@@ -266,7 +270,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
          */
         virtual void getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
                                                                  const std::string& recoveryString_,
-                                                                 const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
+                                                                 const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
         /**
          * This function is the implementation function for the changeUserPasswordForEmailAddressAndRecoveryString function.
          * @param emailAddress_ - Email address from the user.
