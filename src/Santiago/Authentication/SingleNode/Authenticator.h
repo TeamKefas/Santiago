@@ -24,14 +24,14 @@
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
 
-#include "Santiago/Authentication/ControllerBase.h"
+#include "Santiago/Authentication/AuthenticatorBase.h"
 #include "Santiago/Utils/STLog.h"
 #define MAX_SESSION_DURATION 1
 
 namespace Santiago{ namespace Authentication{ namespace SingleNode
 {
 
-    class Authenticator:public Authentication::ControllerBase
+    class Authenticator:public Authentication::AuthenticatorBase
     {
     public:
 
