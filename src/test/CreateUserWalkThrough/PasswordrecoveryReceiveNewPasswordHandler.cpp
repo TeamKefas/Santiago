@@ -19,12 +19,13 @@ namespace Test{ namespace AppServer
     void PasswordRecoveryInitiateRecoveryHandler::handleNonVerifiedRequest(const RequestPtr& request_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
-
+        std::map<std::string,std::string>::const_iterator emailAddressIter =  request_->getPostData().find("email_address");
+        std::map<std::string,std::string>::const_iterator recoveryStringIter =  request_->getPostData().find("recovery_string");
+         
  
-        if(request_->getPostData().end() == emailAddressIter)
+        if(request_->getPostData().end() == emailAddressIter || request->getPostData().end() == recoveryStringIter)
         {
-            request_->out()<<"email_address not send in the post data. \n";
-            request_->out()<<"in buffer: "<<request_->getStdinBuffer()<<std::endl;
+            request_->out()<<"email_address or recovery_string not send in the post data. \n";
             request_->setAppStatus(0);
             std::error_code error;
             request_->commit(error);        
