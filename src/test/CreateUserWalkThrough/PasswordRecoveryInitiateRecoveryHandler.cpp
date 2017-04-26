@@ -124,7 +124,7 @@ namespace Test{ namespace AppServer
     
     void PasswordRecoveryInitiateRecoveryHandler::handleInitiatePasswordRecovery(const RequestPtr& request_,
                                                                                  const std::string& emailAddress_,
-                                                                                 const std::error_code& error_,
+                                                                                 std::error_code error_,
                                                                                  const std::string& recoveryString_)
     {
         if(error_)

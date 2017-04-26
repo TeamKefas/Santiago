@@ -21,7 +21,7 @@ namespace Test{namespace AppServer{
         
         void handleInitiatePasswordRecovery(const RequestPtr& request_,
                                             const std::string& emailAddress_,
-                                            const std::error_code& error_,
+                                            std::error_code error_,
                                             const std::string& recoveryString_);
         
         virtual void handleVerifiedRequest(const RequestPtr& request_,
