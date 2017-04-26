@@ -493,12 +493,18 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
      void Authenticator::getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
+                                                                     const std::string& recoveryString_,
                                                                      const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
      {
           boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
           std::error_code error;
           usersRecOpt = _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
           if(error)
+          {
+               postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error);
+               return;
+          }
+          if(usersRecOpt->_recoveryString != recoveryString_)
           {
                postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,error);
                return;

@@ -265,6 +265,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
          * @param onGetUserForEmailAddressAndRecoveryStringCallbackFn_ -Call back function for get user for email address operations.
          */
         virtual void getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
+                                                                 const std::string& recoveryString_,
                                                                  const ErrorCodeCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
         /**
          * This function is the implementation function for the changeUserPasswordForEmailAddressAndRecoveryString function.
