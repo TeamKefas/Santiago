@@ -1,12 +1,12 @@
-#ifndef SANTIAGO_AUTHENTICATION_CONTROLLERBASE_H
-#define SANTIAGO_AUTHENTICATION_CONTROLLERBASE_H
+#ifndef SANTIAGO_AUTHENTICATION_AUTHENTICATORBASE_H
+#define SANTIAGO_AUTHENTICATION_AUTHENTICATORBASE_H
 
 /**
- * @file ControllerBase.h
+ * @file AuthenticatorBase.h
  *
  * @section DESCRIPTION
  *
- * Contains the ControllerBase class and UserInfo Structure.
+ * Contains the AuthenticatorBase class and UserInfo Structure.
  */
 
 #include <functional>
@@ -35,7 +35,7 @@ namespace Santiago{ namespace Authentication
         std::string  _emailAddress;
     };
 
-    class ControllerBase
+    class AuthenticatorBase
     {
     public:
 
@@ -51,21 +51,21 @@ namespace Santiago{ namespace Authentication
 
         typedef std::function<void(const std::error_code&)> ErrorCodeCallbackFn;
 
-        ControllerBase(const ControllerBase&) = delete;
-        ControllerBase& operator=(const ControllerBase&) = delete;
+        AuthenticatorBase(const AuthenticatorBase&) = delete;
+        AuthenticatorBase& operator=(const AuthenticatorBase&) = delete;
         
         /**
          * The constructor
          * @param ioService_- the ioservice to use
          * @param config_- Used to hold the json data.   
          */
-        ControllerBase(boost::asio::io_service& ioService_, const boost::property_tree::ptree& config_):
+        AuthenticatorBase(boost::asio::io_service& ioService_, const boost::property_tree::ptree& config_):
             _ioService(ioService_),
             _strand(_ioService),
             _config(config_)
         {}
 
-	virtual ~ControllerBase()
+	virtual ~AuthenticatorBase()
 	{}
 
         /**
