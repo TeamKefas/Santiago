@@ -1,7 +1,5 @@
 #include <iostream>
-
 #include "Server.h"
-
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <csignal>
@@ -14,8 +12,13 @@ void onSigintHandler(int signum_)
 }
 
 
-int main()
+int main(int argc, char *argv[])
 {
+    if(argc != 2)
+    {
+        std::cout << "Format is ./CreateUserWalkthrough <config.json>" << std::endl;
+        return -1;
+    }
 
     try
     {
@@ -26,12 +29,7 @@ int main()
 
         //   SimpleAppServer::Server server(Santiago::LocalEndpoint<boost::asio::ip::tcp> (7000));
         boost::property_tree::ptree config;
-        config.put("Santiago.SantiagoDBTables.host", "localhost");
-        config.put("Santiago.SantiagoDBTables.user", "root");
-        config.put("Santiago.SantiagoDBTables.password", "9995");
-        config.put("Santiago.SantiagoDBTables.db", "testdb");
-        config.put("Santiago.AppServer.port", 7000);
-        config.put("Santiago.SantiagoDBTables.port", 3306);
+        boost::property_tree::read_json(argv[1],config);
         Test::AppServer::Server server(config);
         server.start();
         int i;
