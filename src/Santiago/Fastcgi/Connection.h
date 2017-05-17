@@ -34,7 +34,7 @@ namespace Santiago{ namespace Fastcgi
 
         typedef std::shared_ptr<RequestData> RequestDataPtr;
 
-        typedef std::function<void(uint,RequestDataPtr)> NewRequestCallbackFn;
+        typedef std::function<void(unsigned,RequestDataPtr)> NewRequestCallbackFn;
         typedef std::function<void()> CloseCallbackFn;
 
         enum State
@@ -86,7 +86,7 @@ namespace Santiago{ namespace Fastcgi
          * @param - requestId
          * @param - requestData
          */
-        void commitReply(uint requestId_,RequestDataPtr requestData_)
+        void commitReply(unsigned requestId_,RequestDataPtr requestData_)
         {
             ST_LOG_DEBUG("commitReply called."<<std::endl);
             _strandPtr->post(std::bind(&Connection::commitReplyImpl,this,requestId_,requestData_));
@@ -114,7 +114,7 @@ namespace Santiago{ namespace Fastcgi
          * @param requestId_
          * @param newRequest_
          */
-        void handleRequestReady(uint requestId_,RequestDataPtr newRequest_)
+        void handleRequestReady(unsigned requestId_,RequestDataPtr newRequest_)
         {
 //            BOOST_ASSERT(_state == OPEN);
             ST_LOG_DEBUG("New request ready to be processed. requestId_ ="<<requestId_<<std::endl);
@@ -183,7 +183,7 @@ namespace Santiago{ namespace Fastcgi
          * @param - requestId
          * @param - requestData
          */
-        void commitReplyImpl(uint requestId_,RequestDataPtr requestData_)
+        void commitReplyImpl(unsigned requestId_,RequestDataPtr requestData_)
         {
             ST_LOG_DEBUG("In commitReplyImpl"<<std::endl);
             if(!_data.isValidRequest(requestId_,requestData_))

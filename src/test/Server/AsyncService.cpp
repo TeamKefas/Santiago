@@ -35,7 +35,7 @@ public:
         _ioService(ioService_)
     {}
 
-    void asyncWait(uint seconds_,std::function<void()> callbackFn_)
+    void asyncWait(unsigned seconds_,std::function<void()> callbackFn_)
     {
         TimerPtr timer(new boost::asio::deadline_timer(_ioService,boost::posix_time::seconds(seconds_)));
         timer->async_wait(std::bind(&TimerService::timerCallback,this,timer,callbackFn_));

@@ -36,7 +36,7 @@ namespace Santiago{ namespace Fastcgi
 
         typedef std::shared_ptr<Connection<Protocol> > ConnectionPtr;
         typedef std::weak_ptr<Connection<Protocol> > ConnectionWeakPtr;        
-        typedef std::map<uint,ConnectionPtr > ConnectionMap;
+        typedef std::map<unsigned,ConnectionPtr > ConnectionMap;
 
         typedef std::function<void(std::shared_ptr<Request<Protocol> >)> NewRequestCallbackFn;
 
@@ -105,7 +105,7 @@ namespace Santiago{ namespace Fastcgi
 
             //start new connection
             ST_LOG_DEBUG("Received new connection."<<std::endl);
-            uint newConnectionId = _nextConnectionId++;
+            unsigned newConnectionId = _nextConnectionId++;
             ST_ASSERT(_activeConnections.find(newConnectionId) == _activeConnections.end());
             ConnectionPtr newConnection(new Connection<Protocol>(
                                             _ioService,
@@ -134,7 +134,7 @@ namespace Santiago{ namespace Fastcgi
          * So it should not directly modify the _activeConnections map 
          * @param connectionId-id of connection object in the _activeConnections map
          */
-        void handleConnectionClose(uint connectionId_)
+        void handleConnectionClose(unsigned connectionId_)
         {
             ST_LOG_DEBUG("Connection close callback received."<<std::endl);
             ST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
@@ -148,7 +148,7 @@ namespace Santiago{ namespace Fastcgi
          * in the acceptor's strand.
          * @param connectionId-id of connection object in the _activeConnections map
          */
-        void closeConnection(uint connectionId_)
+        void closeConnection(unsigned connectionId_)
         {
             ST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             _activeConnections.erase(connectionId_);                        
@@ -161,7 +161,7 @@ namespace Santiago{ namespace Fastcgi
          * @param requestid- received from the server
          * @param newRequestData - new filled in request data 
          */
-        void handleNewRequest(uint connectionId_,uint newRequestId_,const std::shared_ptr<RequestData>& newRequestData_)
+        void handleNewRequest(unsigned connectionId_,unsigned newRequestId_,const std::shared_ptr<RequestData>& newRequestData_)
         {
             ST_LOG_DEBUG("New request ready to handle. requestId_ ="<<newRequestId_<<std::endl);
 

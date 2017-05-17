@@ -60,9 +60,9 @@ namespace Santiago{namespace Fastcgi
          * @param connectionWeakPtr - weak ptr to the connection
          */
         Request(boost::asio::io_service& ioService_,
-                uint requestId_,
+                unsigned requestId_,
                 RequestDataPtr dataPtr_,
-                uint connectionId_,
+                unsigned connectionId_,
                 ConnectionWeakPtr connectionWeakPtr_):
             _requestId(requestId_),
             _dataPtr(dataPtr_),
@@ -76,7 +76,7 @@ namespace Santiago{namespace Fastcgi
          */
         RequestId getId() const
         {
-            return std::pair<uint,uint>(_connectionId,_requestId);
+            return std::pair<unsigned,unsigned>(_connectionId,_requestId);
         }
 
         /**
@@ -140,7 +140,7 @@ namespace Santiago{namespace Fastcgi
          * Sets the appstatus to be replied
          * @param status_
          */
-        void setAppStatus(uint status_)
+        void setAppStatus(unsigned status_)
         {
             _dataPtr->_appStatus = status_;
         }
@@ -258,9 +258,9 @@ namespace Santiago{namespace Fastcgi
         }
 
         std::mutex               _commitMutex;
-        uint                     _requestId;
+        unsigned                     _requestId;
         RequestDataPtr           _dataPtr;
-        uint                     _connectionId;
+        unsigned                     _connectionId;
         ConnectionWeakPtr        _connectionWeakPtr;
         bool                     _hasReplied;
 

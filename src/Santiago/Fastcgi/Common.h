@@ -20,9 +20,6 @@
 
 namespace Santiago{ namespace Fastcgi
 {
-    typedef unsigned int        uint;
-    typedef unsigned char       uchar;
-
     enum TransceiverEventInfo
     {
         SOCKET_CLOSED,

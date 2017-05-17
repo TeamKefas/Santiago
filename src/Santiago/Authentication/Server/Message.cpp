@@ -5,7 +5,7 @@ namespace Santiago{ namespace Authentication { namespace Server
     /***********************************************************
      * RequestId
      ***********************************************************/
-    RequestId::RequestId(uchar initiatingConnectionId_,unsigned requestNo_)
+    RequestId::RequestId(unsigned char initiatingConnectionId_,unsigned requestNo_)
         :_initiatingConnectionId(initiatingConnectionId_)
         ,_requestNo(requestNo_)
     {}

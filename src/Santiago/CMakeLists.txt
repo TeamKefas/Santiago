@@ -19,7 +19,16 @@ if(WIN32)
       Utils/PTimeUtils.h
       Utils/STLog.h
       Utils/LogLevel.h
-      Utils/Email.h)
+      Utils/Email.h
+      FastCGI/Acceptor.h
+      FastCGI/Common.h
+      FastCGI/Connection.h
+      FastCGI/ConnectionData.h
+      FastCGI/PacketSocket.h
+      FastCGI/PairParseFunctions.h
+      FastCGI/RecordSocket.h
+      FastCGI/Request.h
+      FastCGI/RequestData.h)
 endif(WIN32)
 
 add_library(Santiago STATIC ${Santiago_SRCS})

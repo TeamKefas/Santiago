@@ -30,7 +30,7 @@ namespace Santiago{ namespace Fastcgi
     {
 
     private:
-        static const uint BUFFER_INCREMENT_SIZE = 4096;
+        static const unsigned BUFFER_INCREMENT_SIZE = 4096;
 
         enum State
         {
@@ -43,7 +43,7 @@ namespace Santiago{ namespace Fastcgi
         typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;
 
-        typedef std::function<void(const std::error_code&,uint,uchar,uint,const char*)> NewPacketCallbackFn;
+        typedef std::function<void(const std::error_code&,unsigned,unsigned char,unsigned,const char*)> NewPacketCallbackFn;
 
         /**
          * Deleting the copy constructor to make the class non copyable
@@ -92,9 +92,9 @@ namespace Santiago{ namespace Fastcgi
          * @param content
          * @param ec- error code to be returned as reference
          */
-        void writePacket(uint requestId_,
-                         uchar headerType_,
-                         unsigned int contentLength_,
+        void writePacket(unsigned requestId_,
+                         unsigned char headerType_,
+                         unsigned contentLength_,
                          const char* content_,
                          std::error_code &error_)
         {
@@ -211,7 +211,7 @@ namespace Santiago{ namespace Fastcgi
                 const char* inputBufferData = boost::asio::buffer_cast<const char*>(_inputBuffer.data());
                 
                 const FCGI_Header& header = *reinterpret_cast<const FCGI_Header*>(inputBufferData);
-                uint requestId = (header.requestIdB1 << 8) + header.requestIdB0;
+                unsigned requestId = (header.requestIdB1 << 8) + header.requestIdB0;
                 unsigned contentLength = (header.contentLengthB1 << 8) + header.contentLengthB0;
 
                 if (header.version != FCGI_VERSION_1)
@@ -269,7 +269,7 @@ namespace Santiago{ namespace Fastcgi
             {
                 //--------Debugging --------------------
                 const char* tempData = boost::asio::buffer_cast<const char*>(_inputBuffer.data());
-                for(uint temp = 0;temp<_inputBuffer.size();temp++)
+                for(unsigned temp = 0;temp<_inputBuffer.size();temp++)
                 {
                     std::cout<<tempData[temp];
                 }
