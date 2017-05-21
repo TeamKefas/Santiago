@@ -45,6 +45,7 @@ namespace Santiago
              {ERR_EMAIL_ADDRESS_ALREADY_EXISTS,            "Email id already exists."},
              {ERR_INVALID_USERNAME_PASSWORD,               "Invalid username password."},
              {ERR_INVALID_EMAIL_ADDRESS_PASSWORD,          "Invalid email-id password."},
+             {ERR_EMAIL_ADDRESS_NOT_REGISTERED,            "Email address not registered."},
              {ERR_INVALID_EMAIL_ADDRESS_RECOVERY_STRING,   "Invalid email-id recovery string."},
              {ERR_INVALID_SESSION_COOKIE,                  "Invalid session cookie."},
              {ERR_INVALID_FASTCGI_REQUEST,                 "Invalid fastcgi request."},

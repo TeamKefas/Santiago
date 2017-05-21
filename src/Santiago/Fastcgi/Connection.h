@@ -172,7 +172,7 @@ namespace Santiago{ namespace Fastcgi
         void closeAndCleanup()
         {
             ST_LOG_DEBUG("In closeAndCleanup()"<<std::endl);
-            _data.clear(); //note: clear() does not callback the emptyHandler.bu cleanupRequest() does.            
+            _data.clear(); //note: clear() does not callback the dataEmptyHandler.but cleanupRequest() does.            
             _recordSocket.close();
             _state = CLOSED;
             _closeCallbackFn();

@@ -4,6 +4,7 @@ CREATE TABLE `ST_users` (
   `email_address` varchar(30) NOT NULL,
   `password` varchar(100) NOT NULL,
   `recovery_string` varchar(100) DEFAULT NULL,
+  `recovery_string_create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name` (`user_name`),
   UNIQUE KEY `email_address` (`email_address`)

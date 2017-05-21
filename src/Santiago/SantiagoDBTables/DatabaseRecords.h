@@ -31,11 +31,12 @@ namespace Santiago{ namespace SantiagoDBTables
         UsersRec():_id(INVALID_DATABASE_ID)
         {}
 
-        int         _id;
-        std::string _userName;
-        std::string _emailAddress;
-        std::string _password;
-        std::string _recoveryString;
+        int                           _id;
+        std::string                   _userName;
+        std::string                   _emailAddress;
+        std::string                   _password;
+        boost::optional<std::string>  _recoveryString;
+        boost::optional<ptime>        _recoveryStringCreateTime;
     };
 
 /**

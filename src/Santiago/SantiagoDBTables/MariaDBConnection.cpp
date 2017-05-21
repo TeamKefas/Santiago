@@ -204,14 +204,28 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         if(!isUserInputClean(usersRec_._userName) ||
            !isUserInputClean(usersRec_._emailAddress) ||
-           !isUserInputClean(usersRec_._password))
+           !isUserInputClean(usersRec_._password) ||
+           (usersRec_._recoveryString && (!isUserInputClean(usersRec_._recoveryString))))
         {
             error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
             return;
         }
 
-        std::string addUsersRecQuery = "INSERT INTO ST_users(user_name, email_address, password) VALUES('" +
-            usersRec_._userName + "', '" + usersRec_._emailAddress + "', '" + usersRec_._password + "')";
+        std::string addUsersRecQuery = "INSERT INTO ST_users(user_name, email_address,"
+            "password, recovery_string, recovery_string_create_time) VALUES('" +
+            usersRec_._userName + "', '" + usersRec_._emailAddress + "', '" + usersRec_._password + "',";
+        
+        if(usersRec_._recoveryString)
+            addUsersRecQuery += "'" + *usersRec_._recoveryString + "', ";
+        else
+            addUsersRecQuery += "NULL, ";
+
+        if(usersRec_._recoveryStringCreateTime)
+            addUsersRecQuery += "'" + Utils::ConvertPtimeToString(*usersRec_._recoveryStringCreateTime) + "'";
+        else
+            addUsersRecQuery += "NULL";
+        
+        addUsersRecQuest += ")";
         usersRec_._id = runInsertQuery(addUsersRecQuery, error_);
     }
 
@@ -228,7 +242,9 @@ namespace Santiago{ namespace SantiagoDBTables
         std::string getUsersRecQuery = "SELECT id, "
             "user_name, "
             "email_address, "
-            "password "
+            "password, "
+            "recovery_string, "
+            "recovery_string_create_time "
             "FROM ST_users WHERE user_name = '" + userName_ + "'";
         return getUsersRecImpl(getUsersRecQuery,error_); 
     }
@@ -246,7 +262,9 @@ namespace Santiago{ namespace SantiagoDBTables
         std::string getUsersRecQuery = "SELECT id, "
             "user_name, "
             "email_address, "
-            "password "
+            "password, "
+            "recovery_string, "
+            "recovery_string_create_time "
             "FROM ST_users WHERE email_address = '" + emailAddress_ + "'";
         return getUsersRecImpl(getUsersRecQuery,error_); 
     }
@@ -268,7 +286,7 @@ namespace Santiago{ namespace SantiagoDBTables
                     return;
                 }
 
-                if(4 != mysql_num_fields(mysqlResult_))
+                if(6 != mysql_num_fields(mysqlResult_))
                 {
                     ST_LOG_DEBUG("Mismatch in number of fields in the ST_users table");
                     error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
@@ -284,6 +302,11 @@ namespace Santiago{ namespace SantiagoDBTables
                 usersRec->_userName = row[1];
                 usersRec->_emailAddress = row[2];
                 usersRec->_password = row[3];
+                if(NULL != row[4])
+                    usersRec->_recoveryString = row[4];
+                if(NULL != row[5])
+                    usersRec->_recoveryStringCreateTime = Utils::ConvertStringToPtime(row[5]);
+                    
                 error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
             },
             error_);
@@ -295,32 +318,27 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         if(!isUserInputClean(newUsersRec_._userName) ||
            !isUserInputClean(newUsersRec_._emailAddress) ||
-           !isUserInputClean(newUsersRec_._password))
+           !isUserInputClean(newUsersRec_._password) ||
+           (newUsersRec_._recoveryString && !isUserInputClean(newUsersRec_._recoveryString)))
         {
             error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
             return;
         }
 
-        std::string updateUsersRecQuery = "UPDATE ST_users SET password ='" +
-            newUsersRec_._password + "', email_address = '" + newUsersRec_._emailAddress +
-            "' WHERE user_name = '" + newUsersRec_._userName +"'";
-        runUpdateQuery(updateUsersRecQuery,error_);
-    }
-
-    void MariaDBConnection::updateRecoveryStringInUsersRec(UsersRec& newUsersRec_, std::error_code& error_)
-    {
-        if(!isUserInputClean(newUsersRec_._userName) ||
-           !isUserInputClean(newUsersRec_._recoveryString))
-        {
-            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
-            return;
-        }
-
-        std::string updateUsersRecQuery = "UPDATE ST_users SET recovery_string = ";
-        if(newUsersRec_._recoveryString == "")
-            updateUsersRecQuery += "NULL";
+        std::string updateUsersRecQuery = "UPDATE ST_users SET password ='" + newUsersRec_._password +
+            "', email_address = '" + newUsersRec_._emailAddress
+            "', recovery_string = ";
+        if(newUsersRec_._recoveryString)
+            updateUsersRecQuery += "'" + *newUsersRec_._recoveryString + "'";
         else
-            updateUsersRecQuery += "'" + newUsersRec_._recoveryString + "'";
+            updateUsersRecQuery += "NULL";
+
+        updateUsersRecQuery += ", recovery_string_create_time = ";
+        if(newUsersRec_._recoveryStringCreateTime)
+            updateUsersRecQuery += "'" + Utils::ConvertPtimeToString(*newUsersRec_._recoveryStringCreateTime) + "'";
+        else
+            updateUsersRecQuery += "NULL";
+        
         updateUsersRecQuery += " WHERE user_name = '" + newUsersRec_._userName +"'";
         runUpdateQuery(updateUsersRecQuery,error_);
     }
@@ -405,11 +423,8 @@ namespace Santiago{ namespace SantiagoDBTables
                 sessionsRec->_userName = row[1];
                 sessionsRec->_cookieString = row[2];
                 sessionsRec->_loginTime = Utils::ConvertStringToPtime(row[3]);
-
                 if(NULL != row[4])
-                {
                     sessionsRec->_logoutTime = Utils::ConvertStringToPtime(row[4]);
-                }
 
                 sessionsRec->_lastActiveTime = Utils::ConvertStringToPtime(row[5]);
 

@@ -42,7 +42,7 @@ namespace Santiago{ namespace Authentication
         typedef std::function<void(const std::error_code&,const boost::optional<UserInfo>&)>
         ErrorCodeUserInfoCallbackFn;
 	
-	typedef std::function<void(const std::error_code&,const std::string&)>
+	typedef std::function<void(const std::error_code&,const boost::optional<std::string>&)>
         ErrorCodeStringCallbackFn;
 
         typedef std::function<void(const std::error_code&,const boost::optional<std::pair<UserInfo,std::string> >&)>
