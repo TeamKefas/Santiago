@@ -601,20 +601,18 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         SantiagoDBTables::UsersRec newUsersRec = *usersRecOpt;
 
         //verify no other existing user with same email address
-        std::tie(error,usersRecOpt) =
-            verifyEmailAddressPasswordAndGetUsersRec(newEmailAddress_,"");
-        if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
-           (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
+        usersRecOpt = _databaseConnection.get().getUsersRecForEmailAddress(newEmailAddress_,error);
+        if(error)
         {
             postCallbackFn(onChangeEmailAddressCallbackFn_,error);
             return;
-        }
-        else if(usersRecOpt)
+        }        
+        if(usersRecOpt)
         {
             postCallbackFn(onChangeEmailAddressCallbackFn_,std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
                                                                            ErrorCategory::GetInstance()));
             return;
-        }
+        }   
 
         //change and update the password
         newUsersRec._emailAddress = newEmailAddress_;
