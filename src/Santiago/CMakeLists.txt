@@ -3,6 +3,7 @@ set(Santiago_SRCS
   HTTPDefinitions.cpp
   SantiagoDBTables/Definitions.cpp
   SantiagoDBTables/MariaDBConnection.cpp
+  Authentication/AuthenticatorBase.cpp
   Authentication/SingleNode/Authenticator.cpp
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp

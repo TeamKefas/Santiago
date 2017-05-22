@@ -13,6 +13,7 @@
 #include <system_error>
 
 #include <boost/asio.hpp>
+#include <boost/asio/spawn.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include <boost/optional.hpp>
@@ -91,6 +92,13 @@ namespace Santiago{ namespace Authentication
                                bool isUserNameNotEmailAddress_,
                                const std::string& password_,
                                const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_) = 0;
+
+        boost::optional<std::pair<UserInfo,std::string> > asyncLoginUser(const std::string& userNameOrEmailAddress_,
+                                                             bool isUserNameNotEmailAddress_,
+                                                             const std::string& password_,
+                                                             boost::asio::yield_context&& yield_);
+
+                
         /**
          * This function is used for the getting user info details for the given cookie string.
          * @param cookieString_ - Cookie string received from the user.

@@ -91,7 +91,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         virtual void loginUser(const std::string& userNameOrEmailAddress_,
                                bool isUserNameNotEmailAddress_,
                                const std::string& password_,
-                               const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);
+                               const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);        
+        
         /**
          * This function is used to verify cookie from the user and gets the UserInfo
          * @param cookieString_ - cookieString of the user that is used to get user information.
