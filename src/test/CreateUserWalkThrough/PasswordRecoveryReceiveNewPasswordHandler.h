@@ -22,7 +22,7 @@ namespace Test{namespace AppServer{
                                       const std::string& emailAddress_,
                                       const std::string& recoveryString_,
                                       std::error_code error_,
-                                      const std::string& userName_);
+                                      const boost::optional<std::string>& userNameOpt_);
         
         virtual void handleVerifiedRequest(const RequestPtr& request_,
                                            const std::string& userName_,

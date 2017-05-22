@@ -22,7 +22,7 @@ namespace SimpleAppServer{
         void handleInitiatePasswordRecovery(const RequestPtr& request_,
                                             const std::string& emailAddress_,
                                             std::error_code error_,
-                                            const std::string& recoveryString_);
+                                            const boost::optional<std::string>& recoveryStringOpt_);
         
         virtual void handleVerifiedRequest(const RequestPtr& request_,
                                            const std::string& userName_,

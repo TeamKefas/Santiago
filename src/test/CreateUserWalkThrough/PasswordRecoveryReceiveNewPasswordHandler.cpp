@@ -48,10 +48,10 @@ namespace Test{ namespace AppServer
     }
     
     void PasswordRecoveryReceiveNewPasswordHandler::handleReceiveNewPassword(const RequestPtr& request_,
-                                                                                    const std::string& emailAddress_,
-                                                                                    const std::string& recoveryString_,
-                                                                                    std::error_code error_,
-                                                                                    const std::string& userName_)
+                                                                             const std::string& emailAddress_,
+                                                                             const std::string& recoveryString_,
+                                                                             std::error_code error_,
+                                                                             const boost::optional<std::string>& userNameOpt_)
     {
         if(error_)
         {
@@ -62,11 +62,12 @@ namespace Test{ namespace AppServer
             request_->commit(error);
         }
         else
-        { 
+        {
+            ST_ASSERT(userNameOpt_);
             request_->out()<<"<html> \n"
                            <<"<body> \n"
                            << "<form action='http://localhost:8080/password-recovey-set-new-password.fcgi' method='post'>\n"
-                           << "hai"<<userName_<<"\n"
+                           << "hai"<<userNameOpt_<<"\n"
                            << "New Password: <input type='password' name='password'><br />\n"
                            <<"Repeat Password: <input type='password' name='repeat_password' />\n"
                            <<"<input type = 'hidden' name = 'email_address' value ="<<emailAddress_<<"\n"

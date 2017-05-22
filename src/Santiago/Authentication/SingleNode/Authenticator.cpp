@@ -492,7 +492,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         SantiagoDBTables::UsersRec newUsersRec = *usersRecOpt;
         newUsersRec._recoveryString = generateRecoveryString();
         newUsersRec._recoveryStringCreateTime = boost::posix_time::second_clock::universal_time();
-        _databaseConnection.get().updateRecoveryStringInUsersRec(newUsersRec,error);
+        _databaseConnection.get().updateUsersRec(newUsersRec,error);
         if(error)
         {     
             postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error,boost::none);

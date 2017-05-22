@@ -3,6 +3,8 @@
 
 #include "MariaDBConnection.h"
 
+#include <mysql.h>
+
 namespace Santiago{ namespace SantiagoDBTables
 {
         //take db ip, port, username, password from config
@@ -205,7 +207,7 @@ namespace Santiago{ namespace SantiagoDBTables
         if(!isUserInputClean(usersRec_._userName) ||
            !isUserInputClean(usersRec_._emailAddress) ||
            !isUserInputClean(usersRec_._password) ||
-           (usersRec_._recoveryString && (!isUserInputClean(usersRec_._recoveryString))))
+           (usersRec_._recoveryString && (!isUserInputClean(*usersRec_._recoveryString))))
         {
             error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
             return;
@@ -225,7 +227,7 @@ namespace Santiago{ namespace SantiagoDBTables
         else
             addUsersRecQuery += "NULL";
         
-        addUsersRecQuest += ")";
+        addUsersRecQuery += ")";
         usersRec_._id = runInsertQuery(addUsersRecQuery, error_);
     }
 
@@ -319,14 +321,14 @@ namespace Santiago{ namespace SantiagoDBTables
         if(!isUserInputClean(newUsersRec_._userName) ||
            !isUserInputClean(newUsersRec_._emailAddress) ||
            !isUserInputClean(newUsersRec_._password) ||
-           (newUsersRec_._recoveryString && !isUserInputClean(newUsersRec_._recoveryString)))
+           (newUsersRec_._recoveryString && !isUserInputClean(*newUsersRec_._recoveryString)))
         {
             error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
             return;
         }
 
         std::string updateUsersRecQuery = "UPDATE ST_users SET password ='" + newUsersRec_._password +
-            "', email_address = '" + newUsersRec_._emailAddress
+            "', email_address = '" + newUsersRec_._emailAddress +
             "', recovery_string = ";
         if(newUsersRec_._recoveryString)
             updateUsersRecQuery += "'" + *newUsersRec_._recoveryString + "'";

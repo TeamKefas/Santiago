@@ -125,7 +125,7 @@ namespace SimpleAppServer
     void PasswordRecoveryInitiateRecoveryHandler::handleInitiatePasswordRecovery(const RequestPtr& request_,
                                                                                  const std::string& emailAddress_,
                                                                                  std::error_code error_,
-                                                                                 const std::string& recoveryString_)
+                                                                                 const boost::optional<std::string>& recoveryStringOpt_)
     {
         if(error_)
         {
@@ -137,9 +137,10 @@ namespace SimpleAppServer
         }
         else
         {
+            ST_ASSERT(recoveryStringOpt_);
             std::stringstream passwordRecoverylink;
             passwordRecoverylink<<"localhost:8080/password-recovery-receive-new-password.fcgi?recovery-string=";
-            passwordRecoverylink<<recoveryString_;
+            passwordRecoverylink<<*recoveryStringOpt_;
             passwordRecoverylink<<"&email-address=";
             passwordRecoverylink<<emailAddress_;
             std::string subject = "Password recovery";

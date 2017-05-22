@@ -206,7 +206,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
          */
         void postCallbackFn(const ErrorCodeStringCallbackFn& errorCodeStringCallbackFn_,
                             const std::error_code& error_,
-                            const std::string& recoveryString_);
+                            const boost::optional<std::string>& recoveryString_);
 
         //implementation functions to implement in strand
         /**

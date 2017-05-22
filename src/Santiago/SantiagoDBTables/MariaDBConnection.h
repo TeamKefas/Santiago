@@ -17,17 +17,21 @@
 #include <boost/optional.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include <mysql.h>
-
 #include "../ErrorCategory.h"
 
 #include "DatabaseRecords.h"
 #include "Definitions.h"
 
+struct st_mysql;
+struct st_mysql_res;
+
 namespace Santiago{ namespace SantiagoDBTables
 {
     class MariaDBConnection
     {
+        typedef st_mysql MYSQL;
+        typedef st_mysql_res MYSQL_RES;
+
     public:
 /**
  * The constructor

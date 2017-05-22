@@ -48,7 +48,7 @@ namespace Test{ namespace AppServer
     void PasswordRecoveryInitiateRecoveryHandler::handleInitiatePasswordRecovery(const RequestPtr& request_,
                                                                                  const std::string& emailAddress_,
                                                                                  std::error_code error_,
-                                                                                 const std::string& recoveryString_)
+                                                                                 const boost::optional<std::string>& recoveryStringOpt_)
     {
         if(error_)
         {
@@ -60,9 +60,10 @@ namespace Test{ namespace AppServer
         }
         else
         {
+            ST_ASSERT(recoveryStringOpt_);
             std::stringstream passwordRecoverylink;
             passwordRecoverylink<<"localhost:8080/password-recovery-receive-new-password.fcgi?recovery_string=";
-            passwordRecoverylink<<recoveryString_;
+            passwordRecoverylink<<*recoveryStringOpt_;
             passwordRecoverylink<<"&email_address=";
             passwordRecoverylink<<emailAddress_;
             std::string subject = "Password recovery";
