@@ -48,9 +48,9 @@ namespace Santiago{ namespace Fastcgi
             IsRequestAlivePtr _isRequestAlivePtr;
         };
 
-        typedef std::map<uint,std::pair<RequestStateInfo,RequestDataPtr> > RequestMap;
+        typedef std::map<unsigned,std::pair<RequestStateInfo,RequestDataPtr> > RequestMap;
 
-        typedef std::function<void(uint,RequestDataPtr)> RequestReadyCallbackFn;
+        typedef std::function<void(unsigned,RequestDataPtr)> RequestReadyCallbackFn;
         typedef std::function<void()> EmptyCallbackFn;
 
         /**
@@ -75,7 +75,7 @@ namespace Santiago{ namespace Fastcgi
          * Called when a new request is received
          * @param requestId
          */
-        void handleBeginRequest(uint requestId_)
+        void handleBeginRequest(unsigned requestId_)
         {
             ST_LOG_DEBUG("Beginning request. requestId_ ="<<requestId_<<std::endl);
             if(_requestMap.find(requestId_) != _requestMap.end())
@@ -97,7 +97,7 @@ namespace Santiago{ namespace Fastcgi
          * Called when a request is aborted
          * @param requestId
          */
-        void handleAbortRequest(uint requestId_)
+        void handleAbortRequest(unsigned requestId_)
         {
             ST_LOG_DEBUG("Aborting request. requestId_ ="<<requestId_<<std::endl);
             RequestMap::iterator iter = _requestMap.find(requestId_); 
@@ -115,7 +115,7 @@ namespace Santiago{ namespace Fastcgi
          * Called when stdin data of a request received at the socket.
          * @param requestId
          */
-        void handleStdin(uint requestId_,const char* inBuffer_,uint size_)
+        void handleStdin(unsigned requestId_,const char* inBuffer_,unsigned size_)
         {
             ST_LOG_DEBUG("Handling stdin request. requestId_ ="<<requestId_<<std::endl);
 
@@ -150,7 +150,7 @@ namespace Santiago{ namespace Fastcgi
          * @param inBuffer
          * @param size
          */
-        void handleParams(uint requestId_,const char* inBuffer_,uint size_)
+        void handleParams(unsigned requestId_,const char* inBuffer_,unsigned size_)
         {
             ST_LOG_DEBUG("Handling params request. requestId_ ="<<requestId_<<std::endl);
 
@@ -183,7 +183,7 @@ namespace Santiago{ namespace Fastcgi
          * Cleans up a request
          * @param requestId
          */
-        void cleanupRequest(uint requestId_)
+        void cleanupRequest(unsigned requestId_)
         {
             ST_LOG_DEBUG("Cleaning up request. requestId_="<<requestId_<<std::endl);
             RequestMap::iterator iter = _requestMap.find(requestId_);
@@ -212,7 +212,7 @@ namespace Santiago{ namespace Fastcgi
         /**
          * Size of connection data.
          */
-        uint size()
+        unsigned size()
         {
             return _requestMap.size();
         }
@@ -222,7 +222,7 @@ namespace Santiago{ namespace Fastcgi
          * @param requestId_
          * @param requestDataPtr_
          */
-        bool isValidRequest(uint requestId_,RequestDataPtr requestDataPtr_)
+        bool isValidRequest(unsigned requestId_,RequestDataPtr requestDataPtr_)
         {
             RequestMap::iterator iter = _requestMap.find(requestId_);
             if(iter != _requestMap.end())

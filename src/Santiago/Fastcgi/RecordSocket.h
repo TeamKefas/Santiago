@@ -34,10 +34,10 @@ namespace Santiago{ namespace Fastcgi
         typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;      
         typedef std::shared_ptr<PacketSocket<Protocol> > PacketSocketPtr; 
 
-        typedef std::function<void(uint,const char*,uint)> StdinCallbackFn;
-        typedef std::function<void(uint,const char*,uint)> ParamsCallbackFn;
-        typedef std::function<void(uint)> BeginRequestCallbackFn;
-        typedef std::function<void(uint)> AbortRequestCallbackFn;
+        typedef std::function<void(unsigned,const char*,unsigned)> StdinCallbackFn;
+        typedef std::function<void(unsigned,const char*,unsigned)> ParamsCallbackFn;
+        typedef std::function<void(unsigned)> BeginRequestCallbackFn;
+        typedef std::function<void(unsigned)> AbortRequestCallbackFn;
         typedef std::function<void(TransceiverEventInfo)> TransceiverEventCallbackFn;
 
         /**
@@ -84,7 +84,7 @@ namespace Santiago{ namespace Fastcgi
          * @param appStatus - set by the user
          * @param error code
          */
-        void sendReply(uint requestId_,
+        void sendReply(unsigned requestId_,
                        boost::asio::streambuf &httpHeaderOutBuffer_,
                        boost::asio::streambuf &outBuffer_,
                        boost::asio::streambuf& errBuffer_,
@@ -186,9 +186,9 @@ namespace Santiago{ namespace Fastcgi
          * @param content
          */
         void handleNewPacket(const std::error_code& ec_,
-                             uint requestId_,
+                             unsigned requestId_,
                              unsigned char headerType_,
-                             uint contentLength_,
+                             unsigned contentLength_,
                              const char* content_)
         {
             if(ec_)
