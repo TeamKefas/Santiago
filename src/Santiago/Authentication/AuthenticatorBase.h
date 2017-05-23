@@ -94,9 +94,10 @@ namespace Santiago{ namespace Authentication
                                const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_) = 0;
 
         boost::optional<std::pair<UserInfo,std::string> > asyncLoginUser(const std::string& userNameOrEmailAddress_,
-                                                             bool isUserNameNotEmailAddress_,
-                                                             const std::string& password_,
-                                                             boost::asio::yield_context&& yield_);
+                                                                         bool isUserNameNotEmailAddress_,
+                                                                         const std::string& password_,
+                                                                         boost::asio::yield_context&& yield_,
+                                                                         std::error_code& error_);
 
                 
         /**
@@ -107,7 +108,13 @@ namespace Santiago{ namespace Authentication
         virtual void verifyCookieAndGetUserInfo(
             const std::string& cookieString_,
             const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_) = 0;
-         /**
+
+        boost::optional<UserInfo> verifyCookieAndGetUserInfo(
+            const std::string& cookieString_,
+            boost::asio::yield_context&& yield_,
+            std::error_code& error_);
+
+        /**
          * This function is used for logging out user account for the  given cookie string.
          * @param cookieString_ - Cookie string received from the user.
          * @param onLogoutCookieCallbackFn_ - Handler function for logout operations.
