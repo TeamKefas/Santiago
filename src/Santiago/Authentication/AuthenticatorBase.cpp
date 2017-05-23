@@ -5,10 +5,10 @@
 namespace Santiago{ namespace Authentication
 {
     boost::optional<std::pair<UserInfo,std::string> >
-    AuthenticatorBase::asyncLoginUser(const std::string& userNameOrEmailAddress_,
-                                      bool isUserNameNotEmailAddress_,
-                                      const std::string& password_,
-                                      boost::asio::yield_context&& yield_)
+    AuthenticatorBase::loginUser(const std::string& userNameOrEmailAddress_,
+                                 bool isUserNameNotEmailAddress_,
+                                 const std::string& password_,
+                                 boost::asio::yield_context&& yield_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));

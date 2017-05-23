@@ -102,12 +102,12 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         _strand.post(std::bind(&Authenticator::logoutUserForCookieImpl,this,cookieString_,onLogoutCookieCallbackFn_));
     }
 
-    void Authenticator::logoutUserForAllCookies(const std::string& currentCookieString_,
-                                             const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
+    void Authenticator::logoutUserForAllCookies(const std::string& userName_,
+                                                const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
     {
         _strand.post(std::bind(&Authenticator::logoutUserForAllCookiesImpl,
                                this,
-                               currentCookieString_,
+                               userName_,
                                onLogoutAllCookiesCallbackFn_));
     }
 
@@ -413,20 +413,20 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         return;        
     }
 
-    void Authenticator::logoutUserForAllCookiesImpl(const std::string& cookieString_,
-                                                 const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
+    void Authenticator::logoutUserForAllCookiesImpl(const std::string& userName_,
+                                                    const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
     {
-        //verify if the cookie is in the cookieStringSessionsRecMap.
-        std::map<std::string,SantiagoDBTables::SessionsRec>::iterator cookieStringSessionsRecMapIter;
-        std::error_code error;
-        std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
-        if(error)
+        //verify if such a user is already logged in
+        std::map<std::string,UserData >::iterator userNameUserDataMapIter = _userNameUserDataMap.find(userName_);
+        if(userNameUserDataMapIter == _userNameUserDataMap.end())
         {
-            postCallbackFn(onLogoutAllCookiesCallbackFn_,error);
+            postCallbackFn(onLogoutAllCookiesCallbackFn_,
+                           std::error_code(ErrorCode::ERR_NO_ACTIVE_SESSION_FOR_USERNAME,
+                                           ErrorCategory::GetInstance()));
             return;
         }
-
-        cleanupCookieDataAndUpdateSessionRecordsForAllCookies(cookieStringSessionsRecMapIter->second._userName);
+        
+        cleanupCookieDataAndUpdateSessionRecordsForAllCookies(userName_);
         postCallbackFn(onLogoutAllCookiesCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
         return;
     }
