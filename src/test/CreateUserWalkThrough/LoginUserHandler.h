@@ -23,11 +23,13 @@ namespace Test{ namespace AppServer
                             const boost::optional<std::pair<Santiago::Authentication::UserInfo,std::string> >& userInfoCookieStringPair_);
 
        virtual void handleVerifiedRequest(const RequestPtr& request_,
+                                          boost::asio::yield_context yield_,
                                           const std::string& userName_,
                                           const std::string& emailAddress_,
                                           const std::string& cookieString_);
 
-       virtual void handleNonVerifiedRequest(const RequestPtr& request_);
+       virtual void handleNonVerifiedRequest(const RequestPtr& request_,
+                                             boost::asio::yield_context yield_);
 
    };
     }}

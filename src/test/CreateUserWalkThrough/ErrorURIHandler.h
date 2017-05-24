@@ -16,17 +16,20 @@ namespace Test{ namespace AppServer
    protected:
 
        virtual void handleVerifiedRequest(const RequestPtr& request_,
+                                          boost::asio::yield_context yield_,
                                           const std::string& userName_,
                                           const std::string& emailAddress_,
                                           const std::string& cookieString_);
 
-       virtual void handleNonVerifiedRequest(const RequestPtr& request_);
+       virtual void handleNonVerifiedRequest(const RequestPtr& request_,
+                                             boost::asio::yield_context yield_);
    };
 
     void ErrorURIHandler::handleVerifiedRequest(const RequestPtr& request_,
-                                                 const std::string& userName_,
-                                                 const std::string& emailAddress_,
-                                                 const std::string& cookieString_)
+                                                boost::asio::yield_context yield_,
+                                                const std::string& userName_,
+                                                const std::string& emailAddress_,
+                                                const std::string& cookieString_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out() << "Page not found... " << std::endl;
@@ -37,7 +40,8 @@ namespace Test{ namespace AppServer
         request_->commit(error);
     }
 
-    void ErrorURIHandler::handleNonVerifiedRequest(const RequestPtr& request_)
+    void ErrorURIHandler::handleNonVerifiedRequest(const RequestPtr& request_,
+                                                   boost::asio::yield_context yield_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out() << "Page not found... " << std::endl;

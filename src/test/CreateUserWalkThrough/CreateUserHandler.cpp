@@ -3,9 +3,10 @@
 namespace Test { namespace AppServer
 {
     void CreateUserHandler::handleVerifiedRequest(const RequestPtr& request_,
-                                              const std::string& userName_,
-                                              const std::string& emailAddress_,
-                                              const std::string& cookieString_)
+                                                  boost::asio::yield_context yield_,
+                                                  const std::string& userName_,
+                                                  const std::string& emailAddress_,
+                                                  const std::string& cookieString_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out()<<"User already logged in. Please logout(logout.fcgi) before trying again."<<std::endl;
@@ -17,7 +18,8 @@ namespace Test { namespace AppServer
         request_->commit(error);
     }
 
-    void CreateUserHandler::handleNonVerifiedRequest(const RequestPtr& request_)
+    void CreateUserHandler::handleNonVerifiedRequest(const RequestPtr& request_,
+                                                     boost::asio::yield_context yield_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         
@@ -57,9 +59,9 @@ namespace Test { namespace AppServer
 
 
     void CreateUserHandler::handleSignupUser(const RequestPtr& request_,
-                                         const std::string& userName_,
-                                         const std::string& emailAddress_,
-                                         std::error_code error_)                                             
+                                             const std::string& userName_,
+                                             const std::string& emailAddress_,
+                                             std::error_code error_)                                             
     {
         if(error_)
         {

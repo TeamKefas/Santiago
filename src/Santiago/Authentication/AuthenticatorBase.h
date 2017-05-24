@@ -96,7 +96,7 @@ namespace Santiago{ namespace Authentication
         boost::optional<std::pair<UserInfo,std::string> > asyncLoginUser(const std::string& userNameOrEmailAddress_,
                                                                          bool isUserNameNotEmailAddress_,
                                                                          const std::string& password_,
-                                                                         boost::asio::yield_context&& yield_,
+                                                                         boost::asio::yield_context yield_,
                                                                          std::error_code& error_);
 
                 
@@ -111,7 +111,7 @@ namespace Santiago{ namespace Authentication
 
         boost::optional<UserInfo> verifyCookieAndGetUserInfo(
             const std::string& cookieString_,
-            boost::asio::yield_context&& yield_,
+            boost::asio::yield_context yield_,
             std::error_code& error_);
 
         /**

@@ -20,22 +20,24 @@ namespace Test { namespace AppServer
                 _userController(userController_)
         {}
             
-            virtual void handleRequest(const RequestPtr& request_);
+            virtual void handleRequest(const RequestPtr& request_, boost::asio::yield_context yield_);
             
         protected:
             
             virtual void handleVerifyCookieAndGetUserInfo(const RequestPtr& request_,
                                                           const std::string& cookieString_,
                                                           std::error_code error_,
-                                                      const boost::optional<Santiago::Authentication::UserInfo>& userInfo_);
+                                                     	  const boost::optional<Santiago::Authentication::UserInfo>& userInfo_);
             
             virtual void handleVerifiedRequest(const RequestPtr& request_,
+                                               boost::asio::yield_context yield_,
                                                const std::string& userName_,
                                                const std::string& emailAddress_,
                                                const std::string& cookieString_) = 0;
-            virtual void handleNonVerifiedRequest(const RequestPtr& request_) = 0;
+            virtual void handleNonVerifiedRequest(const RequestPtr& request_,
+                                                  boost::asio::yield_context yield_) = 0;
             
-        virtual void printEcho(const RequestPtr& request_);
+            virtual void printEcho(const RequestPtr& request_);
             
             Santiago::Authentication::AuthenticatorBase                  &_userController;
         };

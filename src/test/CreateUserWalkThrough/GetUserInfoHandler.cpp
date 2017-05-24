@@ -3,9 +3,10 @@
 namespace Test{ namespace AppServer
 {
     void GetUserInfoHandler::handleVerifiedRequest(const RequestPtr& request_,
-                                             const std::string& userName_,
-                                             const std::string& emailAddress_,
-                                             const std::string& cookieString_)
+                                                   boost::asio::yield_context yield_,
+                                                   const std::string& userName_,
+                                                   const std::string& emailAddress_,
+                                                   const std::string& cookieString_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         _userController.verifyCookieAndGetUserInfo(
@@ -17,7 +18,8 @@ namespace Test{ namespace AppServer
                       std::placeholders::_2));
     }
 
-    void GetUserInfoHandler::handleNonVerifiedRequest(const RequestPtr& request_)
+    void GetUserInfoHandler::handleNonVerifiedRequest(const RequestPtr& request_,
+                                                      boost::asio::yield_context yield_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out()<<"User not logged in. Please login(login.fcgi) before trying again."<<std::endl;

@@ -4,9 +4,10 @@ namespace Test{ namespace AppServer
 {
 
     void PasswordRecoverySetNewPasswordHandler::handleVerifiedRequest(const RequestPtr& request_,
-                                                                          const std::string& userName_,
-                                                                          const std::string& emailAddress_,
-                                                                          const std::string& cookieString_)
+                                                                      boost::asio::yield_context yield_,
+                                                                      const std::string& userName_,
+                                                                      const std::string& emailAddress_,
+                                                                      const std::string& cookieString_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out()<<"User already logged in."<<std::endl;
@@ -16,7 +17,8 @@ namespace Test{ namespace AppServer
         request_->commit(error);
     }
 
-    void PasswordRecoverySetNewPasswordHandler::handleNonVerifiedRequest(const RequestPtr& request_)
+    void PasswordRecoverySetNewPasswordHandler::handleNonVerifiedRequest(const RequestPtr& request_,
+                                                                         boost::asio::yield_context yield_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         std::map<std::string,std::string>::const_iterator emailAddressIter =  request_->getPostData().find("email_address");

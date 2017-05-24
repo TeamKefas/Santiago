@@ -167,8 +167,11 @@ namespace Santiago{ namespace AppServer
             BOOST_ASSERT(iter1 == _activeRequestHandlers.end());
             _activeRequestHandlers[fastcgiRequest_->getId()] =  requestHandler;
             
-            requestHandler->getStrand().post(std::bind(&RequestHandlerBase<Protocol>::handleRequest,
-                                                       requestHandler,request));
+            /*  requestHandler->getStrand().post(std::bind(&RequestHandlerBase<Protocol>::handleRequest,
+                requestHandler,request));*/
+            boost::asio::spawn(requestHandler->getStrand(), std::bind(&RequestHandlerBase<Protocol>::handleRequest,
+                                                                      requestHandler,request,std::placeholders::_1));
+            
         }
 
         /**

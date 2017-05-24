@@ -3,9 +3,10 @@
 namespace Test{ namespace AppServer
 {
     void DeleteUserHandler::handleVerifiedRequest(const RequestPtr& request_,
-                                             const std::string& userName_,
-                                             const std::string& emailAddress_,
-                                             const std::string& cookieString_)
+                                                  boost::asio::yield_context yield_,
+                                                  const std::string& userName_,
+                                                  const std::string& emailAddress_,
+                                                  const std::string& cookieString_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out()<<"Deleting "<<userName_<<"..."<<std::endl;
@@ -18,7 +19,8 @@ namespace Test{ namespace AppServer
                       std::placeholders::_1));
     }
 
-    void DeleteUserHandler::handleNonVerifiedRequest(const RequestPtr& request_)
+    void DeleteUserHandler::handleNonVerifiedRequest(const RequestPtr& request_,
+                                                     boost::asio::yield_context yield_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out()<<"User not logged in. Please login(login.fcgi) before trying again."<<std::endl;

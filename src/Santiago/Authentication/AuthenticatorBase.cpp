@@ -8,7 +8,7 @@ namespace Santiago{ namespace Authentication
     AuthenticatorBase::asyncLoginUser(const std::string& userNameOrEmailAddress_,
                                       bool isUserNameNotEmailAddress_,
                                       const std::string& password_,
-                                      boost::asio::yield_context&& yield_,
+                                      boost::asio::yield_context yield_,
                                       std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
@@ -34,7 +34,7 @@ namespace Santiago{ namespace Authentication
 
     boost::optional<UserInfo> AuthenticatorBase::
     verifyCookieAndGetUserInfo(const std::string& cookieString_,
-                               boost::asio::yield_context&& yield_,
+                               boost::asio::yield_context yield_,
                                std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
@@ -55,6 +55,7 @@ namespace Santiago{ namespace Authentication
         
         result.get();
         return ret;
+        
         
         
     }

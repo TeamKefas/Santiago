@@ -1,1 +1,1 @@
-add_subdirectory (SessionServer)
+#add_subdirectory (SessionServer)
