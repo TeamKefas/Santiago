@@ -40,6 +40,7 @@ namespace Santiago
              {ERR_SUCCESS,                                 "Success."},
              {ERR_DATABASE_EXCEPTION,                      "Database exception."},
              {ERR_DATABASE_INVALID_USER_INPUT,             "Invalid input."},
+             {ERR_DATABASE_GET_RETURNED_ZERO_RESULTS,      "Database get returned zero results."},
 //             {ERR_DATABASE_QUERY_FAILED,                   "Database query failed."},
              {ERR_USERNAME_ALREADY_EXISTS,                 "Username already exists."},
              {ERR_EMAIL_ADDRESS_ALREADY_EXISTS,            "Email id already exists."},
