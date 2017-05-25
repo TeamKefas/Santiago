@@ -8,7 +8,8 @@ set(CreateUserWalkThrough_SRCS  main.cpp
                                 DeleteUserHandler.cpp
 				PasswordRecoveryInitiateRecoveryHandler.cpp
 				PasswordRecoveryReceiveNewPasswordHandler.cpp
-				PasswordRecoverySetNewPasswordHandler.cpp)
+				PasswordRecoverySetNewPasswordHandler.cpp
+	  			AsyncLoginUserHandler.cpp)
 
 if(WIN32)
   set(CreateUserWalkThrough_SRCS 
@@ -24,7 +25,8 @@ if(WIN32)
     DeleteUserHandler.h
     PasswordRecoveryInitiateRecoveryHandler.h
     PasswordRecoveryReceiveNewPasswordHandler.h
-    PasswordRecoverySetNewPasswordHandler.h)
+    PasswordRecoverySetNewPasswordHandler.h
+    AsyncLoginUserHandler.h)
 endif(WIN32)
 
 

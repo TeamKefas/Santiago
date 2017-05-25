@@ -1,5 +1,5 @@
-#ifndef SLABS_APPSERVER_SERVER_H
-#define SLABS_APPSERVER_SERVER_H
+#ifndef SANTIAGO_TEST_APPSERVER_SERVER_H
+#define SANTIAGO_TEST_APPSERVER_SERVER_H
 
 #include <boost/asio.hpp>
 
@@ -18,6 +18,7 @@
 #include "PasswordRecoveryInitiateRecoveryHandler.h"
 #include "PasswordRecoveryReceiveNewPasswordHandler.h"
 #include "PasswordRecoverySetNewPasswordHandler.h"
+#include "AsyncLoginUserHandler.h"
 
 
 namespace Test{ namespace AppServer
@@ -54,7 +55,7 @@ namespace Test{ namespace AppServer
             }
             else if(documentURI_ == "/loginuser.fcgi")
             {
-                ret.reset(new LoginUserHandler(_userController));
+                ret.reset(new AsyncLoginUserHandler(_userController));
             }
             else if(documentURI_ == "/logoutuser.fcgi")
             {
