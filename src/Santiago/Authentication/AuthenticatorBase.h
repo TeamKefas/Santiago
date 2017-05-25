@@ -79,7 +79,7 @@ namespace Santiago{ namespace Authentication
         virtual void createUser(const std::string& userName_,
                                 const std::string& emailAddress_,
                                 const std::string& password_,
-                                const ErrorCodeCallbackFn& onCreateUserCallbackFn_) = 0;
+                                const ErrorCodeCallbackFn& onCreateUserCallbackFn_);
         
         /**
          * ///Message\\
@@ -91,7 +91,7 @@ namespace Santiago{ namespace Authentication
         virtual void loginUser(const std::string& userNameOrEmailAddress_,
                                bool isUserNameNotEmailAddress_,
                                const std::string& password_,
-                               const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_) = 0;
+                               const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);
 
         boost::optional<std::pair<UserInfo,std::string> > asyncLoginUser(const std::string& userNameOrEmailAddress_,
                                                                          bool isUserNameNotEmailAddress_,
@@ -107,7 +107,7 @@ namespace Santiago{ namespace Authentication
          */
         virtual void verifyCookieAndGetUserInfo(
             const std::string& cookieString_,
-            const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_) = 0;
+            const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_);
 
         boost::optional<UserInfo> verifyCookieAndGetUserInfo(
             const std::string& cookieString_,
@@ -120,14 +120,14 @@ namespace Santiago{ namespace Authentication
          * @param onLogoutCookieCallbackFn_ - Handler function for logout operations.
          */
         virtual void logoutUserForCookie(const std::string& cookieString_,
-                                         const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_) = 0;
+                                         const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
         /**
          * This function is used for loging out user account for all cookies.
          * @param userName_ - username of the user.
          * @param onLogoutAllCookiesCallbackFn_ - Handler function for the logout operations.
          */
         virtual void logoutUserForAllCookies(const std::string& userName_,
-                                             const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_) = 0;
+                                             const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_);
          /**
          * This function is used for updating the user password using the new password provided by the user.
          * @param cookieString_ -Cookie string received from the user.
@@ -138,7 +138,7 @@ namespace Santiago{ namespace Authentication
         virtual void changeUserPassword(const std::string& cookieString_,
                                         const std::string& oldPassword_,
                                         const std::string& newPassword_,
-                                        const ErrorCodeCallbackFn& onChangePasswordCallbackFn_) = 0;
+                                        const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
         /**
          * This function is used to get user for the given email adress and calls the call back function onGetUserForEmailAddressAndRecoveryStringCallbackFn.
          * @param emailAddress_ - Email address  received from the user.
@@ -146,7 +146,7 @@ namespace Santiago{ namespace Authentication
          */
         virtual void getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
                                                              const std::string& recoverystring_,
-                                                             const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_) = 0;
+                                                             const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
         
         /**
          * This function is used to create and return a recovery string for the  user using the given email address and calls the call back function onCreateAndReturnRecoveryStringCallbackFn.
@@ -154,7 +154,7 @@ namespace Santiago{ namespace Authentication
          * @param onCreateAndReturnRecoveryStringCallbackFn_ - Handler function for create and return recovery string operations.
          */
         virtual void createAndReturnRecoveryString(const std::string& emailAddress_,
-                                                   const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_) = 0;
+                                                   const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_);
 
         
         /**
@@ -166,7 +166,7 @@ namespace Santiago{ namespace Authentication
         virtual void changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
                                                                         const std::string& recoveryString_,
                                                                         const std::string& newPassword_,
-                                                                        const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_) = 0;
+                                                                        const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_);
         /**
          * This function is used to update the email address using the email address provided by the user.
          * @param - cookieString_ - Cookie string received from the user.
@@ -177,14 +177,14 @@ namespace Santiago{ namespace Authentication
         virtual void changeUserEmailAddress(const std::string& cookieString_,
                                             const std::string& newEmailAddress_,
                                             const std::string& password_,
-                                            const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_) = 0;
+                                            const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
         /**
          * This function is used to delete a user using the given cookie string and calls the call back function onDeleteUserCallbackFn.
          * @param cookieString_ - Cookie string received from the user.
          * @param onDeleteUserCallbackFn_ - Handler function for delete operations.
          */
         virtual void deleteUser(const std::string& cookieString_,
-                                const ErrorCodeCallbackFn& onDeleteUserCallbackFn_) = 0;
+                                const ErrorCodeCallbackFn& onDeleteUserCallbackFn_);
 
         //implementation functions
         /**
