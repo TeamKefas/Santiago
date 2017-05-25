@@ -9,6 +9,7 @@
 # MARIADB_FOUND - Confirmation
 
 find_path(MARIADB_INCLUDE_DIR mysql.h
+	  /usr/include/mariadb
           /usr/include/mysql
           /usr/local/include/mysql
           )
