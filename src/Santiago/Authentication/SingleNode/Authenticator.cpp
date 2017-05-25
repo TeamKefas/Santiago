@@ -77,40 +77,6 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         return ss.str();
     }
      
-    void Authenticator::postCallbackFn(const ErrorCodeUserInfoCallbackFn& errorCodeUserInfoCallbackFn_,
-                                       const std::error_code& error_,
-                                       const boost::optional<UserInfo>& userInfoOpt_)
-    {
-        std::function<void()> errorCodeUserInfoCallbackFnImpl =
-            std::bind(errorCodeUserInfoCallbackFn_,error_, userInfoOpt_);
-        _ioService.post(errorCodeUserInfoCallbackFnImpl);
-    }
-
-    void Authenticator::postCallbackFn(const ErrorCodeUserInfoStringPairCallbackFn& errorCodeUserInfoStringPairCallbackFn_,
-                                       const std::error_code& error_,
-                                       const boost::optional<std::pair<UserInfo,std::string> >& userInfoStringPair_)
-    {
-        std::function<void()> errorCodeUserInfoStringPairCallbackFnImpl = 
-            std::bind(errorCodeUserInfoStringPairCallbackFn_, error_, userInfoStringPair_);
-        _ioService.post(errorCodeUserInfoStringPairCallbackFnImpl);
-    }
-
-    void Authenticator::postCallbackFn(const ErrorCodeCallbackFn& errorCodeCallbackFn_,
-                                       const std::error_code& error_)
-    {
-        std::function<void()> errorCodeCallbackFnImpl = std::bind(errorCodeCallbackFn_,error_);
-        _ioService.post(errorCodeCallbackFnImpl);
-    }
-
-    void Authenticator::postCallbackFn(const ErrorCodeStringCallbackFn& errorCodeStringCallbackFn_,
-                                       const std::error_code& error_,
-                                       const boost::optional<std::string>& string_)
-    {
-        std::function<void()> errorCodeStringCallbackFnImpl =
-            std::bind(errorCodeStringCallbackFn_,error_,string_);
-        _ioService.post(errorCodeStringCallbackFnImpl);
-    }
-
     void Authenticator::createUserImpl(const std::string& userName_,
                                        const std::string& emailAddress_,
                                        const std::string& password_,
@@ -125,13 +91,13 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
-            postCallbackFn(onCreateUserCallbackFn_,error);
+            onCreateUserCallbackFn_(error);
             return;
         }
         else if(usersRecOpt)
         {
-            postCallbackFn(onCreateUserCallbackFn_,std::error_code(ErrorCode::ERR_USERNAME_ALREADY_EXISTS,
-                                                                   ErrorCategory::GetInstance()));
+            onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_USERNAME_ALREADY_EXISTS,
+                                                    ErrorCategory::GetInstance()));
             return;
         }
 
@@ -140,13 +106,13 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
-            postCallbackFn(onCreateUserCallbackFn_,error);
+            onCreateUserCallbackFn_(error);
             return;
         }
         else if(usersRecOpt)
         {
-            postCallbackFn(onCreateUserCallbackFn_,std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
-                                                                   ErrorCategory::GetInstance()));
+            onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
+                                                    ErrorCategory::GetInstance()));
             return;
         }
 
@@ -158,12 +124,12 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         _databaseConnection.get().addUsersRec(usersRec,error);
         if(error)
         {
-            postCallbackFn(onCreateUserCallbackFn_,error);
+            onCreateUserCallbackFn_(error);
             return;
         }
 
         ST_LOG_INFO("Create user successfull for userName:"<<userName_<<std::endl);
-        postCallbackFn(onCreateUserCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
         return;
     }
 
@@ -180,18 +146,18 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         {
             std::tie(error,usersRecOpt) =
                 verifyUserNamePasswordAndGetUsersRec(userNameOrEmailAddress_,
-                                                     generateSHA256(password_));
+                                                     password_);
         }
         else
         {
             std::tie(error,usersRecOpt) =
                 verifyEmailAddressPasswordAndGetUsersRec(userNameOrEmailAddress_,
-                                                         generateSHA256(password_));
+                                                         password_);
         }
 
         if(error)
         {
-            postCallbackFn(onLoginUserCallbackFn_,error,boost::none);
+            onLoginUserCallbackFn_(error,boost::none);
             return;
         }
         ST_ASSERT(usersRecOpt);
@@ -215,7 +181,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 
         if(error)
         {
-            postCallbackFn(onLoginUserCallbackFn_,error,boost::none);
+            onLoginUserCallbackFn_(error,boost::none);
             return;
         }
         
@@ -238,11 +204,11 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         userNameUserDataMapIter->second._cookieList.push_back(sessionsRec._cookieString);
 
 
-        postCallbackFn(onLoginUserCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,
-                                                              ErrorCategory::GetInstance()),
-                       std::make_pair(UserInfo(usersRecOpt->_userName,
-                                               usersRecOpt->_emailAddress),
-                                      sessionsRec._cookieString));
+        onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
+                                               ErrorCategory::GetInstance()),
+                               std::make_pair(UserInfo(usersRecOpt->_userName,
+                                                       usersRecOpt->_emailAddress),
+                                              sessionsRec._cookieString));
         return;
     }
 
@@ -254,7 +220,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
         if(error)
         {
-            postCallbackFn(onVerifyUserCallbackFn_,error,boost::none);
+            onVerifyUserCallbackFn_(error,boost::none);
             return;
         }
 
@@ -268,9 +234,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                      <<cookieString_<<std::endl);            
             cleanupCookieDataAndUpdateSessionRecord(cookieString_);
 
-            postCallbackFn(onVerifyUserCallbackFn_,std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,
-                                                                   ErrorCategory::GetInstance()),
-                           boost::none);
+            onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,
+                                                    ErrorCategory::GetInstance()),
+                                    boost::none);
             return;
         }
         else //set the lastActiveTime to now
@@ -288,9 +254,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         ST_ASSERT(_userNameUserDataMap.end() != userNameUserDataMapIter);
 
 
-        postCallbackFn(onVerifyUserCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
-                       UserInfo(cookieStringSessionsRecMapIter->second._userName,
-                                userNameUserDataMapIter->second._emailAddress));
+        onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
+                                UserInfo(cookieStringSessionsRecMapIter->second._userName,
+                                         userNameUserDataMapIter->second._emailAddress));
         return;
     }
 
@@ -301,13 +267,13 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         std::tie(error,std::ignore) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
         if(error)
         {
-            postCallbackFn(onLogoutCookieCallbackFn_,error);
+            onLogoutCookieCallbackFn_(error);
             return;
         }
 
         cleanupCookieDataAndUpdateSessionRecord(cookieString_);
 
-        postCallbackFn(onLogoutCookieCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
         return;        
     }
 
@@ -318,14 +284,13 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         std::map<std::string,UserData >::iterator userNameUserDataMapIter = _userNameUserDataMap.find(userName_);
         if(userNameUserDataMapIter == _userNameUserDataMap.end())
         {
-            postCallbackFn(onLogoutAllCookiesCallbackFn_,
-                           std::error_code(ErrorCode::ERR_NO_ACTIVE_SESSION_FOR_USERNAME,
-                                           ErrorCategory::GetInstance()));
+            onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_NO_ACTIVE_SESSION_FOR_USERNAME,
+                                                          ErrorCategory::GetInstance()));
             return;
         }
         
         cleanupCookieDataAndUpdateSessionRecordsForAllCookies(userName_);
-        postCallbackFn(onLogoutAllCookiesCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
         return;
     }
 
@@ -339,7 +304,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
         if(error)
         {
-            postCallbackFn(onChangePasswordCallbackFn_,error);
+            onChangePasswordCallbackFn_(error);
             return;
         }
 
@@ -350,7 +315,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
             verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,generateSHA256(oldPassword_));
         if(error)
         {
-            postCallbackFn(onChangePasswordCallbackFn_,error);
+            onChangePasswordCallbackFn_(error);
             return;
         }
         ST_ASSERT(usersRecOpt);
@@ -359,9 +324,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         usersRecOpt->_password = generateSHA256(newPassword_);
         _databaseConnection.get().updateUsersRec(*usersRecOpt,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
-        postCallbackFn(onChangePasswordCallbackFn_,error);
+        onChangePasswordCallbackFn_(error);
         return;
-
     }
     
      void Authenticator::createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
@@ -373,15 +337,14 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         if(error && (ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS != error.value()))
         {
             
-            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error,boost::none);
+            onCreateAndReturnRecoveryStringCallbackFn_(error,boost::none);
             return;
         }
         if(ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS == error.value())
         {
-            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,
-                           std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_NOT_REGISTERED,
-                                           ErrorCategory::GetInstance()),
-                           boost::none);
+            onCreateAndReturnRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_NOT_REGISTERED,
+                                                                       ErrorCategory::GetInstance()),
+                                                       boost::none);
             return;
         }
             
@@ -393,14 +356,13 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         _databaseConnection.get().updateUsersRec(newUsersRec,error);
         if(error)
         {     
-            postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,error,boost::none);
+            onCreateAndReturnRecoveryStringCallbackFn_(error,boost::none);
             return;
         }
         ST_LOG_INFO("Created recovery string successfully for emailAddress:"<<emailAddress_<<std::endl);
-        postCallbackFn(onCreateAndReturnRecoveryStringCallbackFn_,
-                       std::error_code(ErrorCode::ERR_SUCCESS,
-                                       ErrorCategory::GetInstance()),
-                       newUsersRec._recoveryString);
+        onCreateAndReturnRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
+                                                                   ErrorCategory::GetInstance()),
+                                                   newUsersRec._recoveryString);
         return;
     }
 
@@ -413,34 +375,30 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
           usersRecOpt = _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
           if(error && (ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS != error.value()))
           {
-              postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,
-                             error,
-                             boost::none);
-               return;
+              onGetUserForEmailAddressAndRecoveryStringCallbackFn_(error,
+                                                                   boost::none);
+              return;
           }
           if(ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS == error.value())
           {
-              postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,
-                             std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_NOT_REGISTERED,
-                                             ErrorCategory::GetInstance()),
-                             boost::none);
+              onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_NOT_REGISTERED,
+                                                                                   ErrorCategory::GetInstance()),
+                                                                   boost::none);
               return;
           }
           ST_ASSERT(usersRecOpt);
           
           if(usersRecOpt->_recoveryString != recoveryString_)
           {
-              postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,
-                             std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_RECOVERY_STRING,
-                                             ErrorCategory::GetInstance()),
-                             boost::none);
-               return;
+              onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_RECOVERY_STRING,
+                                                                                   ErrorCategory::GetInstance()),
+                                                                   boost::none);
+              return;
           }
 
-          postCallbackFn(onGetUserForEmailAddressAndRecoveryStringCallbackFn_,
-                         std::error_code(ErrorCode::ERR_SUCCESS,
-                                         ErrorCategory::GetInstance()),
-                         usersRecOpt->_userName);
+          onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
+                                                                               ErrorCategory::GetInstance()),
+                                                               usersRecOpt->_userName);
           return;
      }
 
@@ -455,7 +413,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
             verifyEmailAddressRecoveryStringAndGetUsersRec(emailAddress_,recoveryString_);
         if(error)
         {
-            postCallbackFn(onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_,error);
+            onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_(error);
             return;
         }
         ST_ASSERT(usersRecOpt);
@@ -466,7 +424,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         usersRecOpt->_recoveryStringCreateTime = boost::none;
         _databaseConnection.get().updateUsersRec(*usersRecOpt,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
-        postCallbackFn(onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_,error);
+        onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_(error);
         return;
     }
 
@@ -491,7 +449,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
             verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,generateSHA256(password_));
         if(error)
         {
-            postCallbackFn(onChangeEmailAddressCallbackFn_,error);
+            onChangeEmailAddressCallbackFn_(error);
             return;
         }
         ST_ASSERT(usersRecOpt);
@@ -502,13 +460,13 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         usersRecOpt = _databaseConnection.get().getUsersRecForEmailAddress(newEmailAddress_,error);
         if(error && (ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS != error.value()))
         {
-            postCallbackFn(onChangeEmailAddressCallbackFn_,error);
+            onChangeEmailAddressCallbackFn_(error);
             return;
         }        
         if(usersRecOpt)
         {
-            postCallbackFn(onChangeEmailAddressCallbackFn_,std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
-                                                                           ErrorCategory::GetInstance()));
+            onChangeEmailAddressCallbackFn_(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
+                                                            ErrorCategory::GetInstance()));
             return;
         }
         ST_ASSERT(ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS == error.value());
@@ -517,7 +475,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         newUsersRec._emailAddress = newEmailAddress_;
         _databaseConnection.get().updateUsersRec(newUsersRec,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
-        postCallbackFn(onChangeEmailAddressCallbackFn_,error);
+        onChangeEmailAddressCallbackFn_(error);
         return;
 
     }
@@ -531,7 +489,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
         if(error)
         {
-            postCallbackFn(onDeleteUserCallbackFn_,error);
+            onDeleteUserCallbackFn_(error);
             return;
         }
 
@@ -542,7 +500,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         if((ErrorCode::ERR_DATABASE_EXCEPTION == error.value()) ||
            (ErrorCode::ERR_DATABASE_INVALID_USER_INPUT == error.value()))
         {
-            postCallbackFn(onDeleteUserCallbackFn_,error);
+            onDeleteUserCallbackFn_(error);
             return;
         }
 
@@ -550,13 +508,13 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         _databaseConnection.get().deleteUsersRec(usersRecOpt->_userName,error);
         if(error)
         {
-            postCallbackFn(onDeleteUserCallbackFn_,error);
+            onDeleteUserCallbackFn_(error);
             return;
         }
 
         //remove from memory
         cleanupCookieDataAndUpdateSessionRecordsForAllCookies(cookieStringSessionsRecMapIter->second._userName);
-        postCallbackFn(onDeleteUserCallbackFn_,std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+        onDeleteUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
         return;
     }
 
@@ -589,7 +547,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 
     std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
     Authenticator::verifyEmailAddressPasswordAndGetUsersRec(const std::string& emailAddress_,
-                                                                const std::string& password_)
+                                                            const std::string& password_)
     {
         //get the UsersRec from db
         std::error_code error;
@@ -599,7 +557,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         {
             return std::make_pair(error,usersRecOpt);
         }
-
+        
         //check if the username/password matches
         if(!usersRecOpt || (usersRecOpt->_password != generateSHA256(password_)))
         {
@@ -690,7 +648,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         {
             _userNameUserDataMap.erase(userNameUserDataMapIter);
         }
-
+        
         //remove from _cookieStringSessionsRecMap
         _cookieStringSessionsRecMap.erase(cookieStringSessionsRecMapIter);
 
@@ -752,5 +710,5 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 	}
         return str;
     }
-
-}}}
+        
+    }}}

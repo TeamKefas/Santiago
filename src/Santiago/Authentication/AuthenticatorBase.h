@@ -286,6 +286,41 @@ namespace Santiago{ namespace Authentication
         virtual void deleteUserImpl(const std::string& cookieString_,
                                     const ErrorCodeCallbackFn& onDeleteUserCallbackFn_) = 0;
 
+         /**
+         * This function is used for calling call back functions.
+         * @param errorCodeUserInfoCallbackFn_ - Call back function for error code and userinfo.
+         * @param error_ - Error code for representing errors.
+         * @param userInfoOpt_ - For holding userInfo details.
+         */
+        void postCallbackFn(const ErrorCodeUserInfoCallbackFn& errorCodeUserInfoCallbackFn_,
+                            const std::error_code& error_,
+                            const boost::optional<UserInfo>& userInfoOpt_);
+        /**
+         * This function is used for calling call back functions
+         * @param errorCodeUserInfoStringPairCallbackFn_ - Call back function for error code and userinfo.
+         * @param error_ - Error code for representing errors.
+         * @param userInfoStringPair_ - For holding userInfo details.
+         */
+        void postCallbackFn(const ErrorCodeUserInfoStringPairCallbackFn& errorCodeUserInfoStringPairCallbackFn_,
+                            const std::error_code& error_,
+                            const boost::optional<std::pair<UserInfo,std::string> >& userInfoStringPair_);
+        /**
+         * This function is used for calling call back functions
+         * @param errorCodeCallbackFn_ - Call back function 
+         * @param error_ - Error code for representing errors.
+         */
+        void postCallbackFn(const ErrorCodeCallbackFn& errorCodeCallbackFn_,const std::error_code& error_);
+        
+         /**
+         * This function is used for calling call back functions
+         * @param errorCodeStringCallbackFn_ - Call back function for error code and recoverySrting.
+         * @param error_ - Error code for representing errors.
+         * @param recoveryString_ - For holding password recovery string.
+         */
+        void postCallbackFn(const ErrorCodeStringCallbackFn& errorCodeStringCallbackFn_,
+                            const std::error_code& error_,
+                            const boost::optional<std::string>& recoveryString_);
+
     protected:
         
         boost::asio::io_service         &_ioService;

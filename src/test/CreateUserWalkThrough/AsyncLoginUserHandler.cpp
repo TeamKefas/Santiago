@@ -119,7 +119,7 @@ namespace Test{ namespace AppServer
             cookieData._value = userInfoCookieStringPair_->second;
 //            cookieData._expiryTime = boost::posix_time::second_clock::universal_time() + boost::posix_time::seconds(240);
             bool flag = request_->responseHTTPCookies().insert(cookieData).second;
-            BOOST_ASSERT(flag);
+            ST_ASSERT(flag);
 
             request_->out()<<"User login successfull. \n";
             request_->setAppStatus(0);

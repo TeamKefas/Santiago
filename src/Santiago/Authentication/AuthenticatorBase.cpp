@@ -173,6 +173,40 @@ namespace Santiago{ namespace Authentication
         _strand.post(std::bind(&AuthenticatorBase::deleteUserImpl,this,cookieString_,onDeleteUserCallbackFn_));
     }
 
+     void AuthenticatorBase::postCallbackFn(const ErrorCodeUserInfoCallbackFn& errorCodeUserInfoCallbackFn_,
+                                            const std::error_code& error_,
+                                            const boost::optional<UserInfo>& userInfoOpt_)
+    {
+        std::function<void()> errorCodeUserInfoCallbackFnImpl =
+            std::bind(errorCodeUserInfoCallbackFn_,error_, userInfoOpt_);
+        _ioService.post(errorCodeUserInfoCallbackFnImpl);
+    }
+
+    void AuthenticatorBase::postCallbackFn(const ErrorCodeUserInfoStringPairCallbackFn& errorCodeUserInfoStringPairCallbackFn_,
+                                           const std::error_code& error_,
+                                           const boost::optional<std::pair<UserInfo,std::string> >& userInfoStringPair_)
+    {
+        std::function<void()> errorCodeUserInfoStringPairCallbackFnImpl = 
+            std::bind(errorCodeUserInfoStringPairCallbackFn_, error_, userInfoStringPair_);
+        _ioService.post(errorCodeUserInfoStringPairCallbackFnImpl);
+    }
+
+    void AuthenticatorBase::postCallbackFn(const ErrorCodeCallbackFn& errorCodeCallbackFn_,
+                                           const std::error_code& error_)
+    {
+        std::function<void()> errorCodeCallbackFnImpl = std::bind(errorCodeCallbackFn_,error_);
+        _ioService.post(errorCodeCallbackFnImpl);
+    }
+
+    void AuthenticatorBase::postCallbackFn(const ErrorCodeStringCallbackFn& errorCodeStringCallbackFn_,
+                                           const std::error_code& error_,
+                                           const boost::optional<std::string>& string_)
+    {
+        std::function<void()> errorCodeStringCallbackFnImpl =
+            std::bind(errorCodeStringCallbackFn_,error_,string_);
+        _ioService.post(errorCodeStringCallbackFnImpl);
+    }
+
 
 }}
         
