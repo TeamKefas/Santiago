@@ -1,6 +1,14 @@
 #ifndef SANTIAGO_THREADSPECIFICVAR_THREADSPECIFICVAR_H
 #define SANTIAGO_THREADSPECIFICVAR_THREADSPECIFICVAR_H
 
+/**
+ * @file ThreadSpecificVar.h
+ *
+ * @section DESCRIPTION
+ *
+ *  Contains ThreadSpecificVar class .
+ */
+
 #include <functional>
 
 #include <boost/thread/tss.hpp>

@@ -4,7 +4,7 @@
 #include <boost/asio.hpp>
 
 #include "Santiago/AppServer/ServerBase.h"
-#include "Santiago/User/SingleNode/Controller.h"
+#include "Santiago/Authentication/SingleNode/Authenticator.h"
 #include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 
@@ -68,7 +68,7 @@ namespace SessionServer
 
         boost::property_tree::ptree                         _config;
         SantiagoDBConnection                                _databaseConnection;
-        Santiago::User::SingleNode::Controller              _userController;
+        Santiago::Authentication::SingleNode::Authenticator              _userController;
     };
 
 }

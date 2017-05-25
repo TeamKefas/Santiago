@@ -10,16 +10,16 @@
 
 #include <memory>
 
-#include <boost/assert.hpp>
+//#include <boost/assert.hpp>
 #include <boost/optional.hpp>
+
+#include "../ErrorCategory.h"
+#include "../Utils/STLog.h"
 
 #define MAX_REQUEST_PER_CONNECTION 1
 
 namespace Santiago{ namespace Fastcgi
 {
-    typedef unsigned int        uint;
-    typedef unsigned char       uchar;
-
     enum TransceiverEventInfo
     {
         SOCKET_CLOSED,

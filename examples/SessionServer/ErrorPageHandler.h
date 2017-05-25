@@ -9,7 +9,7 @@ namespace SessionServer
    {
    public:
 
-       ErrorPageHandler(Santiago::User::ControllerBase& userController_):
+       ErrorPageHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
        {}
 

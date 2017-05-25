@@ -60,9 +60,9 @@ namespace Santiago{namespace Fastcgi
          * @param connectionWeakPtr - weak ptr to the connection
          */
         Request(boost::asio::io_service& ioService_,
-                uint requestId_,
+                unsigned requestId_,
                 RequestDataPtr dataPtr_,
-                uint connectionId_,
+                unsigned connectionId_,
                 ConnectionWeakPtr connectionWeakPtr_):
             _requestId(requestId_),
             _dataPtr(dataPtr_),
@@ -76,7 +76,7 @@ namespace Santiago{namespace Fastcgi
          */
         RequestId getId() const
         {
-            return std::pair<uint,uint>(_connectionId,_requestId);
+            return std::pair<unsigned,unsigned>(_connectionId,_requestId);
         }
 
         /**
@@ -99,6 +99,7 @@ namespace Santiago{namespace Fastcgi
          */
         void commit(std::error_code& error_)
         {
+            ST_LOG_DEBUG("Committing request. requestId = "<<_requestId<<std::endl);
             error_ = std::error_code(ERR_SUCCESS,ErrorCategory::GetInstance());
             std::lock_guard<std::mutex> lock(_commitMutex);
             ConnectionPtr connectionPtr = checkRequestValidityAndGetConnectionPtr(error_);
@@ -119,6 +120,7 @@ namespace Santiago{namespace Fastcgi
          */
         void cancel(std::error_code& error_)
         {
+            ST_LOG_DEBUG("Cancelling request. requestId = "<<_requestId<<std::endl);
             error_ = std::error_code(ERR_SUCCESS,ErrorCategory::GetInstance());
             std::lock_guard<std::mutex> lock(_commitMutex);
             ConnectionPtr connectionPtr = checkRequestValidityAndGetConnectionPtr(error_);
@@ -138,7 +140,7 @@ namespace Santiago{namespace Fastcgi
          * Sets the appstatus to be replied
          * @param status_
          */
-        void setAppStatus(uint status_)
+        void setAppStatus(unsigned status_)
         {
             _dataPtr->_appStatus = status_;
         }
@@ -222,6 +224,7 @@ namespace Santiago{namespace Fastcgi
          */
         ~Request()
         {
+            ST_LOG_DEBUG("Destroying request. requestId="<<_requestId<<std::endl);
             if(isValid())
             {
                 std::error_code error;
@@ -240,6 +243,7 @@ namespace Santiago{namespace Fastcgi
         {
             if(_hasReplied)
             {
+                ST_LOG_INFO("Request already replied to. requestId ="<<_requestId<<std::endl);
                 error_ = std::error_code(ERR_FASTCGI_REQUEST_ALREADY_REPLIED, ErrorCategory::GetInstance());
                 return ConnectionPtr();
             }
@@ -247,15 +251,16 @@ namespace Santiago{namespace Fastcgi
             ConnectionPtr ret(_connectionWeakPtr.lock());
             if(ret == NULL)
             {
+                ST_LOG_DEBUG("Invalid request. requestId ="<<_requestId<<std::endl);
                 error_ = std::error_code(ERR_INVALID_FASTCGI_REQUEST, ErrorCategory::GetInstance());
             }
             return ret;
         }
 
         std::mutex               _commitMutex;
-        uint                     _requestId;
+        unsigned                     _requestId;
         RequestDataPtr           _dataPtr;
-        uint                     _connectionId;
+        unsigned                     _connectionId;
         ConnectionWeakPtr        _connectionWeakPtr;
         bool                     _hasReplied;
 

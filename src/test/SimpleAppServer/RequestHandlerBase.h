@@ -6,7 +6,7 @@
 #include <boost/asio.hpp>
 
 #include "Santiago/AppServer/RequestHandlerBase.h"
-#include "Santiago/User/SingleNode/Controller.h"
+#include "Santiago/Authentication/SingleNode/Authenticator.h"
 
 namespace SimpleAppServer
 {
@@ -18,7 +18,7 @@ namespace SimpleAppServer
         typedef Santiago::AppServer::RequestHandlerBase<boost::asio::ip::tcp> MyBase;
         typedef std::shared_ptr<RequestHandlerBase> Ptr;
 
-        RequestHandlerBase(Santiago::User::ControllerBase& userController_):
+        RequestHandlerBase(Santiago::Authentication::AuthenticatorBase& userController_):
             _userController(userController_)
         {}
 
@@ -29,7 +29,7 @@ namespace SimpleAppServer
         virtual void handleVerifyCookieAndGetUserInfo(const RequestPtr& request_,
                                                       const std::string& cookieString_,
                                                       std::error_code error_,
-                                                      const boost::optional<Santiago::User::UserInfo>& userInfo_);
+                                                      const boost::optional<Santiago::Authentication::UserInfo>& userInfo_);
 
         virtual void handleVerifiedRequest(const RequestPtr& request_,
                                            const std::string& userName_,
@@ -38,7 +38,7 @@ namespace SimpleAppServer
         virtual void handleNonVerifiedRequest(const RequestPtr& request_) = 0;
 
         
-        Santiago::User::ControllerBase                  &_userController;
+        Santiago::Authentication::AuthenticatorBase                  &_userController;
     };
 
 }

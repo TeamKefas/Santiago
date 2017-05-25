@@ -34,10 +34,10 @@ namespace Santiago{ namespace Fastcgi
         typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;      
         typedef std::shared_ptr<PacketSocket<Protocol> > PacketSocketPtr; 
 
-        typedef std::function<void(uint,const char*,uint)> StdinCallbackFn;
-        typedef std::function<void(uint,const char*,uint)> ParamsCallbackFn;
-        typedef std::function<void(uint)> BeginRequestCallbackFn;
-        typedef std::function<void(uint)> AbortRequestCallbackFn;
+        typedef std::function<void(unsigned,const char*,unsigned)> StdinCallbackFn;
+        typedef std::function<void(unsigned,const char*,unsigned)> ParamsCallbackFn;
+        typedef std::function<void(unsigned)> BeginRequestCallbackFn;
+        typedef std::function<void(unsigned)> AbortRequestCallbackFn;
         typedef std::function<void(TransceiverEventInfo)> TransceiverEventCallbackFn;
 
         /**
@@ -84,15 +84,15 @@ namespace Santiago{ namespace Fastcgi
          * @param appStatus - set by the user
          * @param error code
          */
-        void sendReply(uint requestId_,
+        void sendReply(unsigned requestId_,
                        boost::asio::streambuf &httpHeaderOutBuffer_,
                        boost::asio::streambuf &outBuffer_,
                        boost::asio::streambuf& errBuffer_,
                        int appStatus_,
-                       boost::system::error_code &ec_)
+                       std::error_code &ec_)
         {
 //            BOOST_ASSERT((this->_state & SocketBase<Protocol,Socket>::INTERNAL_CLOSED)== 0);
-
+            ST_LOG_DEBUG("Send reply for request. requestId = "<<requestId_<<std::endl);
             if(httpHeaderOutBuffer_.size() != 0)
             {
                 const char* httpHeaderOutBufferArray = 
@@ -155,6 +155,7 @@ namespace Santiago{ namespace Fastcgi
             {
                 return;
             }
+            ST_LOG_DEBUG("Send reply succeeded. requestId = "<<requestId_<<std::endl);
             return;
         }
 
@@ -184,22 +185,30 @@ namespace Santiago{ namespace Fastcgi
          * @param contentLength
          * @param content
          */
-        void handleNewPacket(boost::system::error_code ec_,uint requestId,unsigned char headerType,uint contentLength,const char* content)
+        void handleNewPacket(const std::error_code& ec_,
+                             unsigned requestId_,
+                             unsigned char headerType_,
+                             unsigned contentLength_,
+                             const char* content_)
         {
             if(ec_)
             {
+                ST_LOG_INFO("Received error. calling transceiverEvenCallbackFn with SOCKET_CLOSED. error_code ="
+                            <<ec_.value()<<std::endl);
                 close();
                 _transceiverEventCallbackFn(SOCKET_CLOSED);
                 return;
             }
 
-            switch (headerType)
+            switch (headerType_)
             {
             case FCGI_GET_VALUES:
             {
+                ST_LOG_DEBUG("Received FCGI_GET_VALUES packet."<<std::endl);
+
                 typedef std::map<std::string,std::string> Pairs;
                 std::map<std::string,std::string> pairs;
-                ParsePairs(content, contentLength,pairs);
+                ParsePairs(content_, contentLength_,pairs);
                           
                 std::string outputBuffer;
                 for (Pairs::iterator it = pairs.begin(); it != pairs.end(); ++it)
@@ -218,43 +227,52 @@ namespace Santiago{ namespace Fastcgi
                     }
                 }
 
-                boost::system::error_code ec;
+                std::error_code ec;
                 _packetSocketPtr->writePacket(0,FCGI_GET_VALUES_RESULT,outputBuffer.size(),outputBuffer.data(),ec);
                 if(ec)
                 {
+                    ST_LOG_INFO("FCGI_GET_VALUES_RESULT write failed. Calling transceiverEvenCallback with"
+                                <<" SOCKET_CLOSED"<<std::endl);
                     _transceiverEventCallbackFn(SOCKET_CLOSED);                    
                 }
                 break;
             }
             case FCGI_BEGIN_REQUEST:
             {
-                if (contentLength < sizeof(FCGI_BeginRequestBody))
+                ST_LOG_DEBUG("Received FCGI_BEGIN_REQUEST packet."<<std::endl);
+                if (contentLength_ < sizeof(FCGI_BeginRequestBody))
                 {
+                    ST_LOG_ERROR("Invalid size FCGI_BEGIN_REQUEST packet."<<std::endl);
                     throw std::runtime_error("invalid begin request body");
                 }
-                const FCGI_BeginRequestBody& body = *reinterpret_cast<const FCGI_BeginRequestBody*>(content);                        
+                const FCGI_BeginRequestBody& body = *reinterpret_cast<const FCGI_BeginRequestBody*>(content_);
                 unsigned role = (body.roleB1 << 8) + body.roleB0;
                 
                 if (role != FCGI_RESPONDER)
                 {
+                    ST_LOG_ERROR("Unknown role FCGI_BEGIN_REQUEST packet. role ="<<role<<std::endl);
                     std::string outputBuffer;
                     FCGI_EndRequestBody unknown;
                     bzero(&unknown, sizeof(unknown));
                     unknown.protocolStatus = FCGI_UNKNOWN_ROLE;
                     outputBuffer.append( reinterpret_cast<const char*>(&unknown), sizeof(unknown));
-                    boost::system::error_code ec;
-                    _packetSocketPtr->writePacket(requestId,FCGI_END_REQUEST,outputBuffer.size(),outputBuffer.data(),ec);
+                    std::error_code ec;
+                    _packetSocketPtr->writePacket(requestId_,FCGI_END_REQUEST,outputBuffer.size(),outputBuffer.data(),ec);
                     if(ec)
                     {
+                        ST_LOG_INFO("FCGI_END_REQUEST write failed. Calling transceiverEvenCallback with"
+                                    <<" SOCKET_CLOSED"<<std::endl);
                         _transceiverEventCallbackFn(SOCKET_CLOSED);
                     }
-                    std::cout<<"Unknown role"<<std::endl;
+//                    std::cout<<"Unknown role"<<std::endl;
                     return;
                 }
-                _beginRequestCallbackFn(requestId);
+                _beginRequestCallbackFn(requestId_);
                 
                 if (!(body.flags & FCGI_KEEP_CONN))
                 {
+                    ST_LOG_DEBUG("Last request in connection. calling transceiverEventCallback with"
+                                 <<" CONNECTION_WIND_DOWN"<<std::endl);
                     this->_transceiverEventCallbackFn(CONNECTION_WIND_DOWN);
                 }
                 break;
@@ -262,48 +280,57 @@ namespace Santiago{ namespace Fastcgi
             }
             case FCGI_ABORT_REQUEST: 
             {
+                ST_LOG_DEBUG("Received FCGI_ABORT_REQUEST packet."<<std::endl);
                 std::string outputBuffer;                            
                 FCGI_EndRequestBody aborted;
                 bzero(&aborted, sizeof(aborted));
                 aborted.appStatusB0 = 1;
                 aborted.protocolStatus = FCGI_REQUEST_COMPLETE;
                 outputBuffer.append(reinterpret_cast<const char*>(&aborted), sizeof(aborted));
-                boost::system::error_code ec;
-                _packetSocketPtr->writePacket(requestId,FCGI_REQUEST_COMPLETE,outputBuffer.size(),outputBuffer.data(),ec);
+                std::error_code ec;
+                _packetSocketPtr->writePacket(requestId_,FCGI_REQUEST_COMPLETE,outputBuffer.size(),outputBuffer.data(),ec);
                 if(ec)
                 {
+                    ST_LOG_INFO("FCGI_REQUEST_COMPLETE write failed. Calling transceiverEvenCallback with"
+                                <<" SOCKET_CLOSED"<<std::endl);
                     _transceiverEventCallbackFn(SOCKET_CLOSED);
                 }
-                _abortRequestCallbackFn(requestId);
+                _abortRequestCallbackFn(requestId_);
                 
                 break;
             }
             case FCGI_PARAMS:
             {
-                _paramsCallbackFn(requestId,content,contentLength);
+                ST_LOG_DEBUG("Received FCGI_PARAMS packet."<<std::endl);
+                _paramsCallbackFn(requestId_,content_,contentLength_);
                 break;
             }                        
             case FCGI_STDIN:
             {
-                _stdinCallbackFn(requestId,content,contentLength);
+                ST_LOG_DEBUG("Received FCGI_STDIN packet."<<std::endl);
+                _stdinCallbackFn(requestId_,content_,contentLength_);
                 break;                            
             }                        
             case FCGI_DATA:
             {
+                ST_LOG_ERROR("Received FCGI_DATA packet."<<std::endl);
                 throw std::runtime_error("FCGI_DATA ");
                 break;
             }                        
             default:
             {
+                ST_LOG_ERROR("Received unknown type packet."<<std::endl);
                 std::string outputBuffer;
                 FCGI_UnknownTypeBody unknown;
                 bzero(&unknown, sizeof(unknown));
-                unknown.type = headerType;
+                unknown.type = headerType_;
                 outputBuffer.append(reinterpret_cast<const char*>(&unknown), sizeof(unknown));
-                boost::system::error_code ec;
+                std::error_code ec;
                 _packetSocketPtr->writePacket(0,FCGI_UNKNOWN_TYPE,outputBuffer.size(),outputBuffer.data(),ec);
                 if(ec)
                 {
+                    ST_LOG_INFO("FCGI_UNKNOWN_TYPE write failed. Calling transceiverEvenCallback with"
+                                <<" SOCKET_CLOSED"<<std::endl);
                     _transceiverEventCallbackFn(SOCKET_CLOSED);
                 }
 

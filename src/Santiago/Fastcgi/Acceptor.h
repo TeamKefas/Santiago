@@ -36,7 +36,7 @@ namespace Santiago{ namespace Fastcgi
 
         typedef std::shared_ptr<Connection<Protocol> > ConnectionPtr;
         typedef std::weak_ptr<Connection<Protocol> > ConnectionWeakPtr;        
-        typedef std::map<uint,ConnectionPtr > ConnectionMap;
+        typedef std::map<unsigned,ConnectionPtr > ConnectionMap;
 
         typedef std::function<void(std::shared_ptr<Request<Protocol> >)> NewRequestCallbackFn;
 
@@ -56,6 +56,7 @@ namespace Santiago{ namespace Fastcgi
               _newRequestCallbackFn(newRequestCallbackFn_),
               _nextConnectionId(0)
         {
+            ST_LOG_DEBUG("Starting acceptor"<<std::endl);
             ProtocolSocketPtr newProtocolSocket(new ProtocolSocket(_ioService));
 
             //listen for new connection. Make sure the callback is called in the
@@ -77,10 +78,11 @@ namespace Santiago{ namespace Fastcgi
         }
 
         /**
-         * The destrunctor
+         * The destructor
          */
         ~Acceptor()
         {
+            ST_LOG_DEBUG("Closing acceptor"<<std::endl);
             _acceptor.cancel();
             _acceptor.close();
         }
@@ -97,11 +99,14 @@ namespace Santiago{ namespace Fastcgi
         {
             if(error_)
             {//TODO: end connections and make a callback fn 
+                ST_LOG_DEBUG("Acceptor returned error. closing acceptor. error_code="<<error_.value()<<std::endl);
                 return; 
             }
+
             //start new connection
-            uint newConnectionId = _nextConnectionId++;
-            BOOST_ASSERT(_activeConnections.find(newConnectionId) == _activeConnections.end());
+            ST_LOG_DEBUG("Received new connection."<<std::endl);
+            unsigned newConnectionId = _nextConnectionId++;
+            ST_ASSERT(_activeConnections.find(newConnectionId) == _activeConnections.end());
             ConnectionPtr newConnection(new Connection<Protocol>(
                                             _ioService,
                                             newProtocolSocket_,
@@ -129,9 +134,10 @@ namespace Santiago{ namespace Fastcgi
          * So it should not directly modify the _activeConnections map 
          * @param connectionId-id of connection object in the _activeConnections map
          */
-        void handleConnectionClose(uint connectionId_)
+        void handleConnectionClose(unsigned connectionId_)
         {
-            BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
+            ST_LOG_DEBUG("Connection close callback received."<<std::endl);
+            ST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             //call the close connection in the acceptor's strand
             _strand.post(std::bind(&Acceptor::closeConnection,this,connectionId_));
 
@@ -142,9 +148,9 @@ namespace Santiago{ namespace Fastcgi
          * in the acceptor's strand.
          * @param connectionId-id of connection object in the _activeConnections map
          */
-        void closeConnection(uint connectionId_)
+        void closeConnection(unsigned connectionId_)
         {
-            BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
+            ST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             _activeConnections.erase(connectionId_);                        
         }
 
@@ -155,9 +161,11 @@ namespace Santiago{ namespace Fastcgi
          * @param requestid- received from the server
          * @param newRequestData - new filled in request data 
          */
-        void handleNewRequest(uint connectionId_,uint newRequestId_,const std::shared_ptr<RequestData>& newRequestData_)
+        void handleNewRequest(unsigned connectionId_,unsigned newRequestId_,const std::shared_ptr<RequestData>& newRequestData_)
         {
-            BOOST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
+            ST_LOG_DEBUG("New request ready to handle. requestId_ ="<<newRequestId_<<std::endl);
+
+            ST_ASSERT(_activeConnections.find(connectionId_) != _activeConnections.end());
             std::shared_ptr<Request<Protocol> > newRequest(new Request<Protocol>(_ioService,newRequestId_,newRequestData_,connectionId_,ConnectionWeakPtr(_activeConnections[connectionId_])));
             //post it in the acceptor's strand
             _strand.post(std::bind(_newRequestCallbackFn,newRequest));

@@ -149,7 +149,7 @@ namespace Santiago{ namespace AppServer
          * Sets the appstatus to be replied
          * @param status_
          */
-        void setAppStatus(uint status_)
+        void setAppStatus(unsigned status_)
         {
             _fastcgiRequest->setAppStatus(status_);
         }

@@ -4,11 +4,13 @@
 #include <boost/asio.hpp>
 
 #include "Santiago/AppServer/ServerBase.h"
-#include "Santiago/User/SingleNode/Controller.h"
+#include "Santiago/Authentication/SingleNode/Authenticator.h"
 #include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "LoginPageHandler.h"
 #include "SimplePageHandler.h"
+#include "SignupHandler.h"
+#include "PasswordRecoveryInitiateRecoveryHandler.h"
 
 namespace SimpleAppServer
 {
@@ -38,6 +40,14 @@ namespace SimpleAppServer
             {
                 ret.reset(new LoginPageHandler(_userController));
             }
+            else if(documentURI_ == "/signup.fcgi")
+            {
+                ret.reset(new SignupHandler(_userController));
+            }
+            else if(documentURI_ == "/password-recovery-initiate.fcgi")
+            {
+                ret.reset(new PasswordRecoveryInitiateRecoveryHandler(_userController));
+            }
             else
             {
                 ret.reset(new SimplePageHandler(_userController));
@@ -56,7 +66,7 @@ namespace SimpleAppServer
 
         boost::property_tree::ptree                         _config;
         SantiagoDBConnection                                _databaseConnection;
-        Santiago::User::SingleNode::Controller              _userController;
+        Santiago::Authentication::SingleNode::Authenticator              _userController;
     };
 
 }
