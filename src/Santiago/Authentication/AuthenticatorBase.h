@@ -123,10 +123,10 @@ namespace Santiago{ namespace Authentication
                                          const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_) = 0;
         /**
          * This function is used for loging out user account for all cookies.
-         * @param currentCookieString_ - Cookie string received from the user.
+         * @param userName_ - username of the user.
          * @param onLogoutAllCookiesCallbackFn_ - Handler function for the logout operations.
          */
-        virtual void logoutUserForAllCookies(const std::string& currentCookieString_,
+        virtual void logoutUserForAllCookies(const std::string& userName_,
                                              const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_) = 0;
          /**
          * This function is used for updating the user password using the new password provided by the user.

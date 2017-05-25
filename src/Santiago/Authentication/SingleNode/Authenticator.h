@@ -109,10 +109,10 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                          const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
         /**
          * This function is used to logout user account using for the current cookie string and also logout all other instances of other cookies.
-         * @param currentCookieString_ - Current cookie strin of the user.
+         * @param userName_ - username of the user.
          * @param onLogoutAllCookiesCallbackFn_ - Call back function logout operations.
          */
-        virtual void logoutUserForAllCookies(const std::string& currentCookieString_,
+        virtual void logoutUserForAllCookies(const std::string& userName_,
                                              const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_);
         /**
          * This function is used to chnage the user password of the user.
@@ -248,10 +248,10 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                              const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
         /**
          * This function is the implementation function for the logoutUserForAllCookies function.
-         * @param currentCookieString_ - Current cookie strin of the user.
+         * @param userName_ - username of the user.
          * @param onLogoutAllCookiesCallbackFn_ - Call back function for logout for all cookie operations.
          */
-        virtual void logoutUserForAllCookiesImpl(const std::string& currentCookieString_,
+        virtual void logoutUserForAllCookiesImpl(const std::string& userName_,
                                                  const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_);
         /**
          * This function is the implementation function for the changeUserPassword function.
