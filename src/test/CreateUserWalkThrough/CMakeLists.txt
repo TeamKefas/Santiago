@@ -6,6 +6,7 @@ set(CreateUserWalkThrough_SRCS  main.cpp
                                 LogoutUserForAllCookieHandler.cpp 
                                 GetUserInfoHandler.cpp
                                 DeleteUserHandler.cpp
+				ChangePasswordHandler.cpp
 				PasswordRecoveryInitiateRecoveryHandler.cpp
 				PasswordRecoveryReceiveNewPasswordHandler.cpp
 				PasswordRecoverySetNewPasswordHandler.cpp
@@ -26,6 +27,7 @@ if(WIN32)
     LogoutUserForAllCookieHandler.h
     GetUserInfoHandler.h
     DeleteUserHandler.h
+    ChangePasswordHandler.h
     PasswordRecoveryInitiateRecoveryHandler.h
     PasswordRecoveryReceiveNewPasswordHandler.h
     PasswordRecoverySetNewPasswordHandler.h
