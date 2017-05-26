@@ -9,11 +9,12 @@
 # MARIADB_FOUND - Confirmation
 
 find_path(MARIADB_INCLUDE_DIR mysql.h
+	  /usr/include/mariadb 	
           /usr/include/mysql
           /usr/local/include/mysql
           )
 
-find_library(MARIADB_LIBRARIES NAMES mysqlclient
+find_library(MARIADB_LIBRARIES NAMES mariadb
             PATHS
             /usr/lib/mysql
             /usr/local/lib/mysql
