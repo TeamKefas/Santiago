@@ -95,11 +95,11 @@ namespace Santiago{ namespace Authentication
                                 const std::string& password_,
                                 const ErrorCodeCallbackFn& onCreateUserCallbackFn_);
         
-        void asyncCreateUser(const std::string& userName_,
-                                              const std::string& emailAddress_,
-                                              const std::string& password_,
-                                              boost::asio::yield_context yield_,
-                                              std::error_code& error_);
+        void createUser(const std::string& userName_,
+                        const std::string& emailAddress_,
+                        const std::string& password_,
+                        boost::asio::yield_context yield_,
+                        std::error_code& error_);
         
         
         /**
@@ -114,12 +114,12 @@ namespace Santiago{ namespace Authentication
                                const std::string& password_,
                                const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);
 
-        boost::optional<std::pair<UserInfo,std::string> > asyncLoginUser(const std::string& userNameOrEmailAddress_,
-                                                                         bool isUserNameNotEmailAddress_,
-                                                                         const std::string& password_,
-                                                                         boost::asio::yield_context yield_,
-                                                                         std::error_code& error_);
-
+        boost::optional<std::pair<UserInfo,std::string> > loginUser(const std::string& userNameOrEmailAddress_,
+                                                                    bool isUserNameNotEmailAddress_,
+                                                                    const std::string& password_,
+                                                                    boost::asio::yield_context yield_,
+                                                                    std::error_code& error_);
+        
         /**
          * This function is used for logging out user account for the  given cookie string.
          * @param cookieString_ - Cookie string received from the user.
@@ -128,9 +128,9 @@ namespace Santiago{ namespace Authentication
         virtual void logoutUserForCookie(const std::string& cookieString_,
                                          const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
         
-        void asyncLogoutUserForCookie(const std::string& cookieString_,
-                                      boost::asio::yield_context yield_,
-                                      std::error_code& error_);
+        void logoutUserForCookie(const std::string& cookieString_,
+                                 boost::asio::yield_context yield_,
+                                 std::error_code& error_);
         /**
          * This function is used for loging out user account for all cookies.
          * @param userName_ - username of the user.
@@ -139,9 +139,9 @@ namespace Santiago{ namespace Authentication
         virtual void logoutUserForAllCookies(const std::string& userName_,
                                              const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_);
 
-        void asyncLogoutUserForAllCookies(const std::string& userName_,
-                                          boost::asio::yield_context yield_,
-                                          std::error_code& error_);
+        void logoutUserForAllCookies(const std::string& userName_,
+                                     boost::asio::yield_context yield_,
+                                     std::error_code& error_);
          /**
          * This function is used for updating the user password using the new password provided by the user.
          * @param cookieString_ -Cookie string received from the user.
@@ -154,11 +154,22 @@ namespace Santiago{ namespace Authentication
                                         const std::string& newPassword_,
                                         const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
         
-        void asyncChangeUserPassword(const std::string& cookieString_,
-                                     const std::string& oldPassword_,
-                                     const std::string& newPassword_,
-                                     boost::asio::yield_context yield_,
-                                     std::error_code& error_  );
+        void changeUserPassword(const std::string& cookieString_,
+                                const std::string& oldPassword_,
+                                const std::string& newPassword_,
+                                boost::asio::yield_context yield_,
+                                std::error_code& error_  );
+
+         /**
+         * This function is used to create and return a recovery string for the  user using the given email address and calls the call back function onCreateAndReturnRecoveryStringCallbackFn.
+         * @param emailAddress_ - EmailAddress received from the user.
+         * @param onCreateAndReturnRecoveryStringCallbackFn_ - Handler function for create and return recovery string operations.
+         */
+        virtual void createAndReturnRecoveryString(const std::string& emailAddress_,
+                                                   const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_);
+        boost::optional<std::string> createAndReturnRecoveryString(const std::string& emailAddress_,
+                                                                   boost::asio::yield_context yield_,
+                                                                   std::error_code& error_);
         /**
          * This function is used to get user for the given email adress and calls the call back function onGetUserForEmailAddressAndRecoveryStringCallbackFn.
          * @param emailAddress_ - Email address  received from the user.
@@ -168,18 +179,12 @@ namespace Santiago{ namespace Authentication
                                                              const std::string& recoverystring_,
                                                              const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
         
-        boost::optional<std::string> asyncGetUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
-                                                                                  const std::string& recoverystring_,
-                                                                                  boost::asio::yield_context yield_,
-                                                                                  std::error_code& error_);  
+        boost::optional<std::string> getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                             const std::string& recoverystring_,
+                                                                             boost::asio::yield_context yield_,
+                                                                             std::error_code& error_);  
         
-        /**
-         * This function is used to create and return a recovery string for the  user using the given email address and calls the call back function onCreateAndReturnRecoveryStringCallbackFn.
-         * @param emailAddress_ - EmailAddress received from the user.
-         * @param onCreateAndReturnRecoveryStringCallbackFn_ - Handler function for create and return recovery string operations.
-         */
-        virtual void createAndReturnRecoveryString(const std::string& emailAddress_,
-                                                   const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_);
+       
 
         
         /**
@@ -334,7 +339,7 @@ namespace Santiago{ namespace Authentication
          * @param errorCodeCallbackFn_ - Call back function 
          * @param error_ - Error code for representing errors.
          */
-        void postCallbackFn(const ErrorCodeCallbackFn& errorCodeCallbackFn_,const std::error_code& error_);
+        void postCallbackFn1(const ErrorCodeCallbackFn& errorCodeCallbackFn_,const std::error_code& error_);
         
          /**
          * This function is used for calling call back functions

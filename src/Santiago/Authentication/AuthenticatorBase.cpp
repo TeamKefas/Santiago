@@ -30,25 +30,25 @@ namespace Santiago{ namespace Authentication
         return ret;       
     }
 
-    void AuthenticatorBase::asyncCreateUser(const std::string& userName_,
-                                             const std::string& emailAddress_,
-                                             const std::string& password_,
-                                             boost::asio::yield_context yield_,
-                                             std::error_code& error_)
+    void AuthenticatorBase::createUser(const std::string& userName_,
+                                       const std::string& emailAddress_,
+                                       const std::string& password_,
+                                       boost::asio::yield_context yield_,
+                                       std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));
         
         boost::asio::async_result<decltype(handler)> result(handler);
         
-        createUser(userName_,
-                   emailAddress_,
-                   password_,
-                   [&error_,handler](const std::error_code& ec_)
-                   {
-                       error_ = ec_;
-                       asio_handler_invoke(handler, &handler);
-                   });
+        createUserImpl(userName_,
+                       emailAddress_,
+                       password_,
+                       [&error_,handler](const std::error_code& ec_)
+                       {
+                           error_ = ec_;
+                           asio_handler_invoke(handler, &handler);
+                       });
         
         result.get();
     }
@@ -56,11 +56,11 @@ namespace Santiago{ namespace Authentication
 
     
     boost::optional<std::pair<UserInfo,std::string> >
-    AuthenticatorBase::asyncLoginUser(const std::string& userNameOrEmailAddress_,
-                                      bool isUserNameNotEmailAddress_,
-                                      const std::string& password_,
-                                      boost::asio::yield_context yield_,
-                                      std::error_code& error_)
+    AuthenticatorBase::loginUser(const std::string& userNameOrEmailAddress_,
+                                 bool isUserNameNotEmailAddress_,
+                                 const std::string& password_,
+                                 boost::asio::yield_context yield_,
+                                 std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));
@@ -68,49 +68,30 @@ namespace Santiago{ namespace Authentication
         boost::asio::async_result<decltype(handler)> result(handler);
         boost::optional<std::pair<UserInfo,std::string> > ret;
         
-        loginUser(userNameOrEmailAddress_,
-                  isUserNameNotEmailAddress_,
-                  password_,
-                  [&error_,&ret,handler](const std::error_code& ec_,
-                                         const boost::optional<std::pair<UserInfo,std::string> >& userInfoCookiePairOpt_)
-                  {
-                      error_ = ec_;
-                      ret = userInfoCookiePairOpt_;
-                      asio_handler_invoke(handler, &handler);
-                  });
+        loginUserImpl(userNameOrEmailAddress_,
+                      isUserNameNotEmailAddress_,
+                      password_,
+                      [&error_,&ret,handler](const std::error_code& ec_,
+                                             const boost::optional<std::pair<UserInfo,std::string> >& userInfoCookiePairOpt_)
+                      {
+                          error_ = ec_;
+                          ret = userInfoCookiePairOpt_;
+                          asio_handler_invoke(handler, &handler);
+                      });
         result.get();
         return ret;
     }
 
-    void AuthenticatorBase::asyncLogoutUserForCookie(const std::string& cookieString_,
-                                                     boost::asio::yield_context yield_,
-                                                     std::error_code& error_)
-    {
-         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
-        boost::asio::async_result<decltype(handler)> result(handler);
-        
-        logoutUserForCookie(cookieString_,
-                            [&error_,handler](const std::error_code& ec_)
-                            {
-                                error_ = ec_;
-                                asio_handler_invoke(handler, &handler);
-                            });
-        
-        result.get();
-    }
-
-    void AuthenticatorBase:: asyncLogoutUserForAllCookies(const std::string& userName_,
-                                                          boost::asio::yield_context yield_,
-                                                          std::error_code& error_)
+    void AuthenticatorBase::logoutUserForCookie(const std::string& cookieString_,
+                                                boost::asio::yield_context yield_,
+                                                std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));
         
         boost::asio::async_result<decltype(handler)> result(handler);
         
-        logoutUserForAllCookies(userName_,
+        logoutUserForCookieImpl(cookieString_,
                                 [&error_,handler](const std::error_code& ec_)
                                 {
                                     error_ = ec_;
@@ -120,41 +101,85 @@ namespace Santiago{ namespace Authentication
         result.get();
     }
 
-    void AuthenticatorBase::asyncChangeUserPassword(const std::string& cookieString_,
-                                                    const std::string& oldPassword_,
-                                                    const std::string& newPassword_,
-                                                    boost::asio::yield_context yield_,
-                                                    std::error_code& error_  )
+    void AuthenticatorBase:: logoutUserForAllCookies(const std::string& userName_,
+                                                     boost::asio::yield_context yield_,
+                                                     std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));
         
         boost::asio::async_result<decltype(handler)> result(handler);
         
-        changeUserPassword(cookieString_,
-                           oldPassword_,
-                           newPassword_,
-                           [&error_,handler](const std::error_code& ec_)
-                           {
-                               error_ = ec_;
-                               asio_handler_invoke(handler, &handler);
-                           });
+        logoutUserForAllCookiesImpl(userName_,
+                                    [&error_,handler](const std::error_code& ec_)
+                                    {
+                                        error_ = ec_;
+                                        asio_handler_invoke(handler, &handler);
+                                    });
         
         result.get();
     }
 
-    boost::optional<std::string> AuthenticatorBase::asyncGetUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
-                                                                                                 const std::string& recoverystring_,
-                                                                                                 boost::asio::yield_context yield_,
-                                                                                                 std::error_code& error_)
+    void AuthenticatorBase::changeUserPassword(const std::string& cookieString_,
+                                               const std::string& oldPassword_,
+                                               const std::string& newPassword_,
+                                               boost::asio::yield_context yield_,
+                                               std::error_code& error_  )
     {
-         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+            handler(std::forward<boost::asio::yield_context>(yield_));
+        
+        boost::asio::async_result<decltype(handler)> result(handler);
+        
+        changeUserPasswordImpl(cookieString_,
+                               oldPassword_,
+                               newPassword_,
+                               [&error_,handler](const std::error_code& ec_)
+                               {
+                                   error_ = ec_;
+                                   asio_handler_invoke(handler, &handler);
+                               });
+        
+        result.get();
+    }
+
+    boost::optional<std::string> AuthenticatorBase::createAndReturnRecoveryString(const std::string& emailAddress_,
+                                                                                  boost::asio::yield_context yield_,
+                                                                                  std::error_code& error_)
+    {
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));
         
         boost::asio::async_result<decltype(handler)> result(handler);
         boost::optional<std::string> ret;
         
-        getUserForEmailAddressAndRecoveryString(
+        createAndReturnRecoveryStringImpl(
+            emailAddress_,
+            [&error_,&ret,handler](const std::error_code& ec_,
+                                   const boost::optional<std::string>& recoveryStringOpt_)
+            {
+                error_ = ec_;
+                ret = recoveryStringOpt_;
+                asio_handler_invoke(handler, &handler);
+            });
+        
+        result.get();
+        return ret;
+    }
+         
+
+    boost::optional<std::string> AuthenticatorBase::getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                                            const std::string& recoverystring_,
+                                                                                            boost::asio::yield_context yield_,
+                                                                                            std::error_code& error_)
+    {
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+            handler(std::forward<boost::asio::yield_context>(yield_));
+        
+        boost::asio::async_result<decltype(handler)> result(handler);
+        boost::optional<std::string> ret;
+        
+        getUserForEmailAddressAndRecoveryStringImpl(
             emailAddress_,
             recoverystring_,
             [&error_,&ret,handler](const std::error_code& ec_,
@@ -184,12 +209,22 @@ namespace Santiago{ namespace Authentication
                                        const std::string& password_,
                                        const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
+/*        std::bind(&AuthenticatorBase::postCallbackFn,
+                  this,
+                  onCreateUserCallbackFn_,
+                  std::placeholders::_1);
+*/        
+         ErrorCodeCallbackFn postCallbackWrapper(std::bind(&AuthenticatorBase::postCallbackFn1,
+                                                           this,
+                                                           onCreateUserCallbackFn_,
+                                                           std::placeholders::_1));
+         
         _strand.post(std::bind(&AuthenticatorBase::createUserImpl,
                                this,
                                userName_,
                                emailAddress_,
                                password_,
-                               onCreateUserCallbackFn_));
+                               postCallbackWrapper));
     }
     
     void AuthenticatorBase::loginUser(const std::string& userNameOrEmailAddress_,
@@ -204,7 +239,7 @@ namespace Santiago{ namespace Authentication
                                password_,
                                onLoginUserCallbackFn_));
     }
-
+    
     void AuthenticatorBase::logoutUserForCookie(const std::string& cookieString_,
                                                 const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
     {
@@ -304,7 +339,7 @@ namespace Santiago{ namespace Authentication
         _ioService.post(errorCodeUserInfoStringPairCallbackFnImpl);
     }
 
-    void AuthenticatorBase::postCallbackFn(const ErrorCodeCallbackFn& errorCodeCallbackFn_,
+    void AuthenticatorBase::postCallbackFn1(const ErrorCodeCallbackFn& errorCodeCallbackFn_,
                                            const std::error_code& error_)
     {
         std::function<void()> errorCodeCallbackFnImpl = std::bind(errorCodeCallbackFn_,error_);

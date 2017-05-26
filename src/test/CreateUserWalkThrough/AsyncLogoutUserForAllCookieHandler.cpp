@@ -12,7 +12,7 @@ namespace Test{ namespace AppServer
         request_->out()<<"Logging out "<<userName_<<"..."<<std::endl;
 
         std::error_code error1;
-        _userController.asyncLogoutUserForAllCookies(
+        _userController.logoutUserForAllCookies(
             userName_,
             yield_,
             error1);

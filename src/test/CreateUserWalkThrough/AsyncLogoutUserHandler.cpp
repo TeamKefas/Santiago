@@ -12,7 +12,7 @@ namespace Test{ namespace AppServer
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         request_->out()<<"Logging out "<<userName_<<"..."<<std::endl;
 
-        _userController.asyncLogoutUserForCookie(
+        _userController.logoutUserForCookie(
             cookieString_,
             yield_,
             error1);

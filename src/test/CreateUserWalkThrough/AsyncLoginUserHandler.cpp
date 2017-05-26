@@ -39,7 +39,7 @@ namespace Test{ namespace AppServer
         else if(request_->getPostData().end() != userNameIter)
         {
             userInfoCookieStringPair =
-                _userController.asyncLoginUser(
+                _userController.loginUser(
                     userNameIter->second,
                     true,
                     passwordIter->second,
@@ -49,7 +49,7 @@ namespace Test{ namespace AppServer
         else
         {
            userInfoCookieStringPair =
-               _userController.asyncLoginUser(
+               _userController.loginUser(
                    emailIter->second,
                    false,
                    passwordIter->second,

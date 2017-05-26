@@ -45,7 +45,7 @@ namespace Test { namespace AppServer
         else
         {
             std::error_code error1;
-            _userController.asyncCreateUser(
+            _userController.createUser(
                 userNameIter->second,
                 emailAddressIter->second,
                 passwordIter->second,
