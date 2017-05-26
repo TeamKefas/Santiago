@@ -70,6 +70,20 @@ namespace Santiago{ namespace Authentication
 	{}
 
         /**
+         * This function is used for the getting user info details for the given cookie string.
+         * @param cookieString_ - Cookie string received from the user.
+         * @param onVerifyUserCallbackFn_ - Handler function for the get user info operations.
+         */
+        virtual void verifyCookieAndGetUserInfo(
+            const std::string& cookieString_,
+            const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_);
+        
+        boost::optional<UserInfo> verifyCookieAndGetUserInfo(
+            const std::string& cookieString_,
+            boost::asio::yield_context yield_,
+            std::error_code& error_);
+
+        /**
          * This function is used to create a new user using the user credentials given by the user.
          * @param userName_ - User name provided by the user.
          * @param emailAddress_ - Email address provided by the user. 
@@ -80,6 +94,13 @@ namespace Santiago{ namespace Authentication
                                 const std::string& emailAddress_,
                                 const std::string& password_,
                                 const ErrorCodeCallbackFn& onCreateUserCallbackFn_);
+        
+        void asyncCreateUser(const std::string& userName_,
+                                              const std::string& emailAddress_,
+                                              const std::string& password_,
+                                              boost::asio::yield_context yield_,
+                                              std::error_code& error_);
+        
         
         /**
          * ///Message\\
@@ -99,21 +120,6 @@ namespace Santiago{ namespace Authentication
                                                                          boost::asio::yield_context yield_,
                                                                          std::error_code& error_);
 
-                
-        /**
-         * This function is used for the getting user info details for the given cookie string.
-         * @param cookieString_ - Cookie string received from the user.
-         * @param onVerifyUserCallbackFn_ - Handler function for the get user info operations.
-         */
-        virtual void verifyCookieAndGetUserInfo(
-            const std::string& cookieString_,
-            const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_);
-
-        boost::optional<UserInfo> verifyCookieAndGetUserInfo(
-            const std::string& cookieString_,
-            boost::asio::yield_context yield_,
-            std::error_code& error_);
-
         /**
          * This function is used for logging out user account for the  given cookie string.
          * @param cookieString_ - Cookie string received from the user.
@@ -121,6 +127,10 @@ namespace Santiago{ namespace Authentication
          */
         virtual void logoutUserForCookie(const std::string& cookieString_,
                                          const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
+        
+        void asyncLogoutUserForCookie(const std::string& cookieString_,
+                                      boost::asio::yield_context yield_,
+                                      std::error_code& error_);
         /**
          * This function is used for loging out user account for all cookies.
          * @param userName_ - username of the user.
@@ -128,6 +138,10 @@ namespace Santiago{ namespace Authentication
          */
         virtual void logoutUserForAllCookies(const std::string& userName_,
                                              const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_);
+
+        void asyncLogoutUserForAllCookies(const std::string& userName_,
+                                          boost::asio::yield_context yield_,
+                                          std::error_code& error_);
          /**
          * This function is used for updating the user password using the new password provided by the user.
          * @param cookieString_ -Cookie string received from the user.
@@ -139,6 +153,12 @@ namespace Santiago{ namespace Authentication
                                         const std::string& oldPassword_,
                                         const std::string& newPassword_,
                                         const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
+        
+        void asyncChangeUserPassword(const std::string& cookieString_,
+                                     const std::string& oldPassword_,
+                                     const std::string& newPassword_,
+                                     boost::asio::yield_context yield_,
+                                     std::error_code& error_  );
         /**
          * This function is used to get user for the given email adress and calls the call back function onGetUserForEmailAddressAndRecoveryStringCallbackFn.
          * @param emailAddress_ - Email address  received from the user.
@@ -147,6 +167,11 @@ namespace Santiago{ namespace Authentication
         virtual void getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
                                                              const std::string& recoverystring_,
                                                              const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
+        
+        boost::optional<std::string> asyncGetUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                                  const std::string& recoverystring_,
+                                                                                  boost::asio::yield_context yield_,
+                                                                                  std::error_code& error_);  
         
         /**
          * This function is used to create and return a recovery string for the  user using the given email address and calls the call back function onCreateAndReturnRecoveryStringCallbackFn.

@@ -44,31 +44,17 @@ namespace Test{ namespace AppServer
                     true,
                     passwordIter->second,
                     yield_,
-                    error1);    
-            /* std::bind(&AsyncLoginUserHandler::handleLoginUser,
-               this->sharedFromThis<AsyncLoginUserHandler>(),
-               request_,
-               userNameIter->second,
-               std::placeholders::_1,
-               std::placeholders::_2));*/
-            
+                    error1);                
         }
         else
         {
            userInfoCookieStringPair =
                _userController.asyncLoginUser(
                    emailIter->second,
-                   true,
+                   false,
                    passwordIter->second,
                    yield_,
-                   error1);
-               
-               /* std::bind(&AsyncLoginUserHandler::handleLoginUser,
-                  this->sharedFromThis<AsyncLoginUserHandler>(),
-                  request_,
-                  emailIter->second,
-                  std::placeholders::_1,
-                  std::placeholders::_2));*/
+                   error1);              
         }
         
         if (error1)
@@ -98,33 +84,4 @@ namespace Test{ namespace AppServer
         
     }
 
-    void AsyncLoginUserHandler::handleLoginUser(const RequestPtr& request_,
-                                                const std::string& userName_,
-                                                std::error_code error_,
-                                                const boost::optional<std::pair<Santiago::Authentication::UserInfo,std::string> >& userInfoCookieStringPair_)
-    {
-        if(error_)
-        {
-            request_->out()<<"User authentication failed. \n";
-            request_->out()<<error_.message()<<std::endl;
-            request_->setAppStatus(0);
-            std::error_code error;
-            request_->commit(error);
-        }
-        else
-        {
-            BOOST_ASSERT(userInfoCookieStringPair_);
-            Santiago::HTTPCookieData cookieData;
-            cookieData._name = "SID";
-            cookieData._value = userInfoCookieStringPair_->second;
-//            cookieData._expiryTime = boost::posix_time::second_clock::universal_time() + boost::posix_time::seconds(240);
-            bool flag = request_->responseHTTPCookies().insert(cookieData).second;
-            ST_ASSERT(flag);
-
-            request_->out()<<"User login successfull. \n";
-            request_->setAppStatus(0);
-            std::error_code error;
-            request_->commit(error);
-        }
-    }
     }}

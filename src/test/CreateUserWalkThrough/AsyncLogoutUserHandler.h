@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_TEST_APPSERVER_ASYNCLOGINHANDLER_H
-#define SANTIAGO_TEST_APPSERVER_ASYNCLOGINHANDLER_H
+#ifndef SANTIAGO_TEST_APPSERVER_ASYNCLOGOUTHANDLER_H
+#define SANTIAGO_TEST_APPSERVER_ASYNCLOGOUTHANDLER_H
 
 #include <memory>
 
@@ -7,12 +7,12 @@
 
 namespace Test{ namespace AppServer
 {
-   class AsyncLoginUserHandler:public RequestHandlerBase
+   class AsyncLogoutUserHandler:public RequestHandlerBase
    {
    public:
 
-       AsyncLoginUserHandler(Santiago::Authentication::AuthenticatorBase& userController_):
-            RequestHandlerBase(userController_)
+       AsyncLogoutUserHandler(Santiago::Authentication::AuthenticatorBase& userController_):
+           RequestHandlerBase(userController_)
        {}
 
    protected:
@@ -28,5 +28,6 @@ namespace Test{ namespace AppServer
 
    };
     }}
+
 
 #endif

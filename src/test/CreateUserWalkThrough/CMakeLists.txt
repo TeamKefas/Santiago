@@ -9,7 +9,10 @@ set(CreateUserWalkThrough_SRCS  main.cpp
 				PasswordRecoveryInitiateRecoveryHandler.cpp
 				PasswordRecoveryReceiveNewPasswordHandler.cpp
 				PasswordRecoverySetNewPasswordHandler.cpp
-	  			AsyncLoginUserHandler.cpp)
+				AsyncCreateUserHandler.cpp	
+	  			AsyncLoginUserHandler.cpp
+				AsyncLogoutUserHandler.cpp
+				AsyncLogoutUserForAllCookieHandler.cpp )
 
 if(WIN32)
   set(CreateUserWalkThrough_SRCS 
@@ -26,7 +29,10 @@ if(WIN32)
     PasswordRecoveryInitiateRecoveryHandler.h
     PasswordRecoveryReceiveNewPasswordHandler.h
     PasswordRecoverySetNewPasswordHandler.h
-    AsyncLoginUserHandler.h)
+    AsyncCreateUserHandler.ch
+    AsyncLoginUserHandler.h
+    AsyncLogoutUserHandler.h
+    AsyncLogoutUserForAllCookieHandler.h)
 endif(WIN32)
 
 

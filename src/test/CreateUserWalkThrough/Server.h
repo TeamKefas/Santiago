@@ -18,8 +18,11 @@
 #include "PasswordRecoveryInitiateRecoveryHandler.h"
 #include "PasswordRecoveryReceiveNewPasswordHandler.h"
 #include "PasswordRecoverySetNewPasswordHandler.h"
-#include "AsyncLoginUserHandler.h"
 
+#include "AsyncCreateUserHandler.h"
+#include "AsyncLoginUserHandler.h"
+#include "AsyncLogoutUserHandler.h"
+#include "AsyncLogoutUserForAllCookieHandler.h"
 
 namespace Test{ namespace AppServer
 {
@@ -51,7 +54,7 @@ namespace Test{ namespace AppServer
             
             if(documentURI_ == "/createuser.fcgi")
             {
-                ret.reset(new CreateUserHandler(_userController));
+                	ret.reset(new AsyncCreateUserHandler(_userController));
             }
             else if(documentURI_ == "/loginuser.fcgi")
             {
@@ -59,11 +62,11 @@ namespace Test{ namespace AppServer
             }
             else if(documentURI_ == "/logoutuser.fcgi")
             {
-                ret.reset(new LogoutUserHandler(_userController));
+                ret.reset(new AsyncLogoutUserHandler(_userController));
             }
             else if(documentURI_ == "/logoutuserforallcookie.fcgi")
             {
-                ret.reset(new LogoutUserForAllCookieHandler(_userController));
+                ret.reset(new AsyncLogoutUserForAllCookieHandler(_userController));
             }
             else if(documentURI_ == "/getuserinfo.fcgi")
             {
