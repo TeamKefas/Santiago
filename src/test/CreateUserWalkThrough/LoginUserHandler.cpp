@@ -67,9 +67,9 @@ namespace Test{ namespace AppServer
     }
 
     void LoginUserHandler::handleLoginUser(const RequestPtr& request_,
-                                       const std::string& userName_,
-                                       std::error_code error_,
-                                       const boost::optional<std::pair<Santiago::Authentication::UserInfo,std::string> >& userInfoCookieStringPair_)
+                                           const std::string& userName_,
+                                           std::error_code error_,
+                                           const boost::optional<std::pair<Santiago::Authentication::UserInfo,std::string> >& userInfoCookieStringPair_)
     {
         if(error_)
         {
