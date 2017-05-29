@@ -14,10 +14,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
-#undef NDEBUG
 #include <cassert>
-
-#include "LogLevel.h"
 
 //#define BOOST_ENABLE_ASSERT_HANDLER 1
 
@@ -28,43 +25,50 @@
 #define SOURCE_FILE (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : strrchr(__FILE__, '\\') ? \
 strrchr(__FILE__, '\\') + 1 : __FILE__)
 
-#define ST_LOG_IMPL(statement,log_type)\
+#define ST_LOG_IMPL(statement,log_level)\
     {\
-        Santiago::Utils::logLevel log = Santiago::Utils::logLevel::DEBUG; \
-        if(log_type == Santiago::Utils::logLevelStringMap.find(log)->second) \
+        unsigned logLevelInt = static_cast<unsigned>(log_level);\
+        if(logLevelInt >= static_cast<unsigned>(Santiago::Utils::STLog::GetInstance().getLogLevel())) \
         {\
             boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); \
             std::lock_guard<std::mutex> guard(Santiago::Utils::STLog::GetInstance().mutex()); \
             Santiago::Utils::STLog::GetInstance().stream()              \
             << SOURCE_FILE << "(LineNo:" << __LINE__ << ") ThreadNo:"<<std::this_thread::get_id() << " [" \
-            << boost::posix_time::to_simple_string(now)<<"] "<< log_type<<": "<< statement << std::endl; \
+            << boost::posix_time::to_simple_string(now)<<"] "<<\
+                Santiago::Utils::LogLevelStringMap[logLevelInt]<<": "<< statement << std::endl; \
         }\
     }\
 
-//#define NDEBUG
-#define ST_ASSERT_IMPL(statement,log_type)\
+#define ST_ASSERT(statement)\
     {\
         if(!(statement))\
         {\
-            boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); \
-            std::lock_guard<std::mutex> guard(Santiago::Utils::STLog::GetInstance().mutex()); \
-            Santiago::Utils::STLog::GetInstance().stream()              \
-            << SOURCE_FILE << "(LineNo:" << __LINE__ << ") ThreadNo:"<<std::this_thread::get_id() << " [" \
-            << boost::posix_time::to_simple_string(now)<<"] "<< log_type<<": "<< "Assertion failed." << std::endl; \
-            assert(statement);                                          \
+            ST_LOG_IMPL(#statement,Santiago::Utils::LogLevel::ASSERT);\
+            assert(statement);\
         }\
     }\
 
-#define ST_LOG_DEBUG(statement) ST_LOG_IMPL(statement,"DEBUG")
-#define ST_LOG_INFO(statement) ST_LOG_IMPL(statement,"INFO")
-#define ST_LOG_ERROR(statement) ST_LOG_IMPL(statement,"ERROR")
-#define ST_LOG_CRITICAL(statement) ST_LOG_IMPL(statement,"CRITICAL")
-#define ST_ASSERT(statement) ST_ASSERT_IMPL(statement, "ASSERT")
+#define ST_LOG_DEBUG(statement) ST_LOG_IMPL(statement,Santiago::Utils::LogLevel::DEBUG)
+#define ST_LOG_INFO(statement) ST_LOG_IMPL(statement,Santiago::Utils::LogLevel::INFO)
+#define ST_LOG_ERROR(statement) ST_LOG_IMPL(statement,Santiago::Utils::LogLevel::ERROR)
+#define ST_LOG_CRITICAL(statement) ST_LOG_IMPL(statement,Santiago::Utils::LogLevel::CRITICAL)
 
 //#undef NDEBUG
 
 namespace Santiago{ namespace Utils
-{   
+{
+
+    enum class LogLevel
+    {
+        DEBUG = 0,
+        INFO = 1,
+        ERROR = 2,
+        CRITICAL = 3,
+        ASSERT = 4
+    };
+    
+    extern const std::array<std::string,5> LogLevelStringMap;
+    
     class STLog
     {
     public:
@@ -86,6 +90,10 @@ namespace Santiago{ namespace Utils
           * @param  fileName_ -  It is used to create a new Log file.
           */
         void setOutputFile(const std::string& fileName_);
+
+        void setLogLevel(LogLevel logLevel_) {_logLevel = logLevel_;}
+        LogLevel getLogLevel() const {return _logLevel;}
+        
         /**
          * The destructor
          */
@@ -108,6 +116,7 @@ namespace Santiago{ namespace Utils
 
         boost::optional<std::pair<std::string,OStreamPtr> >  _fileNameStreamPair;
         std::mutex                                           _mutex;
+        LogLevel                                             _logLevel;
     };
 
 }} //closing namespace Santiago::Utils

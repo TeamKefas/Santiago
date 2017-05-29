@@ -4,6 +4,12 @@
 
 namespace Santiago{ namespace Utils
 {
+    const std::array<std::string, 5> LogLevelStringMap = {"DEBUG",
+                                                          "INFO",
+                                                          "ERROR",
+                                                          "CRITICAL",
+                                                          "ASSERT FAILED"};
+                                                               
     STLog& STLog::GetInstance()
     {
         static STLog instance;
@@ -12,8 +18,13 @@ namespace Santiago{ namespace Utils
 
     STLog::STLog():
         _fileNameStreamPair(boost::none),
-        _mutex()
-    {}
+        _mutex(),
+        _logLevel(LogLevel::INFO)
+    {
+#ifndef NDEBUG
+        _logLevel = LogLevel::DEBUG;
+#endif
+    }
 
     void STLog::setOutputFile(const std::string& fileName_)
     {
