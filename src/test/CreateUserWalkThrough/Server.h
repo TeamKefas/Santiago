@@ -23,6 +23,8 @@
 #include "AsyncLoginUserHandler.h"
 #include "AsyncLogoutUserHandler.h"
 #include "AsyncLogoutUserForAllCookieHandler.h"
+#include "AsyncGetUserInfoHandler.h"
+#include "AsyncDeleteUserHandler.h"
 
 namespace Test{ namespace AppServer
 {
@@ -70,11 +72,11 @@ namespace Test{ namespace AppServer
             }
             else if(documentURI_ == "/getuserinfo.fcgi")
             {
-                ret.reset(new GetUserInfoHandler(_userController));
+                ret.reset(new AsyncGetUserInfoHandler(_userController));
             }
             else if(documentURI_ == "/deleteuser.fcgi")
             {
-                ret.reset(new DeleteUserHandler(_userController));
+                ret.reset(new AsyncDeleteUserHandler(_userController));
             }
             else if(documentURI_ == "/password-recovery-initiate.fcgi")
             {

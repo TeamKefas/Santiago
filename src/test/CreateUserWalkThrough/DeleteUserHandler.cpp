@@ -30,7 +30,7 @@ namespace Test{ namespace AppServer
     }
 
     void DeleteUserHandler::handleDeleteUser(const RequestPtr& request_,
-                                         std::error_code error_)
+                                             std::error_code error_)
     {
         if(error_)
         {

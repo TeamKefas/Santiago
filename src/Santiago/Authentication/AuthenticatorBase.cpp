@@ -194,7 +194,26 @@ namespace Santiago{ namespace Authentication
         return ret;
     }
     
+    void AuthenticatorBase::deleteUser(const std::string& cookieString_,
+                                       boost::asio::yield_context yield_,
+                                       std::error_code& error_)
+    {
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+            handler(std::forward<boost::asio::yield_context>(yield_));
+        
+        boost::asio::async_result<decltype(handler)> result(handler);
+        
+        deleteUserImpl(cookieString_,
+                       [&error_,handler](const std::error_code& ec_)
+                       {
+                           error_ = ec_;
+                           asio_handler_invoke(handler, &handler);
+                       });
+        
+        result.get();
+    }
 
+    
     void AuthenticatorBase::verifyCookieAndGetUserInfo(const std::string& cookieString_,
                                                        const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {

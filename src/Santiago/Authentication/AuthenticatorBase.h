@@ -216,6 +216,10 @@ namespace Santiago{ namespace Authentication
         virtual void deleteUser(const std::string& cookieString_,
                                 const ErrorCodeCallbackFn& onDeleteUserCallbackFn_);
 
+	void deleteUser(const std::string& cookieString_,
+			boost::asio::yield_context yield_,
+                        std::error_code& error_);
+
         //implementation functions
         /**
          * Implementation function for createUser.
