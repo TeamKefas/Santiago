@@ -101,7 +101,7 @@ namespace Santiago{ namespace Authentication
         result.get();
     }
 
-    void AuthenticatorBase:: logoutUserForAllCookies(const std::string& userName_,
+    void AuthenticatorBase::logoutUserForAllCookies(const std::string& userName_,
                                                      boost::asio::yield_context yield_,
                                                      std::error_code& error_)
     {
@@ -193,6 +193,30 @@ namespace Santiago{ namespace Authentication
         result.get();
         return ret;
     }
+
+    void AuthenticatorBase::changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                               const std::string& recoveryString_,
+                                                                               const std::string& newPassword_,
+                                                                               boost::asio::yield_context yield_,
+                                                                               std::error_code& error_)
+    {
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+            handler(std::forward<boost::asio::yield_context>(yield_));
+        
+        boost::asio::async_result<decltype(handler)> result(handler);
+        
+        changeUserPasswordForEmailAddressAndRecoveryStringImpl(emailAddress_,
+                                                               recoveryString_,
+                                                               newPassword_,
+                                                               [&error_,handler](const std::error_code& ec_)
+                                                               {
+                                                                   error_ = ec_;
+                                                                   asio_handler_invoke(handler, &handler);
+                                                               });
+        
+        result.get();
+    }
+        
     
     void AuthenticatorBase::deleteUser(const std::string& cookieString_,
                                        boost::asio::yield_context yield_,

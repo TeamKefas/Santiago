@@ -159,6 +159,17 @@ namespace Santiago{ namespace Authentication
                                 const std::string& newPassword_,
                                 boost::asio::yield_context yield_,
                                 std::error_code& error_  );
+         /**
+         * This function is used to update the email address using the email address provided by the user.
+         * @param - cookieString_ - Cookie string received from the user.
+         * @param - newEmailAddress_ - Email address received from the user.
+         * @param - password_ - Password from the user.
+         * @param - onChangeEmailAddressCallbackFn_ - Handler function for email change operations.
+         */
+        virtual void changeUserEmailAddress(const std::string& cookieString_,
+                                            const std::string& newEmailAddress_,
+                                            const std::string& password_,
+                                            const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
 
          /**
          * This function is used to create and return a recovery string for the  user using the given email address and calls the call back function onCreateAndReturnRecoveryStringCallbackFn.
@@ -197,17 +208,11 @@ namespace Santiago{ namespace Authentication
                                                                         const std::string& recoveryString_,
                                                                         const std::string& newPassword_,
                                                                         const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_);
-        /**
-         * This function is used to update the email address using the email address provided by the user.
-         * @param - cookieString_ - Cookie string received from the user.
-         * @param - newEmailAddress_ - Email address received from the user.
-         * @param - password_ - Password from the user.
-         * @param - onChangeEmailAddressCallbackFn_ - Handler function for email change operations.
-         */
-        virtual void changeUserEmailAddress(const std::string& cookieString_,
-                                            const std::string& newEmailAddress_,
-                                            const std::string& password_,
-                                            const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
+        void changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                const std::string& recoveryString_,
+                                                                const std::string& newPassword_,
+                                                                boost::asio::yield_context yield_,
+                                                                std::error_code& error_);
         /**
          * This function is used to delete a user using the given cookie string and calls the call back function onDeleteUserCallbackFn.
          * @param cookieString_ - Cookie string received from the user.

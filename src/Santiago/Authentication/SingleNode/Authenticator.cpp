@@ -429,9 +429,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     }
 
     void Authenticator::changeUserEmailAddressImpl(const std::string& cookieString_,
-                                                const std::string& newEmailAddress_,
-                                                const std::string& password_,
-                                                const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
+                                                   const std::string& newEmailAddress_,
+                                                   const std::string& password_,
+                                                   const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
     {
         std::map<std::string,SantiagoDBTables::SessionsRec>::iterator cookieStringSessionsRecMapIter;
         std::error_code error;
