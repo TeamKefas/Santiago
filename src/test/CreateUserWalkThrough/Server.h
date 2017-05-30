@@ -56,27 +56,27 @@ namespace Test{ namespace AppServer
             
             if(documentURI_ == "/createuser.fcgi")
             {
-                	ret.reset(new AsyncCreateUserHandler(_userController));
+                ret.reset(new CreateUserHandler(_userController));
             }
             else if(documentURI_ == "/loginuser.fcgi")
             {
-                ret.reset(new AsyncLoginUserHandler(_userController));
+                ret.reset(new LoginUserHandler(_userController));
             }
             else if(documentURI_ == "/logoutuser.fcgi")
             {
-                ret.reset(new AsyncLogoutUserHandler(_userController));
+                ret.reset(new LogoutUserHandler(_userController));
             }
             else if(documentURI_ == "/logoutuserforallcookie.fcgi")
             {
-                ret.reset(new AsyncLogoutUserForAllCookieHandler(_userController));
+                ret.reset(new LogoutUserForAllCookieHandler(_userController));
             }
             else if(documentURI_ == "/getuserinfo.fcgi")
             {
-                ret.reset(new AsyncGetUserInfoHandler(_userController));
+                ret.reset(new GetUserInfoHandler(_userController));
             }
             else if(documentURI_ == "/deleteuser.fcgi")
             {
-                ret.reset(new AsyncDeleteUserHandler(_userController));
+                ret.reset(new DeleteUserHandler(_userController));
             }
             else if(documentURI_ == "/password-recovery-initiate.fcgi")
             {
@@ -90,6 +90,43 @@ namespace Test{ namespace AppServer
             {
                 ret.reset(new PasswordRecoverySetNewPasswordHandler(_userController));
             }
+
+	    else if(documentURI_ == "/async-createuser.fcgi")
+            {
+                ret.reset(new AsyncCreateUserHandler(_userController));
+            }
+            else if(documentURI_ == "/async-loginuser.fcgi")
+            {
+                ret.reset(new AsyncLoginUserHandler(_userController));
+            }
+            else if(documentURI_ == "/async-logoutuser.fcgi")
+            {
+                ret.reset(new AsyncLogoutUserHandler(_userController));
+            }
+            else if(documentURI_ == "/async-logoutuserforallcookie.fcgi")
+            {
+                ret.reset(new AsyncLogoutUserForAllCookieHandler(_userController));
+            }
+            else if(documentURI_ == "/async-getuserinfo.fcgi")
+            {
+                ret.reset(new AsyncGetUserInfoHandler(_userController));
+            }
+            else if(documentURI_ == "/async-deleteuser.fcgi")
+            {
+                ret.reset(new AsyncDeleteUserHandler(_userController));
+            }
+           /* else if(documentURI_ == "/async-password-recovery-initiate.fcgi")
+            {
+                ret.reset(new AsyncPasswordRecoveryInitiateRecoveryHandler(_userController));
+            }
+            else if(documentURI_ == "/async-password-recovery-receive-new-password.fcgi")
+            {
+                ret.reset(new AsyncPasswordRecoveryReceiveNewPasswordHandler(_userController));
+            }
+            else if(documentURI_ == "/async-password-recovery-set-new-password.fcgi")
+            {
+                ret.reset(new AsyncPasswordRecoverySetNewPasswordHandler(_userController));
+            }*/
             else
             {
                 ret.reset(new ErrorURIHandler(_userController));
