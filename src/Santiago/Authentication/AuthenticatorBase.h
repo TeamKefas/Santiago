@@ -343,7 +343,7 @@ namespace Santiago{ namespace Authentication
          * @param errorCodeCallbackFn_ - Call back function 
          * @param error_ - Error code for representing errors.
          */
-        void postCallbackFn1(const ErrorCodeCallbackFn& errorCodeCallbackFn_,const std::error_code& error_);
+        void postCallbackFn(const ErrorCodeCallbackFn& errorCodeCallbackFn_,const std::error_code& error_);
         
          /**
          * This function is used for calling call back functions

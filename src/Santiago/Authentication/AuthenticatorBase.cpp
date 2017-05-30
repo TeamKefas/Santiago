@@ -228,16 +228,14 @@ namespace Santiago{ namespace Authentication
                                        const std::string& password_,
                                        const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
-/*        std::bind(&AuthenticatorBase::postCallbackFn,
-                  this,
-                  onCreateUserCallbackFn_,
-                  std::placeholders::_1);
-*/        
-         ErrorCodeCallbackFn postCallbackWrapper(std::bind(&AuthenticatorBase::postCallbackFn1,
-                                                           this,
-                                                           onCreateUserCallbackFn_,
-                                                           std::placeholders::_1));
-         
+
+        ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                          std::ref(onCreateUserCallbackFn_),
+                                                          std::placeholders::_1));
+        
         _strand.post(std::bind(&AuthenticatorBase::createUserImpl,
                                this,
                                userName_,
@@ -251,27 +249,54 @@ namespace Santiago{ namespace Authentication
                                       const std::string& password_,
                                       const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
     {
+        ErrorCodeUserInfoStringPairCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                                            (const ErrorCodeUserInfoStringPairCallbackFn&,
+                                                                             const std::error_code&,
+                                                                             const boost::optional<std::pair<UserInfo,std::string> >&)>
+                                                                            (&AuthenticatorBase::postCallbackFn),
+                                                                            this,
+                                                                            std::ref(onLoginUserCallbackFn_),
+                                                                            std::placeholders::_1,
+                                                                            std::placeholders::_2));
+        
         _strand.post(std::bind(&AuthenticatorBase::loginUserImpl,
                                this,
                                userNameOrEmailAddress_,
                                isUserNameNotEmailAddress_,
                                password_,
-                               onLoginUserCallbackFn_));
+                               postCallbackWrapper));
     }
     
     void AuthenticatorBase::logoutUserForCookie(const std::string& cookieString_,
                                                 const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
     {
-        _strand.post(std::bind(&AuthenticatorBase::logoutUserForCookieImpl,this,cookieString_,onLogoutCookieCallbackFn_));
+        ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                          std::ref(onLogoutCookieCallbackFn_),
+                                                          std::placeholders::_1));
+        
+        _strand.post(std::bind(&AuthenticatorBase::logoutUserForCookieImpl,
+                               this,
+                               cookieString_,
+                               postCallbackWrapper));
     }
 
     void AuthenticatorBase::logoutUserForAllCookies(const std::string& userName_,
                                                     const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
     {
+        ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                          std::ref(onLogoutAllCookiesCallbackFn_),
+                                                          std::placeholders::_1));
+        
         _strand.post(std::bind(&AuthenticatorBase::logoutUserForAllCookiesImpl,
                                this,
                                userName_,
-                               onLogoutAllCookiesCallbackFn_));
+                               postCallbackWrapper));
     }
 
     void AuthenticatorBase::changeUserPassword(const std::string& cookieString_,
@@ -279,32 +304,59 @@ namespace Santiago{ namespace Authentication
                                                const std::string& newPassword_,
                                                const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
     {
+        ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                          std::ref(onChangePasswordCallbackFn_),
+                                                          std::placeholders::_1));
+        
         _strand.post(std::bind(&AuthenticatorBase::changeUserPasswordImpl,
                                this,
                                cookieString_,
                                oldPassword_,
                                newPassword_,
-                               onChangePasswordCallbackFn_));
+                               postCallbackWrapper));
     }
     
     void AuthenticatorBase::createAndReturnRecoveryString(const std::string& emailAddress_,
                                                           const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
     {
+        ErrorCodeStringCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                                (const ErrorCodeStringCallbackFn&,
+                                                                 const std::error_code&,
+                                                                 const boost::optional<std::string>& )>
+                                                                (&AuthenticatorBase::postCallbackFn),
+                                                                this,
+                                                                std::ref(onCreateAndReturnRecoveryStringCallbackFn_),
+                                                                std::placeholders::_1,
+                                                                std::placeholders::_2));
+        
         _strand.post(std::bind(&AuthenticatorBase::createAndReturnRecoveryStringImpl,
                                this,
                                emailAddress_,
-                               onCreateAndReturnRecoveryStringCallbackFn_));
+                               postCallbackWrapper));
     }
 
     void AuthenticatorBase::getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
                                                                     const std::string& recoveryString_,
                                                                     const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
     {
+         ErrorCodeStringCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                                (const ErrorCodeStringCallbackFn&,
+                                                                 const std::error_code&,
+                                                                 const boost::optional<std::string>& )>
+                                                                (&AuthenticatorBase::postCallbackFn),
+                                                                this,
+                                                                std::ref(onGetUserForEmailAddressAndRecoveryStringCallbackFn_),
+                                                                std::placeholders::_1,
+                                                                std::placeholders::_2));
+         
         _strand.post(std::bind(&AuthenticatorBase::getUserForEmailAddressAndRecoveryStringImpl,
                                this,
                                emailAddress_,
                                recoveryString_,
-                               onGetUserForEmailAddressAndRecoveryStringCallbackFn_));
+                               postCallbackWrapper));
     }
 
     void AuthenticatorBase::changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
@@ -312,12 +364,19 @@ namespace Santiago{ namespace Authentication
                                                                                const std::string& newPassword_,
                                                                                const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
     {
+         ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                          std::ref(onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_),
+                                                          std::placeholders::_1));
+         
         _strand.post(std::bind(&AuthenticatorBase::changeUserPasswordForEmailAddressAndRecoveryStringImpl,
                                this,
                                emailAddress_,
                                recoveryString_,
                                newPassword_,
-                               onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_));
+                               postCallbackWrapper));
     }
 
     void AuthenticatorBase::changeUserEmailAddress(const std::string& cookieString_,
@@ -325,19 +384,36 @@ namespace Santiago{ namespace Authentication
                                                    const std::string& password_,
                                                    const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
     {
+         ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                           std::ref(onChangeEmailAddressCallbackFn_),
+                                                           std::placeholders::_1));
+        
         _strand.post(std::bind(&AuthenticatorBase::changeUserEmailAddressImpl,
                                this,
                                cookieString_,
                                newEmailAddress_,
                                password_,
-                               onChangeEmailAddressCallbackFn_));
+                               postCallbackWrapper));
     }
 
     
     void AuthenticatorBase::deleteUser(const std::string& cookieString_,
                                        const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
-        _strand.post(std::bind(&AuthenticatorBase::deleteUserImpl,this,cookieString_,onDeleteUserCallbackFn_));
+         ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                           this,
+                                                           std::ref(onDeleteUserCallbackFn_),
+                                                           std::placeholders::_1));
+         
+        _strand.post(std::bind(&AuthenticatorBase::deleteUserImpl,
+                               this,
+                               cookieString_,
+                               postCallbackWrapper));
     }
 
      void AuthenticatorBase::postCallbackFn(const ErrorCodeUserInfoCallbackFn& errorCodeUserInfoCallbackFn_,
@@ -358,7 +434,7 @@ namespace Santiago{ namespace Authentication
         _ioService.post(errorCodeUserInfoStringPairCallbackFnImpl);
     }
 
-    void AuthenticatorBase::postCallbackFn1(const ErrorCodeCallbackFn& errorCodeCallbackFn_,
+    void AuthenticatorBase::postCallbackFn(const ErrorCodeCallbackFn& errorCodeCallbackFn_,
                                            const std::error_code& error_)
     {
         std::function<void()> errorCodeCallbackFnImpl = std::bind(errorCodeCallbackFn_,error_);
