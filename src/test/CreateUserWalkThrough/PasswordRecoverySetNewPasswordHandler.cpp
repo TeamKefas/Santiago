@@ -21,16 +21,16 @@ namespace Test{ namespace AppServer
                                                                          boost::asio::yield_context yield_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
-        std::map<std::string,std::string>::const_iterator emailAddressIter =  request_->getPostData().find("email_address");
-        std::map<std::string,std::string>::const_iterator recoveryStringIter =  request_->getPostData().find("recovery_string");
+        std::map<std::string,std::string>::const_iterator emailAddressIter =  request_->getGetData().find("email_address");
+        std::map<std::string,std::string>::const_iterator recoveryStringIter =  request_->getGetData().find("recovery_string");
 
-        std::map<std::string,std::string>::const_iterator passwordIter =  request_->getPostData().find("password");
-        std::map<std::string,std::string>::const_iterator repeatPasswordIter =  request_->getPostData().find("repeat_password");
+        std::map<std::string,std::string>::const_iterator passwordIter =  request_->getGetData().find("password");
+        std::map<std::string,std::string>::const_iterator repeatPasswordIter =  request_->getGetData().find("repeat_password");
        
        
             
  
-        if(request_->getPostData().end() == emailAddressIter || request_->getPostData().end() == recoveryStringIter || request_->getPostData().end()== passwordIter || request_->getPostData().end() == repeatPasswordIter)
+        if(request_->getGetData().end() == emailAddressIter || request_->getGetData().end() == recoveryStringIter || request_->getGetData().end()== passwordIter || request_->getGetData().end() == repeatPasswordIter)
         {
             request_->out()<<"email_address or recovery_string not send in the post data. \n";
             request_->setAppStatus(0);

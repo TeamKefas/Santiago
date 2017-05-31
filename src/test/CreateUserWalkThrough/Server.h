@@ -8,13 +8,14 @@
 #include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "RequestHandlerBase.h"
-#include "LogoutUserHandler.h"
-#include "LoginUserHandler.h"
+#include "ErrorURIHandler.h"
+
 #include "CreateUserHandler.h"
+#include "LoginUserHandler.h"
+#include "LogoutUserHandler.h"
 #include "LogoutUserForAllCookieHandler.h"
 #include "GetUserInfoHandler.h"
 #include "DeleteUserHandler.h"
-#include "ErrorURIHandler.h"
 #include "PasswordRecoveryInitiateRecoveryHandler.h"
 #include "PasswordRecoveryReceiveNewPasswordHandler.h"
 #include "PasswordRecoverySetNewPasswordHandler.h"
@@ -25,6 +26,9 @@
 #include "AsyncLogoutUserForAllCookieHandler.h"
 #include "AsyncGetUserInfoHandler.h"
 #include "AsyncDeleteUserHandler.h"
+#include "AsyncPasswordRecoveryInitiateRecoveryHandler.h"
+#include "AsyncPasswordRecoveryReceiveNewPasswordHandler.h"
+#include "AsyncPasswordRecoverySetNewPasswordHandler.h"
 
 namespace Test{ namespace AppServer
 {
@@ -80,7 +84,7 @@ namespace Test{ namespace AppServer
             }
             else if(documentURI_ == "/password-recovery-initiate.fcgi")
             {
-                ret.reset(new PasswordRecoveryInitiateRecoveryHandler(_userController));
+                ret.reset(new PasswordRecoveryInitiateRecoveryHandler(_userController, _config));
             }
             else if(documentURI_ == "/password-recovery-receive-new-password.fcgi")
             {
@@ -115,7 +119,7 @@ namespace Test{ namespace AppServer
             {
                 ret.reset(new AsyncDeleteUserHandler(_userController));
             }
-           /* else if(documentURI_ == "/async-password-recovery-initiate.fcgi")
+            else if(documentURI_ == "/async-password-recovery-initiate.fcgi")
             {
                 ret.reset(new AsyncPasswordRecoveryInitiateRecoveryHandler(_userController));
             }
@@ -126,7 +130,7 @@ namespace Test{ namespace AppServer
             else if(documentURI_ == "/async-password-recovery-set-new-password.fcgi")
             {
                 ret.reset(new AsyncPasswordRecoverySetNewPasswordHandler(_userController));
-            }*/
+            }
             else
             {
                 ret.reset(new ErrorURIHandler(_userController));
@@ -144,8 +148,8 @@ namespace Test{ namespace AppServer
         }
 
         
-        boost::property_tree::ptree                         _config;
-        SantiagoDBConnection                                _databaseConnection;
+        boost::property_tree::ptree                                      _config;
+        SantiagoDBConnection                                             _databaseConnection;
         Santiago::Authentication::SingleNode::Authenticator              _userController;
 
     };

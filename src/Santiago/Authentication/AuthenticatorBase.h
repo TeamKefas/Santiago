@@ -170,6 +170,12 @@ namespace Santiago{ namespace Authentication
                                             const std::string& newEmailAddress_,
                                             const std::string& password_,
                                             const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
+        
+        void changeUserEmailAddress(const std::string& cookieString_,
+                                    const std::string& newEmailAddress_,
+                                    const std::string& password_,
+                                    boost::asio::yield_context yield_,
+                                    std::error_code& error_);
 
          /**
          * This function is used to create and return a recovery string for the  user using the given email address and calls the call back function onCreateAndReturnRecoveryStringCallbackFn.

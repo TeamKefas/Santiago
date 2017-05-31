@@ -21,9 +21,10 @@ namespace Test{ namespace AppServer
                                                                              boost::asio::yield_context yield_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
-        std::map<std::string,std::string>::const_iterator emailAddressIter =  request_->getPostData().find("email_address");
-        std::map<std::string,std::string>::const_iterator recoveryStringIter =  request_->getPostData().find("recovery_string");
-         
+        
+         std::map<std::string,std::string>::const_iterator recoveryStringIter =  request_->getGetData().find("recovery_string");
+        std::map<std::string,std::string>::const_iterator emailAddressIter =  request_->getGetData().find("email_address");
+       
  
         if(request_->getPostData().end() == emailAddressIter || request_->getPostData().end() == recoveryStringIter)
         {
@@ -66,15 +67,18 @@ namespace Test{ namespace AppServer
         else
         {
             ST_ASSERT(userNameOpt_);
+            request_->setContentMIMEType(Santiago::MIMEType::HTML);
             request_->out()<<"<html> \n"
                            <<"<body> \n"
-                           << "<form action='http://localhost:8080/password-recovey-set-new-password.fcgi' method='post'>\n"
-                           << "hai"<<userNameOpt_<<"\n"
-                           << "New Password: <input type='password' name='password'><br />\n"
+                           <<"<form action='http://localhost:8080/password-recovery-set-new-password.fcgi' method='get'>\n"
+                           <<"hai"<<userNameOpt_<<"\n"
+                           <<"<br />"
+                           <<"New Password: <input type='password' name='password'><br />\n"
                            <<"Repeat Password: <input type='password' name='repeat_password' />\n"
-                           <<"<input type = 'hidden' name = 'email_address' value ="<<emailAddress_<<"\n"
-                           <<"<input type = 'hidden' name = 'recovery_string' value ="<<recoveryString_<<"\n" 
-                           <<"<input type='submit' value='Submit' />\n"
+                           <<"<input type = 'hidden' name = 'email_address' value ='"<<emailAddress_<<"' />\n"
+                           <<"<input type = 'hidden' name = 'recovery_string' value ='"<<recoveryString_<<"' />\n"
+                           <<"<br />"
+                           <<"<input type= 'submit' value= 'Submit' />\n"
                            <<"</form>\n"
                            <<"</body>\n"
                            <<"</html>";

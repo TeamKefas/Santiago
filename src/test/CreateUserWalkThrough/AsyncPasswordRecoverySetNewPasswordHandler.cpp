@@ -17,8 +17,8 @@ namespace Test{ namespace AppServer
         request_->commit(error);
     }
 
-    void PasswordRecoverySetNewPasswordHandler::handleNonVerifiedRequest(const RequestPtr& request_,
-                                                                         boost::asio::yield_context yield_)
+    void AsyncPasswordRecoverySetNewPasswordHandler::handleNonVerifiedRequest(const RequestPtr& request_,
+                                                                              boost::asio::yield_context yield_)
     {
         request_->setContentMIMEType(Santiago::MIMEType::TEXT);
         std::map<std::string,std::string>::const_iterator emailAddressIter =  request_->getPostData().find("email_address");
@@ -48,42 +48,31 @@ namespace Test{ namespace AppServer
             }
             else
             {
-                _userController.changeUserPasswordForEmailAddressAndRecoveryString(
-                    emailAddressIter->second,
-                    recoveryStringIter->second,
-                    passwordIter->second,
-                    std::bind(&PasswordRecoverySetNewPasswordHandler::handleSetNewPassword,
-                              this->sharedFromThis<PasswordRecoverySetNewPasswordHandler>(),
-                              request_,
-                              std::placeholders::_1));
-                
+                std::error_code error1;
+               _userController.changeUserPasswordForEmailAddressAndRecoveryString(
+                   emailAddressIter->second,
+                   recoveryStringIter->second,
+                   passwordIter->second,
+                   yield_,
+                   error1);
+               
+               if(error1)
+               {
+                   request_->out()<<"Password Recovery Set new password failed. \n";
+                   request_->out()<<error1.message()<<std::endl;
+                   request_->setAppStatus(0);
+                   std::error_code error;
+                   request_->commit(error);
+               }
+               else
+               {
+                   request_->out()<<"Successfully updated new password \n";
+                   request_->setAppStatus(0);
+                   std::error_code error;
+                   request_->commit(error);
+               }
             }
-        }
-        
+        }   
     }
-    void PasswordRecoverySetNewPasswordHandler::handleSetNewPassword(const RequestPtr& request_,
-                                                                  std::error_code error_)
-    {
-        if(error_)
-        {
-            request_->out()<<"Password Recovery Set new password failed. \n";
-            request_->out()<<error_.message()<<std::endl;
-            request_->setAppStatus(0);
-            std::error_code error;
-            request_->commit(error);
-        }
-        else
-        { 
-            
-            request_->out()<<"Successfully updated new password \n";
-            request_->setAppStatus(0);
-            std::error_code error;
-            request_->commit(error);
-
-            
-        }
-    }
-
-
-
+   
 }}

@@ -63,8 +63,15 @@ namespace Test{ namespace AppServer
         else
         {
             ST_ASSERT(recoveryStringOpt_);
+            std::string sendingAddress = _config.get<std::string>("Santiago.Email.sending_address");
+            std::string senderName = _config.get<std::string>("Santiago.Email.sender_name");
+            std::string password = _config.get<std::string>("Santiago.Email.password");
+            std::string serverAddress = _config.get<std::string>("Santiago.Email.server_address");
+
+            Santiago::Utils::Email::initEmail(sendingAddress, senderName, password, serverAddress);
+            
             std::stringstream passwordRecoverylink;
-            passwordRecoverylink<<"localhost:8080/password-recovery-receive-new-password.fcgi?recovery_string=";
+            passwordRecoverylink<<"http://localhost:8080/password-recovery-receive-new-password.fcgi?recovery_string=";
             passwordRecoverylink<<*recoveryStringOpt_;
             passwordRecoverylink<<"&email_address=";
             passwordRecoverylink<<emailAddress_;

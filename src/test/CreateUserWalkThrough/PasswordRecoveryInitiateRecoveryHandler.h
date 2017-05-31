@@ -13,8 +13,10 @@ namespace Test{namespace AppServer{
         typedef RequestHandlerBase MyBase;
         typedef std::shared_ptr<PasswordRecoveryInitiateRecoveryHandler> Ptr;
         
-        PasswordRecoveryInitiateRecoveryHandler(Santiago::Authentication::AuthenticatorBase& userController_):
-            RequestHandlerBase(userController_)
+        PasswordRecoveryInitiateRecoveryHandler(Santiago::Authentication::AuthenticatorBase& userController_,
+                                                boost::property_tree::ptree& config_):
+            RequestHandlerBase(userController_),
+            _config(config_)
         {}
         
     protected:
@@ -32,7 +34,10 @@ namespace Test{namespace AppServer{
         
         virtual void handleNonVerifiedRequest(const RequestPtr& request_,
                                               boost::asio::yield_context yield_);
+    private:
         
+         boost::property_tree::ptree                                      _config;
+       
     };
 
 }}
