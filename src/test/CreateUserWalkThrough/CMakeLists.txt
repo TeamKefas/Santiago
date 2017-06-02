@@ -10,15 +10,15 @@ set(CreateUserWalkThrough_SRCS  main.cpp
 				PasswordRecoveryInitiateRecoveryHandler.cpp
 				PasswordRecoveryReceiveNewPasswordHandler.cpp
 				PasswordRecoverySetNewPasswordHandler.cpp
-				AsyncCreateUserHandler.cpp	
-	  			AsyncLoginUserHandler.cpp
-				AsyncLogoutUserHandler.cpp
-				AsyncLogoutUserForAllCookieHandler.cpp
-				AsyncGetUserInfoHandler.cpp
-				AsyncDeleteUserHandler.cpp
-				AsyncPasswordRecoveryInitiateRecoveryHandler.cpp
-				AsyncPasswordRecoveryReceiveNewPasswordHandler.cpp
-				AsyncPasswordRecoverySetNewPasswordHandler.cpp)
+				Asynchronous/AsyncCreateUserHandler.cpp	
+	  			Asynchronous/AsyncLoginUserHandler.cpp
+				Asynchronous/AsyncLogoutUserHandler.cpp
+				Asynchronous/AsyncLogoutUserForAllCookieHandler.cpp
+				Asynchronous/AsyncGetUserInfoHandler.cpp
+				Asynchronous/AsyncDeleteUserHandler.cpp
+				Asynchronous/AsyncPasswordRecoveryInitiateRecoveryHandler.cpp
+				Asynchronous/AsyncPasswordRecoveryReceiveNewPasswordHandler.cpp
+				Asynchronous/AsyncPasswordRecoverySetNewPasswordHandler.cpp)
 
 if(WIN32)
   set(CreateUserWalkThrough_SRCS 
@@ -36,15 +36,15 @@ if(WIN32)
     PasswordRecoveryInitiateRecoveryHandler.h
     PasswordRecoveryReceiveNewPasswordHandler.h
     PasswordRecoverySetNewPasswordHandler.h
-    AsyncCreateUserHandler.ch
-    AsyncLoginUserHandler.h
-    AsyncLogoutUserHandler.h
-    AsyncLogoutUserForAllCookieHandler.h
-    AsyncGetUserInfoHandler.h
-    AsyncDeleteUserHandler.h
-    AsyncPasswordRecoveryInitiateRecoveryHandler.h
-    AsyncPasswordRecoveryReceiveNewPasswordHandler.h
-    AsyncPasswordRecoverySetNewPasswordHandler.h)
+    Asynchronous/AsyncCreateUserHandler.h
+    Asynchronous/AsyncLoginUserHandler.h
+    Asynchronous/AsyncLogoutUserHandler.h
+    Asynchronous/AsyncLogoutUserForAllCookieHandler.h
+    Asynchronous/AsyncGetUserInfoHandler.h
+    Asynchronous/AsyncDeleteUserHandler.h
+    Asynchronous/AsyncPasswordRecoveryInitiateRecoveryHandler.h
+    Asynchronous/AsyncPasswordRecoveryReceiveNewPasswordHandler.h
+    Asynchronous/AsyncPasswordRecoverySetNewPasswordHandler.h)
 endif(WIN32)
 
 

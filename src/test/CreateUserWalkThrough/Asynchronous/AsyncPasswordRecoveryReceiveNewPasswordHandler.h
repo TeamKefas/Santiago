@@ -1,23 +1,22 @@
-#ifndef SANTIAGO_TEST_APPSERVER_ASYNCPASSWORDRECOVERYSETNEWPASSWORDHANDLER_H
-#define SANTIAGO_TEST_APPSERVER_ASYNCPASSWORDRECOVERYSETNEWPAASWORDHANDLER_H
+#ifndef SANTIAGO_TEST_APPSERVER_ASYNCPASSWORDRECOVERYRECEIVENEWPASSWORDHANDLER_H
+#define SANTIAGO_TEST_APPSERVER_ASYNCPASSWORDRECOVERYRECEIVENEWPASSWORDHANDLER_H
 
 
-#include "RequestHandlerBase.h"
+#include "../RequestHandlerBase.h"
 
 namespace Test{namespace AppServer{
-    class AsyncPasswordRecoverySetNewPasswordHandler:public RequestHandlerBase
+    class AsyncPasswordRecoveryReceiveNewPasswordHandler:public RequestHandlerBase
     {
     public:
         
         typedef RequestHandlerBase MyBase;
-        typedef std::shared_ptr<AsyncPasswordRecoverySetNewPasswordHandler> Ptr;
+        typedef std::shared_ptr<AsyncPasswordRecoveryReceiveNewPasswordHandler> Ptr;
         
-        AsyncPasswordRecoverySetNewPasswordHandler(Santiago::Authentication::AuthenticatorBase& userController_):
+        AsyncPasswordRecoveryReceiveNewPasswordHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
         {}
         
     protected:
-        
         
         virtual void handleVerifiedRequest(const RequestPtr& request_,
                                            boost::asio::yield_context yield_,

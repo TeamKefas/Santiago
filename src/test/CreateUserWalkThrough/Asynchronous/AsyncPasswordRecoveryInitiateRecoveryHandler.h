@@ -1,18 +1,19 @@
-#ifndef SANTIAGO_TEST_APPSERVER_ASYNCPASSWORDRECOVERYRECEIVENEWPASSWORDHANDLER_H
-#define SANTIAGO_TEST_APPSERVER_ASYNCPASSWORDRECOVERYRECEIVENEWPASSWORDHANDLER_H
+#ifndef SANTIAGO_TEST_APPSERVER_ASYNCPASSWORDRECOVERYINITIATERECOVERYHANDLER_H
+#define SANTIAGO_TEST_APPSERVER_ASYNCPASSWORDRECOVERYINITIATERECOVERYHANDLER_H
 
 
-#include "RequestHandlerBase.h"
+#include "../RequestHandlerBase.h"
+#include "../../../Santiago/Utils/Email.h"
 
 namespace Test{namespace AppServer{
-    class AsyncPasswordRecoveryReceiveNewPasswordHandler:public RequestHandlerBase
+    class AsyncPasswordRecoveryInitiateRecoveryHandler:public RequestHandlerBase
     {
     public:
         
         typedef RequestHandlerBase MyBase;
-        typedef std::shared_ptr<AsyncPasswordRecoveryReceiveNewPasswordHandler> Ptr;
+        typedef std::shared_ptr<AsyncPasswordRecoveryInitiateRecoveryHandler> Ptr;
         
-        AsyncPasswordRecoveryReceiveNewPasswordHandler(Santiago::Authentication::AuthenticatorBase& userController_):
+        AsyncPasswordRecoveryInitiateRecoveryHandler(Santiago::Authentication::AuthenticatorBase& userController_):
             RequestHandlerBase(userController_)
         {}
         

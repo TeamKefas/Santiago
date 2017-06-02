@@ -1,22 +1,22 @@
-#ifndef SANTIAGO_TEST_APPSERVER_ASYNCLOGINHANDLER_H
-#define SANTIAGO_TEST_APPSERVER_ASYNCLOGINHANDLER_H
+#ifndef SANTIAGO_TEST_APPSERVER_ASYNCLOGOUTFORALLCOOKIEHANDLER_H
+#define SANTIAGO_TEST_APPSERVER_ASYNCLOGOUTFORALLCOOKIEHANDLER_H
 
 #include <memory>
 
-#include "RequestHandlerBase.h"
+#include "../RequestHandlerBase.h"
 
 namespace Test{ namespace AppServer
 {
-   class AsyncLoginUserHandler:public RequestHandlerBase
+   class AsyncLogoutUserForAllCookieHandler:public RequestHandlerBase
    {
    public:
-
-       AsyncLoginUserHandler(Santiago::Authentication::AuthenticatorBase& userController_):
-            RequestHandlerBase(userController_)
+       
+       AsyncLogoutUserForAllCookieHandler(Santiago::Authentication::AuthenticatorBase& userController_):
+           RequestHandlerBase(userController_)
        {}
 
    protected:
-
+       
        virtual void handleVerifiedRequest(const RequestPtr& request_,
                                           boost::asio::yield_context yield_,
                                           const std::string& userName_,
@@ -28,5 +28,6 @@ namespace Test{ namespace AppServer
 
    };
     }}
+
 
 #endif

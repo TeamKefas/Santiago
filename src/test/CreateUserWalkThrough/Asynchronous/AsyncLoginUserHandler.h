@@ -1,18 +1,18 @@
-#ifndef SANTIAGO_TEST_APPSERVER_ASYNCGETUSERINFO_H
-#define SANTIAGO_TEST_APPSERVER_ASYNCGETUSERINFO_H
+#ifndef SANTIAGO_TEST_APPSERVER_ASYNCLOGINHANDLER_H
+#define SANTIAGO_TEST_APPSERVER_ASYNCLOGINHANDLER_H
 
 #include <memory>
 
-#include "RequestHandlerBase.h"
+#include "../RequestHandlerBase.h"
 
 namespace Test{ namespace AppServer
 {
-   class AsyncGetUserInfoHandler:public RequestHandlerBase
+   class AsyncLoginUserHandler:public RequestHandlerBase
    {
    public:
 
-       AsyncGetUserInfoHandler(Santiago::Authentication::AuthenticatorBase& userController_):
-           RequestHandlerBase(userController_)
+       AsyncLoginUserHandler(Santiago::Authentication::AuthenticatorBase& userController_):
+            RequestHandlerBase(userController_)
        {}
 
    protected:
@@ -28,6 +28,5 @@ namespace Test{ namespace AppServer
 
    };
     }}
-
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef SANTIAGO_TEST_APPSERVER_ASYNCCREATEUSERHANDLER_H
 #define SANTIAGO_TEST_APPSERVER_ASYNCCREATEUSERHANDLER_H
 
-#include "RequestHandlerBase.h"
+#include "../RequestHandlerBase.h"
 
 namespace Test{ namespace AppServer
 {

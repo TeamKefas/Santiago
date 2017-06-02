@@ -20,15 +20,15 @@
 #include "PasswordRecoveryReceiveNewPasswordHandler.h"
 #include "PasswordRecoverySetNewPasswordHandler.h"
 
-#include "AsyncCreateUserHandler.h"
-#include "AsyncLoginUserHandler.h"
-#include "AsyncLogoutUserHandler.h"
-#include "AsyncLogoutUserForAllCookieHandler.h"
-#include "AsyncGetUserInfoHandler.h"
-#include "AsyncDeleteUserHandler.h"
-#include "AsyncPasswordRecoveryInitiateRecoveryHandler.h"
-#include "AsyncPasswordRecoveryReceiveNewPasswordHandler.h"
-#include "AsyncPasswordRecoverySetNewPasswordHandler.h"
+#include "Asynchronous/AsyncCreateUserHandler.h"
+#include "Asynchronous/AsyncLoginUserHandler.h"
+#include "Asynchronous/AsyncLogoutUserHandler.h"
+#include "Asynchronous/AsyncLogoutUserForAllCookieHandler.h"
+#include "Asynchronous/AsyncGetUserInfoHandler.h"
+#include "Asynchronous/AsyncDeleteUserHandler.h"
+#include "Asynchronous/AsyncPasswordRecoveryInitiateRecoveryHandler.h"
+#include "Asynchronous/AsyncPasswordRecoveryReceiveNewPasswordHandler.h"
+#include "Asynchronous/AsyncPasswordRecoverySetNewPasswordHandler.h"
 
 namespace Test{ namespace AppServer
 {

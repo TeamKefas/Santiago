@@ -1,23 +1,23 @@
-#ifndef SANTIAGO_TEST_APPSERVER_ASYNCDELETEUSERHANDLER_H
-#define SANTIAGO_TEST_APPSERVER_ASYNCDELETEUSERHANDLER_H
+#ifndef SANTIAGO_TEST_APPSERVER_ASYNCLOGOUTHANDLER_H
+#define SANTIAGO_TEST_APPSERVER_ASYNCLOGOUTHANDLER_H
 
 #include <memory>
 
-#include "RequestHandlerBase.h"
+#include "../RequestHandlerBase.h"
 
 namespace Test{ namespace AppServer
 {
-   class AsyncDeleteUserHandler:public RequestHandlerBase
+   class AsyncLogoutUserHandler:public RequestHandlerBase
    {
    public:
 
-       AsyncDeleteUserHandler(Santiago::Authentication::AuthenticatorBase& userController_):
-            RequestHandlerBase(userController_)
+       AsyncLogoutUserHandler(Santiago::Authentication::AuthenticatorBase& userController_):
+           RequestHandlerBase(userController_)
        {}
 
    protected:
 
-        virtual void handleVerifiedRequest(const RequestPtr& request_,
+       virtual void handleVerifiedRequest(const RequestPtr& request_,
                                           boost::asio::yield_context yield_,
                                           const std::string& userName_,
                                           const std::string& emailAddress_,
