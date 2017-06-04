@@ -16,7 +16,7 @@ namespace Santiago{ namespace Authentication
         boost::asio::async_result<decltype(handler)> result(handler);
         boost::optional<UserInfo> ret;
         
-        verifyCookieAndGetUserInfo(
+        verifyCookieAndGetUserInfoImpl(
             cookieString_,
             [&error_,&ret,handler](const std::error_code& ec_,
                                    const boost::optional<UserInfo>& userInfoOpt_)
@@ -191,10 +191,11 @@ namespace Santiago{ namespace Authentication
     }
          
 
-    boost::optional<std::string> AuthenticatorBase::getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
-                                                                                            const std::string& recoverystring_,
-                                                                                            boost::asio::yield_context yield_,
-                                                                                            std::error_code& error_)
+    boost::optional<std::string> AuthenticatorBase::getUserForEmailAddressAndRecoveryString(
+        const std::string& emailAddress_,
+        const std::string& recoverystring_,
+        boost::asio::yield_context yield_,
+        std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));

@@ -231,7 +231,9 @@ namespace Santiago{ namespace Authentication
 			boost::asio::yield_context yield_,
                         std::error_code& error_);
 
-        //implementation functions
+    protected:
+
+                //implementation functions
         /**
          * Implementation function for createUser.
          * @param userName_ - username of the user.
@@ -366,7 +368,6 @@ namespace Santiago{ namespace Authentication
                             const std::error_code& error_,
                             const boost::optional<std::string>& recoveryString_);
 
-    protected:
         
         boost::asio::io_service         &_ioService;
         boost::asio::strand              _strand;
