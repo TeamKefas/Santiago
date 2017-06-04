@@ -5,7 +5,7 @@
 
 #include "../../Santiago/AppServer/ServerBase.h"
 #include "../../Santiago/Authentication/SingleNode/Authenticator.h"
-#include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
+#include "Santiago/Thread/ThreadSpecificVar.h"
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "RequestHandlerBase.h"
 #include "ErrorURIHandler.h"
@@ -36,7 +36,7 @@ namespace Test{ namespace AppServer
     {
     public:
 
-        typedef Santiago::ThreadSpecificVar::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection>
+        typedef Santiago::Thread::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection>
         SantiagoDBConnection;
         typedef Santiago::AppServer::ServerBase<boost::asio::ip::tcp> MyBase;
 

@@ -12,7 +12,7 @@ AC_CONFIG_HEADERS([config.h])
 
 CFLAGS="-g -O3" # -fno-omit-frame-pointer
 CPPFLAGS="-g -O3" # -fno-omit-frame-pointer
-CXXFLAGS="-g -O3 -std=c++0x -std=gnu++1y -Wall -pedantic -L/usr/lib/mysql -I/usr/include/mysql -lmysqlclient -lboost_system -L/usr/lib -lssl -lcrypto -lpthread" # -fno-omit-frame-pointer
+CXXFLAGS="-g -O3 -std=c++0x -std=gnu++1y -Wall -pedantic -L/usr/lib/mysql -I/usr/include/mysql -lmysqlclient -lboost_system -lboost_thread -lboost_coroutine -L/usr/lib -lssl -lcrypto -lpthread -lcurl" # -fno-omit-frame-pointer
 
 # Checks for programs.
 AC_PROG_CXX
@@ -29,7 +29,7 @@ AC_CHECK_LIB([boost_thread], [main], [], [echo "boost library not found.  Please
 AC_CHECK_LIB([crypto], [main], [], [echo "openssl crypto library not found.  Please install openssl library before proceeding"; exit -1])
 AC_CHECK_LIB([pthread], [pthread_mutex_init], [], [echo "pthreads not found.  Please install pthread library before proceeding"; exit -1])
 AC_CHECK_LIB([mysqlclient], [mysql_init], [], [echo "libmysqlclient is needed for MySQL support"; exit -1])
-
+AC_CHECK_LIB([curl], [], [echo "curl library is needed"; exit -1])
  	         
 # Checks for header files.
 AC_HEADER_STDC

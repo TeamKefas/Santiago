@@ -5,6 +5,7 @@ set(Santiago_SRCS
   SantiagoDBTables/MariaDBConnection.cpp
   Authentication/AuthenticatorBase.cpp
   Authentication/SingleNode/Authenticator.cpp
+  Thread/ThreadSpecificVarImpl.cpp
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp
   Utils/Email.cpp
