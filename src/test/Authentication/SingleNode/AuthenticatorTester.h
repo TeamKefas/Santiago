@@ -7,7 +7,7 @@
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
 
-#include "../SingleNode/AuthenticatorTesterBase.h"
+#include "../AuthenticatorTesterBase.h"
 
 namespace Test{ namespace Authentication{ namespace SingleNode
 {

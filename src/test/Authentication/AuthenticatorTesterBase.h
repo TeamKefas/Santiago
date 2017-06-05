@@ -6,7 +6,7 @@
 #include <boost/asio.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "Santaigo/Authentication/SingleNode/AuthenticatorBase.h"
+#include "Santiago/Authentication/SingleNode/Authenticator.h"
 
 namespace Test{ namespace Authentication
 {
@@ -34,7 +34,7 @@ namespace Test{ namespace Authentication
                            const std::string& user1UserName_,
                            const std::string& user1Password_,
                            const std::string& user2UserName_,
-                           const std::string& user2Password_)
+                           const std::string& user2Password_);
 
         boost::asio::io_service     &_ioService;
         boost::property_tree::ptree  _config;
