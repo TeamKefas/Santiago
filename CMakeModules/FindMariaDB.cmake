@@ -5,13 +5,12 @@
 # MARIADB_LIBRARIES - Libraries required to link MariaDB
 # MARIADB_FOUND - Confirmation
 
-find_path(MARIADB_INCLUDE_DIR mysql.h
-	  /usr/include/mariadb 	
+find_path(MARIADB_INCLUDE_DIR mysql.h	
           /usr/include/mysql
           /usr/local/include/mysql
           )
 
-find_library(MARIADB_LIBRARIES NAMES mariadb
+find_library(MARIADB_LIBRARIES NAMES mysqlclient
             PATHS
             /usr/lib/mysql
             /usr/local/lib/mysql
@@ -65,7 +64,7 @@ IF(WIN32)
   ENDIF()
 
 ELSE()
-  SET(MARIADB_LIB libmariadbclient.a)
+  SET(MARIADB_LIB libmysqlclient.a)
   FIND_PATH(MARIADB_BIN_DIR mariadb_config
     $ENV{MARIADB_DIR}/bin
     ${MARIADB_DIR}/bin)
@@ -88,4 +87,4 @@ IF(MARIADB_LIBRARY_DIR AND MARIADB_INCLUDE_DIR)
   MESSAGE(STATUS "Found MariaDB libraries: ${MARIADB_LIBRARY_DIR}")
   SET(MARIADB_FOUND TRUE)
 ENDIF()
->>>>>>> pre-prod
+

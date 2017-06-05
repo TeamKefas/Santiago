@@ -9,7 +9,7 @@ namespace Test{ namespace Authentication
         std::cout<<"description: \t "<<(value_?"[SUCCEEDED]":"[FAILED]")<<std::endl;
     }
 
-    void runTests(boost::asio::yield_context yieldContext_)
+    void  AuthenticatorTesterBase::runTests(boost::asio::yield_context yieldContext_)
     {
         //first create 3 users santiagoTestUser1, santiagoTestUser2, santiagoTestUser3
         //call spawn on run1UserTests, run2UserTests

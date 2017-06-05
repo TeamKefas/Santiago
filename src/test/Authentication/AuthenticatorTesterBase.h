@@ -28,7 +28,8 @@ namespace Test{ namespace Authentication
         void testAssert(const std::string& description, bool value_);
 
         void run1UserTests(boost::asio::yield_context yieldContext_,
-                           const std::string& userName_, const std::string& password_);
+                           const std::string& userName_,
+                           const std::string& password_);
         
         void run2UserTests(boost::asio::yield_context yieldContext_,
                            const std::string& user1UserName_,
