@@ -13,7 +13,35 @@ namespace Test{ namespace Authentication
     {
         //first create 3 users santiagoTestUser1, santiagoTestUser2, santiagoTestUser3
         //call spawn on run1UserTests, run2UserTests
-    }
+        
+        SantiagoTestUser user1,user2,user3;
 
+        user1.userName = "user1";
+        user1.password = "pass1";
+
+        user2.userName = "user2";
+        user2.password = "pass2";
+        
+        user3.userName = "user3";
+        user3.password = "pass3";
+
+
+        boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run1UserTests, this, yieldContext_, user1));
+        boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run2UserTests, this, yieldContext_, user2, user3));
+
+    }
+     void AuthenticatorTesterBase::run1UserTests(boost::asio::yield_context yieldContext_,
+                                                 const SantiagoTestUser& santiagoTestUser1)
+     {
+         //TODO
+     }
+    
+    void AuthenticatorTesterBase::run2UserTests(boost::asio::yield_context yieldContext_,
+                                                const SantiagoTestUser& santiagoTestUser1,
+                                                const SantiagoTestUser& santiagoTestUser2)
+    {
+        //TODO
+    }
+    
 
 }}

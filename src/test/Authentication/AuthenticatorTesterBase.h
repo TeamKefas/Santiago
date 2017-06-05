@@ -22,20 +22,31 @@ namespace Test{ namespace Authentication
         {}
 
         void runTests(boost::asio::yield_context yieldContext_);
+        
+        struct SantiagoTestUser
+        {
+            std::string userName;
+            std::string password;   
+        };
 
     protected:
 
         void testAssert(const std::string& description, bool value_);
 
         void run1UserTests(boost::asio::yield_context yieldContext_,
-                           const std::string& userName_,
-                           const std::string& password_);
+                           const SantiagoTestUser& santiagoTestUser1);
+
+                           /*const std::string& userName_,
+                             const std::string& password_);*/
         
         void run2UserTests(boost::asio::yield_context yieldContext_,
-                           const std::string& user1UserName_,
+                           const SantiagoTestUser& santiagoTestUser1,
+                           const SantiagoTestUser& santiagoTestUser2);
+                           
+                           /*const std::string& user1UserName_,
                            const std::string& user1Password_,
                            const std::string& user2UserName_,
-                           const std::string& user2Password_);
+                           const std::string& user2Password_);*/
 
         boost::asio::io_service     &_ioService;
         boost::property_tree::ptree  _config;
