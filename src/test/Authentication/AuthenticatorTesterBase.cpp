@@ -18,12 +18,15 @@ namespace Test{ namespace Authentication
 
         user1.userName = "user1";
         user1.password = "pass1";
+        user1.emailAddress = "user1@email";
 
         user2.userName = "user2";
         user2.password = "pass2";
+        user2.emailAddress = "user2@email";
         
         user3.userName = "user3";
         user3.password = "pass3";
+        user3.emailAddress = "user3@email";
 
 
         boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run1UserTests, this, yieldContext_, user1));

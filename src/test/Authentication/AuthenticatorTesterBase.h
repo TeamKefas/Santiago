@@ -26,6 +26,7 @@ namespace Test{ namespace Authentication
         struct SantiagoTestUser
         {
             std::string userName;
+            std::string emailAddress;
             std::string password;   
         };
 
