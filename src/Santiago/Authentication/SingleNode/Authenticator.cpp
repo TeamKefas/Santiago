@@ -446,7 +446,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         //verify password
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::tie(error,usersRecOpt) =
-            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,generateSHA256(password_));
+            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName, password_);
         if(error)
         {
             onChangeEmailAddressCallbackFn_(error);

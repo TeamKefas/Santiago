@@ -71,10 +71,10 @@ namespace Test{ namespace Authentication
         }
          
         boost::optional<std::pair<Santiago::Authentication::UserInfo, std::string> > userInfo2 = _authenticatorBasePtr->loginUser(santiagoTestUser1.emailAddress,
-                                                                                                                                 0,
-                                                                                                                                 santiagoTestUser1.password,
-                                                                                                                                 yieldContext_,
-                                                                                                                                 error);
+                                                                                                                                  0,
+                                                                                                                                  santiagoTestUser1.password,
+                                                                                                                                  yieldContext_,
+                                                                                                                                  error);
         if(error)
         {
             std::cout << "\nLogin user error." << std::endl;
@@ -83,7 +83,7 @@ namespace Test{ namespace Authentication
         {
             std::cout << "\nSuccessfully logged in.\n\nUsername : " << userInfo2->first._userName << "\nEmail Address : " << userInfo2->first._emailAddress << std::endl;
         }
-
+        
         const std::string cookieString = userInfo1->second;
         _authenticatorBasePtr->logoutUserForCookie(cookieString,
                                                    yieldContext_,
@@ -122,7 +122,22 @@ namespace Test{ namespace Authentication
         {
             std::cout << "\nSuccessfully changed password for the user " << userInfo1->first._userName << "." << std::endl;
         }
+
+        _authenticatorBasePtr->changeUserEmailAddress(cookieString,
+                                                      "user@gmail",
+                                                      santiagoTestUser1.password,
+                                                      yieldContext_,
+                                                      error);
         
+        if(error)
+        {
+            std::cout << "\nChange email address error." << std::endl;
+        }
+        else
+        {
+            std::cout << "\nSuccessfully changed email address for the user " << userInfo1->first._userName << "." << std::endl;
+        }
+
     }
     
     void AuthenticatorTesterBase::run2UserTests(boost::asio::yield_context yieldContext_,
