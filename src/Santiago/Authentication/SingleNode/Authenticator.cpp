@@ -31,9 +31,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                 _databaseConnection.get().getUsersRecForUserName(it->_userName,error);
             if(error)
             {
-                ST_LOG_ERROR("Authenticator contruction failed. Error message:"<<
+                ST_LOG_ERROR("Authenticator construction failed. Error message:"<<
                              error.message());
-                throw std::runtime_error("Authenticator contruction failed. Error message:" +
+                throw std::runtime_error("Authenticator construction failed. Error message:" +
                                          error.message());
             }
             
@@ -312,7 +312,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         //verify username-password
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::tie(error,usersRecOpt) =
-            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName,generateSHA256(oldPassword_));
+            verifyUserNamePasswordAndGetUsersRec(cookieStringSessionsRecMapIter->second._userName, oldPassword_);
         if(error)
         {
             onChangePasswordCallbackFn_(error);
