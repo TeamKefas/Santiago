@@ -10,7 +10,7 @@ build/
 testbin/
 bin/
 examplesbin/
-config.json/
+config.json
 .deps/
 .dirstamp
 
