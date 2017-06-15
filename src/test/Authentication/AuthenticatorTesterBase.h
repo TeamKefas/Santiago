@@ -33,7 +33,7 @@ namespace Test{ namespace Authentication
 
     protected:
 
-        void testAssert(const std::string& description, bool value_);
+        void printResult(const std::string& description, bool value);
 
         void run1UserTests(boost::asio::yield_context yieldContext_,
                            const SantiagoTestUser& santiagoTestUser1);
