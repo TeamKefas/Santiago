@@ -232,8 +232,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         
         ThreadSpecificDbConnection                           &_databaseConnection;
 
-        std::map<std::string,SantiagoDBTables::SessionsRec>   _cookieStringSessionsRecMap;
-        std::map<std::string,UserData>                        _userNameUserDataMap;
+        // std::map<std::string,SantiagoDBTables::SessionsRec>   _cookieStringSessionsRecMap;
+        // std::map<std::string,UserData>                        _userNameUserDataMap;
 
         struct AuthenticationData
         {
@@ -241,10 +241,10 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
             std::map<std::string,UserData>                        _userNameUserDataMap;
         };
 
-        std::array<AuthenticationData,26>                         _authenticationData;
-        
-            
-        
+        std::array<AuthenticationData,26>                         _authenticationDataArray;
+
+        int getAlphabetPosition(char alphabet);
+             
     };
 
 }}}

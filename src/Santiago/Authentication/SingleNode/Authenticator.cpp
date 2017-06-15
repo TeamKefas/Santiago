@@ -26,7 +26,10 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         for(std::vector<SantiagoDBTables::SessionsRec>::iterator it = activeSessionsRec.begin();
             it != activeSessionsRec.end();++it)
         {
-            _cookieStringSessionsRecMap.insert(std::make_pair(it->_cookieString,*it));
+            std::string cookieString = it->_cookieString;
+            int index = getAlphabetPosition(cookieString[0]);
+            
+            _authenticationDataArray[index]._cookieStringSessionsRecMap.insert(std::make_pair(it->_cookieString,*it));
             boost::optional<SantiagoDBTables::UsersRec> usersRecOpt =
                 _databaseConnection.get().getUsersRecForUserName(it->_userName,error);
             if(error)
@@ -40,15 +43,15 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
             ST_ASSERT(usersRecOpt);
             // _userNameUserDataMap.insert(std::make_pair(it->_userName,UserData(userRec->_emailAddress)));
             std::map<std::string,UserData>::iterator userNameUserDataMapIter =
-                _userNameUserDataMap.find(usersRecOpt->_userName);
-            if(_userNameUserDataMap.end() == userNameUserDataMapIter)
+                _authenticationDataArray[index]._userNameUserDataMap.find(usersRecOpt->_userName);
+            if(_authenticationDataArray[index]._userNameUserDataMap.end() == userNameUserDataMapIter)
             {
                 bool isInsertionSuccessfulFlag;
                 std::tie(userNameUserDataMapIter,isInsertionSuccessfulFlag) =
-                    _userNameUserDataMap.insert(std::make_pair(usersRecOpt->_userName,
-                                                               UserData(usersRecOpt->_emailAddress)));
+                    _authenticationDataArray[index]._userNameUserDataMap.insert(std::make_pair(usersRecOpt->_userName,
+                                                                                               UserData(usersRecOpt->_emailAddress)));
                 ST_ASSERT(isInsertionSuccessfulFlag);
-                ST_ASSERT(userNameUserDataMapIter != _userNameUserDataMap.end());
+                ST_ASSERT(userNameUserDataMapIter != _authenticationDataArray[index]._userNameUserDataMap.end());
             }    
             userNameUserDataMapIter->second._cookieList.push_back(it->_cookieString);
             
@@ -66,6 +69,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     void Authenticator::verifyCookieAndGetUserInfoImpl(const std::string& cookieString_,
                                                        const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {
+        int index = getAlphabetPosition(cookieString_[0]);
+        
         std::map<std::string,SantiagoDBTables::SessionsRec>::iterator cookieStringSessionsRecMapIter;
         std::error_code error;
         std::tie(error,cookieStringSessionsRecMapIter) = checkForCookieInMapAndGetSessionsRecIter(cookieString_);
@@ -101,8 +106,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 
         //update the _userNameUserSessionsInfoMap;
         std::map<std::string,UserData>::iterator userNameUserDataMapIter =
-            _userNameUserDataMap.find(cookieStringSessionsRecMapIter->second._userName);
-        ST_ASSERT(_userNameUserDataMap.end() != userNameUserDataMapIter);
+            _authenticationDataArray[index]._userNameUserDataMap.find(cookieStringSessionsRecMapIter->second._userName);
+        ST_ASSERT(_authenticationDataArray[index]._userNameUserDataMap.end() != userNameUserDataMapIter);
 
 
         onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
@@ -206,10 +211,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 
         for(unsigned i=0;i<5;i++)
         { //5 attempts with different cookie strings
-            if(isUserNameNotEmailAddress_)
-            {
-                sessionsRec._cookieString = generateUniqueCookieForUserName(userNameOrEmailAddress_);
-            }
+            sessionsRec._cookieString = generateUniqueCookieForUserName(usersRecOpt->_userName);
             _databaseConnection.get().addSessionsRec(sessionsRec,error);
             if(!error)
             {
@@ -222,22 +224,24 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
             onLoginUserCallbackFn_(error,boost::none);
             return;
         }
+
+        int index = getAlphabetPosition((usersRecOpt->_userName)[0]);
         
         //update the _cookieStringSessionsRecMap;
         bool isInsertionSuccessfulFlag =
-            _cookieStringSessionsRecMap.insert(std::make_pair(sessionsRec._cookieString,sessionsRec)).second;
+            _authenticationDataArray[index]._cookieStringSessionsRecMap.insert(std::make_pair(sessionsRec._cookieString,sessionsRec)).second;
         ST_ASSERT(isInsertionSuccessfulFlag);
         
         //update the _userNameUserSessionsInfoMap;
         std::map<std::string,UserData>::iterator userNameUserDataMapIter =
-            _userNameUserDataMap.find(usersRecOpt->_userName);
-        if(_userNameUserDataMap.end() == userNameUserDataMapIter)
+            _authenticationDataArray[index]._userNameUserDataMap.find(usersRecOpt->_userName);
+        if(_authenticationDataArray[index]._userNameUserDataMap.end() == userNameUserDataMapIter)
         {
             std::tie(userNameUserDataMapIter,isInsertionSuccessfulFlag) =
-                _userNameUserDataMap.insert(std::make_pair(usersRecOpt->_userName,
-                                                           UserData(usersRecOpt->_emailAddress)));
+                _authenticationDataArray[index]._userNameUserDataMap.insert(std::make_pair(usersRecOpt->_userName,
+                                                                                           UserData(usersRecOpt->_emailAddress)));
             ST_ASSERT(isInsertionSuccessfulFlag);
-            ST_ASSERT(userNameUserDataMapIter != _userNameUserDataMap.end());
+            ST_ASSERT(userNameUserDataMapIter != _authenticationDataArray[index]._userNameUserDataMap.end());
         }
         userNameUserDataMapIter->second._cookieList.push_back(sessionsRec._cookieString);
 
@@ -271,9 +275,10 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     void Authenticator::logoutUserForAllCookiesImpl(const std::string& userName_,
                                                     const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
     {
+        int index = getAlphabetPosition(userName_[0]);
         //verify if such a user is already logged in
-        std::map<std::string,UserData >::iterator userNameUserDataMapIter = _userNameUserDataMap.find(userName_);
-        if(userNameUserDataMapIter == _userNameUserDataMap.end())
+        std::map<std::string,UserData >::iterator userNameUserDataMapIter = _authenticationDataArray[index]._userNameUserDataMap.find(userName_);
+        if(userNameUserDataMapIter == _authenticationDataArray[index]._userNameUserDataMap.end())
         {
             onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_NO_ACTIVE_SESSION_FOR_USERNAME,
                                                           ErrorCategory::GetInstance()));
@@ -594,13 +599,15 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     std::pair<std::error_code,std::map<std::string,Santiago::SantiagoDBTables::SessionsRec>::iterator > 
     Authenticator::checkForCookieInMapAndGetSessionsRecIter(const std::string& cookieString_)
     {
+        int index = getAlphabetPosition(cookieString_[0]);
+        
         std::map<std::string,SantiagoDBTables::SessionsRec>::iterator cookieStringSessionsRecMapIter =
-            _cookieStringSessionsRecMap.find(cookieString_);
-        if(cookieStringSessionsRecMapIter == _cookieStringSessionsRecMap.end())
+            _authenticationDataArray[index]._cookieStringSessionsRecMap.find(cookieString_);
+        if(cookieStringSessionsRecMapIter == _authenticationDataArray[index]._cookieStringSessionsRecMap.end())
         {
             ST_LOG_INFO("Cookie not in _cookieStringSessionsRecMap. cookieString:" <<cookieString_<<std::endl);
             return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,ErrorCategory::GetInstance()),
-                                  _cookieStringSessionsRecMap.end());
+                                   _authenticationDataArray[index]._cookieStringSessionsRecMap.end());
         }
 
         return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
@@ -609,10 +616,11 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     
     void Authenticator::cleanupCookieDataAndUpdateSessionRecord(const std::string& cookieString_)
     {
+        int index = getAlphabetPosition(cookieString_[0]);
         //internal fn. so when this fn is called the cookie should already be verified.
         std::map<std::string,SantiagoDBTables::SessionsRec>::iterator cookieStringSessionsRecMapIter =
-            _cookieStringSessionsRecMap.find(cookieString_);
-        ST_ASSERT(cookieStringSessionsRecMapIter != _cookieStringSessionsRecMap.end());
+            _authenticationDataArray[index]._cookieStringSessionsRecMap.find(cookieString_);
+        ST_ASSERT(cookieStringSessionsRecMapIter != _authenticationDataArray[index]._cookieStringSessionsRecMap.end());
 
         //update the db
         cookieStringSessionsRecMapIter->second._logoutTime = boost::posix_time::second_clock::universal_time();
@@ -626,8 +634,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 
         //remove from _userNameUserDataMap
         std::map<std::string,UserData>::iterator userNameUserDataMapIter =
-            _userNameUserDataMap.find(cookieStringSessionsRecMapIter->second._userName);
-        ST_ASSERT(userNameUserDataMapIter != _userNameUserDataMap.end());
+            _authenticationDataArray[index]._userNameUserDataMap.find(cookieStringSessionsRecMapIter->second._userName);
+        ST_ASSERT(userNameUserDataMapIter != _authenticationDataArray[index]._userNameUserDataMap.end());
         std::vector<std::string>::iterator cookieListIter =
             std::find(userNameUserDataMapIter->second._cookieList.begin(),
                       userNameUserDataMapIter->second._cookieList.end(),
@@ -637,21 +645,22 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         //if all cookie are removed for a user, remove the use from the userNameUserDataMap
         if(0 == userNameUserDataMapIter->second._cookieList.size())
         {
-            _userNameUserDataMap.erase(userNameUserDataMapIter);
+            _authenticationDataArray[index]._userNameUserDataMap.erase(userNameUserDataMapIter);
         }
         
         //remove from _cookieStringSessionsRecMap
-        _cookieStringSessionsRecMap.erase(cookieStringSessionsRecMapIter);
+        _authenticationDataArray[index]._cookieStringSessionsRecMap.erase(cookieStringSessionsRecMapIter);
 
         return;
     }
 
     void Authenticator::cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const std::string& userName_)
     {
+        int index = getAlphabetPosition(userName_[0]);
         //internal fn. the username should exist.
         std::map<std::string,UserData >::iterator userNameUserDataMapIter =
-            _userNameUserDataMap.find(userName_);
-        ST_ASSERT(userNameUserDataMapIter != _userNameUserDataMap.end());
+            _authenticationDataArray[index]._userNameUserDataMap.find(userName_);
+        ST_ASSERT(userNameUserDataMapIter != _authenticationDataArray[index]._userNameUserDataMap.end());
         
         while(userNameUserDataMapIter->second._cookieList.size() > 1)
         {
@@ -736,5 +745,17 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 	}
         return str;
     }
-        
-    }}}
+    
+    int Authenticator::getAlphabetPosition(char alphabet)
+    {
+        if(islower(alphabet))
+        {
+            return alphabet -'a';
+        }
+        else
+        {
+            return alphabet - 'A';
+        }
+    }
+    
+}}}
