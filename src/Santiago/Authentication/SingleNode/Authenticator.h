@@ -227,12 +227,23 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
          * @return Returns the unique cookie string.
          */
         std::string generateUniqueCookie();
+        std::string generateUniqueCookieForUserName(std::string userName_);
         std::string generateRecoveryString();
         
         ThreadSpecificDbConnection                           &_databaseConnection;
 
         std::map<std::string,SantiagoDBTables::SessionsRec>   _cookieStringSessionsRecMap;
         std::map<std::string,UserData>                        _userNameUserDataMap;
+
+        struct AuthenticationData
+        {
+            std::map<std::string,SantiagoDBTables::SessionsRec>   _cookieStringSessionsRecMap;
+            std::map<std::string,UserData>                        _userNameUserDataMap;
+        };
+
+        std::array<AuthenticationData,26>                         _authenticationData;
+        
+            
         
     };
 
