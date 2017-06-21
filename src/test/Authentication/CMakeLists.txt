@@ -1,5 +1,17 @@
-#define the variable echo-external_SRCS
-set (TestAuthentication_SRCS MessageTest.cpp)
+set(TestAuthentication_SRCS  
+	AuthenticatorTesterBase.cpp
+	SingleNode/AuthenticatorTester.cpp
+	SingleNode/SingleNodeAuthenticationTest.cpp)
+                               
 
-add_executable(TestAuthentication ${TestAuthentication_SRCS}) 
-target_link_libraries(TestAuthentication ${Boost_LIBRARIES})
+if(WIN32)
+  set(TestAuthentication_SRCS
+    ${TestAuthentication_SRCS}
+    AuthenticatorTesterBase.h
+    SingleNode/AuthenticatorTester.h)
+endif(WIN32)
+
+
+
+add_executable(TestAuthenticationExec ${TestAuthentication_SRCS}) 
+target_link_libraries(TestAuthenticationExec Santiago ${MARIADB_LIBRARIES} ${Boost_LIBRARIES}) 

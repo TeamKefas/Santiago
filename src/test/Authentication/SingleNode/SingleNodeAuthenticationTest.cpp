@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include <boost/asio.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include "AuthenticatorTester.h"
 
@@ -32,14 +34,27 @@ int main(int argc, char *argv[])
         boost::property_tree::ptree config;
         boost::property_tree::read_json(argv[1],config);
 
-        Test::Authentication::SingleNode::AuthenticationTester authenticationTester(config);
-        boost::asio::spawn(ioService,&Test::Authentication::AuthenticatorTesterBase::runTests,
-                           &authenticationTester,
-                           std::placeholders::_1);
+        Test::Authentication::SingleNode::AuthenticatorTester authenticatorTester(ioService, config);
+        boost::asio::spawn(ioService,std::bind(&Test::Authentication::AuthenticatorTesterBase::runTests,
+                                               &authenticatorTester,
+                                               std::placeholders::_1));
 
-        std::thread thread1(std::bind(&boost::asio::io_service::run,&ioService));
+        /*std::thread thread1(std::bind(&boost::asio::io_service::run,&ioService));
         std::thread thread2(std::bind(&boost::asio::io_service::run,&ioService));
-        std::thread thread3(std::bind(&boost::asio::io_service::run,&ioService));
+        std::thread thread3(std::bind(&boost::asio::io_service::run,&ioService));*/
+
+        std::thread thread1(std::bind(
+                                static_cast<std::size_t(boost::asio::io_service::*)()> 
+                                (&boost::asio::io_service::run),
+                                &ioService));
+        std::thread thread2(std::bind(
+                                static_cast<std::size_t(boost::asio::io_service::*)()> 
+                                (&boost::asio::io_service::run),
+                                &ioService));
+        std::thread thread3(std::bind(
+                                static_cast<std::size_t(boost::asio::io_service::*)()> 
+                                (&boost::asio::io_service::run),
+                                &ioService));
         ioService.run();
 
         thread1.join();
