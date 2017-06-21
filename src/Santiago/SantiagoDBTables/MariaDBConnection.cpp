@@ -45,8 +45,10 @@ namespace Santiago{ namespace SantiagoDBTables
             ST_LOG_ERROR("mysql_real_connect() failed. host = " 
                          << host
                          <<" user = " << user
-                         <<" db = " << db
-                         <<" port = " << _config.get<unsigned>("Santiago.SantiagoDBTables.port") << std::endl);
+                         <<", db = " << db
+                         <<", port = " << _config.get<unsigned>("Santiago.SantiagoDBTables.port")
+                         <<", Error code returned: "<<mysql_errno(_mysql)
+                         <<", Error message :"<<mysql_error(_mysql)<< std::endl);
 
             error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
 	    ST_ASSERT(false);

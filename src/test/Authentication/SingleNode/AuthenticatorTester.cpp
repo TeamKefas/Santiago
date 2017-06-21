@@ -1,6 +1,6 @@
 #include "AuthenticatorTester.h"
 
-namespace Test{ namespace Authenticator{ namespace SingleNode
+namespace Test{ namespace Authentication{ namespace SingleNode
 {
     void AuthenticatorTester::initAuthenticator(const boost::property_tree::ptree& config_)
     {

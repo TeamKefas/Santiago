@@ -265,10 +265,19 @@ namespace Santiago{ namespace Authentication
     void AuthenticatorBase::verifyCookieAndGetUserInfo(const std::string& cookieString_,
                                                        const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {
+        ErrorCodeUserInfoCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                                  (const ErrorCodeUserInfoCallbackFn&, const std::error_code&,
+                                                                   const boost::optional<UserInfo>&)>
+                                                                  (&AuthenticatorBase::postCallbackFn),
+                                                                  this,
+                                                                  onVerifyUserCallbackFn_,
+                                                                  std::placeholders::_1,
+                                                                  std::placeholders::_2));
+        
         _strand.post(std::bind(&AuthenticatorBase::verifyCookieAndGetUserInfoImpl,
                                this,
                                cookieString_,
-                               onVerifyUserCallbackFn_));
+                               postCallbackWrapper));
     }
     
     void AuthenticatorBase::createUser(const std::string& userName_,
