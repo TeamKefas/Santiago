@@ -1,10 +1,13 @@
 #ifndef SANTIAGO_AUTHENTICATION_MULTINODE_AUTHENTICATOR_H
 #define SANTIAGO_AUTHENTICATION_MULTINODE_AUTHENTICATOR_H
 
+#include "AuthenticatorMessageSocket.h"
+
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
     class Authenticator:public AuthenticatorBase
     {
+
     protected:
         
         virtual void createUserImpl(const std::string& userName_,
@@ -50,6 +53,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         virtual void deleteUserImpl(const std::string& cookieString_,
                                     const ErrorCodeCallbackFn& onDeleteUserCallbackFn_);
+        
+        std::string generateSHA256(const std::string str);
 
     protected:
 

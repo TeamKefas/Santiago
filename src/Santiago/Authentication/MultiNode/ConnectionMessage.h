@@ -17,7 +17,7 @@
 
 #include "../../Utils/STLog.h"
 
-namespace Santiago{ namespace User { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode
 {
     enum class ConnectionMessageType
     {

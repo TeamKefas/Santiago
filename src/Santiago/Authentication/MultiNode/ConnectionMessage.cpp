@@ -1,6 +1,6 @@
 #include "ConnectionMessage.h"
 
-namespace Santiago{ namespace User { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode
 {
     ConnectionMessage::ConnectionMessage(const char* content_, unsigned size_)
     {
