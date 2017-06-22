@@ -14,7 +14,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     protected:
         
-        std::map<std::string,UserInfo>                   _cookieStringUserInfoMap;
+        std::map<std::string,std::string>                _cookieStringUserInfoMap;
         std::map<std::string,std::vector<std::string> >  _userNameCookieStringListMap;
     };
 

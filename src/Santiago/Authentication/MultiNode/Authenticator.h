@@ -2,6 +2,7 @@
 #define SANTIAGO_AUTHENTICATION_MULTINODE_AUTHENTICATOR_H
 
 #include "AuthenticatorMessageSocket.h"
+#include "ClientCache.h"
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
@@ -14,7 +15,11 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                     const std::string& emailAddress_,
                                     const std::string& password_,
                                     const ErrorCodeCallbackFn& onCreateUserCallbackFn_);
-
+        
+        void handleCreateUserConnectionMessage(const std::error_code& error_,
+                                               const ConnectionMessage& connectionMessage_,
+                                               const onCreateUserCallbackFn& onCreateUserCallbackFn_);
+        
         virtual void loginUserImpl(const std::string& userNameOrEmailAddress_,
                                    bool isUserNameNotEmailAddress_,
                                    const std::string& password_,
@@ -59,6 +64,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     protected:
 
         AuthenticatorMessageSocket         _messageSocket;
+        ClientCache                        _clientCache;
     };
 
 }}}
