@@ -18,15 +18,23 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         void handleCreateUserConnectionMessage(const std::error_code& error_,
                                                const ConnectionMessage& connectionMessage_,
-                                               const onCreateUserCallbackFn& onCreateUserCallbackFn_);
+                                               const ErrorCodeCallbackFn& onCreateUserCallbackFn_);
         
         virtual void loginUserImpl(const std::string& userNameOrEmailAddress_,
                                    bool isUserNameNotEmailAddress_,
                                    const std::string& password_,
                                    const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);
+        
+        void handleLoginUserConnectionMessage(const std::error_code& error_,
+                                              const ConnectionMessage& connectionMessage_,
+                                              const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);
 
         virtual void verifyCookieAndGetUserInfoImpl(const std::string& cookieString_,
                                                     const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_);
+        
+        void handleVerifyCookieConnectionMessage(const std::error_code& error_,
+                                                 const ConnectionMessage& connectionMessage_,
+                                                 const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_);
 
         virtual void logoutUserForCookieImpl(const std::string& cookieString_,
                                              const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
