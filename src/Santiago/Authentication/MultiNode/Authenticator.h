@@ -41,14 +41,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         void handleLogoutUserForCookieConnectionMessage(const std::error_code& error_,
                                                         const ConnectionMessage& connectionMessage_,
-                                                        const ErrorCodeUserInfoCallbackFn& onLogoutCookieCallbackFn_);
+                                                        const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_);
 
         virtual void logoutUserForAllCookiesImpl(const std::string& userName_,
                                                  const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_);
 
         void handleLogoutUserForAllCookiesConnectionMessage(const std::error_code& error_,
                                                             const ConnectionMessage& connectionMessage_,
-                                                            const ErrorCodeUserInfoCallbackFn& onLogoutAllCookiesCallbackFn_);
+                                                            const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_);
 
         virtual void changeUserPasswordImpl(const std::string& cookieString_,
                                             const std::string& oldPassword_,
@@ -57,7 +57,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         void handleChangeUserPasswordConnectionMessage(const std::error_code& error_,
                                                        const ConnectionMessage& connectionMessage_,
-                                                       const ErrorCodeUserInfoCallbackFn& onChangePasswordCallbackFn_);
+                                                       const ErrorCodeCallbackFn& onChangePasswordCallbackFn_);
 
         virtual void getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
                                                                  const std::string& recoveryString_,
@@ -65,7 +65,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         void handleGetUserForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
                                                                             const ConnectionMessage& connectionMessage_,
-                                                                            const ErrorCodeUserInfoCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
+                                                                            const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
 
         virtual void changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
                                                                             const std::string& recoverystring_,
@@ -74,7 +74,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         void handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
                                                                                        const ConnectionMessage& connectionMessage_,
-                                                                                       const ErrorCodeUserInfoCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_);
+                                                                                       const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_);
 
         virtual void changeUserEmailAddressImpl(const std::string& cookieString_,
                                                 const std::string& newEmailAddress_,
@@ -83,21 +83,21 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         void handleChangeUserEmailAddressConnectionMessage(const std::error_code& error_,
                                                            const ConnectionMessage& connectionMessage_,
-                                                           const ErrorCodeUserInfoCallbackFn& onChangeEmailAddressCallbackFn_);
+                                                           const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_);
         
         virtual void createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
                                                        const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_);
 
         void handleCreateAndReturnRecoveryStringConnectionMessage(const std::error_code& error_,
                                                                   const ConnectionMessage& connectionMessage_,
-                                                                  const ErrorCodeUserInfoCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_);
+                                                                  const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_);
 
         virtual void deleteUserImpl(const std::string& cookieString_,
                                     const ErrorCodeCallbackFn& onDeleteUserCallbackFn_);
 
         void handleDeleteUserConnectionMessage(const std::error_code& error_,
                                                const ConnectionMessage& connectionMessage_,
-                                               const ErrorCodeUserInfoCallbackFn& onDeleteUserCallbackFn_);
+                                               const ErrorCodeCallbackFn& onDeleteUserCallbackFn_);
         
         std::string generateSHA256(const std::string str);
 

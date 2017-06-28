@@ -49,13 +49,13 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     {
         if(!error_)
         {
-            if(connectionMessage_._type == SUCCEEDED)
+            if(connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
                                         UserInfo(connectionMessage_._parameters[0],  //userName
                                                  connectionMessage_._parameters[1])); //emailAddress
             }
-            else if(ConnectionMessage_._type == FAILED)
+            else if(ConnectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),
@@ -97,11 +97,11 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     {
         if(!error_)
         {
-            if (connectionMessage_._type == SUCCEEDED)
+            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
-            else if(connectionMessage_._type == FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
@@ -140,7 +140,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     {
         if(!error_)
         {
-            if (connectionMessage_._type == SUCCEEDED)
+            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 _clientCache._cookieStringUserNameMap.insert(std::make_pair(connectionMessage_._parameters[2],  //ccokiestring_
                                                                             UserInfo(connectionMessage_._parameters[0], //username
@@ -167,7 +167,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                                connectionMessage_._parameters[1]), // emailAddress
                                                       connectionMessage_._parameters[2]));  // cookieString
             }
-            else if(connectionMessage_._type == FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),boost::none);
@@ -198,16 +198,16 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     void Authenticator::handleLogoutUserForCookieConnectionMessage(const std::error_code& error_,
                                                                    const ConnectionMessage& connectionMessage_,
-                                                                   const ErrorCodeUserInfoCallbackFn& onLogoutCookieCallbackFn_)
+                                                                   const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
     {
         if(!error_)
         {
-            if (connectionMessage_._type == SUCCEEDED)
+            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 _clientCache.removeCookieInfoFromCache(connectionMessage_.parameters[2]); //cookie string
                 onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
-            else if(connectionMessage_._type == FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
@@ -238,16 +238,16 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     void Authenticator::handleLogoutUserForAllCookiesConnectionMessage(const std::error_code& error_,
                                                                        const ConnectionMessage& connectionMessage_,
-                                                                       const ErrorCodeUserInfoCallbackFn& onLogoutAllCookiesCallbackFn_)
+                                                                       const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
     {
         if(!error_)
         {
-            if (connectionMessage_._type == SUCCEEDED)
+            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0]); //username 
                 onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
-            else if(connectionMessage_._type == FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
@@ -282,15 +282,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     void Authenticator::handleChangeUserPasswordConnectionMessage(const std::error_code& error_,
                                                                   const ConnectionMessage& connectionMessage_,
-                                                                  const ErrorCodeUserInfoCallbackFn& onChangePasswordCallbackFn_)
+                                                                  const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
     {
         if(!error_)
         {
-            if (connectionMessage_._type == SUCCEEDED)
+            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 onChangePasswordCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
-            else if(connectionMessage_._type == FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onChangePasswordCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
@@ -323,15 +323,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     void Authenticator::handleGetUserForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
                                                                                        const ConnectionMessage& connectionMessage_,
-                                                                                       const ErrorCodeUserInfoCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
+                                                                                       const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
     {
         if(!error_)
         {
-            if (connectionMessage_._type == SUCCEEDED)
+            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),connectionMessage_._parameters[0]);
             }
-            else if(connectionMessage_._type == FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),boost::none);
@@ -366,15 +366,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     void Authenticator::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
                                                                                                   const ConnectionMessage& connectionMessage_,
-                                                                                                  const ErrorCodeUserInfoCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
+                                                                                                  const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
     {
         if(!error_)
         {
-            if (connectionMessage_._type == SUCCEEDED)
+            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
-            else if(connectionMessage_._type == FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
@@ -409,15 +409,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     void Authenticator::handleChangeUserEmailAddressConnectionMessage(const std::error_code& error_,
                                                                       const ConnectionMessage& connectionMessage_,
-                                                                      const ErrorCodeUserInfoCallbackFn& onChangeEmailAddressCallbackFn_)
+                                                                      const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
     {
         if(!error_)
         {
-            if (connectionMessage_._type == SUCCEEDED)
+            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 onChangeEmailAddressCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
-            else if(connectionMessage_._type == FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onChangeEmailAddressCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
@@ -448,15 +448,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     void Authenticator::handleCreateAndReturnRecoveryStringConnectionMessage(const std::error_code& error_,
                                                                              const ConnectionMessage& connectionMessage_,
-                                                                             const ErrorCodeUserInfoCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
+                                                                             const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
     {
         if(!error_)
         {
-            if (connectionMessage_._type == SUCCEEDED)
+            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 onCreateAndReturnRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),connectionMessage_._parameters[0]);  //username
             }
-            else if(connectionMessage_._type == FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onCreateAndReturnRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),boost::none);
@@ -487,11 +487,11 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     void Authenticator::handleDeleteUserConnectionMessage(const std::error_code& error_,
                                                           const ConnectionMessage& connectionMessage_,
-                                                          const ErrorCodeUserInfoCallbackFn& onDeleteUserCallbackFn_)
+                                                          const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
         if(!error_)
         {
-            if (connectionMessage_._type == SUCCEEDED)
+            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 for(auto it = _clientCache._cookieStringUserNameMap.begin();it != _clientCache._cookieStringUserNameMap.end();++it)
                 {
@@ -510,7 +510,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0]);
                 onDeleteUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
-            else if(connectionMessage_._type == FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onDeleteUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
