@@ -9,9 +9,9 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         std::map<std::string,std::string>::iterator cookieStringUserNameMapIter =
             _clientCache._cookieStringUserNameMap.find(cookieString_);
         
-        if(cookieStringUserInfoMapIter == _clientCache._cookieStringUserNameMap.end())
+        if(cookieStringUserNameMapIter == _clientCache._cookieStringUserNameMap.end())
         {
-            ST_LOG_INFO("Cookie not in _cookieStringSessionsRecMap. cookieString:" <<cookieString_<<std::endl);
+            ST_LOG_INFO("Cookie not in _cookieStringUserNameMap. cookieString:" <<cookieString_<<std::endl);
             std::vector<std::string> parameters;
             ConnectionMessageType connectionMessageType = CR_VERIFY_COOKIE_AND_GET_USER_INFO;
             parameters.push_back(cookieString_);
@@ -154,7 +154,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                         std::make_pair(
                             std::make_pair(connectionMessage_._parameters[0],  //username
                                            connectionMessage_._parameters[1]), //email address
-                            std::vector<std::string>(connectionMessage_.parameters[2])));
+                            std::vector<std::string>(connectionMessage_.parameters[2]))); //cookiestring
                 }
                 else
                 {
