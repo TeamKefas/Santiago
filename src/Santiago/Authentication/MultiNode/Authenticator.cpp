@@ -244,7 +244,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         {
             if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
-                _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0]); //username 
+                _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0], //userName
+                                                     connectionMessage_._parameters[1]); //emailAddress 
                 onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
             else if(connectionMessage_._type == ConnectionMessageType::FAILED)

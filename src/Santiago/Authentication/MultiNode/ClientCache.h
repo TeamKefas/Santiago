@@ -7,10 +7,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     {
     public:
 
-        Optional<UserInfo> getCookieInfoFromLocalCache(const std::string& cookieString_) const;
-        void addCookieInfoToCache(const std::string& cookieString_, const UserInfo& userInfo_) const;
-        void removeCookieInfoFromCache(const std::string& cookieString_);
-        void removeAllCookiesForUser(const std::string& userName_);
+        boost::Optional<std::string> getCookieInfoFromLocalCache(const std::string& cookieString_) const;
+        void addCookieUserNameToCache(const std::string& cookieString_,
+                                      const std::string& userName_,
+                                      const std::string& emailAdress_) const;
+        void removeCookieUsernameFromCache(const std::string& cookieString_,
+                                           const std::string userName_,
+                                           const std::string emailAdress_);
+        void removeAllCookiesForUser(const std::string& userName_, const std::string& emailAddress_);
 
     protected:
         
