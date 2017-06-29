@@ -1,4 +1,3 @@
-#include "ClientCache.h"
 #include "Authenticator.h"
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode
@@ -6,14 +5,13 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     void Authenticator::verifyCookieAndGetUserInfoImpl(const std::string& cookieString_,
                                                        const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {
-        std::map<std::string,std::string>::iterator cookieStringUserNameMapIter =
-            _clientCache._cookieStringUserNameMap.find(cookieString_);
+        boost::optional<std::string> userNameOpt = _clientCache.getCookieInfoFromLocalCache(cookieString_);
         
-        if(cookieStringUserNameMapIter == _clientCache._cookieStringUserNameMap.end())
+        if(*userNameOpt == boost::none)
         {
             ST_LOG_INFO("Cookie not in _cookieStringUserNameMap. cookieString:" <<cookieString_<<std::endl);
             std::vector<std::string> parameters;
-            ConnectionMessageType connectionMessageType = CR_VERIFY_COOKIE_AND_GET_USER_INFO;
+            ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_VERIFY_COOKIE_AND_GET_USER_INFO;
             parameters.push_back(cookieString_);
              
             ConnectionMessage ConnectionMessage(connectionMessageType, parameters);
@@ -26,7 +24,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }
         else
         {
-            for(std::map<std::pair<std::string,std::string>,std::string>::iterator
+            for(std::map<std::pair<std::string,std::string>,std::vector<std::string>>::iterator
                     _userNameEmailAddressCookieStringListMapIter =
                     _clientCache._userNameEmailAddressCookieStringListMap.begin();
                 _userNameEmailAddressCookieStringListMapIter !=
@@ -36,8 +34,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(_userNameEmailAddressCookieStringListMapIter->first.first == cookieStringUserNameMapIter->second)
                 {
                     onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
-                                            std::make_pair(cookieStringUserNameMapIter->second,
-                                                           _userNameEmailAddressCookieStringListMapIter->first.second));
+                                            UserInfo(cookieStringUserNameMapIter->second,
+                                                     _userNameEmailAddressCookieStringListMapIter->first.second));
                 }
             }  
         }
@@ -55,7 +53,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                         UserInfo(connectionMessage_._parameters[0],  //userName
                                                  connectionMessage_._parameters[1])); //emailAddress
             }
-            else if(ConnectionMessage_._type == ConnectionMessageType::FAILED)
+            else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
                 onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),
@@ -77,11 +75,11 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                        const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
         std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = CR_CREATE_USER;
+        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_CREATE_USER;
         parameters.push_back(userName_);
         parameters.push_back(emailAddress_);
         parameters.push_back(generateSHA256(password_));
-
+        
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
                                    std::bind(&Authenticator::handleCreateUserConnectionMessage,
@@ -97,7 +95,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     {
         if(!error_)
         {
-            if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
+            if(connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
                 onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
@@ -109,17 +107,17 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }
         else
         {
-            onCreateUserCallbackFn_(error);
+            onCreateUserCallbackFn_(error_);
         }    
     }
-
+    
     void Authenticator::loginUserImpl(const std::string& userNameOrEmailAddress_,
-                                       bool isUserNameNotEmailAddress_,
-                                       const std::string& password_,
-                                       const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);
+                                      bool isUserNameNotEmailAddress_,
+                                      const std::string& password_,
+                                      const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);
     {
         std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = CR_LOGIN_USER;
+        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_LOGIN_USER;
 
         parameters.push_back(userNameOrEmailAddress_);
         parameters.push_back(isUserNameNotEmailAddress_);
@@ -142,9 +140,9 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         {
             if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
-                _clientCache._cookieStringUserNameMap.insert(std::make_pair(connectionMessage_._parameters[2],  //ccokiestring_
-                                                                            UserInfo(connectionMessage_._parameters[0], //username
-                                                                                     connectionMessage_._parameters[1])));  //emailAdress
+                _clientCache.addCookieUserNameToCache(connectionMessage_._parameters[2],  //ccokiestring_
+                                                      connectionMessage_._parameters[0], //username
+                                                      connectionMessage_._parameters[1]); //emailAddress
 
                 auto it = _clientCache._userNameEmailAddressCookieStringListMap.find(make_pair(connectionMessage_._parameters[0],
                                                                                                connectionMessage_._parameters[1]));
@@ -154,7 +152,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                         std::make_pair(
                             std::make_pair(connectionMessage_._parameters[0],  //username
                                            connectionMessage_._parameters[1]), //email address
-                            std::vector<std::string>(connectionMessage_.parameters[2]))); //cookiestring
+                            std::vector<std::string>(connectionMessage_._parameters[2]))); //cookiestring
                 }
                 else
                 {
@@ -183,7 +181,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                         const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
     {
         std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = CR_LOGOUT_USER_FOR_COOKIE;
+        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_LOGOUT_USER_FOR_COOKIE;
 
         parameters.push_back(cookieString_);
         
@@ -204,7 +202,9 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         {
             if (connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
             {
-                _clientCache.removeCookieInfoFromCache(connectionMessage_.parameters[2]); //cookie string
+                _clientCache.removeCookieUsernameFromCache(connectionMessage_._parameters[2], //cookie string
+                                                           connectionMessage_._parameters[0], //userName
+                                                           connectionMessage_._parameters[1]); //emailAddress
                 onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
             else if(connectionMessage_._type == ConnectionMessageType::FAILED)
@@ -223,7 +223,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                     const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
     {
         std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = CR_LOGOUT_USER_FOR_ALL_COOKIES;
+        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_LOGOUT_USER_FOR_ALL_COOKIES;
 
         parameters.push_back(userName_);
         
@@ -266,7 +266,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
     {
         std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = CR_CHANGE_USER_PASSWORD;
+        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_CHANGE_USER_PASSWORD;
 
         parameters.push_back(cookieString_);
         parameters.push_back(generateSHA256(oldPassword_));
@@ -308,7 +308,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                                     const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
     {
         std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = CR_GET_USER_FOR_EMAIL_ADDRESS_AND_RECOVERY_STRING;
+        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_GET_USER_FOR_EMAIL_ADDRESS_AND_RECOVERY_STRING;
 
         parameters.push_back(emailAddress_);
         parameters.push_back(recoveryString_);
@@ -345,12 +345,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     }
 
     void Authenticator::changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
-                                                                               const std::string& recoverystring_,
+                                                                               const std::string& recoveryString_,
                                                                                const std::string& newPassword_,
                                                                                const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
     {
         std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = CR_CHANGE_USER_PASSWORD_FOR_EMAIL_ADDRESS_AND_RECOVERY_STRING;    
+        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_CHANGE_USER_PASSWORD_FOR_EMAIL_ADDRESS_AND_RECOVERY_STRING;    
 
         parameters.push_back(emailAddress_);
         parameters.push_back(recoveryString_);
@@ -393,7 +393,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                    const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
     {
         std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = CR_CHANGE_USER_EMAIL_ADDRESS;
+        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_CHANGE_USER_EMAIL_ADDRESS;
 
         parameters.push_back(cookieString_);
         parameters.push_back(newEmailAddress_);
@@ -434,7 +434,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                           const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
     {
         std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = CR_CREATE_AND_RETURN_RECOVERY_STRING;   
+        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_CREATE_AND_RETURN_RECOVERY_STRING;   
 
         parameters.push_back(emailAddress_);
 
@@ -473,7 +473,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                        const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
         std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = CR_DELETE_USER;
+        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_DELETE_USER;
 
         parameters.push_back(cookieString_);
 
@@ -508,7 +508,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                         _clientCache._userNameEmailAddressCookieStringListMap.erase(it);
                     }
                 }
-                _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0]);
+                _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0],
+                                                     connectionMessage_._parameters[1]);
                 onDeleteUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
             }
             else if(connectionMessage_._type == ConnectionMessageType::FAILED)
@@ -538,7 +539,4 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         return ss.str();
     }
 
-
-    
-            
-        }}}
+}}}

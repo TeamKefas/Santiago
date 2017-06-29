@@ -1,8 +1,25 @@
 #ifndef SANTIAGO_AUTHENTICATION_MULTINODE_AUTHENTICATOR_H
 #define SANTIAGO_AUTHENTICATION_MULTINODE_AUTHENTICATOR_H
 
+#include <functional>
+#include <map>
+#include <system_error>
+#include <vector>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+#include <openssl/sha.h>
+
+
+#include "Santiago/Authentication/AuthenticatorBase.h"
 #include "AuthenticatorMessageSocket.h"
 #include "ClientCache.h"
+#include "Santiago/ErrorCategory.h"
+#include "Santiago/Utils/STLog.h"
+
+
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {

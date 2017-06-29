@@ -1,25 +1,30 @@
 #ifndef SANTIAGO_AUTHENTICATION_MULTINODE_CLIENTCACHE_H
 #define SANTIAGO_AUTHENTICATION_MULTINODE_CLIENTCACHE_H
 
+#include <boost/optional/optional.hpp>
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
     class ClientCache
     {
     public:
 
-        boost::Optional<std::string> getCookieInfoFromLocalCache(const std::string& cookieString_) const;
-        void addCookieUserNameToCache(const std::string& cookieString_,
+        boost::optional<UserInfo> getCookieInfoFromLocalCache(const std::string& cookieString_) const;
+        void addCookieUserInfoToCache(const std::string& cookieString_,
                                       const std::string& userName_,
                                       const std::string& emailAdress_) const;
         void removeCookieUsernameFromCache(const std::string& cookieString_,
-                                           const std::string userName_,
-                                           const std::string emailAdress_);
+                                           const std::string& userName_,
+                                           const std::string& emailAdress_);
         void removeAllCookiesForUser(const std::string& userName_, const std::string& emailAddress_);
 
     protected:
         
-        std::map<std::string,std::string>                                       _cookieStringUserNameMap;
-        std::map<std::pair<std::string,std::string>,std::vector<std::string> >  _userNameEmailAddressCookieStringListMap;
+        std::map<std::string,UserInfo>                                       _cookieStringUserInfoMap;
+        std::map<std::string,std::vector<std::string> >                      _userNameCookieStringListMap;
     };
 
 

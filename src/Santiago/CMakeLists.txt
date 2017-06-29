@@ -5,6 +5,10 @@ set(Santiago_SRCS
   SantiagoDBTables/MariaDBConnection.cpp
   Authentication/AuthenticatorBase.cpp
   Authentication/SingleNode/Authenticator.cpp
+  Authentication/MultiNode/Authenticator.cpp
+  Authentication/MultiNode/ClientCache.cpp
+  Authentication/MultiNode/AuthenticatorMessageSocket.cpp
+  Authentication/MultiNode/ConnectionMessage.cpp
   Thread/ThreadSpecificVarImpl.cpp
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp
@@ -18,6 +22,10 @@ if(WIN32)
       SantiagoDBTables/Definitions.h
       SantiagoDBTables/MariaDBConnection.h
       Authentication/SingleNode/Authenticator.h
+      Authentication/MultiNode/Authenticator.h
+      Authentication/MultiNode/ClientCache.h
+      Authentication/MultiNode/AuthenticatorMessageSocket.h
+      Authentication/MultiNode/ConnectionMessage.h
       Utils/PTimeUtils.h
       Utils/STLog.h
       Utils/LogLevel.h
