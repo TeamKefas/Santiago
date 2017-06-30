@@ -5,7 +5,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     boost::optional<UserInfo> ClientCache::getCookieInfoFromLocalCache(const std::string& cookieString_) const
     {
-        std::map<std::string,std::string>::iterator cookieStringUserInfoMapIter =
+        std::map<std::string,UserInfo>::const_iterator cookieStringUserInfoMapIter =
             _cookieStringUserInfoMap.find(cookieString_);
         if(cookieStringUserInfoMapIter != _cookieStringUserInfoMap.end())
         {
@@ -20,9 +20,10 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     void ClientCache::addCookieUserInfoToCache(const std::string& cookieString_,
                                                const std::string& userName_,
-                                               const std::string& emailAdress_) const
+                                               const std::string& emailAddress_)
     {
-        _cookieStringUserNameMap[cookieString_] = UserInfo(userName_,emailAddress_);
+        // _cookieStringUserInfoMap[cookieString_] = UserInfo(userName_,emailAddress_);
+        _cookieStringUserInfoMap.insert(std::make_pair(cookieString_, UserInfo(userName_, emailAddress_)));
 
         auto it = _userNameCookieStringListMap.find(userName_);
         if (it != _userNameCookieStringListMap.end())
@@ -33,15 +34,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         {
             std::vector<std::string> cookieStringVec;
             cookieStringVec.push_back(cookieString_);
-            _userNameCookieStringListMap.insert(userName_, cookieStringVec);
+            _userNameCookieStringListMap.insert(std::make_pair(userName_, cookieStringVec));
         }
     }
     void ClientCache::removeCookieUsernameFromCache(const std::string& cookieString_,
                                                     const std::string& userName_,
-                                                    const std::string& emailAdress_)
+                                                    const std::string& emailAddress_)
     {
-        auto it = _cookieStringUserNameMap.find(cookieString_);
-        _cookieStringUserNameMap.erase(it);
+        auto it = _cookieStringUserInfoMap.find(cookieString_);
+        _cookieStringUserInfoMap.erase(it);
 
         auto iterator = _userNameCookieStringListMap.find(userName_);
         iterator->second.erase(std::remove(iterator->second.begin(),

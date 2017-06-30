@@ -6,6 +6,8 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include "Santiago/Authentication/AuthenticatorBase.h"
+
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
     class ClientCache
@@ -15,7 +17,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         boost::optional<UserInfo> getCookieInfoFromLocalCache(const std::string& cookieString_) const;
         void addCookieUserInfoToCache(const std::string& cookieString_,
                                       const std::string& userName_,
-                                      const std::string& emailAdress_) const;
+                                      const std::string& emailAdress_);
         void removeCookieUsernameFromCache(const std::string& cookieString_,
                                            const std::string& userName_,
                                            const std::string& emailAdress_);
