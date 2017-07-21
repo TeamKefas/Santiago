@@ -3,6 +3,7 @@
 
 #include <map>
 #include <memory>
+#include <set>
 
 #include <boost/optional.hpp>
 
@@ -19,8 +20,7 @@ namespace Santiago{ namespace Authentication
         struct UserData
         {
             UserData(const std::string& emailAddress_):
-                _emailAddress(emailAddress_),
-                _cookieList()
+                _emailAddress(emailAddress_)
             {}
 
             std::string                   _emailAddress;
@@ -36,8 +36,8 @@ namespace Santiago{ namespace Authentication
             SantiagoDBTables::SessionsRec _sessionsRec;
         };
         typedef std::shared_ptr<CookieDataBase> CookieDataBasePtr;
-
-        Optional<SantiagoDDTables::SessionsRec> getCookieSessionsRec(const std::string& cookieString_) const;
+ 
+        boost::optional<SantiagoDBTables::SessionsRec> getCookieSessionsRec(const std::string& cookieString_) const;
         std::vector<std::string> getAllCookieStringsForUser(const std::string& userName_) const;
         
         void removeCookie(const std::string& cookieString_);
@@ -47,7 +47,7 @@ namespace Santiago{ namespace Authentication
     protected:
 
         std::map<std::string, UserData>            _userNameUserDataMap;
-        std::map<std::string, CookieDataBasePtr>   _cookieStringCookeDataPtrMap;
+        std::map<std::string, CookieDataBasePtr>   _cookieStringCookieDataPtrMap;
     };
 
     struct None
@@ -62,13 +62,13 @@ namespace Santiago{ namespace Authentication
     public:
         typedef ControllerDataBase::CookieDataBase CookieData;
         
-        void addCookie(const std::string& usersName_,
+        void addCookie(const std::string& userName_,
                        const std::string& emailAddress_,
                        const SantiagoDBTables::SessionsRec& sessionsRec_,
                        const boost::optional<None>&);
         
-        void updateCookie(const SantiagoDBTable::SessionsRec& newSessionsRec_,
-                          const boost::optional<None>&) const;
+        void updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
+                          const boost::optional<None>&);
         
     };
 
@@ -86,13 +86,13 @@ namespace Santiago{ namespace Authentication
             std::set<unsigned>         _clientIdSet;
         };
 
-        void addCookie(const std::string& usersName_,
+        void addCookie(const std::string& userName_,
                        const std::string& emailAddress_,
                        const SantiagoDBTables::SessionsRec& sessionsRec_,
                        const boost::optional<unsigned>& clientId_);
         
-        void updateCookie(const SantiagoDBTable::SessionsRec& newSessionsRec_,
-                          const boost::optional<unsigned>& clientIdToBeAdded_) const;
+        void updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
+                          const boost::optional<unsigned>& clientIdToBeAdded_);
 
         std::set<unsigned> getCookieClientIds(std::string& cookieString_) const;
         std::set<unsigned> getAllClientIdsForUser(const std::string& userName_) const;
