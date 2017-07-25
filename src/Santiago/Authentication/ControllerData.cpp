@@ -4,38 +4,42 @@ namespace Santiago{ namespace Authentication
     {
         boost::optional<SantiagoDBTables::SessionsRec> ControllerDataBase::getCookieSessionsRec(const std::string& cookieString_) const
         {
-            if(_cookieStringCookieDataPtrMap.find(cookieString_) != _cookieStringCookieDataPtrMap.end())
+            auto iter = _cookieStringCookieDataPtrMap.find(cookieString_);
+            if(iter != _cookieStringCookieDataPtrMap.end())
             {
-                return _cookieStringCookieDataPtrMap.find(cookieString_)->second->_sessionsRec;
+                return iter->second->_sessionsRec;
             }
-            return SantiagoDBTables::SessionsRec();
+            return boost::none;
         }
     
         std::vector<std::string> ControllerDataBase::getAllCookieStringsForUser(const std::string& userName_) const
         {
-            if(_userNameUserDataMap.find(userName_) != _userNameUserDataMap.end())
+            auto iter = _userNameUserDataMap.find(userName_);
+            if(iter != _userNameUserDataMap.end())
             {
-                return _userNameUserDataMap.find(userName_)->second._cookieList;
+                return iter->second._cookieList;
             }
-            return {};
+            return std::vector<std::string>();
         }
 
         void ControllerDataBase::removeCookie(const std::string& cookieString_)
         {
-            if(_cookieStringCookieDataPtrMap.find(cookieString_) != _cookieStringCookieDataPtrMap.end())
+            auto iter = _cookieStringCookieDataPtrMap.find(cookieString_); 
+            if(iter == _cookieStringCookieDataPtrMap.end())
             {
-                std::string userName = _cookieStringCookieDataPtrMap.find(cookieString_)->second->_sessionsRec._userName;
-                _cookieStringCookieDataPtrMap.erase(cookieString_);
-                std::vector<std::string>::iterator iter;
-                for(iter = _userNameUserDataMap.find(userName)->second._cookieList.begin(); iter != _userNameUserDataMap.find(userName)->second._cookieList.end(); ++iter)
+                ST_ASSERT(false);
+            }
+            std::string userName = iter->second->_sessionsRec._userName;
+            _cookieStringCookieDataPtrMap.erase(iter);
+            auto itr = _userNameUserDataMap.find(userName);
+            for(auto it = itr->second._cookieList.begin(); it != itr->second._cookieList.end(); ++it)
+            {
+                if(*it == cookieString_)
                 {
-                    if(*iter == cookieString_)
+                    itr->second._cookieList.erase(it);
+                    if(!itr->second._cookieList.size())
                     {
-                        _userNameUserDataMap.find(userName)->second._cookieList.erase(iter);
-                        if(!_userNameUserDataMap.find(userName)->second._cookieList.size())
-                        {
-                            removeUser(userName);
-                        }
+                        removeUser(userName);
                     }
                 }
             }
@@ -44,19 +48,29 @@ namespace Santiago{ namespace Authentication
     
         void ControllerDataBase::removeUser(const std::string& userName_)
         {
-            if(_userNameUserDataMap.find(userName_) != _userNameUserDataMap.end())
+            auto iter = _userNameUserDataMap.find(userName_);
+            if(iter == _userNameUserDataMap.end())
             {
-                _userNameUserDataMap.erase(userName_);
+                ST_ASSERT(false);
             }
+            std::vector<std::string> cookieList = iter->second._cookieList;
+            std::vector<std::string>::iterator itr;
+            for(itr = cookieList.begin(); itr != cookieList.end(); ++itr)
+            {
+                _cookieStringCookieDataPtrMap.erase(*itr);
+            }
+            _userNameUserDataMap.erase(iter);
             return;
         }
 
         void ControllerDataBase::updateUserEmailAddress(const std::string& userName_, const std::string& newEmailAddress_)
         {
-            if(_userNameUserDataMap.find(userName_) != _userNameUserDataMap.end())
+            auto iter = _userNameUserDataMap.find(userName_);
+            if(iter == _userNameUserDataMap.end())
             {
-                _userNameUserDataMap.find(userName_)->second._emailAddress = newEmailAddress_;
+                ST_ASSERT(false);
             }
+            iter->second._emailAddress = newEmailAddress_;
             return;
         }
       
@@ -65,10 +79,16 @@ namespace Santiago{ namespace Authentication
                                              const SantiagoDBTables::SessionsRec& sessionsRec_,
                                              const boost::optional<None>&)
         {
-            if(_userNameUserDataMap.find(userName_) != _userNameUserDataMap.end())
+            auto itr = _cookieStringCookieDataPtrMap.find(sessionsRec_._cookieString);
+            if(itr != _cookieStringCookieDataPtrMap.end())
             {
-                _userNameUserDataMap.find(userName_)->second._emailAddress = emailAddress_;
-                _userNameUserDataMap.find(userName_)->second._cookieList.push_back(sessionsRec_._cookieString);
+                ST_ASSERT(false);
+            }
+            auto iter = _userNameUserDataMap.find(userName_);
+            if(iter != _userNameUserDataMap.end())
+            {
+                iter->second._emailAddress = emailAddress_;
+                iter->second._cookieList.push_back(sessionsRec_._cookieString);
             }
             else
             {
@@ -76,27 +96,21 @@ namespace Santiago{ namespace Authentication
                 userData._cookieList.push_back(sessionsRec_._cookieString);
                 _userNameUserDataMap.insert(std::pair<std::string, UserData>(userName_, userData));
             }
-            CookieData cookieData(sessionsRec_);
-            if(_cookieStringCookieDataPtrMap.find(sessionsRec_._cookieString) != _cookieStringCookieDataPtrMap.end())
-            {
-                _cookieStringCookieDataPtrMap.find(sessionsRec_._cookieString)->second.reset(new ControllerData::CookieData(cookieData));
-            }
-            else
-            {                
-                std::shared_ptr<ControllerDataBase::CookieDataBase> cookieDataPtr(new ControllerData::CookieData(cookieData));
-                _cookieStringCookieDataPtrMap[sessionsRec_._cookieString] = cookieDataPtr;
-            }
+            CookieData cookieData(sessionsRec_);            
+            CookieDataBasePtr cookieDataPtr(new ControllerData::CookieData(cookieData));
+            _cookieStringCookieDataPtrMap[sessionsRec_._cookieString] = cookieDataPtr;
             return;
         }     
        
         void ControllerData<None>::updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
                                                 const boost::optional<None>&)
         {
-            if(_cookieStringCookieDataPtrMap.find(newSessionsRec_._cookieString) != _cookieStringCookieDataPtrMap.end())
+            auto iter = _cookieStringCookieDataPtrMap.find(newSessionsRec_._cookieString);
+            if(iter == _cookieStringCookieDataPtrMap.end())
             {
-                CookieData cookieData(newSessionsRec_);
-                _cookieStringCookieDataPtrMap.find(newSessionsRec_._cookieString)->second.reset(new ControllerData::CookieData(cookieData));
+                ST_ASSERT(false);
             }
+            iter->second->_sessionsRec = newSessionsRec_;
             return;
         }
         
@@ -105,10 +119,16 @@ namespace Santiago{ namespace Authentication
                                                  const SantiagoDBTables::SessionsRec& sessionsRec_,
                                                  const boost::optional<unsigned>& clientId_)
         {
-            if(_userNameUserDataMap.find(userName_) != _userNameUserDataMap.end())
+            auto itr = _cookieStringCookieDataPtrMap.find(sessionsRec_._cookieString);
+            if(itr != _cookieStringCookieDataPtrMap.end())
             {
-                _userNameUserDataMap.find(userName_)->second._emailAddress = emailAddress_;
-                _userNameUserDataMap.find(userName_)->second._cookieList.push_back(sessionsRec_._cookieString);
+                ST_ASSERT(false);
+            }
+            auto iter = _userNameUserDataMap.find(userName_);
+            if(iter != _userNameUserDataMap.end())
+            {
+                iter->second._emailAddress = emailAddress_;
+                iter->second._cookieList.push_back(sessionsRec_._cookieString);
             }
             else
             {
@@ -117,57 +137,53 @@ namespace Santiago{ namespace Authentication
                 _userNameUserDataMap.insert(std::pair<std::string, UserData>(userName_, userData));
             }
             CookieData cookieData(sessionsRec_);
-            cookieData._clientIdSet.insert(*clientId_);
-            if(_cookieStringCookieDataPtrMap.find(sessionsRec_._cookieString) != _cookieStringCookieDataPtrMap.end())
-            {
-                _cookieStringCookieDataPtrMap.find(sessionsRec_._cookieString)->second.reset(new ControllerData::CookieData(cookieData));
-            }
-            else
-            {
-                std::shared_ptr<ControllerDataBase::CookieDataBase> cookieDataPtr(new ControllerData::CookieData(cookieData));
-                _cookieStringCookieDataPtrMap[sessionsRec_._cookieString] = cookieDataPtr;
-            }
+            cookieData._clientIdSet.insert(*clientId_);              
+            CookieDataBasePtr cookieDataPtr(new ControllerData::CookieData(cookieData));
+            _cookieStringCookieDataPtrMap[sessionsRec_._cookieString] = cookieDataPtr;
             return;
         }
         
         void ControllerData<unsigned>::updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
-                                                              const boost::optional<unsigned>& clientIdToBeAdded_)
+                                                    const boost::optional<unsigned>& clientIdToBeAdded_)
         {
-            if(_cookieStringCookieDataPtrMap.find(newSessionsRec_._cookieString) != _cookieStringCookieDataPtrMap.end())
+            auto iter = _cookieStringCookieDataPtrMap.find(newSessionsRec_._cookieString);
+            if(iter == _cookieStringCookieDataPtrMap.end())
             {
-                CookieData cookieData(newSessionsRec_);
-                cookieData._clientIdSet.insert(*clientIdToBeAdded_);
-                _cookieStringCookieDataPtrMap.find(newSessionsRec_._cookieString)->second.reset(new ControllerData::CookieData(cookieData));
+                ST_ASSERT(false);
             }
-            return;
+            iter->second->_sessionsRec = newSessionsRec_;
+            std::static_pointer_cast<CookieData>(iter->second)->_clientIdSet.insert(*clientIdToBeAdded_);
+            return;               
         }
         
         std::set<unsigned> ControllerData<unsigned>::getCookieClientIds(std::string& cookieString_) const
         {
-            if(_cookieStringCookieDataPtrMap.find(cookieString_) != _cookieStringCookieDataPtrMap.end())
+            auto iter = _cookieStringCookieDataPtrMap.find(cookieString_);
+            if(iter == _cookieStringCookieDataPtrMap.end())
             {
-                CookieDataBasePtr cookieDataBasePtr = _cookieStringCookieDataPtrMap.find(cookieString_)->second;
-                return std::static_pointer_cast<CookieData>(cookieDataBasePtr)->_clientIdSet;
+                ST_ASSERT(false);
             }
-            return std::set<unsigned>();
+            CookieDataBasePtr cookieDataBasePtr = iter->second;
+            return std::static_pointer_cast<CookieData>(cookieDataBasePtr)->_clientIdSet;
         }
         
         std::set<unsigned> ControllerData<unsigned>::getAllClientIdsForUser(const std::string& userName_) const
         {
-            if(_userNameUserDataMap.find(userName_) != _userNameUserDataMap.end())
+            auto iter =_userNameUserDataMap.find(userName_);
+            if(iter == _userNameUserDataMap.end())
             {
-                std::vector<std::string> cookieList = _userNameUserDataMap.find(userName_)->second._cookieList;
-                std::set<unsigned> allClientIdSets;
-                std::vector<std::string>::iterator iter;
-                for(iter = cookieList.begin(); iter != cookieList.end(); ++iter)
-                {
-                    std::string cookieString = *iter;
-                    CookieDataBasePtr cookieDataBasePtr = _cookieStringCookieDataPtrMap.find(cookieString)->second;
-                    std::set<unsigned> clientIdSet = std::static_pointer_cast<CookieData>(cookieDataBasePtr)->_clientIdSet;
-                    allClientIdSets.insert(clientIdSet.begin(), clientIdSet.end());
-                }
-                return allClientIdSets;
+                ST_ASSERT(false);
             }
-            return std::set<unsigned>();
+            std::vector<std::string> cookieList = iter->second._cookieList;
+            std::set<unsigned> allClientIdSets;
+            std::vector<std::string>::iterator itr;
+            for(itr = cookieList.begin(); itr != cookieList.end(); ++itr)
+            {
+                std::string cookieString = *itr;
+                CookieDataBasePtr cookieDataBasePtr = _cookieStringCookieDataPtrMap.find(cookieString)->second;
+                std::set<unsigned> clientIdSet = std::static_pointer_cast<CookieData>(cookieDataBasePtr)->_clientIdSet;
+                allClientIdSets.insert(clientIdSet.begin(), clientIdSet.end());
+            }
+            return allClientIdSets;
         }
 }}
