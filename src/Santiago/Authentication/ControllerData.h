@@ -39,9 +39,10 @@ namespace Santiago{ namespace Authentication
  
         boost::optional<SantiagoDBTables::SessionsRec> getCookieSessionsRec(const std::string& cookieString_) const;
         std::vector<std::string> getAllCookieStringsForUser(const std::string& userName_) const;
-        
+        boost::optional<std::string> getUserEmailAddress(const std::string& userName_) const;
+
         void removeCookie(const std::string& cookieString_);
-        void removeUser(const std::string& userName_);
+//        void removeUser(const std::string& userName_);
         void updateUserEmailAddress(const std::string& userName_,const std::string& newEmailAddress_);
         
     protected:
@@ -68,7 +69,7 @@ namespace Santiago{ namespace Authentication
                        const boost::optional<None>&);
         
         void updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
-                          const boost::optional<None>&);
+                          const None&);
         
     };
 
@@ -92,7 +93,7 @@ namespace Santiago{ namespace Authentication
                        const boost::optional<unsigned>& clientId_);
         
         void updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
-                          const boost::optional<unsigned>& clientIdToBeAdded_);
+                          unsigned clientIdToBeAdded_);
 
         std::set<unsigned> getCookieClientIds(std::string& cookieString_) const;
         std::set<unsigned> getAllClientIdsForUser(const std::string& userName_) const;

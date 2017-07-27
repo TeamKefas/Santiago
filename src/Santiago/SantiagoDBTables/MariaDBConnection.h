@@ -94,6 +94,10 @@ namespace Santiago{ namespace SantiagoDBTables
  * @param error
  */ 
         void updateSessionsRec(SessionsRec& sessionsRec_, std::error_code& error_);
+
+        void updateSessionLogoutTimes(const std::vector<std::string>& cookieStringList_,
+                                      const boost::posix_time::ptime& logoutTime_,
+                                      std::error_code& error_);
 /**
  * Gets active session records from the database.
  * @param error
