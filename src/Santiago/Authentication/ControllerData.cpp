@@ -22,8 +22,11 @@ namespace Santiago{ namespace Authentication
     boost::optional<std::string> ControllerDataBase::getUserEmailAddress(const std::string& userName_) const
      {
          auto iter = _userNameUserDataMap.find(userName_);
-         ST_ASSERT(iter != _userNameUserDataMap.end());
-         return iter->second._emailAddress;
+         if(iter != _userNameUserDataMap.end())
+         {
+             return iter->second._emailAddress;
+         }
+         return boost ::none;
      }
     
     void ControllerDataBase::removeCookie(const std::string& cookieString_)
