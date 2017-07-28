@@ -454,6 +454,26 @@ namespace Santiago{ namespace SantiagoDBTables
         runUpdateQuery(updateSessionsRecQuery,error_);
     }
 
+    void MariaDBConnection::updateSessionLogoutTimes(const std::vector<std::string>& cookieStringList_,
+                                                     const boost::posix_time::ptime& logoutTime_,
+                                                     std::error_code& error_)
+    {
+        for(auto iter = cookieStringList_.begin(); iter != cookieStringList_.end(); ++ iter)
+        {
+            if(!isUserInputClean(*iter))
+            {
+                error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+                return;
+            }
+
+            std::string updateSessionsRecQuery = "UPDATE ST_sessions SET logout_time = '" +
+                Utils::ConvertPtimeToString(logoutTime_) +
+                "' WHERE cookie_string ='" +
+                *iter + "'";
+            runUpdateQuery(updateSessionsRecQuery,error_);
+        }
+    }
+
     std::vector<SessionsRec> MariaDBConnection::getActiveSessions(std::error_code& error_)
     {
         // ptime logoutTime;//(from_iso_string("00000000T000000"));

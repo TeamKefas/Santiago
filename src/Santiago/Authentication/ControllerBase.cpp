@@ -5,7 +5,9 @@
 namespace Santiago{ namespace Authentication
 {
     template<typename ClientIdType>
-    ControllerBase<ClientIdType>::ControllerBase(ThreadSpecificDbConnection& databaseConnection_):
+    ControllerBase<ClientIdType>::ControllerBase(ThreadSpecificDbConnection& databaseConnection_,
+                                                 boost::asio::io_service& ioService_,
+                                                 const boost::property_tree::ptree& config_):
         _databaseConnection(databaseConnection_),
         _localData()
     {
@@ -250,6 +252,7 @@ namespace Santiago{ namespace Authentication
         }
 
         //verify username-password
+        std::error_code error;
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::tie(error,usersRecOpt) =
             verifyUserNamePasswordAndGetUsersRec(sessionsRecOpt->_userName, oldPassword_);
@@ -387,7 +390,7 @@ namespace Santiago{ namespace Authentication
         
         if(error)
         {
-            onChangeEmailAddressCallbackFn_(error);
+            //onChangeEmailAddressCallbackFn_(error);
             return;
         }
         ST_ASSERT(usersRecOpt);
@@ -403,7 +406,7 @@ namespace Santiago{ namespace Authentication
         if(usersRecOpt)
         {
             return std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
-                                   ErrorCategory::GetInstance()));
+                                   ErrorCategory::GetInstance());
         }
         ST_ASSERT(ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS == error.value());
 
@@ -537,17 +540,18 @@ namespace Santiago{ namespace Authentication
     cleanupLocalCookieDataAndUpdateSessionsRecordImpl(const SantiagoDBTables::SessionsRec& sessionsRec_)
     {
         //update the db
-        sessionsRec_->_logoutTime = boost::posix_time::second_clock::universal_time();
+        sessionsRec_._logoutTime = boost::posix_time::second_clock::universal_time();
         std::error_code error;
-        _databaseConnection.get().updateSessionsRec(sessionsRec_,error);
+        SantiagoDBTables::SessionsRec sessionsRec = sessionsRec_;
+        _databaseConnection.get().updateSessionsRec(sessionsRec,error);
         if(error)
         {
             ST_LOG_INFO("updateSessionsRec failed. Logging out without writing to db. CookieString:"
-                        <<sessionsRec_._cookieString);
+                        <<sessionsRec._cookieString);
         }
 
         //remove from _userNameUserDataMap
-        _localData.removeCookie(cookieString_);
+        _localData.removeCookie(sessionsRec._cookieString);
         return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
     }
 
@@ -603,7 +607,7 @@ namespace Santiago{ namespace Authentication
 
         //the user should also be removed by now
         ST_ASSERT(!_localData.getUserEmailAddress(userName_));
-        return return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
+        return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
     }
 
     template<typename ClientIdType>

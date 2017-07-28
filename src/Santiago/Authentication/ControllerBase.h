@@ -24,6 +24,7 @@
 #include <boost/asio/spawn.hpp>
 
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
+#include "Santiago/Authentication/AuthenticatorBase.h"
 #include "Santiago/Thread/ThreadSpecificVar.h"
 #include "Santiago/Utils/STLog.h"
 
@@ -113,6 +114,17 @@ namespace Santiago{ namespace Authentication
         std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
         verifyEmailAddressRecoveryStringAndGetUsersRec(const std::string& emailAddress_,
                                                        const std::string& recoveryString_);
+        std::error_code logoutUserForAllCookiesImpl(const std::string& userName_,
+                                                    boost::asio::yield_context yield_);
+        std::pair<std::error_code,boost::optional<std::string> >
+        createAndReturnRecoveryStringImpl(const std::string& emailAddress_,boost::asio::yield_context yield_);
+         std::error_code
+         changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
+                                                           const std::string& recoveryString_,
+                                                           const std::string& newPassword_,
+                                                           boost::asio::yield_context yield_);
+        std::error_code deleteUserImpl(const std::string& cookieString_,
+                                                                     boost::asio::yield_context yield_);
 
         std::error_code cleanupLocalCookieDataAndUpdateSessionsRecord(
             const SantiagoDBTables::SessionsRec& sessionsRec_);
@@ -120,14 +132,16 @@ namespace Santiago{ namespace Authentication
         std::error_code cleanupCookieDataAndUpdateSessionRecord(const std::string& cookieString_,
                                                                 boost::asio::yield_context yield_);
 
+        std::error_code cleanupLocalCookieDataAndUpdateSessionsRecordImpl(const SantiagoDBTables::SessionsRec& sessionsRec_);
         std::error_code cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const std::string& userName_,
                                                                               boost::asio::yield_context yield_);
+        boost::posix_time::time_duration getMaxSessionInactiveDuration() const;
 
-        virtual std::error logoutCookieFromAllClients(const std::string& cookieString_,
-                                                      boost::asio::yield_context yield_) = 0;
+        virtual std::error_code logoutCookieFromAllClients(const std::string& cookieString_,
+                                                           boost::asio::yield_context yield_) = 0;
         
-        virtual std::error logoutUserFromAllClients(const std::string& userName_,
-                                                    boost::asio::yield_context yield_) = 0;
+        virtual std::error_code logoutUserFromAllClients(const std::string& userName_,
+                                                         boost::asio::yield_context yield_) = 0;
 
         std::string generateSHA256(const std::string str);
         std::string generateUniqueCookie();
