@@ -17,9 +17,9 @@ namespace Santiago{ namespace Authentication
             _databaseConnection.get().getActiveSessions(error);
         if(error && (ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS != error.value()))
         {
-            ST_LOG_ERROR("Authenticator contruction failed. Error message:"<<
+            ST_LOG_ERROR("Authenticator construction failed. Error message:"<<
                          error.message());
-            throw std::runtime_error("Authenticator contruction failed. Error message:" +
+            throw std::runtime_error("Authenticator construction failed. Error message:" +
                                      error.message());
         }
         
