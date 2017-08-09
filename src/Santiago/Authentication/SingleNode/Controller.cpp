@@ -5,7 +5,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     template<typename ClientIdType>
     Controller<ClientIdType>::Controller(ThreadSpecificDbConnection& databaseConnection_,
                                          boost::asio::io_service& ioService_,
-                                         const boost::property_tree::ptree& config_):_dbConnection(databaseConnection_)
+                                         const boost::property_tree::ptree& config_):_dbConnection(databaseConnection_),
+                                                                                     _data()
     {
         srand ( time(NULL) );
         std::error_code error;
@@ -50,21 +51,19 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     {
         std::error_code error;
         error = _data.logoutUserForCookie(cookieString_,yield_);
-        if(!error)
-        {
-            std::set<unsigned> clientIds = _data.getCookieClientIds(cookieString_);
-            std::set<unsigned>::iterator it;
-            for (it = clientIds.begin(); it != clientIds.end(); ++it)
-            {
-                _data._clientIdSet.erase(*it);
-            }
-            return _data.cleanupCookieDataAndUpdateSessionRecord(cookieString_,yield_);
-        }
-        else
+        if(error)
         {
             ST_LOG_INFO("Cookie not valid. cookieString:" <<cookieString_<<std::endl);
             return std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,ErrorCategory::GetInstance());
         }
+        std::set<unsigned> clientIds = _data.getCookieClientIds(cookieString_);
+        std::set<unsigned>::iterator it;
+        for (it = clientIds.begin(); it != clientIds.end(); ++it)
+        {
+            _data._clientIdSet.erase(*it);
+        }
+        ST_LOG_INFO("Logout cookie from all clients successfull for cookiestring:"<<cookieString_<<std::endl);
+        return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
     }
 
     template<typename ClientIdType>
@@ -72,23 +71,21 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                                                        boost::asio::yield_context yield_)
     {
         std::error_code error;
-        error = _data.logoutUserForAllCookies(userName_,yield_);
-        if(!error)
-        {
-            std::set<unsigned> clientIds = _data.getAllClientIds(userName_);
-            std::set<unsigned>::iterator it;
-            for (it = clientIds.begin(); it != clientIds.end(); ++it)
-            {
-                _data._clientIdSet.erase(*it);
-            }
-            return _data.cleanupCookieDataAndUpdateSessionRecordForAllCookies(userName_,yield_);
-        }
-        else
+        error = _data.logoutUserForAllCookiesImpl(userName_,yield_);
+        if(error)
         {
             ST_LOG_INFO("No active session for username. username:"<<userName_);
             return std::error_code(ErrorCode::ERR_NO_ACTIVE_SESSION_FOR_USERNAME,
                                    ErrorCategory::GetInstance());
         }
+        std::set<unsigned> clientIds = _data.getAllClientIds(userName_);
+        std::set<unsigned>::iterator it;
+        for (it = clientIds.begin(); it != clientIds.end(); ++it)
+        {
+            _data._clientIdSet.erase(*it);
+        }
+        ST_LOG_INFO("Logout user from all clients successfull for userName:"<<userName_<<std::endl);
+        return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
     }
     
 }}}
