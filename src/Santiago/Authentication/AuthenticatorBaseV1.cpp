@@ -96,8 +96,7 @@ namespace Santiago{ namespace Authentication
                                                    const std::string& password_,
                                                    const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
-     
-         ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+        ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
                                                           (const ErrorCodeCallbackFn&, const std::error_code&)>
                                                           (&AuthenticatorBase::postCallbackFn),
                                                           this,
@@ -137,12 +136,11 @@ namespace Santiago{ namespace Authentication
 
         boost::asio::spawn(
             *controllerStrandPair.second,
-            [&error_,&ret,handler,controllerStrandPair,/*_clientId,*/userNameOrEmailAddress_,isUserNameNotEmailAddress_,password_](boost::asio::yield_context yield_)
+            [&error_,&ret,handler,controllerStrandPair,userNameOrEmailAddress_,isUserNameNotEmailAddress_,password_](boost::asio::yield_context yield_)
             //NOTE:This yield_ is not same as above yield_
             {
                 std::tie(error_,ret) = controllerStrandPair.first->
-                    loginUser(/*_clientId,*/
-                              userNameOrEmailAddress_,
+                    loginUser(userNameOrEmailAddress_,
                               isUserNameNotEmailAddress_,
                               password_,
                               yield_);
@@ -172,59 +170,116 @@ namespace Santiago{ namespace Authentication
 
         boost::asio::spawn(
             *controllerStrandPair.second,
-            [controllerStrandPair,/*_clientId,*/userNameOrEmailAddress_,isUserNameNotEmailAddress_,password_,postCallbackWrapper](boost::asio::yield_context yield_)
+            [controllerStrandPair,userNameOrEmailAddress_,isUserNameNotEmailAddress_,password_,postCallbackWrapper](boost::asio::yield_context yield_)
             {
                 std::error_code error;
                 boost::optional<std::pair<UserInfo,std::string> > userInfoStringPairOpt;
                 
                 std::tie(error,userInfoStringPairOpt) = controllerStrandPair.first->
-                    loginUser(/*_clientId,*/
-                              userNameOrEmailAddress_,
+                    loginUser(userNameOrEmailAddress_,
                               isUserNameNotEmailAddress_,
                               password_,
                               yield_);
                 postCallbackWrapper(error,userInfoStringPairOpt);
             });        
     }
+
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::
+    logoutUserForCookie(const std::string& cookieString_,
+                        boost::asio::yield_context yield_,
+                        std::error_code& error_)
+    {
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+            handler(std::forward<boost::asio::yield_context>(yield_));
+        
+        boost::asio::async_result<decltype(handler)> result(handler);
+
+        std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(cookieString_,true);
+        
+        controllerStrandPair.second->post(
+            [&error_,handler,controllerStrandPair,cookieString_](boost::asio::yield_context yield_)
+            //NOTE: This yield_ is not same as above yield_
+            {
+                error_ = controllerStrandPair.first->logoutUserForCookie(cookieString_,yield_);
+                asio_handler_invoke(handler, &handler);
+            });
+        
+        result.get();
+    }
+
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::logoutUserForCookie(const std::string& cookieString_,
+                                                            const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
+    {
+        ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                          onLogoutCookieCallbackFn_,
+                                                          std::placeholders::_1));
+         std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(cookieString_,true);
+         boost::asio::spawn(
+             *controllerStrandPair->second,
+             [controllerStrandPair,cookieString_,postCallbackWrapper]
+             (boost::asio::yield_context yield_)
+             //NOTE: This yield_ is not same as above yield_
+             {
+                 std::error_code error = controllerStrandPair->first->logoutUserForCookie(
+                     cookieString_,
+                     yield_);
+                 postCallbackWrapper(error);
+             });
+    }
+
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::
+    logoutUserForAllCookies(const std::string& userName_,
+                            boost::asio::yield_context yield_,
+                            std::error_code& error_)
+    {
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+            handler(std::forward<boost::asio::yield_context>(yield_));
+        
+        boost::asio::async_result<decltype(handler)> result(handler);
+        
+        std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(userName_,true);
+        
+        controllerStrandPair.second->post(
+            [&error_,handler,controllerStrandPair,userName_](boost::asio::yield_context yield_)
+            //NOTE: This yield_ is not same as above yield_
+            {
+                error_ = controllerStrandPair.first->logoutUserForAllCookies(userName_,yield_);
+                asio_handler_invoke(handler, &handler);
+            });
+        
+        result.get();
+    }
+
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::
+    logoutUserForAllCookies(const std::string& userName_,
+                            const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
+    {
+        ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                          onLogoutAllCookiesCallbackFn_,
+                                                          std::placeholders::_1));
+         std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(userName_,true);
+         boost::asio::spawn(
+             *controllerStrandPair->second,
+             [controllerStrandPair,userName_,postCallbackWrapper]
+             (boost::asio::yield_context yield_)
+             //NOTE: This yield_ is not same as above yield_
+             {
+                 std::error_code error = controllerStrandPair->first->logoutUserForAllCookies(userName_,
+                                                                                              yield_);
+                 postCallbackWrapper(error);
+             });
+    }
 /*
-    void AuthenticatorBase::logoutUserForCookie(const std::string& cookieString_,
-                                                boost::asio::yield_context yield_,
-                                                std::error_code& error_)
-    {
-        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
-        boost::asio::async_result<decltype(handler)> result(handler);
-        
-        logoutUserForCookieImpl(cookieString_,
-                                [&error_,handler](const std::error_code& ec_)
-                                {
-                                    error_ = ec_;
-                                    asio_handler_invoke(handler, &handler);
-                                });
-        
-        result.get();
-    }
-
-    void AuthenticatorBase::logoutUserForAllCookies(const std::string& userName_,
-                                                     boost::asio::yield_context yield_,
-                                                     std::error_code& error_)
-    {
-        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
-        boost::asio::async_result<decltype(handler)> result(handler);
-        
-        logoutUserForAllCookiesImpl(userName_,
-                                    [&error_,handler](const std::error_code& ec_)
-                                    {
-                                        error_ = ec_;
-                                        asio_handler_invoke(handler, &handler);
-                                    });
-        
-        result.get();
-    }
-
     void AuthenticatorBase::changeUserPassword(const std::string& cookieString_,
                                                const std::string& oldPassword_,
                                                const std::string& newPassword_,
