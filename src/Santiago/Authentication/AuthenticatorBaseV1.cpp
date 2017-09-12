@@ -20,11 +20,11 @@ namespace Santiago{ namespace Authentication
 
         boost::asio::spawn(
             *controllerStrandPair.second,
-            [&error_,&ret,handler,controllerStrandPair,_clientId,cookieString_](boost::asio::yield_context yield_)
+            [&error_,&ret,handler,controllerStrandPair,/*_clientId,*/cookieString_](boost::asio::yield_context yield_)
             //NOTE:This yield_ is not same as above yield_
             {
                 std::tie(error_,ret) = controllerStrandPair.first->
-                    verifyCookieAndGetUserInfo(_clientId,
+                    verifyCookieAndGetUserInfo(/*_clientId,*/
                                                cookieString_,
                                                yield_);
                 asio_handler_invoke(handler, &handler);
@@ -52,13 +52,13 @@ namespace Santiago{ namespace Authentication
 
         boost::asio::spawn(
             *controllerStrandPair.second,
-            [controllerStrandPair,_clientId,cookieString_,postCallbackWrapper](boost::asio::yield_context yield_)
+            [controllerStrandPair,/*_clientId,*/cookieString_,postCallbackWrapper](boost::asio::yield_context yield_)
             {
                 std::error_code error;
                 boost::optional<UserInfo> userInfoOpt;
                 
                 std::tie(error,userInfoOpt) = controllerStrandPair.first->
-                    verifyCookieAndGetUserInfo(_clientId,
+                    verifyCookieAndGetUserInfo(/*_clientId,*/
                                                cookieString_,
                                                yield_);
                 postCallbackWrapper(error,userInfoOpt);
@@ -119,34 +119,74 @@ namespace Santiago{ namespace Authentication
              });
     }
 
-/*            
-    boost::optional<std::pair<UserInfo,std::string> >
-    AuthenticatorBase::loginUser(const std::string& userNameOrEmailAddress_,
-                                 bool isUserNameNotEmailAddress_,
-                                 const std::string& password_,
-                                 boost::asio::yield_context yield_,
-                                 std::error_code& error_)
+    template<typename Controller>
+    boost::optional<std::pair<UserInfo,std::string> > AuthenticatorBase<Controller>::
+    loginUser(const std::string& userNameOrEmailAddress_,
+              bool isUserNameNotEmailAddress_,
+              const std::string& password_,
+              boost::asio::yield_context yield_,
+              std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));
         
         boost::asio::async_result<decltype(handler)> result(handler);
         boost::optional<std::pair<UserInfo,std::string> > ret;
+
+        std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(userNameOrEmailAddress_,isUserNameNotEmailAddress_);
+
+        boost::asio::spawn(
+            *controllerStrandPair.second,
+            [&error_,&ret,handler,controllerStrandPair,/*_clientId,*/userNameOrEmailAddress_,isUserNameNotEmailAddress_,password_](boost::asio::yield_context yield_)
+            //NOTE:This yield_ is not same as above yield_
+            {
+                std::tie(error_,ret) = controllerStrandPair.first->
+                    loginUser(/*_clientId,*/
+                              userNameOrEmailAddress_,
+                              isUserNameNotEmailAddress_,
+                              password_,
+                              yield_);
+                asio_handler_invoke(handler, &handler);
+            });
         
-        loginUserImpl(userNameOrEmailAddress_,
-                      isUserNameNotEmailAddress_,
-                      password_,
-                      [&error_,&ret,handler](const std::error_code& ec_,
-                                             const boost::optional<std::pair<UserInfo,std::string> >& userInfoCookiePairOpt_)
-                      {
-                          error_ = ec_;
-                          ret = userInfoCookiePairOpt_;
-                          asio_handler_invoke(handler, &handler);
-                      });
         result.get();
         return ret;
     }
 
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::loginUser(const std::string& userNameOrEmailAddress_,
+                                                  bool isUserNameNotEmailAddress_,
+                                                  const std::string& password_,
+                                                  const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
+    {
+        ErrorCodeUserInfoStringPairCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                                            (const ErrorCodeUserInfoStringPairCallbackFn&, const std::error_code&,
+                                                                             const boost::optional<std::pair<UserInfo,std::string> >&)>
+                                                                            (&AuthenticatorBase::postCallbackFn),
+                                                                            this,
+                                                                            onLoginUserCallbackFn_,
+                                                                            std::placeholders::_1,
+                                                                            std::placeholders::_2));
+
+        std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(userNameOrEmailAddress_,isUserNameNotEmailAddress_);
+
+        boost::asio::spawn(
+            *controllerStrandPair.second,
+            [controllerStrandPair,/*_clientId,*/userNameOrEmailAddress_,isUserNameNotEmailAddress_,password_,postCallbackWrapper](boost::asio::yield_context yield_)
+            {
+                std::error_code error;
+                boost::optional<std::pair<UserInfo,std::string> > userInfoStringPairOpt;
+                
+                std::tie(error,userInfoStringPairOpt) = controllerStrandPair.first->
+                    loginUser(/*_clientId,*/
+                              userNameOrEmailAddress_,
+                              isUserNameNotEmailAddress_,
+                              password_,
+                              yield_);
+                postCallbackWrapper(error,userInfoStringPairOpt);
+            });        
+    }
+/*
     void AuthenticatorBase::logoutUserForCookie(const std::string& cookieString_,
                                                 boost::asio::yield_context yield_,
                                                 std::error_code& error_)

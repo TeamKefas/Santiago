@@ -50,7 +50,7 @@ namespace Santiago{ namespace Authentication
         typedef std::function<void(const std::error_code&,const boost::optional<std::pair<UserInfo,std::string> >&)>
         ErrorCodeUserInfoStringPairCallbackFn;
 
-        typedef std::shared_ptr<boost::asio::strand> StandPtr;
+        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
         typedef std::shared_ptr<Controller> ControllerPtr;
 
         typedef typename Controller::ClientIdType ClientIdType;
