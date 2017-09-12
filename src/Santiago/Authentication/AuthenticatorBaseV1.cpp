@@ -279,53 +279,117 @@ namespace Santiago{ namespace Authentication
                  postCallbackWrapper(error);
              });
     }
+
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::
+    changeUserPassword(const std::string& cookieString_,
+                       const std::string& oldPassword_,
+                       const std::string& newPassword_,
+                       boost::asio::yield_context yield_,
+                       std::error_code& error_)
+    {
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+            handler(std::forward<boost::asio::yield_context>(yield_));
+        
+        boost::asio::async_result<decltype(handler)> result(handler);
+        
+        std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(cookieString_,true);
+        
+        controllerStrandPair.second->post(
+            [&error_,handler,controllerStrandPair,cookieString_,oldPassword_,newPassword_](boost::asio::yield_context yield_)
+            //NOTE: This yield_ is not same as above yield_
+            {
+                error_ = controllerStrandPair.first->changeUserPassword(cookieString_,oldPassword_,newPassword_,yield_);
+                asio_handler_invoke(handler, &handler);
+            });
+        
+        result.get();
+    }
+
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::
+    changeUserPassword(const std::string& cookieString_,
+                       const std::string& oldPassword_,
+                       const std::string& newPassword_,
+                       const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
+    {
+        ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                          onChangePasswordCallbackFn_,
+                                                          std::placeholders::_1));
+         std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(cookieString_,true);
+         boost::asio::spawn(
+             *controllerStrandPair->second,
+             [controllerStrandPair,cookieString_,oldPassword_,newPassword_,postCallbackWrapper]
+             (boost::asio::yield_context yield_)
+             //NOTE: This yield_ is not same as above yield_
+             {
+                 std::error_code error = controllerStrandPair->first->changeUserPassword(
+                     cookieString_,
+                     oldPassword_,
+                     newPassword_,
+                     yield_);
+                 postCallbackWrapper(error);
+             });
+    }
+    
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::
+    changeUserEmailAddress(const std::string& cookieString_,
+                           const std::string& newEmailAddress_,
+                           const std::string& password_,
+                           boost::asio::yield_context yield_,
+                           std::error_code& error_)
+    {
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+            handler(std::forward<boost::asio::yield_context>(yield_));
+        
+        boost::asio::async_result<decltype(handler)> result(handler);
+        
+        std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(cookieString_,true);
+        
+        controllerStrandPair.second->post(
+            [&error_,handler,controllerStrandPair,cookieString_,newEmailAddress_,password_](boost::asio::yield_context yield_)
+            //NOTE: This yield_ is not same as above yield_
+            {
+                error_ = controllerStrandPair.first->changeUserEmailAddress(cookieString_,newEmailAddress_,password_,yield_);
+                asio_handler_invoke(handler, &handler);
+            });
+        
+        result.get();
+    }
+
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::
+    changeUserEmailAddress(const std::string& cookieString_,
+                           const std::string& newEmailAddress_,
+                           const std::string& password_,
+                           const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
+    {
+        ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                          onChangeEmailAddressCallbackFn_,
+                                                          std::placeholders::_1));
+         std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(cookieString_,true);
+         boost::asio::spawn(
+             *controllerStrandPair->second,
+             [controllerStrandPair,cookieString_,newEmailAddress_,password_,postCallbackWrapper]
+             (boost::asio::yield_context yield_)
+             //NOTE: This yield_ is not same as above yield_
+             {
+                 std::error_code error = controllerStrandPair->first->changeUserEmailAddress(
+                     cookieString_,
+                     newEmailAddress_,
+                     password_,
+                     yield_);
+                 postCallbackWrapper(error);
+             });
+    }
 /*
-    void AuthenticatorBase::changeUserPassword(const std::string& cookieString_,
-                                               const std::string& oldPassword_,
-                                               const std::string& newPassword_,
-                                               boost::asio::yield_context yield_,
-                                               std::error_code& error_  )
-    {
-        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
-        boost::asio::async_result<decltype(handler)> result(handler);
-        
-        changeUserPasswordImpl(cookieString_,
-                               oldPassword_,
-                               newPassword_,
-                               [&error_,handler](const std::error_code& ec_)
-                               {
-                                   error_ = ec_;
-                                   asio_handler_invoke(handler, &handler);
-                               });
-        
-        result.get();
-    }
-
-    void AuthenticatorBase::changeUserEmailAddress(const std::string& cookieString_,
-                                                   const std::string& newEmailAddress_,
-                                                   const std::string& password_,
-                                                   boost::asio::yield_context yield_,
-                                                   std::error_code& error_)
-    {
-        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
-        boost::asio::async_result<decltype(handler)> result(handler);
-        
-        changeUserEmailAddressImpl(cookieString_,
-                                   newEmailAddress_,
-                                   password_,
-                                   [&error_,handler](const std::error_code& ec_)
-                                   {
-                                       error_ = ec_;
-                                       asio_handler_invoke(handler, &handler);
-                                   });
-        
-        result.get();
-    }
-
     boost::optional<std::string> AuthenticatorBase::createAndReturnRecoveryString(const std::string& emailAddress_,
                                                                                   boost::asio::yield_context yield_,
                                                                                   std::error_code& error_)
