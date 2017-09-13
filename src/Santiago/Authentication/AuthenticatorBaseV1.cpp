@@ -375,6 +375,7 @@ namespace Santiago{ namespace Authentication
                                                           onChangeEmailAddressCallbackFn_,
                                                           std::placeholders::_1));
          std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(cookieString_,true);
+         
          boost::asio::spawn(
              *controllerStrandPair->second,
              [controllerStrandPair,cookieString_,newEmailAddress_,password_,postCallbackWrapper]
@@ -420,9 +421,8 @@ namespace Santiago{ namespace Authentication
     }
 
     template<typename Controller>
-    void AuthenticatorBase<Controller>::
-    createAndReturnRecoveryString(const std::string& emailAddress_,
-                                  const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
+    void AuthenticatorBase<Controller>::createAndReturnRecoveryString(const std::string& emailAddress_,
+                                                                      const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
     {
         ErrorCodeStringCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
                                                                 (const ErrorCodeStringCallbackFn&, const std::error_code&)>
@@ -447,12 +447,12 @@ namespace Santiago{ namespace Authentication
              });
     }
          
-/*
-    boost::optional<std::string> AuthenticatorBase::getUserForEmailAddressAndRecoveryString(
-        const std::string& emailAddress_,
-        const std::string& recoverystring_,
-        boost::asio::yield_context yield_,
-        std::error_code& error_)
+    template<typename Controller>
+    boost::optional<std::string> AuthenticatorBase<Controller>::
+    getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                            const std::string& recoveryString_,
+                                            boost::asio::yield_context yield_,
+                                            std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));
@@ -460,14 +460,17 @@ namespace Santiago{ namespace Authentication
         boost::asio::async_result<decltype(handler)> result(handler);
         boost::optional<std::string> ret;
         
-        getUserForEmailAddressAndRecoveryStringImpl(
-            emailAddress_,
-            recoverystring_,
-            [&error_,&ret,handler](const std::error_code& ec_,
-                                   const boost::optional<std::string>& UserNameOpt_)
+         std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(emailAddress_,false);
+        
+        boost::asio::spawn(
+            *controllerStrandPair.second,
+            [&error_,&ret,handler,controllerStrandPair,emailAddress_,recoveryString_](boost::asio::yield_context yield_)
+            //NOTE:This yield_ is not same as above yield_
             {
-                error_ = ec_;
-                ret = UserNameOpt_;
+                std::tie(error_,ret) = controllerStrandPair.first->
+                    getUserForEmailAddressAndRecoveryString(emailAddress_,
+                                                            recoveryString_,
+                                                            yield_);
                 asio_handler_invoke(handler, &handler);
             });
         
@@ -475,6 +478,35 @@ namespace Santiago{ namespace Authentication
         return ret;
     }
 
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                                const std::string& recoveryString_,
+                                                                                const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
+    {
+        ErrorCodeStringCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                                (const ErrorCodeStringCallbackFn&, const std::error_code&)>
+                                                                (&AuthenticatorBase::postCallbackFn),
+                                                                this,
+                                                                onGetUserForEmailAddressAndRecoveryStringCallbackFn_,
+                                                                std::placeholders::_1,
+                                                                std::placeholders::_2));
+         std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(emailAddress_,false);
+         boost::asio::spawn(
+             *controllerStrandPair->second,
+             [controllerStrandPair,emailAddress_,recoveryString_,postCallbackWrapper]
+             (boost::asio::yield_context yield_)
+             //NOTE: This yield_ is not same as above yield_
+             {
+                 std::error_code error;
+                 boost::optional<std::string> stringOpt;
+                 std::tie(error,stringOpt) = controllerStrandPair->first->getUserForEmailAddressAndRecoveryString(
+                     emailAddress_,
+                     recoveryString_,
+                     yield_);
+                 postCallbackWrapper(error,stringOpt);
+             });
+    }
+/*
     void AuthenticatorBase::changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
                                                                                const std::string& recoveryString_,
                                                                                const std::string& newPassword_,

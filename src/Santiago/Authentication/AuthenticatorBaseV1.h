@@ -200,11 +200,11 @@ namespace Santiago{ namespace Authentication
          * @param onGetUserForEmailAddressAndRecoveryStringCallbackFn_ -Handler function for delete operations.
          */
         virtual void getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
-                                                             const std::string& recoverystring_,
+                                                             const std::string& recoveryString_,
                                                              const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
         
         boost::optional<std::string> getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
-                                                                             const std::string& recoverystring_,
+                                                                             const std::string& recoveryString_,
                                                                              boost::asio::yield_context yield_,
                                                                              std::error_code& error_);  
         
