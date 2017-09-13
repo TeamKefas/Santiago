@@ -38,7 +38,7 @@ namespace Santiago{ namespace Authentication
     class ControllerBase
     {
     public:
-        
+
         typedef Thread::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
         typedef ControllerData<ClientIdType> MyControllerData;
         
