@@ -137,7 +137,6 @@ namespace Santiago{ namespace Authentication
         boost::asio::spawn(
             *controllerStrandPair.second,
             [&error_,&ret,handler,controllerStrandPair,userNameOrEmailAddress_,isUserNameNotEmailAddress_,password_](boost::asio::yield_context yield_)
-            //NOTE:This yield_ is not same as above yield_
             {
                 std::tie(error_,ret) = controllerStrandPair.first->
                     loginUser(userNameOrEmailAddress_,
@@ -199,7 +198,6 @@ namespace Santiago{ namespace Authentication
         
         controllerStrandPair.second->post(
             [&error_,handler,controllerStrandPair,cookieString_](boost::asio::yield_context yield_)
-            //NOTE: This yield_ is not same as above yield_
             {
                 error_ = controllerStrandPair.first->logoutUserForCookie(cookieString_,yield_);
                 asio_handler_invoke(handler, &handler);
@@ -223,7 +221,6 @@ namespace Santiago{ namespace Authentication
              *controllerStrandPair->second,
              [controllerStrandPair,cookieString_,postCallbackWrapper]
              (boost::asio::yield_context yield_)
-             //NOTE: This yield_ is not same as above yield_
              {
                  std::error_code error = controllerStrandPair->first->logoutUserForCookie(
                      cookieString_,
@@ -247,7 +244,6 @@ namespace Santiago{ namespace Authentication
         
         controllerStrandPair.second->post(
             [&error_,handler,controllerStrandPair,userName_](boost::asio::yield_context yield_)
-            //NOTE: This yield_ is not same as above yield_
             {
                 error_ = controllerStrandPair.first->logoutUserForAllCookies(userName_,yield_);
                 asio_handler_invoke(handler, &handler);
@@ -272,7 +268,6 @@ namespace Santiago{ namespace Authentication
              *controllerStrandPair->second,
              [controllerStrandPair,userName_,postCallbackWrapper]
              (boost::asio::yield_context yield_)
-             //NOTE: This yield_ is not same as above yield_
              {
                  std::error_code error = controllerStrandPair->first->logoutUserForAllCookies(userName_,
                                                                                               yield_);
@@ -297,7 +292,6 @@ namespace Santiago{ namespace Authentication
         
         controllerStrandPair.second->post(
             [&error_,handler,controllerStrandPair,cookieString_,oldPassword_,newPassword_](boost::asio::yield_context yield_)
-            //NOTE: This yield_ is not same as above yield_
             {
                 error_ = controllerStrandPair.first->changeUserPassword(cookieString_,oldPassword_,newPassword_,yield_);
                 asio_handler_invoke(handler, &handler);
@@ -324,7 +318,6 @@ namespace Santiago{ namespace Authentication
              *controllerStrandPair->second,
              [controllerStrandPair,cookieString_,oldPassword_,newPassword_,postCallbackWrapper]
              (boost::asio::yield_context yield_)
-             //NOTE: This yield_ is not same as above yield_
              {
                  std::error_code error = controllerStrandPair->first->changeUserPassword(
                      cookieString_,
@@ -352,7 +345,6 @@ namespace Santiago{ namespace Authentication
         
         controllerStrandPair.second->post(
             [&error_,handler,controllerStrandPair,cookieString_,newEmailAddress_,password_](boost::asio::yield_context yield_)
-            //NOTE: This yield_ is not same as above yield_
             {
                 error_ = controllerStrandPair.first->changeUserEmailAddress(cookieString_,newEmailAddress_,password_,yield_);
                 asio_handler_invoke(handler, &handler);
@@ -380,7 +372,6 @@ namespace Santiago{ namespace Authentication
              *controllerStrandPair->second,
              [controllerStrandPair,cookieString_,newEmailAddress_,password_,postCallbackWrapper]
              (boost::asio::yield_context yield_)
-             //NOTE: This yield_ is not same as above yield_
              {
                  std::error_code error = controllerStrandPair->first->changeUserEmailAddress(
                      cookieString_,
@@ -408,7 +399,6 @@ namespace Santiago{ namespace Authentication
         boost::asio::spawn(
             *controllerStrandPair.second,
             [&error_,&ret,handler,controllerStrandPair,emailAddress_](boost::asio::yield_context yield_)
-            //NOTE:This yield_ is not same as above yield_
             {
                 std::tie(error_,ret) = controllerStrandPair.first->
                     createAndReturnRecoveryString(emailAddress_,
@@ -436,7 +426,6 @@ namespace Santiago{ namespace Authentication
              *controllerStrandPair->second,
              [controllerStrandPair,emailAddress_,postCallbackWrapper]
              (boost::asio::yield_context yield_)
-             //NOTE: This yield_ is not same as above yield_
              {
                  std::error_code error;
                  boost::optional<std::string> stringOpt;
@@ -465,7 +454,6 @@ namespace Santiago{ namespace Authentication
         boost::asio::spawn(
             *controllerStrandPair.second,
             [&error_,&ret,handler,controllerStrandPair,emailAddress_,recoveryString_](boost::asio::yield_context yield_)
-            //NOTE:This yield_ is not same as above yield_
             {
                 std::tie(error_,ret) = controllerStrandPair.first->
                     getUserForEmailAddressAndRecoveryString(emailAddress_,
@@ -495,7 +483,6 @@ namespace Santiago{ namespace Authentication
              *controllerStrandPair->second,
              [controllerStrandPair,emailAddress_,recoveryString_,postCallbackWrapper]
              (boost::asio::yield_context yield_)
-             //NOTE: This yield_ is not same as above yield_
              {
                  std::error_code error;
                  boost::optional<std::string> stringOpt;
@@ -524,7 +511,6 @@ namespace Santiago{ namespace Authentication
         
         controllerStrandPair.second->post(
             [&error_,handler,controllerStrandPair,emailAddress_,recoveryString_,newPassword_](boost::asio::yield_context yield_)
-            //NOTE: This yield_ is not same as above yield_
             {
                 error_ = controllerStrandPair.first->changeUserPasswordForEmailAddressAndRecoveryString(emailAddress_,recoveryString_,newPassword_,yield_);
                 asio_handler_invoke(handler, &handler);
@@ -552,7 +538,6 @@ namespace Santiago{ namespace Authentication
              *controllerStrandPair->second,
              [controllerStrandPair,emailAddress_,recoveryString_,newPassword_,postCallbackWrapper]
              (boost::asio::yield_context yield_)
-             //NOTE: This yield_ is not same as above yield_
              {
                  std::error_code error = controllerStrandPair->first->changeUserPasswordForEmailAddressAndRecoveryStringUserEmailAddress(
                      emailAddress_,
@@ -563,26 +548,55 @@ namespace Santiago{ namespace Authentication
              });
     }
         
-/*    
-    void AuthenticatorBase::deleteUser(const std::string& cookieString_,
-                                       boost::asio::yield_context yield_,
-                                       std::error_code& error_)
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::
+    deleteUser(const std::string& cookieString_,
+               boost::asio::yield_context yield_,
+               std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));
         
         boost::asio::async_result<decltype(handler)> result(handler);
         
-        deleteUserImpl(cookieString_,
-                       [&error_,handler](const std::error_code& ec_)
-                       {
-                           error_ = ec_;
-                           asio_handler_invoke(handler, &handler);
-                       });
+        std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(cookieString_,true);
+        
+        controllerStrandPair.second->post(
+            [&error_,handler,controllerStrandPair,cookieString_](boost::asio::yield_context yield_)
+            {
+                error_ = controllerStrandPair.first->deleteUser(cookieString_,
+                                                                yield_);
+                asio_handler_invoke(handler, &handler);
+            });
         
         result.get();
     }
-     
+
+    template<typename Controller>
+    void AuthenticatorBase<Controller>::
+    deleteUser(const std::string& cookieString_,
+               const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
+    {
+        ErrorCodeCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                          (const ErrorCodeCallbackFn&, const std::error_code&)>
+                                                          (&AuthenticatorBase::postCallbackFn),
+                                                          this,
+                                                          onDeleteUserCallbackFn_,
+                                                          std::placeholders::_1));
+         std::pair<ControllerPtr,StrandPtr> controllerStrandPair = getControllerAndStrandForString(cookieString_,true);
+         
+         boost::asio::spawn(
+             *controllerStrandPair->second,
+             [controllerStrandPair,cookieString_,postCallbackWrapper]
+             (boost::asio::yield_context yield_)
+             {
+                 std::error_code error = controllerStrandPair->first->deleteUser(
+                     cookieString_,
+                     yield_);
+                 postCallbackWrapper(error);
+             });
+    }
+/*     
     void AuthenticatorBase::loginUser(const std::string& userNameOrEmailAddress_,
                                       bool isUserNameNotEmailAddress_,
                                       const std::string& password_,
