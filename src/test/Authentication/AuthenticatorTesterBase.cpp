@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "AuthenticatorTesterBase.h"
+#include "Santiago/Authentication/AuthenticatorBaseV1.h"
 
 namespace Test{ namespace Authentication
     {
