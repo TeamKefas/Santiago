@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_CONTROLLERDATA_H
-#define SANTIAGO_AUTHENTICATION_CONTROLLERDATA_H
+#ifndef SANTIAGO_AUTHENTICATION_CONTROLLERDATABASE_H
+#define SANTIAGO_AUTHENTICATION_CONTROLLERDATABASE_H
 
 #include <map>
 #include <memory>
@@ -54,49 +54,31 @@ namespace Santiago{ namespace Authentication
     struct None
     {};
     
-    template<typename ClientIdType>
-    class ControllerData;
 
-    template<>
-    class ControllerData<None>:public ControllerDataBase
-    {
-    public:
-        typedef ControllerDataBase::CookieDataBase CookieData;
-        
-        void addCookie(const std::string& userName_,
-                       const std::string& emailAddress_,
-                       const SantiagoDBTables::SessionsRec& sessionsRec_,
-                       const boost::optional<None>&);
-        
-        void updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
-                          const None&);
-        
-    };
-
-    template<>
-    class ControllerData<unsigned>:public ControllerDataBase
+    class ControllerData:public ControllerDataBase
     {
     public:
         
+        typedef unsigned ClientIdType;
         struct CookieData:public CookieDataBase
         {
             CookieData(const SantiagoDBTables::SessionsRec& sessionsRec_)
                 :CookieDataBase(sessionsRec_)
             {}
 
-            std::set<unsigned>         _clientIdSet;
+            std::set<ClientIdType>         _clientIdSet;
         };
 
         void addCookie(const std::string& userName_,
                        const std::string& emailAddress_,
                        const SantiagoDBTables::SessionsRec& sessionsRec_,
-                       const boost::optional<unsigned>& clientId_);
+                       const boost::optional<ClientIdType>& clientId_);
         
         void updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
-                          unsigned clientIdToBeAdded_);
+                          ClientIdType clientIdToBeAdded_);
 
-        std::set<unsigned> getCookieClientIds(std::string& cookieString_) const;
-        std::set<unsigned> getAllClientIdsForUser(const std::string& userName_) const;
+        std::set<ClientIdType> getCookieClientIds(std::string& cookieString_) const;
+        std::set<ClientIdType> getAllClientIdsForUser(const std::string& userName_) const;
         
     };
 }}

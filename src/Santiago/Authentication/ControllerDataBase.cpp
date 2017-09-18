@@ -1,4 +1,4 @@
-#include "ControllerData.h"
+#include "ControllerDataBase.h"
 
 namespace Santiago{ namespace Authentication
 {
@@ -78,46 +78,11 @@ namespace Santiago{ namespace Authentication
         iter->second._emailAddress = newEmailAddress_;
         return;
     }
-      
-    void ControllerData<None>::addCookie(const std::string& userName_,
-                                         const std::string& emailAddress_,
-                                         const SantiagoDBTables::SessionsRec& sessionsRec_,
-                                         const boost::optional<None>&)
-    {
-        ST_ASSERT(_cookieStringCookieDataPtrMap.find(sessionsRec_._cookieString) ==
-                  _cookieStringCookieDataPtrMap.end());
-
-        CookieDataBasePtr cookieDataPtr(new ControllerData::CookieData(sessionsRec_));
-        _cookieStringCookieDataPtrMap[sessionsRec_._cookieString] = cookieDataPtr;
-
-        auto iter = _userNameUserDataMap.find(userName_);
-        if(iter != _userNameUserDataMap.end())
-        {
-            ST_ASSERT(iter->second._emailAddress == emailAddress_);
-            iter->second._cookieList.push_back(sessionsRec_._cookieString);
-        }
-        else
-        {
-            UserData userData(emailAddress_);
-            userData._cookieList.push_back(sessionsRec_._cookieString);
-            _userNameUserDataMap.insert(std::pair<std::string, UserData>(userName_, userData));
-        }
-        return;
-    }     
-    
-    void ControllerData<None>::updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
-                                            const None&)
-    {
-        auto iter = _cookieStringCookieDataPtrMap.find(newSessionsRec_._cookieString);
-        ST_ASSERT(iter != _cookieStringCookieDataPtrMap.end());
-        iter->second->_sessionsRec = newSessionsRec_;
-        return;
-    }
         
-    void ControllerData<unsigned>::addCookie(const std::string& userName_,
-                                             const std::string& emailAddress_,
-                                             const SantiagoDBTables::SessionsRec& sessionsRec_,
-                                             const boost::optional<unsigned>& clientId_)
+    void ControllerData::addCookie(const std::string& userName_,
+                                   const std::string& emailAddress_,
+                                   const SantiagoDBTables::SessionsRec& sessionsRec_,
+                                   const boost::optional<ClientIdType>& clientId_)
     {
         ST_ASSERT(_cookieStringCookieDataPtrMap.find(sessionsRec_._cookieString) ==
                   _cookieStringCookieDataPtrMap.end());
@@ -143,8 +108,8 @@ namespace Santiago{ namespace Authentication
         return;
     }
         
-    void ControllerData<unsigned>::updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
-                                                unsigned clientIdToBeAdded_)
+    void ControllerData::updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
+                                      ClientIdType clientIdToBeAdded_)
     {
         auto iter = _cookieStringCookieDataPtrMap.find(newSessionsRec_._cookieString);
         ST_ASSERT(iter != _cookieStringCookieDataPtrMap.end());
@@ -153,7 +118,7 @@ namespace Santiago{ namespace Authentication
         return;               
     }
         
-    std::set<unsigned> ControllerData<unsigned>::getCookieClientIds(std::string& cookieString_) const
+    std::set<unsigned> ControllerData::getCookieClientIds(std::string& cookieString_) const
     {
         auto iter = _cookieStringCookieDataPtrMap.find(cookieString_);
         ST_ASSERT(iter != _cookieStringCookieDataPtrMap.end());
@@ -162,7 +127,7 @@ namespace Santiago{ namespace Authentication
         return std::static_pointer_cast<CookieData>(cookieDataBasePtr)->_clientIdSet;
     }
         
-    std::set<unsigned> ControllerData<unsigned>::getAllClientIdsForUser(const std::string& userName_) const
+    std::set<unsigned> ControllerData::getAllClientIdsForUser(const std::string& userName_) const
     {
         auto userDataIter =_userNameUserDataMap.find(userName_);
         ST_ASSERT(userDataIter != _userNameUserDataMap.end());

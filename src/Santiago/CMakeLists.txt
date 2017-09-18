@@ -6,7 +6,7 @@ set(Santiago_SRCS
   Authentication/AuthenticatorBaseV1.cpp
   Authentication/AuthenticatorBase.cpp
   Authentication/ControllerBase.cpp
-  Authentication/ControllerData.cpp
+  Authentication/ControllerDataBase.cpp
   Authentication/SingleNode/Authenticator.cpp
   Authentication/MultiNode/Authenticator.cpp
   Authentication/MultiNode/ClientCache.cpp
@@ -27,7 +27,7 @@ if(WIN32)
       Authentication/AuthenticatorBaseV1.h
       Authentication/AuthenticatorBase.h
       Authentication/ControllerBase.h
-      Authentication/ControllerData.h
+      Authentication/ControllerDataBase.h
       Authentication/SingleNode/Authenticator.h
       Authentication/MultiNode/Authenticator.h
       Authentication/MultiNode/ClientCache.h

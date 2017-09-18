@@ -28,19 +28,19 @@
 #include "Santiago/Thread/ThreadSpecificVar.h"
 #include "Santiago/Utils/STLog.h"
 
-#include "ControllerData.h"
+#include "ControllerDataBase.h"
 
 #define MAX_SESSION_DURATION 1
 
 namespace Santiago{ namespace Authentication
 {
-    template<typename ClientIdType>
+    template<typename ControllerData>
     class ControllerBase
     {
     public:
 
         typedef Thread::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
-        typedef ControllerData<ClientIdType> MyControllerData;
+        typedef typename ControllerData::ClientIdType ClientIdType;
         
         /**
          * The constructor
@@ -48,9 +48,7 @@ namespace Santiago{ namespace Authentication
          * @param ioService_- the ioservice to use.
          * @param config_- Used to hold the json data.
          */
-        ControllerBase(ThreadSpecificDbConnection& databaseConnection_,
-                       boost::asio::io_service& ioService_,
-                       const boost::property_tree::ptree& config_);
+        ControllerBase(ThreadSpecificDbConnection& databaseConnection_);
         /**
          * The destructor
          */
@@ -149,7 +147,7 @@ namespace Santiago{ namespace Authentication
         virtual boost::posix_time::time_duration getMaxSessionInactiveTime() const;
 
         ThreadSpecificDbConnection          &_databaseConnection;
-        MyControllerData                     _localData;
+        ControllerData                       _localData;
         
     };
 }}
