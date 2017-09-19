@@ -8,6 +8,8 @@ set(Santiago_SRCS
   Authentication/ControllerBase.cpp
   Authentication/ControllerDataBase.cpp
   Authentication/SingleNode/Authenticator.cpp
+  Authentication/SingleNode/AuthenticatorImpl.cpp
+  Authentication/SingleNode/ControllerData.cpp
   Authentication/MultiNode/Authenticator.cpp
   Authentication/MultiNode/ClientCache.cpp
   Authentication/MultiNode/AuthenticatorMessageSocket.cpp
@@ -26,9 +28,14 @@ if(WIN32)
       SantiagoDBTables/MariaDBConnection.h
       Authentication/AuthenticatorBaseV1.h
       Authentication/AuthenticatorBase.h
+      Authentication/AuthenticatorImplBase.h
       Authentication/ControllerBase.h
       Authentication/ControllerDataBase.h
       Authentication/SingleNode/Authenticator.h
+      Authentication/SingleNode/AuthenticatorImpl.h
+      Authentication/SingleNode/AuthenticatorV1.h
+      Authentication/SingleNode/Controller.h
+      Authentication/SingleNode/ControllerData.h
       Authentication/MultiNode/Authenticator.h
       Authentication/MultiNode/ClientCache.h
       Authentication/MultiNode/AuthenticatorMessageSocket.h

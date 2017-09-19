@@ -9,7 +9,7 @@
 
 #include "Santiago/Utils/STLog.h"
 
-#include "Santiago/SantiagoDBTables/DatabaseRecords.h"
+#include "Santiago/Authentication/ControllerDataBase.h"
 
 namespace Santiago{ namespace Authentication{ namespace SingleNode
 {

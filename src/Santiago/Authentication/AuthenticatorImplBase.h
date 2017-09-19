@@ -1,6 +1,8 @@
 #ifndef SANTIAGO_AUTHENTICATION_AUTHENTICATORIMPLBASE_H
 #define SANTIAGO_AUTHENTICATION_AUTHENTICATORIMPLBASE_H
 
+#include "AuthenticatorBaseV1.h"
+
 namespace Santiago{ namespace Authentication
 {
     class AuthenticatorImplBase

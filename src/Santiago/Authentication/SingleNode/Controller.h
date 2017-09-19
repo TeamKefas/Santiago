@@ -11,7 +11,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     {
     public:
 
-        ControllerBase(ThreadSpecificDbConnection& databaseConnection_)
+        Controller(ThreadSpecificDbConnection& databaseConnection_)
             :ControllerBase<ControllerData>(databaseConnection_)
         {}
 
