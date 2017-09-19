@@ -18,25 +18,12 @@
 
 #include <boost/optional.hpp>
 
+#include "AuthenticatorImplBase.h"
+#include "ControllerDataBase.h"
+
 namespace Santiago{ namespace Authentication
 {
-    struct UserInfo
-    {
-        /**
-         * The constructor
-         * @param userName_- Username from the user. 
-         * @param emailAddress_- Email address from the user.
-         */
-        UserInfo(const std::string& userName_,const std::string& emailAddress_):
-            _userName(userName_),
-            _emailAddress(emailAddress_)
-        {}
-
-        std::string  _userName;
-        std::string  _emailAddress;
-    };
-
-    template<typename Controller>
+    
     class AuthenticatorBase
     {
     public:
@@ -51,9 +38,9 @@ namespace Santiago{ namespace Authentication
         ErrorCodeUserInfoStringPairCallbackFn;
 
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;
-        typedef std::shared_ptr<Controller> ControllerPtr;
+        typedef std::shared_ptr<AuthenticatorImplBase> AuthenticatorImplBasePtr;
 
-        typedef typename Controller::ClientIdType ClientIdType;
+        typedef typename ControllerData::ClientIdType ClientIdType;
 
         typedef std::function<void(const std::error_code&)> ErrorCodeCallbackFn;
 
@@ -240,7 +227,7 @@ namespace Santiago{ namespace Authentication
 
     protected:
 
-        virtual std::pair<ControllerPtr,StrandPtr> getControllerAndStrandForString(
+        virtual std::pair<AuthenticatorImplBasePtr,StrandPtr> getAuthenticatorAndStrandForString(
             const std::string& string_,
             bool isNotEmailAddress_) = 0;
 
