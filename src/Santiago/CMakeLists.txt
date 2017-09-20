@@ -9,6 +9,7 @@ set(Santiago_SRCS
   Authentication/ControllerDataBase.cpp
   Authentication/SingleNode/Authenticator.cpp
   Authentication/SingleNode/AuthenticatorImpl.cpp
+  Authentication/SingleNode/AuthenticatorV1.cpp
   Authentication/SingleNode/ControllerData.cpp
   Authentication/MultiNode/Authenticator.cpp
   Authentication/MultiNode/ClientCache.cpp
