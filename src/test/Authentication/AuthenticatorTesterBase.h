@@ -6,8 +6,8 @@
 #include <boost/asio.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "Santiago/Authentication/SingleNode/Authenticator.h"
-#include "Santiago/Authentication/AuthenticatorBase.h"
+#include "Santiago/Authentication/SingleNode/AuthenticatorV1.h"
+#include "Santiago/Authentication/AuthenticatorBaseV1.h"
 
 namespace Test{ namespace Authentication
 {

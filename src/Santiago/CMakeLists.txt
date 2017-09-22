@@ -4,10 +4,8 @@ set(Santiago_SRCS
   SantiagoDBTables/Definitions.cpp
   SantiagoDBTables/MariaDBConnection.cpp
   Authentication/AuthenticatorBaseV1.cpp
-  Authentication/AuthenticatorBase.cpp
   Authentication/ControllerBase.cpp
   Authentication/ControllerDataBase.cpp
-  Authentication/SingleNode/Authenticator.cpp
   Authentication/SingleNode/AuthenticatorImpl.cpp
   Authentication/SingleNode/AuthenticatorV1.cpp
   Authentication/SingleNode/ControllerData.cpp
@@ -28,11 +26,9 @@ if(WIN32)
       SantiagoDBTables/Definitions.h
       SantiagoDBTables/MariaDBConnection.h
       Authentication/AuthenticatorBaseV1.h
-      Authentication/AuthenticatorBase.h
       Authentication/AuthenticatorImplBase.h
       Authentication/ControllerBase.h
       Authentication/ControllerDataBase.h
-      Authentication/SingleNode/Authenticator.h
       Authentication/SingleNode/AuthenticatorImpl.h
       Authentication/SingleNode/AuthenticatorV1.h
       Authentication/SingleNode/Controller.h
