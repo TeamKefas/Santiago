@@ -112,18 +112,6 @@ namespace Santiago{ namespace Authentication
         std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
         verifyEmailAddressRecoveryStringAndGetUsersRec(const std::string& emailAddress_,
                                                        const std::string& recoveryString_);
-        std::error_code logoutUserForAllCookiesImpl(const std::string& userName_,
-                                                    boost::asio::yield_context yield_);
-        std::pair<std::error_code,boost::optional<std::string> >
-        createAndReturnRecoveryStringImpl(const std::string& emailAddress_,boost::asio::yield_context yield_);
-         std::error_code
-         changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
-                                                           const std::string& recoveryString_,
-                                                           const std::string& newPassword_,
-                                                           boost::asio::yield_context yield_);
-        std::error_code deleteUserImpl(const std::string& cookieString_,
-                                                                     boost::asio::yield_context yield_);
-
         std::error_code cleanupCookieDataAndUpdateSessionRecord(const std::string& cookieString_,
                                                                 boost::asio::yield_context yield_);
 
@@ -141,7 +129,6 @@ namespace Santiago{ namespace Authentication
         std::string generateSHA256(const std::string str);
         std::string generateUniqueCookie();
         std::string generateRecoveryString();
-        virtual boost::posix_time::time_duration getMaxSessionInactiveTime() const;
 
         ThreadSpecificDbConnection          &_databaseConnection;
         ControllerData                       _localData;

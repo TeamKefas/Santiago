@@ -25,7 +25,7 @@
 //#include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
 #include "Santiago/Thread/ThreadSpecificVar.h"
 
-#include "Santiago/Authentication/AuthenticatorBase.h"
+#include "Santiago/Authentication/AuthenticatorBaseV1.h"
 #include "Santiago/Utils/STLog.h"
 #define MAX_SESSION_DURATION 1
 

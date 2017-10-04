@@ -6,7 +6,7 @@
 #include <boost/asio.hpp>
 
 #include "../../Santiago/AppServer/RequestHandlerBase.h"
-#include "../../Santiago/Authentication/SingleNode/Authenticator.h"
+#include "../../Santiago/Authentication/SingleNode/AuthenticatorV1.h"
 namespace Test { namespace AppServer
     {
         class RequestHandlerBase:public Santiago::AppServer::RequestHandlerBase<boost::asio::ip::tcp>

@@ -53,7 +53,7 @@ namespace Santiago{ namespace Authentication
         return;
     }
 
-    /*
+    
     void ControllerDataBase::removeUser(const std::string& userName_)
     {
         auto userDataIter = _userNameUserDataMap.find(userName_);
@@ -68,7 +68,7 @@ namespace Santiago{ namespace Authentication
         _userNameUserDataMap.erase(userDataIter);
         return;
     }
-    */
+    
 
     void ControllerDataBase::updateUserEmailAddress(const std::string& userName_,
                                                     const std::string& newEmailAddress_)

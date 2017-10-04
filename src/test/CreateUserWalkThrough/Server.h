@@ -4,7 +4,7 @@
 #include <boost/asio.hpp>
 
 #include "../../Santiago/AppServer/ServerBase.h"
-#include "../../Santiago/Authentication/SingleNode/Authenticator.h"
+#include "../../Santiago/Authentication/SingleNode/AuthenticatorV1.h"
 #include "Santiago/Thread/ThreadSpecificVar.h"
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "RequestHandlerBase.h"
@@ -39,12 +39,13 @@ namespace Test{ namespace AppServer
         typedef Santiago::Thread::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection>
         SantiagoDBConnection;
         typedef Santiago::AppServer::ServerBase<boost::asio::ip::tcp> MyBase;
+        typedef typename Santiago::Authentication::ControllerData::ClientIdType ClientIdType;
 
         Server(const boost::property_tree::ptree& config_):
             MyBase(getServerLocalEndpoint(config_)),
             _config(config_),
 	    _databaseConnection(std::bind(Santiago::SantiagoDBTables::CreateMariaDBConnection,_config)),
-            _userController(_databaseConnection,MyBase::_ioService,config_)
+            _userController(MyBase::_ioService,config_,_clientId,_databaseConnection)
         {
         }
 
@@ -151,6 +152,7 @@ namespace Test{ namespace AppServer
         boost::property_tree::ptree                                      _config;
         SantiagoDBConnection                                             _databaseConnection;
         Santiago::Authentication::SingleNode::Authenticator              _userController;
+        ClientIdType _clientId;
 
     };
 
