@@ -19,7 +19,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                  const std::string& password_,
                                  boost::asio::yield_context yield_)
     {
-        return _controller.loginUser(None(),
+        //typename Authentication::ControllerData::ClientIdType clientId;
+        return _controller.loginUser(/*clientId,*/None(),
                                      userNameOrEmailAddress_,
                                      isUserNameNotEmailAddress_,
                                      password_,
@@ -30,7 +31,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     AuthenticatorImpl::verifyCookieAndGetUserInfo(const std::string& cookieString_,
                                                   boost::asio::yield_context yield_)
     {
-        return _controller.verifyCookieAndGetUserInfo(None(),
+        //typename Authentication::ControllerData::ClientIdType clientId;
+        return _controller.verifyCookieAndGetUserInfo(/*clientId,*/None(),
                                                       cookieString_,
                                                       yield_);
     }

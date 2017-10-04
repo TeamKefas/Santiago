@@ -4,7 +4,6 @@ set(Santiago_SRCS
   SantiagoDBTables/Definitions.cpp
   SantiagoDBTables/MariaDBConnection.cpp
   Authentication/AuthenticatorBaseV1.cpp
-  Authentication/ControllerBase.cpp
   Authentication/ControllerDataBase.cpp
   Authentication/SingleNode/AuthenticatorImpl.cpp
   Authentication/SingleNode/AuthenticatorV1.cpp

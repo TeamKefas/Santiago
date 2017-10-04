@@ -124,13 +124,10 @@ namespace Santiago{ namespace Authentication
         std::error_code deleteUserImpl(const std::string& cookieString_,
                                                                      boost::asio::yield_context yield_);
 
-        std::error_code cleanupLocalCookieDataAndUpdateSessionsRecord(
-            const SantiagoDBTables::SessionsRec& sessionsRec_);
-
         std::error_code cleanupCookieDataAndUpdateSessionRecord(const std::string& cookieString_,
                                                                 boost::asio::yield_context yield_);
 
-        std::error_code cleanupLocalCookieDataAndUpdateSessionsRecordImpl(const SantiagoDBTables::SessionsRec& sessionsRec_);
+        std::error_code cleanupLocalCookieDataAndUpdateSessionsRecordImpl(SantiagoDBTables::SessionsRec& sessionsRec_);
         std::error_code cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const std::string& userName_,
                                                                               boost::asio::yield_context yield_);
         boost::posix_time::time_duration getMaxSessionInactiveDuration() const;
@@ -152,4 +149,8 @@ namespace Santiago{ namespace Authentication
     };
 }}
 
+#include "ControllerBase.cpp"
+
 #endif
+
+

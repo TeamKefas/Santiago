@@ -1,7 +1,5 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include "ControllerBase.h"
-
 namespace Santiago{ namespace Authentication
 {
     template<typename ControllerData>
@@ -180,7 +178,7 @@ namespace Santiago{ namespace Authentication
 
             ST_LOG_INFO("Session lastActiveTime older than MAX_SESSION_DURATION. Going to log out. cookieString:"
                      <<cookieString_<<std::endl);            
-            std::error_code error = cleanupCookieDataAndUpdateSessionRecord(cookieString_);
+            /*std::error_code error = */cleanupCookieDataAndUpdateSessionRecord(cookieString_,yield_);
 
             return std::pair<std::error_code,boost::optional<UserInfo> >(
                 std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,
@@ -389,7 +387,7 @@ namespace Santiago{ namespace Authentication
         if(error)
         {
             //onChangeEmailAddressCallbackFn_(error);
-            return;
+            return error;
         }
         ST_ASSERT(usersRecOpt);
 
@@ -535,9 +533,9 @@ namespace Santiago{ namespace Authentication
 
     template<typename ControllerData>
     std::error_code ControllerBase<ControllerData>::
-    cleanupLocalCookieDataAndUpdateSessionsRecordImpl(const SantiagoDBTables::SessionsRec& sessionsRec_)
+    cleanupLocalCookieDataAndUpdateSessionsRecordImpl(SantiagoDBTables::SessionsRec& sessionsRec_)
     {
-        //update the db
+        //update the db 
         sessionsRec_._logoutTime = boost::posix_time::second_clock::universal_time();
         std::error_code error;
         SantiagoDBTables::SessionsRec sessionsRec = sessionsRec_;
