@@ -127,7 +127,7 @@ namespace Santiago{ namespace Authentication
                                                          boost::asio::yield_context yield_) = 0;
 
         std::string generateSHA256(const std::string str);
-        std::string generateUniqueCookie();
+        std::string generateUniqueCookie(std::string userName_);
         std::string generateRecoveryString();
 
         ThreadSpecificDbConnection          &_databaseConnection;

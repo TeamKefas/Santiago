@@ -133,7 +133,7 @@ namespace Santiago{ namespace Authentication
 
         for(unsigned i=0;i<5;i++)
         { //5 attempts with different cookie strings
-            sessionsRec._cookieString = generateUniqueCookie();
+            sessionsRec._cookieString = generateUniqueCookie(sessionsRec._userName);
             _databaseConnection.get().addSessionsRec(sessionsRec,error);
             if(!error)
             {
@@ -623,9 +623,10 @@ namespace Santiago{ namespace Authentication
     }
 
     template<typename ControllerData>
-    std::string ControllerBase<ControllerData>::generateUniqueCookie()
+    std::string ControllerBase<ControllerData>::generateUniqueCookie(std::string userName_)
     {
         std::string str;
+        str += userName_[0];
         static const char alphanum[] =
             "0123456789"
             "@#$%^*"
@@ -635,7 +636,7 @@ namespace Santiago{ namespace Authentication
         int stringLength = sizeof(alphanum) - 1;
 	
         //return alphanum[rand() % stringLength];
-	for(unsigned int i = 0; i < 46; ++i)
+	for(unsigned int i = 0; i < 45; ++i)
 	{
             str += alphanum[rand() % stringLength];
 	}
