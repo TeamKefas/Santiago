@@ -445,7 +445,7 @@ namespace Santiago{ namespace Authentication
         }
 
         //remove from memory
-        return cleanupCookieDataAndUpdateSessionRecordsForAllCookies(sessionsRecOpt->_cookieString,yield_);
+        return cleanupCookieDataAndUpdateSessionRecordsForAllCookies(sessionsRecOpt->_userName,yield_);
     }
 
     template<typename ControllerData>

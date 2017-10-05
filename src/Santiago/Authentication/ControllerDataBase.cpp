@@ -26,7 +26,7 @@ namespace Santiago{ namespace Authentication
          {
              return iter->second._emailAddress;
          }
-         return boost ::none;
+         return boost::none;
      }
     
     void ControllerDataBase::removeCookie(const std::string& cookieString_)
