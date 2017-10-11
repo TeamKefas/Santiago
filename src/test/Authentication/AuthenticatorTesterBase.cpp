@@ -176,13 +176,13 @@ namespace Test{ namespace Authentication
                                                                                                                    error);
             printResult("Get user for e-mail address and recovery string", (bool)error);
         
-            /*_authenticatorBasePtr->changeUserPasswordForEmailAddressAndRecoveryString("vnvijayaraj@gmail.com",
+            _authenticatorBasePtr->changeUserPasswordForEmailAddressAndRecoveryString("test@gmail",
                                                                                       *recoveryString2,
                                                                                       "newpass",
                                                                                       yieldContext_,
                                                                                       error);
             printResult("Change password for e-mail address and recovery string", (bool)error);
-            */
+            
             _authenticatorBasePtr->deleteUser(cookieString,
                                               yieldContext_,
                                               error);
@@ -190,7 +190,7 @@ namespace Test{ namespace Authentication
 
             boost::optional<std::pair<Santiago::Authentication::UserInfo, std::string> > userInfo7 = _authenticatorBasePtr->loginUser(santiagoTestUser1.userName,
                                                                                                                                       1,
-                                                                                                                                      "new",
+                                                                                                                                      "newpass",
                                                                                                                                       yieldContext_,
                                                                                                                                       error);
             printResult("Login with username", (bool)error);
@@ -442,6 +442,11 @@ namespace Test{ namespace Authentication
                                                                                                                     yieldContext_,
                                                                                                                     error);
             printResult("Get user for e-mail address and recovery string", (bool)error);
+            _authenticatorBasePtr->changeUserPasswordForEmailAddressAndRecoveryString("new1@email",
+                                                                                      *recoveryString2,
+                                                                                      "new",
+                                                                                      yieldContext_,
+                                                                                      error);
 
             boost::optional<std::string> recoveryString3 = _authenticatorBasePtr->createAndReturnRecoveryString(santiagoTestUser2.emailAddress,
                                                                                                                 yieldContext_,
@@ -465,20 +470,15 @@ namespace Test{ namespace Authentication
                                                                                                                     error);
             printResult("Get user for e-mail address and recovery string", (bool)error);
         
-            /*_authenticatorBasePtr->changeUserPasswordForEmailAddressAndRecoveryString("vnvijayaraj@gmail.com",
-                                                                                      *recoveryString1,
-                                                                                      "newpass",
-                                                                                      yieldContext_,
-                                                                                      error);
             printResult("Change password for e-mail address and recovery string", (bool)error);
 
-            _authenticatorBasePtr->changeUserPasswordForEmailAddressAndRecoveryString("vnvijayaraj@gmail.com",
-                                                                                      *recoveryString2,
-                                                                                      "newpass",
+            _authenticatorBasePtr->changeUserPasswordForEmailAddressAndRecoveryString("new2@email",
+                                                                                      *recoveryString4,
+                                                                                      "new",
                                                                                       yieldContext_,
                                                                                       error);
             printResult("Change password for e-mail address and recovery string", (bool)error);
-            */
+            
             _authenticatorBasePtr->deleteUser(cookieString1,
                                               yieldContext_,
                                               error);
