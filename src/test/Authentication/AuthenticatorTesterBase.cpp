@@ -32,9 +32,9 @@ namespace Test{ namespace Authentication
             boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run1UserTests, this, yieldContext_, user1));
             boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run1UserTests, this, yieldContext_, user2));
             boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run1UserTests, this, yieldContext_, user3));
-            //boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run2UserTests, this, yieldContext_, user2, user3));
-            //boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run2UserTests, this, yieldContext_, user1, user3));
-            //boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run2UserTests, this, yieldContext_, user1, user2));
+            boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run2UserTests, this, yieldContext_, user2, user3));
+            boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run2UserTests, this, yieldContext_, user1, user3));
+            boost::asio::spawn(_ioService, std::bind(&AuthenticatorTesterBase::run2UserTests, this, yieldContext_, user1, user2));
 
         }
     
@@ -176,13 +176,13 @@ namespace Test{ namespace Authentication
                                                                                                                    error);
             printResult("Get user for e-mail address and recovery string", (bool)error);
         
-            _authenticatorBasePtr->changeUserPasswordForEmailAddressAndRecoveryString("vnvijayaraj@gmail.com",
+            /*_authenticatorBasePtr->changeUserPasswordForEmailAddressAndRecoveryString("vnvijayaraj@gmail.com",
                                                                                       *recoveryString2,
                                                                                       "newpass",
                                                                                       yieldContext_,
                                                                                       error);
             printResult("Change password for e-mail address and recovery string", (bool)error);
-            
+            */
             _authenticatorBasePtr->deleteUser(cookieString,
                                               yieldContext_,
                                               error);
@@ -465,7 +465,7 @@ namespace Test{ namespace Authentication
                                                                                                                     error);
             printResult("Get user for e-mail address and recovery string", (bool)error);
         
-            _authenticatorBasePtr->changeUserPasswordForEmailAddressAndRecoveryString("vnvijayaraj@gmail.com",
+            /*_authenticatorBasePtr->changeUserPasswordForEmailAddressAndRecoveryString("vnvijayaraj@gmail.com",
                                                                                       *recoveryString1,
                                                                                       "newpass",
                                                                                       yieldContext_,
@@ -478,7 +478,7 @@ namespace Test{ namespace Authentication
                                                                                       yieldContext_,
                                                                                       error);
             printResult("Change password for e-mail address and recovery string", (bool)error);
-            
+            */
             _authenticatorBasePtr->deleteUser(cookieString1,
                                               yieldContext_,
                                               error);
