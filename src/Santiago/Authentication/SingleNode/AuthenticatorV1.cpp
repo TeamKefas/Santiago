@@ -16,7 +16,10 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         if(!isNotEmailAddress_)
         {
             boost::optional<SantiagoDBTables::UsersRec> usersRec = _databaseConnection.get().getUsersRecForEmailAddress(string_,error);
-            userName = usersRec->_userName;
+            if(usersRec)
+            {
+                userName = usersRec->_userName;
+            }
         }
         return _authenticatorStrandPair[static_cast<int>(toupper(userName.at(0)))-65];
     }
