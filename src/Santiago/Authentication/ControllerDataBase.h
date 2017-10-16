@@ -42,7 +42,7 @@ namespace Santiago{ namespace Authentication
         boost::optional<std::string> getUserEmailAddress(const std::string& userName_) const;
 
         void removeCookie(const std::string& cookieString_);
-//        void removeUser(const std::string& userName_);
+        void removeUser(const std::string& userName_);
         void updateUserEmailAddress(const std::string& userName_,const std::string& newEmailAddress_);
         
     protected:

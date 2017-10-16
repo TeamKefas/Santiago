@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     if(argc != 2)
     {
-        std::cout << "Format is ./AuthenticatorTest <config.json>" << std::endl;
+        std::cout << "Format is ./TestAuthenticationExec <config.json>" << std::endl;
         return -1;
     }
 
