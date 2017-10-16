@@ -2,9 +2,20 @@
 
 namespace Santiago{ namespace Authentication { namespace MultiNode
 {
-    ConnectionMessage::ConnectionMessage(const char* content_, unsigned size_)
+    /***********************************************************
+     * RequestId
+     ***********************************************************/
+    RequestId::RequestId(unsigned char initiatingConnectionId_,unsigned requestNo_)
+        :_initiatingConnectionId(initiatingConnectionId_)
+        ,_requestNo(requestNo_)
+    {}
+
+    /***********************************************************
+     * ConnectionMessageContent
+     ***********************************************************/
+    ConnectionMessageContent::ConnectionMessageContent(const char* content_, unsigned size_)
     {
-        ST_LOG_DEBUG("Starting ConnectionMessage parse."<<std::endl);
+        ST_LOG_DEBUG("Starting ConnectionMessageContent parse."<<std::endl);
         unsigned curPos = 0;
         //parse the type
         _type = *reinterpret_cast<const ConnectionMessageType*>(content_ + curPos);
@@ -39,15 +50,16 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
             ST_LOG_ERROR("Invalid message format: Number of parameters does not match."<<std::endl);
             throw std::runtime_error("Invalid message format: Number of parameters does not match.");
         }
-        ST_LOG_DEBUG("ConnectionMessage successfully parsed and created."<<std::endl);
+        ST_LOG_DEBUG("ConnectionMessageContent successfully parsed and created."<<std::endl);
     }
 
-    ConnectionMessage::ConnectionMessage(ConnectionMessageType type_, const std::vector<std::string>& parameters_)
+    ConnectionMessageContent::ConnectionMessageContent(ConnectionMessageType type_,
+                                                       const std::vector<std::string>& parameters_)
         :_type(type_)
         ,_parameters(parameters_)
     {}
       
-    std::ostream& ConnectionMessage::writeToStream(std::ostream& outStream_) const
+    std::ostream& ConnectionMessageContent::writeToStream(std::ostream& outStream_) const
     {
         outStream_.write(reinterpret_cast<const char*>(&_type), sizeof(_type));
         unsigned noOfParameters = _parameters.size();
@@ -59,11 +71,10 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
             outStream_.write(reinterpret_cast<const char*>(&parameterSize), sizeof(parameterSize));
             outStream_ << *it; 
         }
-
         return outStream_;
     }
 
-    unsigned ConnectionMessage::getSize() const
+    unsigned ConnectionMessageContent::getSize() const
     {
         unsigned size = sizeof(ConnectionMessageType) + sizeof(unsigned);
         for(unsigned i=0;i<_parameters.size();i++)
@@ -73,4 +84,5 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         return size;
     }
     
-}}}//closing Santiago::User::Server 
+}}}//closing Santiago::Authentication::MultiNode
+

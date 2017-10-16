@@ -1,12 +1,12 @@
-#ifndef SANTIAGO_USER_SERVER_CONNECTION_MESSAGE_H
-#define SANTIAGO_USER_SERVER_CONNECTION_MESSAGE_H
+#ifndef SANTIAGO_AUTHENTICATION_MULTINODE_CONNECTIONMESSAGE_H
+#define SANTIAGO_AUTHENTICATION_MULTINODE_CONNECTIONMESSAGE_H
 
 /**
  * @file ConnectionMessage.h
  *
  * @section DESCRIPTION
  *
- * Contains the ConnectionMessage class and ConnectionMessageType class 
+ * Contains the structs for the data that is passed between Client and Server
  */
 
 #include <string>
@@ -45,21 +45,42 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         SR_LOGOUT_USER_FOR_ALL_COOKIES
     };
 
-    struct ConnectionMessage
+    /***********************************************************
+     * RequestId
+     ***********************************************************/
+    struct RequestId 
+    {
+        /*
+         * TODO: Implement the < operator. first check initiatingConnectionId 
+         * and if equal then check requestNo.
+         */
+        RequestId(unsigned _initiatingConnectionId,unsigned _requestNo);
+
+        bool operator<(const RequestId& rhs_);
+
+        unsigned  _initiatingConnectionId;
+        unsigned  _requestNo;
+    };
+
+    /***********************************************************
+     * ConnectionMessageContent
+     ***********************************************************/
+    struct ConnectionMessageContent
     {
         /**
          * The constructor
          * @param content_- 
          * @param size_- ///NEED TO WRITE\\\
          */
-        ConnectionMessage(const char* content_,unsigned size_);
+        ConnectionMessageContent(const char* content_,unsigned size_);
 
         /**
          * The constructor
          * @param type_- 
          * @param parameters_- ///NEED TO WRITE\\\
          */
-        ConnectionMessage(ConnectionMessageType type_,const std::vector<std::string>& parameters_);
+        ConnectionMessageContent(ConnectionMessageType type_,
+                                 const std::vector<std::string>& parameters_);
 
         /**
          * ///Message\\
@@ -73,11 +94,18 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
 
         ConnectionMessageType     _type;
         std::vector<std::string>  _parameters;
-
     };
 
     inline std::ostream& operator<<(std::ostream& ostream_, const ConnectionMessage& connectionMessage_)
     { return connectionMessage_.writeToStream(ostream_);}
+
+    //Another classification of the ConnectionMessage
+    enum class ConnectionMessageType2
+    {
+        CONNECTION_MESSAGE_NEW, //new request 
+        CONNECTION_MESSAGE_REPLY, //reply to a SR
+        CONNECTION_DISCONNECT,
+    };
 
 }}} //closing namespace Santiago::User::Server
 
