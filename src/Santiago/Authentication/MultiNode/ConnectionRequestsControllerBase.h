@@ -25,7 +25,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         typedef std::shared_ptr<ConnectionRequestsControllerBase> Ptr;
         typedef std::function<void()> OnDisconnectCallbackFn;
-        
+               
         ConnectionRequestsControllerBase();
 
     protected:

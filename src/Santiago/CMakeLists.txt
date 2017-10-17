@@ -8,10 +8,9 @@ set(Santiago_SRCS
   Authentication/SingleNode/AuthenticatorImpl.cpp
   Authentication/SingleNode/AuthenticatorV1.cpp
   Authentication/SingleNode/ControllerData.cpp
-  Authentication/MultiNode/Authenticator.cpp
-  Authentication/MultiNode/ClientCache.cpp
-  Authentication/MultiNode/AuthenticatorMessageSocket.cpp
   Authentication/MultiNode/ConnectionMessage.cpp
+  Authentication/MultiNode/ConnectionMessageSocket.cpp
+  Authentication/MultiNode/ConnectionRequestsControllerBase.cpp
   Thread/ThreadSpecificVarImpl.cpp
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp
@@ -32,10 +31,10 @@ if(WIN32)
       Authentication/SingleNode/AuthenticatorV1.h
       Authentication/SingleNode/Controller.h
       Authentication/SingleNode/ControllerData.h
-      Authentication/MultiNode/Authenticator.h
-      Authentication/MultiNode/ClientCache.h
-      Authentication/MultiNode/AuthenticatorMessageSocket.h
-      Authentication/MultiNode/ConnectionMessage.h
+      Authentication/MutiNode/ConnectionMessage.h
+      Authentication/MutiNode/ConnectionMessageSocket.h
+      Authentication/MutiNode/ConnectionRequestsController.h
+      Authentication/MutiNode/ConnectionRequestsControllerBase.h
       Utils/PTimeUtils.h
       Utils/STLog.h
       Utils/LogLevel.h

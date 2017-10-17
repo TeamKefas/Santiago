@@ -5,7 +5,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
     /***********************************************************
      * RequestId
      ***********************************************************/
-    RequestId::RequestId(unsigned char initiatingConnectionId_,unsigned requestNo_)
+    RequestId::RequestId(unsigned initiatingConnectionId_,unsigned requestNo_)
         :_initiatingConnectionId(initiatingConnectionId_)
         ,_requestNo(requestNo_)
     {}

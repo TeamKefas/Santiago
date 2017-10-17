@@ -96,7 +96,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         std::vector<std::string>  _parameters;
     };
 
-    inline std::ostream& operator<<(std::ostream& ostream_, const ConnectionMessage& connectionMessage_)
+    inline std::ostream& operator<<(std::ostream& ostream_, const ConnectionMessageContent& connectionMessage_)
     { return connectionMessage_.writeToStream(ostream_);}
 
     //Another classification of the ConnectionMessage

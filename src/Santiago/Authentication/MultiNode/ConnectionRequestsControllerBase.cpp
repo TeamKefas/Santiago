@@ -1,6 +1,6 @@
 #include "ConnectionRequestsControllerBase.h"
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode
 {
     ConnectionRequestsControllerBase::
     ConnectionRequestsControllerBase()
