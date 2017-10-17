@@ -6,7 +6,7 @@
  *
  * @section DESCRIPTION
  *
- * Contains the ConnectionRequestsControllerBase class
+ * Contains the ConnectionRequestsControllerBase class  
  */
 
 #include <memory>
@@ -36,11 +36,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         void handleConnectionMessageSocketDisconnect();
         void handleConnectionMessageSocketMessage(const RequestId& requestId_, const ConnectionMessageContent& messageContent_);
+        void queueConnectAfterDelay();
 
         virtual void handleRequestMessage(ConnectionMessageType2 messageType_,
                                           const RequestId& requestId_,
                                           const boost::optional<ConnectionMessageContent>& messageContentOpt_) = 0;
-        virtual void furtherHandleConnectionMessageSocketDisconnect() = 0;        
+        virtual void furtherHandleConnectionMessageSocketDisconnect() = 0;
         virtual ConnectionMessageSocket& getConnectionMessageSocket() = 0;
 
         OnDisconnectCallbackFn          _onDisconnectCallbackFn;

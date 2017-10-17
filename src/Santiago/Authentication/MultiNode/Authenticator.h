@@ -12,14 +12,11 @@
 #include <sstream>
 #include <openssl/sha.h>
 
-
 #include "Santiago/Authentication/AuthenticatorBase.h"
-#include "AuthenticatorMessageSocket.h"
+#include "ConnectionRequestsController.h"
 #include "ClientCache.h"
 #include "Santiago/ErrorCategory.h"
 #include "Santiago/Utils/STLog.h"
-
-
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
@@ -120,7 +117,9 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
     protected:
 
-        AuthenticatorMessageSocket         _messageSocket;
+        void handlerServerRequestMessage(const AuthenticatorRequestMessage& message_);
+
+        ConnectionRequestsController       _connectionRequestsController;
         ClientCache                        _clientCache;
     };
 

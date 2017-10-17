@@ -9,7 +9,7 @@ namespace Santiago{ namespace Authenticaton{ namespace MultiNode
     {
         AuthenticatorRequestMessage(const RequestId& requestId_,
                                     ConnectionMessageType2 type_,
-                                    const Optional<ConnectionMessage>& connectionMessage_)
+                                    const Optional<ConnectionMessage>& connectionMessageConent_)
             :_requestId(requestId_)
             ,_type(type_)
             ,_connectionMessage(connectionMessage_)
