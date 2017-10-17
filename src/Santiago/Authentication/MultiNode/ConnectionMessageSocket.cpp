@@ -23,7 +23,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         if(_readStrandPtr)
         {
             _socketPtr->async_read_some(_inputBuffer.prepare(BUFFER_INCREMENT_SIZE),
-                                        _readStrandPtr->wrap(boost::bind(&ConnectionMessageSocketBase::handleRead,
+                                        _readStrandPtr->wrap(boost::bind(&ConnectionMessageSocket::handleRead,
                                                                          this->shared_from_this(),
                                                                          boost::asio::placeholders::error,
                                                                          boost::asio::placeholders::bytes_transferred)));
