@@ -12,14 +12,13 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
 
     bool RequestId::operator<(const RequestId& rhs_)
     {
-        if(rhs_._initiatingConnectionId>this->_initiatingConnectionId)
+        if(rhs_._initiatingConnectionId>this->_initiatingConnectionId ||
+           (rhs_._initiatingConnectionId==this->_initiatingConnectionId &&
+            rhs_._requestNo>this->_requestNo))
         {
             return true;
         }
-        else if(rhs_._initiatingConnectionId==this->_initiatingConnectionId && rhs_._requestNo>this->_requestNo)
-        {
-            return true;
-        }
+        
         return false;
     }
 
