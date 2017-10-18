@@ -16,21 +16,11 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         {
             return true;
         }
-        else if(rhs_._initiatingConnectionId==this->_initiatingConnectionId)
+        else if(rhs_._initiatingConnectionId==this->_initiatingConnectionId && rhs_._requestNo>this->_requestNo)
         {
-            if(rhs_._requestNo>this->_requestNo)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     /***********************************************************
