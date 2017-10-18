@@ -100,7 +100,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
     { return connectionMessage_.writeToStream(ostream_);}
 
     //Another classification of the ConnectionMessage
-    enum class ConnectionMessageType2
+    enum class ConnectionMessageRequest
     {
         CONNECTION_MESSAGE_NEW, //new request 
         CONNECTION_MESSAGE_REPLY, //reply to a SR

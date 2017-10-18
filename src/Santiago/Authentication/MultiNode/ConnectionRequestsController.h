@@ -44,11 +44,13 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         void createAndInitializeConnectionMessageSocket(const boost::asio::ip::tcp::endpoint& endpoint_);
         
-        virtual void handleRequestMessage(ConnectionMessageType2 messageType_,
+        virtual void handleRequestMessage(ConnectionMessageRequest messageType_,
                                           const RequestId& requestId_,
                                           const boost::optional<ConnectionMessageContent>& messageContentOpt_);
-        
+
+        virtual void queueConnectAfterDelay();
         virtual void furtherHandleConnectionMessageSocketDisconnect();
+        virtual ConnectionMessageSocket& getConnectionMessageSocket();
 
         boost::asio::io_service                  &_ioService;
         StrandPtr                                 _strandPtr;

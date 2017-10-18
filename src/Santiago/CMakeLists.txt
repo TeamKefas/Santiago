@@ -31,6 +31,7 @@ if(WIN32)
       Authentication/SingleNode/AuthenticatorV1.h
       Authentication/SingleNode/Controller.h
       Authentication/SingleNode/ControllerData.h
+      Authentication/MutiNode/AuthenticatorRequestMessage.h
       Authentication/MutiNode/ConnectionMessage.h
       Authentication/MutiNode/ConnectionMessageSocket.h
       Authentication/MutiNode/ConnectionRequestsController.h

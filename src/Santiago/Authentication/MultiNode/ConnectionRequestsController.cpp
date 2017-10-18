@@ -23,16 +23,16 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         {
             AuthenticatorRequestMessage replyMessage = message_;
             replyMessage._connectionMessageContent = boost::none;
-            replyMessage._type = ConnectionMessageType2::CONNECTION_DISCONNECT;
+            replyMessage._type = ConnectionMessageRequest::CONNECTION_DISCONNECT;
             onMessageCallbackFn_(replyMessage);
         }
 
-        if(message_._type == ConnectionMessageType2::CONNECTION_MESSAGE_NEW)
+        if(message_._type == ConnectionMessageRequest::CONNECTION_MESSAGE_NEW)
         {
             ST_ASSERT(_requestIdCallbackFnMap.find(message_._requestId) == _requestIdCallbackFnMap.end());
             _requestIdCallbackFnMap[message_._requestId] = onMessageCallbackFn_;
         }
-        else if(message_._type == ConnectionMessageType2::CONNECTION_MESSAGE_REPLY)
+        else if(message_._type == ConnectionMessageRequest::CONNECTION_MESSAGE_REPLY)
         {
 //            ST_ASSERT(_requestIdCallbackFnMap.find(message_._requestId) != _requestIdCallbackFnMap.end());
         }
@@ -90,19 +90,19 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     }
 
     void ConnectionRequestsController::
-    handleRequestMessage(ConnectionMessageType2 messageType_,
+    handleRequestMessage(ConnectionMessageRequest messageType_,
                          const RequestId& requestId_,
                          const boost::optional<ConnectionMessageContent>& messageContentOpt_)
     {
         AuthenticatorRequestMessage requestMessage(requestId_,messageType_,messageContentOpt_);
-        if(requestMessage._type == ConnectionMessageType2::CONNECTION_MESSAGE_NEW)
+        if(requestMessage._type == ConnectionMessageRequest::CONNECTION_MESSAGE_NEW)
         {
             ST_ASSERT(_requestIdCallbackFnMap.find(requestId_) == _requestIdCallbackFnMap.end());
 //            _requestIdCallbackFnMap[requestId_] = requestMessage;
             _onServerRequestCallbackFn(requestMessage);
         }
-        else if((requestMessage._type == ConnectionMessageType2::CONNECTION_MESSAGE_REPLY) ||
-                (requestMessage._type == ConnectionMessageType2::CONNECTION_DISCONNET))
+        else if((requestMessage._type == ConnectionMessageRequest::CONNECTION_MESSAGE_REPLY) ||
+                (requestMessage._type == ConnectionMessageRequest::CONNECTION_DISCONNET))
         {
             std::map<RequestId,OnMessageCallbackFn>::iterator iter =
                 _requestIdCallbackFnMap.find(requestId_);
@@ -120,5 +120,10 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         _connectionMessageSocketOpt = boost::none;
         _onDisconnectCallbackFn();
         createAndInitializeConnectionMessageSocket(_endpoint);
+    }
+
+    ConnectionMessageSocket& ConnectionRequestsController::getConnectionMessageSocket()
+    {
+        return _connectionMessageSocket;
     }
 }}}

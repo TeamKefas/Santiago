@@ -13,7 +13,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
             RequestId requestId = _replyPendingRequestList.begin()->first;
             _replyPendingRequestList.erase(_replyPendingRequestList.begin());
             
-            handleRequestMessage(ConnectionMessageType2::CONNECTION_DISCONNECT,
+            handleRequestMessage(ConnectionMessageRequest::CONNECTION_DISCONNECT,
                                  requestId,
                                  boost::none);
         }
@@ -39,23 +39,23 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
                 _replyPendingRequestList.erase(iter);
             }
 
-            handleRequestMessage(ConnectionMessageType2::CONNECTION_MESSAGE_REPLY,
+            handleRequestMessage(ConnectionMessageRequest::CONNECTION_MESSAGE_REPLY,
                                  requestId_,
                                  messageContent_);
         }
         else
         {
-            handleRequestMessage(ConnectionMessageType2::CONNECTION_MESSAGE_NEW,
+            handleRequestMessage(ConnectionMessageRequest::CONNECTION_MESSAGE_NEW,
                                  requestId_,
                                  messageContent_);            
         }
     }
     
-    void ConnectionRequestsControllerBase::sendMessageImpl(ConnectionMessageType2 messageType_,
+    void ConnectionRequestsControllerBase::sendMessageImpl(ConnectionMessageRequest messageType_,
                                                            const RequestId& requestId_,
                                                            const ConnectionMessageContent& messageContent_)
     {
-        if(ServerMessageType::CONNECTION_MESSAGE_NEW == messageType_)
+        if(ConnectionMessageRequest::CONNECTION_MESSAGE_NEW == messageType_)
         {
             std::map<RequestId,unsigned>::iterator iter = _replyPendingRequestList.find(requestId_);
             if(_replyPendingRequestList.end() == iter)

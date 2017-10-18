@@ -8,16 +8,16 @@ namespace Santiago{ namespace Authenticaton{ namespace MultiNode
     struct AuthenticatorRequestMessage
     {
         AuthenticatorRequestMessage(const RequestId& requestId_,
-                                    ConnectionMessageType2 type_,
-                                    const Optional<ConnectionMessage>& connectionMessageConent_)
+                                    ConnectionMessageRequest type_,
+                                    const boost::optional<ConnectionMessage>& connectionMessageConent_)
             :_requestId(requestId_)
             ,_type(type_)
             ,_connectionMessage(connectionMessage_)
         {}
 
-        RequestId                             _requestId;
-        ConnectionMessageType2                _type;
-        Optional<ConnectionMessageContent>    _connectionMessageContent;
+        RequestId                                    _requestId;
+        ConnectionMessageRequest                     _type;
+        boost::optional<ConnectionMessageContent>    _connectionMessageContent;
     };
 
 }}}
