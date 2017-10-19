@@ -50,10 +50,6 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
      ***********************************************************/
     struct RequestId 
     {
-        /*
-         * TODO: Implement the < operator. first check initiatingConnectionId 
-         * and if equal then check requestNo.
-         */
         RequestId(unsigned _initiatingConnectionId,unsigned _requestNo);
 
         bool operator<(const RequestId& rhs_);
