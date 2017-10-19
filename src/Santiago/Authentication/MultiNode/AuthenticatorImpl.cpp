@@ -1,8 +1,23 @@
-#include "Authenticator.h"
+#include "AuthenticatorImpl.h"
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
-    void Authenticator::verifyCookieAndGetUserInfoImpl(const std::string& cookieString_,
+    AuthenticatorImpl::AuthenticatorImpl(boost::asio::io_service& ioService_,const boost::property_tree::ptree& config_)
+        :AuthenticatorImplBase(ioService_,config_)
+        ,_strandPtr(new boost::asio::strand(_ioService))
+        ,_connectionRequestsController(_ioService,
+                                       _strandPtr,
+                                       boost::asio::ip::tcp::endpoint(
+                                           boost::asio::ip::tcp::address(_config.get<unsigned>("Santiago.AuthServer.address")),
+                                           _config.get<unsigned>("Santiago.AuthServer.port")),
+                                       std::bind(&AuthenticatorImpl::handleConnectionDisconnect,this),
+                                       std::bind(&AuthenticatorImpl::handleServerRequestMessage,
+                                                 this,std::placeholders::_1))
+        ,_clientCache()
+    {        
+    }
+    
+    void AuthenticatorImpl::verifyCookieAndGetUserInfoImpl(const std::string& cookieString_,
                                                        const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {
         boost::optional<UserInfo> userInfoOpt = _clientCache.getCookieInfoFromLocalCache(cookieString_);
@@ -16,7 +31,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
              
             ConnectionMessage ConnectionMessage(connectionMessageType, parameters);
             _messageSocket.sendMessage(ConnectionMessage,
-                                       std::bind(&Authenticator::handleVerifyCookieConnectionMessage,
+                                       std::bind(&AuthenticatorImpl::handleVerifyCookieConnectionMessage,
                                                  this,
                                                  std::placeholders::_1,
                                                  std::placeholders::_2,
@@ -29,7 +44,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }
     }
 
-    void Authenticator::handleVerifyCookieConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleVerifyCookieConnectionMessage(const std::error_code& error_,
                                                             const ConnectionMessage& connectionMessage_,
                                                             const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {
@@ -57,7 +72,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     
     
     
-    void Authenticator::createUserImpl(const std::string& userName_,
+    void AuthenticatorImpl::createUserImpl(const std::string& userName_,
                                        const std::string& emailAddress_,
                                        const std::string& password_,
                                        const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
@@ -70,14 +85,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
-                                   std::bind(&Authenticator::handleCreateUserConnectionMessage,
+                                   std::bind(&AuthenticatorImpl::handleCreateUserConnectionMessage,
                                              this,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              onCreateUserCallbackFn_));
     }
 
-    void Authenticator::handleCreateUserConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleCreateUserConnectionMessage(const std::error_code& error_,
                                                           const ConnectionMessage& connectionMessage_,
                                                           const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
     {
@@ -99,7 +114,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }    
     }
     
-    void Authenticator::loginUserImpl(const std::string& userNameOrEmailAddress_,
+    void AuthenticatorImpl::loginUserImpl(const std::string& userNameOrEmailAddress_,
                                       bool isUserNameNotEmailAddress_,
                                       const std::string& password_,
                                       const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
@@ -120,14 +135,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
-                                   std::bind(&Authenticator::handleLoginUserConnectionMessage,
+                                   std::bind(&AuthenticatorImpl::handleLoginUserConnectionMessage,
                                              this,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              onLoginUserCallbackFn_));
     }
 
-    void Authenticator::handleLoginUserConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleLoginUserConnectionMessage(const std::error_code& error_,
                                                          const ConnectionMessage& connectionMessage_,
                                                          const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
     {
@@ -157,7 +172,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }    
     }
 
-    void Authenticator::logoutUserForCookieImpl(const std::string& cookieString_,
+    void AuthenticatorImpl::logoutUserForCookieImpl(const std::string& cookieString_,
                                                         const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
     {
         std::vector<std::string> parameters;
@@ -167,14 +182,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
-                                   std::bind(&Authenticator::handleLogoutUserForCookieConnectionMessage,
+                                   std::bind(&AuthenticatorImpl::handleLogoutUserForCookieConnectionMessage,
                                              this,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              onLogoutCookieCallbackFn_));
     }
 
-    void Authenticator::handleLogoutUserForCookieConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleLogoutUserForCookieConnectionMessage(const std::error_code& error_,
                                                                    const ConnectionMessage& connectionMessage_,
                                                                    const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
     {
@@ -199,7 +214,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }    
     }
 
-    void Authenticator::logoutUserForAllCookiesImpl(const std::string& userName_,
+    void AuthenticatorImpl::logoutUserForAllCookiesImpl(const std::string& userName_,
                                                     const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
     {
         std::vector<std::string> parameters;
@@ -209,14 +224,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
-                                   std::bind(&Authenticator::handleLogoutUserForAllCookiesConnectionMessage,
+                                   std::bind(&AuthenticatorImpl::handleLogoutUserForAllCookiesConnectionMessage,
                                              this,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              onLogoutAllCookiesCallbackFn_));
     }
 
-    void Authenticator::handleLogoutUserForAllCookiesConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleLogoutUserForAllCookiesConnectionMessage(const std::error_code& error_,
                                                                        const ConnectionMessage& connectionMessage_,
                                                                        const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
     {
@@ -240,7 +255,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }    
     }
 
-    void Authenticator::changeUserPasswordImpl(const std::string& cookieString_,
+    void AuthenticatorImpl::changeUserPasswordImpl(const std::string& cookieString_,
                                                const std::string& oldPassword_,
                                                const std::string& newPassword_,
                                                const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
@@ -254,14 +269,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
-                                   std::bind(&Authenticator::handleChangeUserPasswordConnectionMessage,
+                                   std::bind(&AuthenticatorImpl::handleChangeUserPasswordConnectionMessage,
                                              this,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              onChangePasswordCallbackFn_));
     }
 
-    void Authenticator::handleChangeUserPasswordConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleChangeUserPasswordConnectionMessage(const std::error_code& error_,
                                                                   const ConnectionMessage& connectionMessage_,
                                                                   const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
     {
@@ -283,7 +298,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }    
     }
 
-    void Authenticator::getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
+    void AuthenticatorImpl::getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
                                                                     const std::string& recoveryString_,
                                                                     const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
     {
@@ -295,14 +310,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
-                                   std::bind(&Authenticator::handleGetUserForEmailAddressAndRecoveryStringConnectionMessage,
+                                   std::bind(&AuthenticatorImpl::handleGetUserForEmailAddressAndRecoveryStringConnectionMessage,
                                              this,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              onGetUserForEmailAddressAndRecoveryStringCallbackFn_));
     }
 
-    void Authenticator::handleGetUserForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleGetUserForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
                                                                                        const ConnectionMessage& connectionMessage_,
                                                                                        const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
     {
@@ -324,7 +339,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }    
     }
 
-    void Authenticator::changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
+    void AuthenticatorImpl::changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
                                                                                const std::string& recoveryString_,
                                                                                const std::string& newPassword_,
                                                                                const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
@@ -338,14 +353,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
-                                   std::bind(&Authenticator::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage,
+                                   std::bind(&AuthenticatorImpl::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage,
                                              this,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_));
     }
 
-    void Authenticator::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
                                                                                                   const ConnectionMessage& connectionMessage_,
                                                                                                   const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
     {
@@ -367,7 +382,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }    
     }
 
-    void Authenticator::changeUserEmailAddressImpl(const std::string& cookieString_,
+    void AuthenticatorImpl::changeUserEmailAddressImpl(const std::string& cookieString_,
                                                    const std::string& newEmailAddress_,
                                                    const std::string& password_,
                                                    const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
@@ -381,14 +396,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
-                                   std::bind(&Authenticator::handleChangeUserEmailAddressConnectionMessage,
+                                   std::bind(&AuthenticatorImpl::handleChangeUserEmailAddressConnectionMessage,
                                              this,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              onChangeEmailAddressCallbackFn_));
     }
 
-    void Authenticator::handleChangeUserEmailAddressConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleChangeUserEmailAddressConnectionMessage(const std::error_code& error_,
                                                                       const ConnectionMessage& connectionMessage_,
                                                                       const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
     {
@@ -410,7 +425,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }    
     }
         
-    void Authenticator::createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
+    void AuthenticatorImpl::createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
                                                           const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
     {
         std::vector<std::string> parameters;
@@ -420,14 +435,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
-                                   std::bind(&Authenticator::handleCreateAndReturnRecoveryStringConnectionMessage,
+                                   std::bind(&AuthenticatorImpl::handleCreateAndReturnRecoveryStringConnectionMessage,
                                              this,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              onCreateAndReturnRecoveryStringCallbackFn_));
     }
 
-    void Authenticator::handleCreateAndReturnRecoveryStringConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleCreateAndReturnRecoveryStringConnectionMessage(const std::error_code& error_,
                                                                              const ConnectionMessage& connectionMessage_,
                                                                              const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
     {
@@ -449,7 +464,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }    
     }
 
-    void Authenticator::deleteUserImpl(const std::string& cookieString_,
+    void AuthenticatorImpl::deleteUserImpl(const std::string& cookieString_,
                                        const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
         std::vector<std::string> parameters;
@@ -459,14 +474,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         ConnectionMessage connectionMessage(connectionMessageType, parameters);
         _messageSocket.sendMessage(connectionMessage,
-                                   std::bind(&Authenticator::handleDeleteUserConnectionMessage,
+                                   std::bind(&AuthenticatorImpl::handleDeleteUserConnectionMessage,
                                              this,
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              onDeleteUserCallbackFn_));
     }
 
-    void Authenticator::handleDeleteUserConnectionMessage(const std::error_code& error_,
+    void AuthenticatorImpl::handleDeleteUserConnectionMessage(const std::error_code& error_,
                                                           const ConnectionMessage& connectionMessage_,
                                                           const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
     {
@@ -493,7 +508,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }    
     }
     
-    std::string Authenticator::generateSHA256(const std::string str)
+    std::string AuthenticatorImpl::generateSHA256(const std::string str)
     {
         unsigned char hash[SHA256_DIGEST_LENGTH];
         SHA256_CTX sha256;

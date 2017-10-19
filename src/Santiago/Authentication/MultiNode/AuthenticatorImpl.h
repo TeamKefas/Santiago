@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_MULTINODE_AUTHENTICATOR_H
-#define SANTIAGO_AUTHENTICATION_MULTINODE_AUTHENTICATOR_H
+#ifndef SANTIAGO_AUTHENTICATION_MULTINODE_AUTHENTICATORIMPL_H
+#define SANTIAGO_AUTHENTICATION_MULTINODE_AUTHENTICATORIMPL_H
 
 #include <functional>
 #include <map>
@@ -12,7 +12,7 @@
 #include <sstream>
 #include <openssl/sha.h>
 
-#include "Santiago/Authentication/AuthenticatorBase.h"
+#include "Santiago/Authentication/AuthenticatorImplBase.h"
 #include "ConnectionRequestsController.h"
 #include "ClientCache.h"
 #include "Santiago/ErrorCategory.h"
@@ -22,6 +22,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
     class Authenticator:public AuthenticatorBase
     {
+    public:
+        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
+        
+        AuthenticatorImpl(boost::asio::io_service& ioService_,
+                          const StrandPtr& strandPtr_,
+                          const boost::property_tree::ptree& config_);
 
     protected:
         
@@ -115,10 +121,10 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         std::string generateSHA256(const std::string str);
 
-    protected:
+        void handleServerRequestMessage(const AuthenticatorRequestMessage& message_); //TODO
+        void handleConnectionDisconnect(); //TODO
 
-        void handlerServerRequestMessage(const AuthenticatorRequestMessage& message_);
-
+        StrandPtr                          _strandPtr;
         ConnectionRequestsController       _connectionRequestsController;
         ClientCache                        _clientCache;
     };

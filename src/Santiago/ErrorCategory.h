@@ -23,7 +23,8 @@ namespace Santiago
         ERR_INVALID_FASTCGI_REQUEST = 12,
         ERR_FASTCGI_REQUEST_ALREADY_REPLIED = 13,
         ERR_INVALID_FASTCGI_VERSION = 14,
-        ERR_SOCKET_ERROR = 15
+        ERR_FASTCGI_CONNECTION_ERROR = 15,
+        ERR_AUTH_SERVER_CONNECTION_ERROR = 16,
     };
 
     class ErrorCategory:public std::error_category

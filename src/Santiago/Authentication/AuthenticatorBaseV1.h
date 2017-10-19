@@ -37,10 +37,7 @@ namespace Santiago{ namespace Authentication
         typedef std::function<void(const std::error_code&,const boost::optional<std::pair<UserInfo,std::string> >&)>
         ErrorCodeUserInfoStringPairCallbackFn;
 
-        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
         typedef std::shared_ptr<AuthenticatorImplBase> AuthenticatorImplBasePtr;
-
-        typedef typename ControllerData::ClientIdType ClientIdType;
 
         typedef std::function<void(const std::error_code&)> ErrorCodeCallbackFn;
 
@@ -53,11 +50,9 @@ namespace Santiago{ namespace Authentication
          * @param config_- Used to hold the json data.   
          */
         AuthenticatorBase(boost::asio::io_service& ioService_,
-                          const boost::property_tree::ptree& config_,
-                          const ClientIdType& clientId_):
+                          const boost::property_tree::ptree& config_):
             _ioService(ioService_),
-            _config(config_),
-            _clientId(clientId_)
+            _config(config_)
         {}
 
 	virtual ~AuthenticatorBase()
@@ -269,7 +264,7 @@ namespace Santiago{ namespace Authentication
         
         boost::asio::io_service         &_ioService;
         boost::property_tree::ptree      _config;
-        ClientIdType                     _clientId;
+//        ClientIdType                     _clientId;
 
     };
 

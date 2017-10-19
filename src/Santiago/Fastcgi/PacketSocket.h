@@ -130,7 +130,7 @@ namespace Santiago{ namespace Fastcgi
                 boost::asio::write(*_protocolSocketPtr,bufferSequence,ec);
                 if(ec)
                 {
-                    error_ = std::error_code(ERR_SOCKET_ERROR,ErrorCategory::GetInstance());
+                    error_ = std::error_code(ERR_FASTCGI_CONNECTION_ERROR,ErrorCategory::GetInstance());
                     ST_LOG_INFO("Connection disconnected. Packet write failed. requestId = "
                                 << requestId_ << ", headerType = "<<headerType_<<std::endl);
                     close();
@@ -200,7 +200,7 @@ namespace Santiago{ namespace Fastcgi
                 ST_LOG_INFO("Connection disconnected. handleRead called with error"<<std::endl);
 //                std::cout<<"Connection disconnected"<<std::endl;
                 close();
-                _newPacketCallbackFn(std::error_code(ERR_SOCKET_ERROR,ErrorCategory::GetInstance()) ,0,0,0,NULL);
+                _newPacketCallbackFn(std::error_code(ERR_FASTCGI_CONNECTION_ERROR,ErrorCategory::GetInstance()) ,0,0,0,NULL);
                 return;
             }
 
