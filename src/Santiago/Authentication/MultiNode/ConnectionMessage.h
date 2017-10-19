@@ -63,24 +63,25 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
     };
 
     /***********************************************************
-     * ConnectionMessageContent
+     * ConnectionMessage
      ***********************************************************/
-    struct ConnectionMessageContent
+    struct ConnectionMessage
     {
         /**
          * The constructor
          * @param content_- 
          * @param size_- ///NEED TO WRITE\\\
          */
-        ConnectionMessageContent(const char* content_,unsigned size_);
+        ConnectionMessage(const char* content_,unsigned size_);
 
         /**
          * The constructor
          * @param type_- 
          * @param parameters_- ///NEED TO WRITE\\\
          */
-        ConnectionMessageContent(ConnectionMessageType type_,
-                                 const std::vector<std::string>& parameters_);
+        ConnectionMessage(const RequestId& requestId_,
+                          ConnectionMessageType type_,
+                          const std::vector<std::string>& parameters_);
 
         /**
          * ///Message\\
@@ -92,20 +93,13 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
          */
         unsigned getSize() const;
 
+        RequestId                 _requestId;
         ConnectionMessageType     _type;
         std::vector<std::string>  _parameters;
     };
 
-    inline std::ostream& operator<<(std::ostream& ostream_, const ConnectionMessageContent& connectionMessage_)
+    inline std::ostream& operator<<(std::ostream& ostream_, const ConnectionMessage& connectionMessage_)
     { return connectionMessage_.writeToStream(ostream_);}
-
-    //Another classification of the ConnectionMessage
-    enum class ConnectionMessageRequest
-    {
-        CONNECTION_MESSAGE_NEW, //new request 
-        CONNECTION_MESSAGE_REPLY, //reply to a SR
-        CONNECTION_DISCONNECT,
-    };
 
 }}} //closing namespace Santiago::User::Server
 

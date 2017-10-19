@@ -15,7 +15,6 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/strand.hpp>
 
-#include "AuthenticatorRequestMessage.h"
 #include "ConnectionMessage.h"
 #include "ConnectionMessageSocket.h"
 #include "ConnectionRequestsControllerBase.h"
@@ -26,9 +25,10 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     {
     public:
         
-        typedef std::shared_ptr<ConnectionRequestsControllerBase> Ptr;
         typedef std::function<void()> OnDisconnectCallbackFn;
-        typedef std::function<void(const AuthenticatorRequestMessage&)> OnMessageCallbackFn;
+        typedef std::function<void(const std::error_code&,
+                                   const boost::optional<ConnectionMessage>&)> OnReplyMessageCallbackFn;
+        typedef std::function<void(const ConnectionMessage&)> OnServerRequestMessageCallbackFn;
         typedef boost::optional<ConnectionMessageSocket> ConnectionMessageSocketOpt;
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;
         
@@ -36,27 +36,28 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                      const StrandPtr& strandPtr_,
                                      const boost::asio::ip::tcp::endpoint& endpoint_,
                                      const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
-                                     const OnMessageCallbackFn& onServerRequestCallbackFn_);
+                                     const OnServerRequestMessageCallbackFn& onServerRequestMessageCallbackFn_);
 
-        void sendMessage(const AuthenticatorRequestMessage& message_,
-                         const boost::optional<OnMessageCallbackFn>& onMessageCallbackFn_);
+        void sendMessage(const ConnectionMessage& message_,
+                         bool isReplyExpectingMessage_,
+                         const boost::optional<OnMessageCallbackFn>& onReplyMessageCallbackFn_);
     protected:
 
-        void createAndInitializeConnectionMessageSocket(const boost::asio::ip::tcp::endpoint& endpoint_);
-        
-        virtual void handleRequestMessage(ConnectionMessageRequest messageType_,
-                                          const RequestId& requestId_,
-                                          const boost::optional<ConnectionMessageContent>& messageContentOpt_);
+        void createAndInitializeConnectionMessageSocket();
+        void queueConnectAfterDelay();
 
-        virtual void queueConnectAfterDelay();
-        virtual void furtherHandleConnectionMessageSocketDisconnect();
+        virtual void furtherHandleNewConnectionMessage(const ConnectionMessage& message_);
+        virtual void furtherHandleReplyConnectionMessage(const ConnectionMessage& message_);
+        virtual void furtherHandleConnectionDisconnectForReplyExpectingRequest(const RequestId& requestId_);
+        virtual void furtherHandleConnectionDisconnect();
         virtual ConnectionMessageSocket& getConnectionMessageSocket();
-
+       
+ 
         boost::asio::io_service                  &_ioService;
         StrandPtr                                 _strandPtr;
         boost::asio::ip::tcp::endpoint            _endpoint;
         OnDisconnectCallbackFn                    _onDisconnectCallbackFn;
-        OnMessageCallbackFn                       _onServerRequestCallbackFn;
+        OnServerRequestMessageCallbackFn          _onServerRequestMessageCallbackFn;
 
         unsigned                                  _connectionId;
         ConnectionMessageSocketOpt                _connectionMessageSocketOpt;

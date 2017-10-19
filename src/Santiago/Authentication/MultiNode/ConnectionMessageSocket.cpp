@@ -57,20 +57,11 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
             if(_inputBuffer.size() >= messageSize)
             {
                 _inputBuffer.consume(sizeof(unsigned));
-                unsigned  initiatingConnectionId = *(reinterpret_cast<const unsigned*>
-                                                     (boost::asio::buffer_cast<const char*>(_inputBuffer.data())));
-                _inputBuffer.consume(sizeof(unsigned));
-                
-                unsigned  requestNo =  *(reinterpret_cast<const unsigned*>
-                                         (boost::asio::buffer_cast<const char*>(_inputBuffer.data())));
-                _inputBuffer.consume(sizeof(unsigned));
-                
-                RequestId requestId(initiatingConnectionId,requestNo);
-                 
+
                 const char* inputBufferData = boost::asio::buffer_cast<const char*>(_inputBuffer.data());
-                ConnectionMessageContent messageContent(inputBufferData,messageSize-12);
-                _inputBuffer.consume(messageSize-12);
-                _onMessageCallbackFn(requestId,messageContent);                
+                ConnectionMessage message(inputBufferData,messageSize-sizeof(unsigned));
+                _inputBuffer.consume(messageSize-sizeof(unsigned));
+                _onMessageCallbackFn(message);
             }
             else
             {
@@ -86,34 +77,28 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         _socketPtr.reset();
     }
 
-    void ConnectionMessageSocket::sendMessage(const RequestId& requestId_,
-                                              const ConnectionMessageContent& messageContent_)
+    void ConnectionMessageSocket::sendMessage(const ConnectionMessage& message_)
     {
         if(_writeStrandPtr)
         {
             _writeStrandPtr->dispatch(std::bind(&ConnectionMessageSocket::sendMessageImpl,
-                                                this,
-                                                requestId_,
-                                                messageContent_));
+                                            this,
+                                            message_));
         }
         else
         {
-            sendMessageImpl(requestId_,messageContent_);
+            sendMessageImpl(message_);
         }
     }
     
-    void ConnectionMessageSocket::sendMessageImpl(const RequestId& requestId_,
-                                                  const ConnectionMessageContent& messageContent_)
+    void ConnectionMessageSocket::sendMessageImpl(const ConnectionMessage& message_)
     {
         BOOST_ASSERT(_socketPtr);
-        unsigned bufSize = sizeof(unsigned) + sizeof(unsigned) + sizeof(unsigned)+ messageContent_.getSize();
+        unsigned bufSize = sizeof(unsigned)+ message_.getSize();
         boost::asio::streambuf outputBuffer;
         std::ostream outStream(&outputBuffer);
         outStream.write(reinterpret_cast<const char*>(&bufSize), sizeof(bufSize));
-        outStream.write(reinterpret_cast<const char*>(&requestId_._initiatingConnectionId),
-                         sizeof(requestId_._initiatingConnectionId));
-        outStream.write(reinterpret_cast<const char*>(&requestId_._requestNo), sizeof(requestId_._requestNo));
-        messageContent_.writeToStream(outStream);
+        message_.writeToStream(outStream);
 
         boost::system::error_code errorCode;
         BOOST_ASSERT(_socketPtr);
@@ -124,7 +109,9 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         }
         else
         {
-            close();
+            //Suppressing the error here as read handler expected to call the
+            //onDisconnectCallbackFn and do the cleanup. Few unnecessary read calls may be
+            //made due to this.
         }
     }
 

@@ -25,29 +25,23 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         typedef std::shared_ptr<ConnectionRequestsControllerBase> Ptr;
         typedef std::function<void()> OnDisconnectCallbackFn;
-               
+        
         ConnectionRequestsControllerBase();
 
     protected:
 
-        void sendMessageImpl(ConnectionMessageRequest messageType_,
-                             const RequestId& requestId_,
-                             const ConnectionMessageContent& messageContent_);
-        
-        void handleConnectionMessageSocketDisconnect();
-        void handleConnectionMessageSocketMessage(const RequestId& requestId_, const ConnectionMessageContent& messageContent_);
+        void sendMessageImpl(const ConnectionMessage& message_,bool isReplyExpectingMessage_);
+        void handleConnectionDisconnect();
+        void handleConnectionMessage(const ConnectionMessage& message_);
 
-        virtual void handleRequestMessage(ConnectionMessageRequest messageType_,
-                                          const RequestId& requestId_,
-                                          const boost::optional<ConnectionMessageContent>& messageContentOpt_) = 0;
-        
-        virtual void queueConnectAfterDelay() = 0;
-        virtual void furtherHandleConnectionMessageSocketDisconnect() = 0;
+        virtual void furtherHandleNewConnectionMessage(const ConnectionMessage& message_) = 0;
+        virtual void furtherHandleReplyConnectionMessage(const ConnectionMessage& message_) = 0;
+        virtual void furtherHandleConnectionDisconnectForReplyExpectingRequest(const RequestId& requestId_) = 0;
+        virtual void furtherHandleConnectionDisconnect() = 0;
         virtual ConnectionMessageSocket& getConnectionMessageSocket() = 0;
 
         OnDisconnectCallbackFn          _onDisconnectCallbackFn;
-        ConnectionMessageSocket         _connectionMessageSocket;
-        std::map<RequestId,unsigned>    _replyPendingRequestList; //the pair.second gives the number of pending replies..usually should only be 1
+        std::map<RequestId,unsigned>    _replyExpectingRequestList; //the pair.second gives the number of pending replies..usually should only be 1
     };
 
 }}}

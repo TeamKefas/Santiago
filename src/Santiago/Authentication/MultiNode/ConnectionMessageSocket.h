@@ -38,7 +38,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         typedef std::shared_ptr<MySocket> MySocketPtr;
 
         typedef std::function<void()> OnDisconnectCallbackFn;
-        typedef std::function<void(const RequestId&,const ConnectionMessageContent&)> OnMessageCallbackFn;
+        typedef std::function<void(const ConnectionMessage&)> OnMessageCallbackFn;
         typedef boost::shared_ptr<boost::asio::strand> StrandPtr;
 
         ConnectionMessageSocket(const MySocketPtr& socketPtr_,
@@ -47,13 +47,13 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
                                 const StrandPtr& readStrandPtr_=nullptr,
                                 const StrandPtr& writeStrandPtr_=nullptr);
 
-        void sendMessage(const RequestId& requestId_, const ConnectionMessageContent& messageContent_);
+        void sendMessage(const ConnectionMessage& message_);
         void close();
 
     protected:
 
         void startAsyncRead();
-        void sendMessageImpl(const RequestId& requestId_, const ConnectionMessageContent& messageContent_);
+        void sendMessageImpl(const ConnectionMessage& message_);
         void handleRead(const boost::system::error_code& error_,size_t bytesTransferred_);
 
         MySocketPtr                             _socketPtr;

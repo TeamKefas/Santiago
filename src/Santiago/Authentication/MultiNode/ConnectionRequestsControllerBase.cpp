@@ -6,28 +6,25 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
     ConnectionRequestsControllerBase()
     {}
     
-    void ConnectionRequestsControllerBase::handleConnectionMessageSocketDisconnect()
+    void ConnectionRequestsControllerBase::handleConnectionDisconnect()
     {
-        while(_replyPendingRequestList.begin() != _replyPendingRequestList.end())
+        while(_replyExpectingRequestList.begin() != _replyExpectingRequestList.end())
         {
-            RequestId requestId = _replyPendingRequestList.begin()->first;
-            _replyPendingRequestList.erase(_replyPendingRequestList.begin());
-            
-            handleRequestMessage(ConnectionMessageRequest::CONNECTION_DISCONNECT,
-                                 requestId,
-                                 boost::none);
+            RequestId requestId = _replyExpectingRequestList.begin()->first;
+            _replyExpectingRequestList.erase(_replyExpectingRequestList.begin());
+
+            furtherHandleConnectionDisconnectForReplyExpectingRequest(requestId);
         }
-        furtherHandleConnectionMessageSocketDisconnect();
+        furtherHandleDisconnect();
     }
 
-    void ConnectionRequestsControllerBase::
-    handleConnectionMessageSocketMessage(const RequestId& requestId_, const ConnectionMessageContent& messageContent_)
+    void ConnectionRequestsControllerBase::handleConnectionMessage(const ConnectionMessage& message_)
     {
-        if((ConnectionMessageType::SUCCEEDED == messageContent_._type) ||
-           (ConnectionMessageType::FAILED == messageContent_._type))
+        if((ConnectionMessageType::SUCCEEDED == message_._type) ||
+           (ConnectionMessageType::FAILED == message_._type))
         {
-            std::map<RequestId,unsigned>::iterator iter = _replyPendingRequestList.find(requestId_);
-            if(_replyPendingRequestList.end() == iter)
+            std::map<RequestId,unsigned>::iterator iter = _replyExpectingRequestList.find(message_._requestId);
+            if(_replyExpectingRequestList.end() == iter)
             {
                 BOOST_ASSERT(false);
                 std::runtime_error("Unexpected requestId received");
@@ -36,41 +33,33 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
             --(iter->second);
             if(0 == iter->second)
             {
-                _replyPendingRequestList.erase(iter);
+                _replyExpectingRequestList.erase(iter);
             }
 
-            handleRequestMessage(ConnectionMessageRequest::CONNECTION_MESSAGE_REPLY,
-                                 requestId_,
-                                 messageContent_);
+            furtherHandleReplyConnectionMessage(message_);
         }
         else
         {
-            handleRequestMessage(ConnectionMessageRequest::CONNECTION_MESSAGE_NEW,
-                                 requestId_,
-                                 messageContent_);            
+            furtherHandleNewConnectionMessage(message_);
         }
     }
     
-    void ConnectionRequestsControllerBase::sendMessageImpl(ConnectionMessageRequest messageType_,
-                                                           const RequestId& requestId_,
-                                                           const ConnectionMessageContent& messageContent_)
+    void ConnectionRequestsControllerBase::sendMessageImpl(const ConnectionMessage& message_,
+                                                           bool isReplyExpectingMessage_)
     {
-        if(ConnectionMessageRequest::CONNECTION_MESSAGE_NEW == messageType_)
+        if(isReplyExpectingMessage_)
         {
-            std::map<RequestId,unsigned>::iterator iter = _replyPendingRequestList.find(requestId_);
-            if(_replyPendingRequestList.end() == iter)
+            std::map<RequestId,unsigned>::iterator iter = _replyExpectingRequestList.find(message_._requestId);
+            if(_replyExpectingRequestList.end() == iter)
             {
-                _replyPendingRequestList[requestId_] = 1;
+                _replyExpectingRequestList[message_._requestId] = 1;
             }
             else
             {
                 ++(iter->second);
             }
         }
-        else
-        {
-            getConnectionMessageSocket().sendMessage(requestId_,messageContent_);
-        }
+        getConnectionMessageSocket().sendMessage(message_);
     }
 
 }}}
