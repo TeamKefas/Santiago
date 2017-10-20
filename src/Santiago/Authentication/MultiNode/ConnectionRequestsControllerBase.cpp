@@ -15,7 +15,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
 
             furtherHandleConnectionDisconnectForReplyExpectingRequest(requestId);
         }
-        furtherHandleDisconnect();
+        furtherHandleConnectionDisconnect();
     }
 
     void ConnectionRequestsControllerBase::handleConnectionMessage(const ConnectionMessage& message_)

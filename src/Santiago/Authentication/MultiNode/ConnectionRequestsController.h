@@ -40,7 +40,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         void sendMessage(const ConnectionMessage& message_,
                          bool isReplyExpectingMessage_,
-                         const boost::optional<OnMessageCallbackFn>& onReplyMessageCallbackFn_);
+                         const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_);
     protected:
 
         void createAndInitializeConnectionMessageSocket();
@@ -62,7 +62,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         unsigned                                  _connectionId;
         ConnectionMessageSocketOpt                _connectionMessageSocketOpt;
 
-        std::map<RequestId,OnMessageCallbackFn>   _requestIdCallbackFnMap;
+        std::map<RequestId,OnReplyMessageCallbackFn>   _requestIdCallbackFnMap;
     };
 }}}
 

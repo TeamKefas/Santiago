@@ -52,8 +52,8 @@ namespace Santiago
              {ERR_INVALID_SESSION_COOKIE,                  "Invalid session cookie."},
              {ERR_INVALID_FASTCGI_REQUEST,                 "Invalid fastcgi request."},
              {ERR_FASTCGI_REQUEST_ALREADY_REPLIED,         "Fastcgi request already replied"},
-             {ERR_INVALID_FASTCGI_VERSION,                 "Invalid fastcgi version."}
-             {ERR_FASTCGI_CONNECTION_ERROR,                "Fastcgi connection error."}
+             {ERR_INVALID_FASTCGI_VERSION,                 "Invalid fastcgi version."},
+             {ERR_FASTCGI_CONNECTION_ERROR,                "Fastcgi connection error."},
              {ERR_AUTH_SERVER_CONNECTION_ERROR,            "Authentication server connection error"}
          }
     {}

@@ -39,7 +39,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
 
         typedef std::function<void()> OnDisconnectCallbackFn;
         typedef std::function<void(const ConnectionMessage&)> OnMessageCallbackFn;
-        typedef boost::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
 
         ConnectionMessageSocket(const MySocketPtr& socketPtr_,
                                 const OnDisconnectCallbackFn& onDisconnectCallbackFn_,

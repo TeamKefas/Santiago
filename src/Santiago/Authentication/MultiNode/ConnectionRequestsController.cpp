@@ -1,5 +1,7 @@
 #include "ConnectionRequestsController.h"
 
+#include<boost/asio/deadline_timer.hpp>
+
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
     ConnectionRequestsController::
@@ -20,11 +22,16 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     void ConnectionRequestsController::
     sendMessage(const ConnectionMessage& message_,
                 bool isReplyExpectingMessage_,
-                const boost::optional<OnMessageCallbackFn>& onReplyMessageCallbackFn_)
+                const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_)
     {
+        OnReplyMessageCallbackFn onReplyMessageCallbackFn;
+        if(onReplyMessageCallbackFn_)
+        {
+            onReplyMessageCallbackFn = *onReplyMessageCallbackFn_;
+        }
         if(!_connectionMessageSocketOpt && isReplyExpectingMessage_)
         {
-            onReplyMessageCallbackFn_(std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
+            onReplyMessageCallbackFn(std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
                                                       ErrorCategory::GetInstance()),
                                       boost::none);
             return;
@@ -33,7 +40,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         if(isReplyExpectingMessage_)
         {
             ST_ASSERT(_requestIdCallbackFnMap.find(message_._requestId) == _requestIdCallbackFnMap.end());
-            _requestIdCallbackFnMap[message_._requestId] = onReplyMessageCallbackFn_;
+            _requestIdCallbackFnMap[message_._requestId] = onReplyMessageCallbackFn;
         }
         
         _connectionMessageSocketOpt->sendMessage(message_);
@@ -49,8 +56,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         socketPtr->connect(_endpoint,error);
         if(error)
         {
-            ST_ERROR("Unable to connect to Auth server\n");
-            asyncConnectAgainAfterDelay();
+            ST_LOG_ERROR("Unable to connect to Auth server\n");
+            queueConnectAfterDelay();
             return;
         }
 
@@ -58,27 +65,28 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         boost::asio::read(*socketPtr, boost::asio::buffer(inputArray, 4), error); 
         if(error)
         {
-            ST_ERROR("Unable to connect to Auth server\n");
-            asyncConnectAgainAfterDelay();           
+            ST_LOG_ERROR("Unable to connect to Auth server\n");
+            queueConnectAfterDelay();           
             return;
         }
         
-        _connectionId = reinterpret_cast<unsigned>(inputArray);
+        _connectionId = *(reinterpret_cast<unsigned*>(inputArray));
         _connectionMessageSocketOpt.reset(
             ConnectionMessageSocket(socketPtr,
-                                    std::bind(&ConnectionMessageSocket::handleConnectionDisconnect,
+                                    std::bind(&ConnectionRequestsController::handleConnectionDisconnect,
                                               this),
-                                    std::bind(&ConnectionMessageSocket::handleConnectionMessage,
+                                    std::bind(&ConnectionRequestsController::handleConnectionMessage,
                                               this, std::placeholders::_1),
                                     _strandPtr,
                                     _strandPtr));
-
+        
         return;
     }
 
     void ConnectionRequestsController::queueConnectAfterDelay()
     {
-        std::shared_ptr<boost::asio::basic_deadline_timer> timerPtr(_ioService, boost::duration_time(120)); //TODO: make sure the duration is 2 mins.
+        std::shared_ptr<boost::asio::basic_deadline_timer> timerPtr = std::make_shared<boost::asio::deadline_timer>(_ioService,boost::posix_time::seconds(120));  //TODO: make sure the duration is 2 mins.
+        //timerPtr->expires_from_now(boost::posix_time::seconds(120));
         timerPtr->async_wait([timerPtr,this]() //TODO: Confirm timerPtr won't be destroyed till it reaches here
                              {
                                  this->createAndInitializeConnectionMessageSocket();
@@ -95,11 +103,11 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     void ConnectionRequestsController::
     furtherHandleReplyConnectionMessage(const ConnectionMessage& message_)
     {
-        std::map<RequestId,OnMessageCallbackFn>::iterator iter =
+        std::map<RequestId,OnReplyMessageCallbackFn>::iterator iter =
             _requestIdCallbackFnMap.find(message_._requestId);
         ST_ASSERT(iter != _requestIdCallbackFnMap.end());
             
-        _requestIdCallbackFnMap[requestId_](std::error_code(ErrorCode::ERR_SUCCESS,
+        _requestIdCallbackFnMap[message_._requestId](std::error_code(ErrorCode::ERR_SUCCESS,
                                                             ErrorCategory::GetInstance()),
                                             message_);
         _requestIdCallbackFnMap.erase(iter);//TODO: For client there will always be only 1 reply..so directly delete        
@@ -109,8 +117,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     void ConnectionRequestsController::
     furtherHandleConnectionDisconnectForReplyExpectingRequest(const RequestId& requestId_)
     {
-        std::map<RequestId,OnMessageCallbackFn>::iterator iter =
-            _requestIdCallbackFnMap.find(message_._requestId);
+        std::map<RequestId,OnReplyMessageCallbackFn>::iterator iter =
+            _requestIdCallbackFnMap.find(requestId_);
         ST_ASSERT(iter != _requestIdCallbackFnMap.end());
             
         _requestIdCallbackFnMap[requestId_](std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -120,16 +128,16 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         return;        
     }
     
-    void ConnectionRequestsController::furtherHandleConnectionMessageSocketDisconnect()
+    void ConnectionRequestsController::furtherHandleConnectionDisconnect()
     {
         ST_ASSERT(_requestIdCallbackFnMap.empty());
         _connectionMessageSocketOpt = boost::none;
         _onDisconnectCallbackFn();
-        createAndInitializeConnectionMessageSocket(_endpoint);
+        createAndInitializeConnectionMessageSocket();
     }
 
     ConnectionMessageSocket& ConnectionRequestsController::getConnectionMessageSocket()
     {
-        return _connectionMessageSocket;
+        return *_connectionMessageSocketOpt;
     }
 }}}

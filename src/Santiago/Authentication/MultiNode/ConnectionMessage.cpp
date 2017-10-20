@@ -12,9 +12,9 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
 
     bool RequestId::operator<(const RequestId& rhs_)
     {
-        if(rhs_._initiatingConnectionId>this->_initiatingConnectionId ||
-           (rhs_._initiatingConnectionId==this->_initiatingConnectionId &&
-            rhs_._requestNo>this->_requestNo))
+        if(rhs_._initiatingConnectionId>_initiatingConnectionId ||
+           (rhs_._initiatingConnectionId==_initiatingConnectionId &&
+            rhs_._requestNo>_requestNo))
         {
             return true;
         }        
@@ -33,10 +33,10 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         unsigned curPos = 0;
 
         //parse the initiatingConnectionId
-        _requestId._initiatingConnectionId = *reinterpret_cast<unsigned*>(content_ + curPos);
+        _requestId._initiatingConnectionId = *reinterpret_cast<unsigned*>(*const_cast<char*>(content_ + curPos));
         curPos += sizeof(unsigned);
         //parse the requestNo
-        _requestId._requestNo = *reinterpret_cast<unsigned*>(content_ + curPos);
+        _requestId._requestNo = *reinterpret_cast<unsigned*>(*const_cast<char*>(content_ + curPos));
         curPos += sizeof(unsigned);        
         //parse the type
         _type = *reinterpret_cast<const ConnectionMessageType*>(content_ + curPos);
