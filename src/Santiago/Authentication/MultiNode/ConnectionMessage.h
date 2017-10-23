@@ -57,12 +57,15 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
          */
         RequestId(unsigned _initiatingConnectionId,unsigned _requestNo);
 
-        bool operator<(const RequestId& rhs_);
-
         unsigned  _initiatingConnectionId;
         unsigned  _requestNo;
     };
-
+    
+    bool operator <(const RequestId& lhs_, const RequestId& rhs_)
+    {
+        return std::tie(lhs_._initiatingConnectionId, lhs_._requestNo) < std::tie(rhs_._initiatingConnectionId, rhs_._requestNo);
+    }
+    
     /***********************************************************
      * ConnectionMessage
      ***********************************************************/

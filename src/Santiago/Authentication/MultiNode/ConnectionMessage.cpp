@@ -10,17 +10,6 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         ,_requestNo(requestNo_)
     {}
 
-    bool RequestId::operator<(const RequestId& rhs_)
-    {
-        if(rhs_._initiatingConnectionId>_initiatingConnectionId ||
-           (rhs_._initiatingConnectionId==_initiatingConnectionId &&
-            rhs_._requestNo>_requestNo))
-        {
-            return true;
-        }        
-        return false;
-    }
-
     /***********************************************************
      * ConnectionMessage
      ***********************************************************/

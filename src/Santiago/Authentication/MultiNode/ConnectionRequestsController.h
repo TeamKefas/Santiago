@@ -31,7 +31,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         typedef std::function<void(const ConnectionMessage&)> OnServerRequestMessageCallbackFn;
         typedef boost::optional<ConnectionMessageSocket> ConnectionMessageSocketOpt;
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;
-        
+                
         ConnectionRequestsController(boost::asio::io_service& ioService_,
                                      const StrandPtr& strandPtr_,
                                      const boost::asio::ip::tcp::endpoint& endpoint_,
@@ -53,14 +53,14 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         virtual ConnectionMessageSocket& getConnectionMessageSocket();
        
  
-        boost::asio::io_service                  &_ioService;
-        StrandPtr                                 _strandPtr;
-        boost::asio::ip::tcp::endpoint            _endpoint;
-        OnDisconnectCallbackFn                    _onDisconnectCallbackFn;
-        OnServerRequestMessageCallbackFn          _onServerRequestMessageCallbackFn;
+        boost::asio::io_service                       &_ioService;
+        StrandPtr                                      _strandPtr;
+        boost::asio::ip::tcp::endpoint                 _endpoint;
+        OnDisconnectCallbackFn                         _onDisconnectCallbackFn;
+        OnServerRequestMessageCallbackFn               _onServerRequestMessageCallbackFn;
 
-        unsigned                                  _connectionId;
-        ConnectionMessageSocketOpt                _connectionMessageSocketOpt;
+        unsigned                                       _connectionId;
+        ConnectionMessageSocketOpt                     _connectionMessageSocketOpt;
 
         std::map<RequestId,OnReplyMessageCallbackFn>   _requestIdCallbackFnMap;
     };
