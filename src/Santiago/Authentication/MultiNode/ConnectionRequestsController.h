@@ -60,6 +60,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         OnServerRequestMessageCallbackFn               _onServerRequestMessageCallbackFn;
 
         unsigned                                       _connectionId;
+        ConnectionMessageSocket                       *_connectionMessageSocketPtr;
         ConnectionMessageSocketOpt                     _connectionMessageSocketOpt;
 
         std::map<RequestId,OnReplyMessageCallbackFn>   _requestIdCallbackFnMap;
