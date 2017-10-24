@@ -30,7 +30,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             onReplyMessageCallbackFn = *onReplyMessageCallbackFn_;
         }
         
-        if(!_connectionMessageSocketOpt && isReplyExpectingMessage_)
+        if(!_connectionMessageSocketPtr && isReplyExpectingMessage_)
         {
             onReplyMessageCallbackFn(std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
                                                       ErrorCategory::GetInstance()),
@@ -44,13 +44,13 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             _requestIdCallbackFnMap.insert(std::pair<RequestId,OnReplyMessageCallbackFn>(message_._requestId,onReplyMessageCallbackFn));
         }
         
-        _connectionMessageSocketOpt->sendMessage(message_);
+        _connectionMessageSocketPtr->sendMessage(message_);
     }
 
     void ConnectionRequestsController::
     createAndInitializeConnectionMessageSocket()
     {
-        ST_ASSERT(_connectionMessageSocketOpt);
+        ST_ASSERT(_connectionMessageSocketPtr);
         std::shared_ptr<boost::asio::ip::tcp::socket> socketPtr(new boost::asio::ip::tcp::socket(_ioService));
         
         boost::system::error_code error;
@@ -131,13 +131,13 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     void ConnectionRequestsController::furtherHandleConnectionDisconnect()
     {
         ST_ASSERT(_requestIdCallbackFnMap.empty());
-        _connectionMessageSocketOpt = boost::none;
+        _connectionMessageSocketPtr = nullptr;
         _onDisconnectCallbackFn();
         createAndInitializeConnectionMessageSocket();
     }
 
     ConnectionMessageSocket& ConnectionRequestsController::getConnectionMessageSocket()
     {
-        return *_connectionMessageSocketOpt;
+        return *_connectionMessageSocketPtr;
     }
 }}}
