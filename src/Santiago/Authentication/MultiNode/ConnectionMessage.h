@@ -40,8 +40,8 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         CR_CHANGE_USER_EMAIL_ADDRESS,
 	CR_CREATE_AND_RETURN_RECOVERY_STRING,
         CR_DELETE_USER,
-        CR_PING_TYPE1,
 
+        SR_PING,
         SR_LOGOUT_USER_FOR_COOKIE,
         SR_LOGOUT_USER_FOR_ALL_COOKIES
     };

@@ -4,19 +4,14 @@
 #include <functional>
 #include <map>
 #include <system_error>
-#include <vector>
-#include <string>
-#include <cstdlib>
-#include <ctime>
-#include <iomanip>
-#include <sstream>
-#include <openssl/sha.h>
 
-#include "Santiago/Authentication/AuthenticatorImplBase.h"
-#include "ConnectionRequestsController.h"
-#include "ClientCache.h"
 #include "Santiago/ErrorCategory.h"
 #include "Santiago/Utils/STLog.h"
+
+#include "Santiago/Authentication/AuthenticatorImplBase.h"
+
+#include "ConnectionRequestsController.h"
+#include "ClientCache.h"
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
@@ -27,7 +22,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         AuthenticatorImpl(boost::asio::io_service& ioService_,
                           const StrandPtr& strandPtr_,
-                          const boost::property_tree::ptree& config_);
+                          const boost::asio::ip::tcp::endpoint& serverEndPoint_);
 
     protected:
         
@@ -53,7 +48,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                     const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_);
         
         void handleVerifyCookieConnectionMessage(const std::error_code& error_,
-                                                 const ConnectionMessage& connectionMessage_,
+                                                 const boost::optional<ConnectionMessage>& connectionMessageOpt_,
                                                  const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_);
 
         virtual void logoutUserForCookieImpl(const std::string& cookieString_,
@@ -121,14 +116,19 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         std::string generateSHA256(const std::string str);
 
-        void handleServerRequestMessage(const AuthenticatorRequestMessage& message_); //TODO
-        void handleConnectionDisconnect(); //TODO
+        void handleServerRequestMessage(const AuthenticatorRequestMessage& message_);
+        void handleConnectionDisconnect();
 
+        std::error_code getErrorCodeFromConnectionMessage(const ConnectionMessage& connectonMessage_) const; //TODO
+
+        boost::asio::io_service           &_ioService;
         StrandPtr                          _strandPtr;
+
         ConnectionRequestsController       _connectionRequestsController;
         ClientCache                        _clientCache;
+        clock_t                            _lastPingTime;
+        unsigned                           _lastRequestId;
     };
-
 }}}
 
 #endif

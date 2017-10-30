@@ -1,25 +1,44 @@
+#include <vector>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+
+#include <openssl/sha.h>
+
 #include "AuthenticatorImpl.h"
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
-    AuthenticatorImpl::AuthenticatorImpl(boost::asio::io_service& ioService_,const boost::property_tree::ptree& config_)
-        :AuthenticatorImplBase(ioService_,config_)
+    AuthenticatorImpl::AuthenticatorImpl(boost::asio::io_service& ioService_,
+                                         const StrandPtr& strandPtr_,
+                                         const boost::asio::ip::tcp::endpoint& serverEndPoint_)
+        :AuthenticatorImplBase()
+        ,_ioService(ioService_)
         ,_strandPtr(new boost::asio::strand(_ioService))
         ,_connectionRequestsController(_ioService,
                                        _strandPtr,
-                                       boost::asio::ip::tcp::endpoint(
-                                           boost::asio::ip::tcp::address(_config.get<unsigned>("Santiago.AuthServer.address")),
-                                           _config.get<unsigned>("Santiago.AuthServer.port")),
+                                       serverEndPoint_,
                                        std::bind(&AuthenticatorImpl::handleConnectionDisconnect,this),
                                        std::bind(&AuthenticatorImpl::handleServerRequestMessage,
                                                  this,std::placeholders::_1))
         ,_clientCache()
-    {        
-    }
+        ,_lastPingTime(clock())
+        ,_lastRequestId(0)
+    {}
     
     void AuthenticatorImpl::verifyCookieAndGetUserInfoImpl(const std::string& cookieString_,
-                                                       const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
+                                                           const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {
+        if(static_cast<double>(clock() - lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+        {
+            return onVerifyUserCallbackFn_(
+                std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
+                                ErrorCategory::GetInstance()),
+                boost::none);
+        }
+        
         boost::optional<UserInfo> userInfoOpt = _clientCache.getCookieInfoFromLocalCache(cookieString_);
         
         if(userInfoOpt == boost::none)
@@ -28,9 +47,13 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             std::vector<std::string> parameters;
             ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_VERIFY_COOKIE_AND_GET_USER_INFO;
             parameters.push_back(cookieString_);
-             
+
+            RequestId requestId(_connectionRequestsController.getConnectionId(),_lastRequestId+1);
+            _lastRequestId++;
+            
             ConnectionMessage ConnectionMessage(connectionMessageType, parameters);
             _messageSocket.sendMessage(ConnectionMessage,
+                                       true,
                                        std::bind(&AuthenticatorImpl::handleVerifyCookieConnectionMessage,
                                                  this,
                                                  std::placeholders::_1,
@@ -39,38 +62,36 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         }
         else
         {
-                    onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
-                                            *userInfoOpt); 
+            onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
+                                    *userInfoOpt); 
         }
     }
 
-    void AuthenticatorImpl::handleVerifyCookieConnectionMessage(const std::error_code& error_,
-                                                            const ConnectionMessage& connectionMessage_,
-                                                            const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
+    void AuthenticatorImpl::handleVerifyCookieConnectionMessage(
+        const std::error_code& error_,
+        const boost::optional<ConnectionMessage>& connectionMessageOpt_,
+        const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
     {
         if(!error_)
         {
-            if(connectionMessage_._type == ConnectionMessageType::SUCCEEDED)
+            if(connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
             {
                 onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
-                                        UserInfo(connectionMessage_._parameters[0],  //userName
-                                                 connectionMessage_._parameters[1])); //emailAddress
+                                        UserInfo(connectionMessageOpt_->_parameters[0],  //userName
+                                                 connectionMessageOpt_->_parameters[1])); //emailAddress
             }
             else if(connectionMessage_._type == ConnectionMessageType::FAILED)
             {
                 //will change with appropriate error
-                onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),
+                onVerifyUserCallbackFn_(getErrorCodeFromConnectionMessage(*connectionMessageOpt_),
                                         boost::none);
             }
         }
         else
         {
             onVerifyUserCallbackFn_(error_,boost::none);
-        }
-        
-    }
-    
-    
+        }        
+    }   
     
     void AuthenticatorImpl::createUserImpl(const std::string& userName_,
                                        const std::string& emailAddress_,
