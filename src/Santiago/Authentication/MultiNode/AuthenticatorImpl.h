@@ -15,7 +15,18 @@
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {
-    class Authenticator:public AuthenticatorBase
+    typedef std::function<void(const std::error_code&,const boost::optional<UserInfo>&)>
+    ErrorCodeUserInfoCallbackFn;
+	
+    typedef std::function<void(const std::error_code&,const boost::optional<std::string>&)>
+    ErrorCodeStringCallbackFn;
+
+    typedef std::function<void(const std::error_code&,const boost::optional<std::pair<UserInfo,std::string> >&)>
+    ErrorCodeUserInfoStringPairCallbackFn;
+
+    typedef std::function<void(const std::error_code&)> ErrorCodeCallbackFn;
+    
+    class AuthenticatorImpl:public AuthenticatorImplBase
     {
     public:
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;
@@ -116,7 +127,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         std::string generateSHA256(const std::string str);
 
-        void handleServerRequestMessage(const AuthenticatorRequestMessage& message_);
+        void handleServerRequestMessage(const ConnectionMessage& connectonMessage_);
         void handleConnectionDisconnect();
 
         std::error_code getErrorCodeFromConnectionMessage(const ConnectionMessage& connectonMessage_) const; //TODO

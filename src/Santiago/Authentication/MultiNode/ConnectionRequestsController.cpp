@@ -46,7 +46,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         _connectionMessageSocketPtr->sendMessage(message_);
     }
-
+    
+    unsigned ConnectionRequestsController::getConnectionId()
+    {
+        return _connectionId;
+    }
+    
     void ConnectionRequestsController::
     createAndInitializeConnectionMessageSocket()
     {
@@ -140,4 +145,5 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     {
         return *_connectionMessageSocketPtr;
     }
+
 }}}

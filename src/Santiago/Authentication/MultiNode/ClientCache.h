@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-#include "Santiago/Authentication/AuthenticatorBase.h"
+#include "Santiago/Authentication/AuthenticatorBaseV1.h"
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode
 {

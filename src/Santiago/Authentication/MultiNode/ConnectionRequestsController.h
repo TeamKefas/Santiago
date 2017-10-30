@@ -40,6 +40,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         void sendMessage(const ConnectionMessage& message_,
                          bool isReplyExpectingMessage_,
                          const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_);
+        
+        unsigned getConnectionId();
     protected:
 
         void createAndInitializeConnectionMessageSocket();
@@ -50,7 +52,6 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         virtual void furtherHandleConnectionDisconnectForReplyExpectingRequest(const RequestId& requestId_);
         virtual void furtherHandleConnectionDisconnect();
         virtual ConnectionMessageSocket& getConnectionMessageSocket();
-       
  
         boost::asio::io_service                       &_ioService;
         StrandPtr                                      _strandPtr;
