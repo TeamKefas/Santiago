@@ -25,14 +25,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                std::bind(&AuthenticatorImpl::handleServerRequestMessage,
                                                          this,std::placeholders::_1))
                 ,_clientCache()
-                ,_lastPingTime(clock())
+                ,_lastPingTimeOpt()
                 ,_lastRequestId(0)
             {}
     
             void AuthenticatorImpl::verifyCookieAndGetUserInfoImpl(const std::string& cookieString_,
                                                                    const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(!_lastPingTimeOpt ||
+                   (static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL))
                 {
                     return onVerifyUserCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -648,4 +649,59 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 return ss.str();
             }
 
+            void AuthenticatorImpl::handleServerRequestMessage(const ConnectionMessage& connectonMessage_)
+            {
+                switch(connectionMessage_._type)
+                {
+                case CR_PING:
+                    handleServerRequestPing(connectionMessage_);
+                    break;
+                    
+                case SR_LOGOUT_USER_FOR_COOKIE:
+                    handleServerRequestLogoutUserForCookie(connectionMessage_);
+                    break;
+                    
+                case SR_LOGOUT_USER_FOR_ALL_COOKIES:
+                    handleServerRequestLogoutUserForAllCookies(connectionMessage_);
+                    break;
+                    
+                default:
+                    ST_ASSERT(false);
+                    return;
+                }                
+            }
+
+            void AuthenticatorImpl::handleServerRequestPing(const ConnectionMessage& connectionMessage_)
+            {
+                _lastPingTimeOpt = clock();
+                ConnectionMessage reply(connectionMessage_._requestId,
+                                        ConnectionMessageType::SUCCEEDED,
+                                        std::vector<std::string>());
+                _connectionRequestsController.sendMessage(reply,false,boost::none);
+            }
+
+            void AuthenticatorImpl::handleServerRequestLogoutUserForCookie(const ConnectionMessage& connectionMessage_)
+            {
+                ST_ASSERT(connectionMessage_._parameters.size() == 1);
+                _clientCache.removeCookieUsernameFromCache(connectionMessage_._parameters[0]);
+                
+                ConnectionMessage reply(connectionMessage_._requestId,
+                                        ConnectionMessageType::SUCCEEDED,
+                                        std::vector<std::string>());
+                _connectionRequestsController.sendMessage(reply,false,boost::none);
+            }
+
+            void AuthenticatorImpl::
+            handleServerRequestLogoutUserForAllCookies(const ConnectionMessage& connectionMessage_)
+            {
+                ST_ASSERT(connectionMessage_._parameters.size() == 1);
+                _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0]);
+                
+                ConnectionMessage reply(connectionMessage_._requestId,
+                                        ConnectionMessageType::SUCCEEDED,
+                                        std::vector<std::string>());
+                _connectionRequestsController.sendMessage(reply,false,boost::none);
+            }
+
+            
         }}}
