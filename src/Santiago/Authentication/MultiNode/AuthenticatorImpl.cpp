@@ -52,8 +52,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                     RequestId requestId(_connectionRequestsController.getConnectionId(),_lastRequestId+1);
                     _lastRequestId++;
             
-                    ConnectionMessage ConnectionMessage(requestId, connectionMessageType, parameters);
-                    _connectionRequestsController.sendMessage(ConnectionMessage,
+                    ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
+                    _connectionRequestsController.sendMessage(connectionMessage,
                                                               true,
                                                               std::bind(&AuthenticatorImpl::handleVerifyCookieConnectionMessage,
                                                                         this,
@@ -193,15 +193,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        _clientCache.addCookieUserInfoToCache(connectionMessage_._parameters[2],  //ccokiestring_
-                                                              connectionMessage_._parameters[0], //username
-                                                              connectionMessage_._parameters[1]); //emailAddress
+                        _clientCache.addCookieUserInfoToCache(connectionMessageOpt_->_parameters[2],  //ccokiestring_
+                                                              connectionMessageOpt_->_parameters[0], //username
+                                                              connectionMessageOpt_->_parameters[1]); //emailAddress
                 
                         onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
                                                                ErrorCategory::GetInstance()),
-                                               std::make_pair(UserInfo(connectionMessage_._parameters[0], //username
-                                                                       connectionMessage_._parameters[1]), // emailAddress
-                                                              connectionMessage_._parameters[2]));  // cookieString
+                                               std::make_pair(UserInfo(connectionMessageOpt_->_parameters[0], //username
+                                                                       connectionMessageOpt_->_parameters[1]), // emailAddress
+                                                              connectionMessageOpt_->_parameters[2]));  // cookieString
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
@@ -250,12 +250,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        _clientCache.removeCookieUsernameFromCache(connectionMessage_._parameters[2], //cookie string
-                                                                   connectionMessage_._parameters[0], //userName
-                                                                   connectionMessage_._parameters[1]); //emailAddress
+                        _clientCache.removeCookieUsernameFromCache(connectionMessageOpt_->_parameters[2], //cookie string
+                                                                   connectionMessageOpt_->_parameters[0], //userName
+                                                                   connectionMessageOpt_->_parameters[1]); //emailAddress
                         onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
                     }
-                    else if(connectionMessage_->_type == ConnectionMessageType::FAILED)
+                    else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
                         onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
@@ -302,8 +302,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0], //userName
-                                                             connectionMessage_._parameters[1]); //emailAddress 
+                        _clientCache.removeAllCookiesForUser(connectionMessageOpt_->_parameters[0], //userName
+                                                             connectionMessageOpt_->_parameters[1]); //emailAddress 
                         onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
@@ -409,7 +409,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),connectionMessage_._parameters[0]);
+                        onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),connectionMessageOpt_->_parameters[0]);
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
@@ -446,12 +446,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
         
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                _messageSocket.sendMessage(connectionMessage,
-                                           std::bind(&AuthenticatorImpl::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage,
-                                                     this,
-                                                     std::placeholders::_1,
-                                                     std::placeholders::_2,
-                                                     onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_));
+                _connectionRequestsController.sendMessage(connectionMessage,
+                                                          std::bind(&AuthenticatorImpl::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage,
+                                                                    this,
+                                                                    std::placeholders::_1,
+                                                                    std::placeholders::_2,
+                                                                    onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_));
             }
 
             void AuthenticatorImpl::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
@@ -549,12 +549,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
         
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                _messageSocket.sendMessage(connectionMessage,
-                                           std::bind(&AuthenticatorImpl::handleCreateAndReturnRecoveryStringConnectionMessage,
-                                                     this,
-                                                     std::placeholders::_1,
-                                                     std::placeholders::_2,
-                                                     onCreateAndReturnRecoveryStringCallbackFn_));
+                _connectionRequestsController.sendMessage(connectionMessage,
+                                                          std::bind(&AuthenticatorImpl::handleCreateAndReturnRecoveryStringConnectionMessage,
+                                                                    this,
+                                                                    std::placeholders::_1,
+                                                                    std::placeholders::_2,
+                                                                    onCreateAndReturnRecoveryStringCallbackFn_));
             }
 
             void AuthenticatorImpl::handleCreateAndReturnRecoveryStringConnectionMessage(const std::error_code& error_,
@@ -565,7 +565,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        onCreateAndReturnRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),connectionMessage_._parameters[0]);  //username
+                        onCreateAndReturnRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),connectionMessageOpt_->_parameters[0]);  //username
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
@@ -614,11 +614,11 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        _clientCache.removeCookieUsernameFromCache(connectionMessage_._parameters[2],
-                                                                   connectionMessage_._parameters[0],
-                                                                   connectionMessage_._parameters[1]);
-                        _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0],
-                                                             connectionMessage_._parameters[1]);
+                        _clientCache.removeCookieUsernameFromCache(connectionMessageOpt_->_parameters[2],
+                                                                   connectionMessageOpt_->_parameters[0],
+                                                                   connectionMessageOpt_->_parameters[1]);
+                        _clientCache.removeAllCookiesForUser(connectionMessageOpt_->_parameters[0],
+                                                             connectionMessageOpt_->_parameters[1]);
                         onDeleteUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
