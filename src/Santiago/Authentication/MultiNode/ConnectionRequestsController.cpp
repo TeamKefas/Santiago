@@ -22,7 +22,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
     void ConnectionRequestsController::
     sendMessage(const ConnectionMessage& message_,
                 bool isReplyExpectingMessage_,
-                const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_)
+                const boost::optional<OnReplyMessageCallbackFn> onReplyMessageCallbackFn_)
     {
         OnReplyMessageCallbackFn onReplyMessageCallbackFn;
         if(onReplyMessageCallbackFn_)
