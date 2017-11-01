@@ -37,6 +37,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             _userNameCookieStringListMap.insert(std::make_pair(userName_, cookieStringVec));
         }
     }
+    
     void ClientCache::removeCookieUsernameFromCache(const std::string& cookieString_,
                                                     const std::string& userName_,
                                                     const std::string& emailAddress_)
@@ -50,7 +51,9 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                            cookieString_),
                                iterator->second.end());
     }
-    void ClientCache::removeAllCookiesForUser(const std::string& userName_,const std::string& emailAddress_)
+    
+    void ClientCache::removeAllCookiesForUser(const std::string& userName_,
+                                              const std::string& emailAddress_)
     {
         
         auto it = _userNameCookieStringListMap.find(userName_);

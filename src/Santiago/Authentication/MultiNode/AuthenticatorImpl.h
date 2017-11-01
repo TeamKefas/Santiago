@@ -131,8 +131,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         void handleConnectionDisconnect() {_lastPingTimeOpt.reset();}
         
         void handleServerRequestPing(const ConnectionMessage& connectionMessage_);
-        void handleServerRequestLogoutUserForCookie(const ConnectiomMessage& connectionMessage_);
-        void handleServerRequestLogoutUserForAllCookies(const ConnectiomMessage& connectionMessage_);
+        void handleServerRequestLogoutUserForCookie(const ConnectionMessage& connectionMessage_);
+        void handleServerRequestLogoutUserForAllCookies(const ConnectionMessage& connectionMessage_);
 
 
         std::error_code getErrorCodeFromConnectionMessage(const ConnectionMessage& connectonMessage_) const; //TODO

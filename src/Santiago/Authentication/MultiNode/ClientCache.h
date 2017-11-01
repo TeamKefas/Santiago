@@ -18,8 +18,11 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         void addCookieUserInfoToCache(const std::string& cookieString_,
                                       const std::string& userName_,
                                       const std::string& emailAdress_);
-        void removeCookieUsernameFromCache(const std::string& cookieString_);
-        void removeAllCookiesForUser(const std::string& userName_);
+        void removeCookieUsernameFromCache(const std::string& cookieString_,
+                                           const std::string& userName_,
+                                           const std::string& emailAddress_);
+        void removeAllCookiesForUser(const std::string& userName_,
+                                     const std::string& emailAddress_);
 
     protected:
         

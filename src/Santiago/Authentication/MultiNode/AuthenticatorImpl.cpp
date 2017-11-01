@@ -100,7 +100,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                    const std::string& password_,
                                                    const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onCreateUserCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -152,7 +152,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                   const std::string& password_,
                                                   const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onLoginUserCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -219,7 +219,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             void AuthenticatorImpl::logoutUserForCookieImpl(const std::string& cookieString_,
                                                             const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onLogoutCookieCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -271,7 +271,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             void AuthenticatorImpl::logoutUserForAllCookiesImpl(const std::string& userName_,
                                                                 const ErrorCodeCallbackFn& onLogoutAllCookiesCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onLogoutAllCookiesCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -324,7 +324,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                            const std::string& newPassword_,
                                                            const ErrorCodeCallbackFn& onChangePasswordCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onChangePasswordCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -376,7 +376,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                                                 const std::string& recoveryString_,
                                                                                 const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onGetUserForEmailAddressAndRecoveryStringCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -429,7 +429,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                                                            const std::string& newPassword_,
                                                                                            const ErrorCodeCallbackFn& onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -482,7 +482,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                                const std::string& password_,
                                                                const ErrorCodeCallbackFn& onChangeEmailAddressCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onChangeEmailAddressCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -533,7 +533,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             void AuthenticatorImpl::createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
                                                                       const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onCreateAndReturnRecoveryStringCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -583,7 +583,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             void AuthenticatorImpl::deleteUserImpl(const std::string& cookieString_,
                                                    const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
             {
-                if(static_cast<double>(clock()-_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onDeleteUserCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -649,19 +649,19 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 return ss.str();
             }
 
-            void AuthenticatorImpl::handleServerRequestMessage(const ConnectionMessage& connectonMessage_)
+            void AuthenticatorImpl::handleServerRequestMessage(const ConnectionMessage& connectionMessage_)
             {
                 switch(connectionMessage_._type)
                 {
-                case CR_PING:
+                case ConnectionMessageType::SR_PING:
                     handleServerRequestPing(connectionMessage_);
                     break;
                     
-                case SR_LOGOUT_USER_FOR_COOKIE:
+                case ConnectionMessageType::SR_LOGOUT_USER_FOR_COOKIE:
                     handleServerRequestLogoutUserForCookie(connectionMessage_);
                     break;
                     
-                case SR_LOGOUT_USER_FOR_ALL_COOKIES:
+                case ConnectionMessageType::SR_LOGOUT_USER_FOR_ALL_COOKIES:
                     handleServerRequestLogoutUserForAllCookies(connectionMessage_);
                     break;
                     
@@ -683,7 +683,9 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             void AuthenticatorImpl::handleServerRequestLogoutUserForCookie(const ConnectionMessage& connectionMessage_)
             {
                 ST_ASSERT(connectionMessage_._parameters.size() == 1);
-                _clientCache.removeCookieUsernameFromCache(connectionMessage_._parameters[0]);
+                _clientCache.removeCookieUsernameFromCache(connectionMessage_._parameters[0],
+                                                           connectionMessage_._parameters[1],
+                    connectionMessage_._parameters[2]);
                 
                 ConnectionMessage reply(connectionMessage_._requestId,
                                         ConnectionMessageType::SUCCEEDED,
@@ -695,7 +697,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             handleServerRequestLogoutUserForAllCookies(const ConnectionMessage& connectionMessage_)
             {
                 ST_ASSERT(connectionMessage_._parameters.size() == 1);
-                _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0]);
+                _clientCache.removeAllCookiesForUser(connectionMessage_._parameters[0],
+                                                     connectionMessage_._parameters[1]);
                 
                 ConnectionMessage reply(connectionMessage_._requestId,
                                         ConnectionMessageType::SUCCEEDED,
