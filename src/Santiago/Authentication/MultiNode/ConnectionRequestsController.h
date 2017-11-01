@@ -39,7 +39,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         void sendMessage(const ConnectionMessage& message_,
                          bool isReplyExpectingMessage_,
-                         const boost::optional<OnReplyMessageCallbackFn> onReplyMessageCallbackFn_);
+                         const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_);
         
         unsigned getConnectionId();
     protected:
