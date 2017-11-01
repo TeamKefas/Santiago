@@ -533,7 +533,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             void AuthenticatorImpl::createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
                                                                       const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
             {
-                if(static_cast<double>(clock()-*_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onCreateAndReturnRecoveryStringCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
@@ -583,7 +583,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             void AuthenticatorImpl::deleteUserImpl(const std::string& cookieString_,
                                                    const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
             {
-                if(static_cast<double>(clock()-*_lastPingTime)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onDeleteUserCallbackFn_(
                         std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
