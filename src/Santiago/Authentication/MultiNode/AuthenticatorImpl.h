@@ -128,7 +128,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         std::string generateSHA256(const std::string str);
 
         void handleServerRequestMessage(const ConnectionMessage& connectonMessage_);
-        void handleConnectionDisconnect();
+        void handleConnectionDisconnect() {_lastPingTimeOpt.reset();}
+        
+        void handleServerRequestPing(const ConnectionMessage& connectionMessage_);
+        void handleServerRequestLogoutUserForCookie(const ConnectiomMessage& connectionMessage_);
+        void handleServerRequestLogoutUserForAllCookies(const ConnectiomMessage& connectionMessage_);
+
 
         std::error_code getErrorCodeFromConnectionMessage(const ConnectionMessage& connectonMessage_) const; //TODO
 
@@ -137,7 +142,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
 
         ConnectionRequestsController       _connectionRequestsController;
         ClientCache                        _clientCache;
-        clock_t                            _lastPingTime;
+        boost::optional<clock_t>           _lastPingTimeOpt;
         unsigned                           _lastRequestId;
     };
 }}}
