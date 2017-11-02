@@ -54,15 +54,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                     _lastRequestId++;
             
                     ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                    std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleVerifyCookieConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onVerifyUserCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
+                    ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleVerifyCookieConnectionMessage,
+                                                                                                                 this,
+                                                                                                                 std::placeholders::_1,
+                                                                                                                 std::placeholders::_2,
+                                                                                                                 onVerifyUserCallbackFn_);
+                    const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
                     _connectionRequestsController.sendMessage(connectionMessage,
                                                               true,
-                                                              connectionMessageOpt);
+                                                              errorCodeConnectionMessageOptCallBackFnOpt);
                 }
                 else
                 {
@@ -119,15 +119,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
         
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleCreateUserConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onCreateUserCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleCreateUserConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onCreateUserCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
                 _connectionRequestsController.sendMessage(connectionMessage,
                                                           true,
-                                                          connectionMessageOpt);
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
             }
 
             void AuthenticatorImpl::handleCreateUserConnectionMessage(const std::error_code& error_,
@@ -183,15 +183,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
 
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleLoginUserConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onLoginUserCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleLoginUserConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onLoginUserCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
                 _connectionRequestsController.sendMessage(connectionMessage,
                                                           true,
-                                                          connectionMessageOpt);
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
             }
 
             void AuthenticatorImpl::handleLoginUserConnectionMessage(const std::error_code& error_,
@@ -243,15 +243,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
         
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleLogoutUserForCookieConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onLogoutCookieCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleLogoutUserForCookieConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onLogoutCookieCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
                 _connectionRequestsController.sendMessage(connectionMessage,
                                                           true,
-                                                          connectionMessageOpt);
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
             }
 
             void AuthenticatorImpl::handleLogoutUserForCookieConnectionMessage(const std::error_code& error_,
@@ -298,15 +298,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
         
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleLogoutUserForAllCookiesConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onLogoutAllCookiesCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleLogoutUserForAllCookiesConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onLogoutAllCookiesCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
                 _connectionRequestsController.sendMessage(connectionMessage,
                                                           true,
-                                                          connectionMessageOpt);
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
             }
 
             void AuthenticatorImpl::handleLogoutUserForAllCookiesConnectionMessage(const std::error_code& error_,
@@ -356,15 +356,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
         
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleChangeUserPasswordConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onChangePasswordCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleChangeUserPasswordConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onChangePasswordCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
                 _connectionRequestsController.sendMessage(connectionMessage,
                                                           true,
-                                                          connectionMessageOpt);
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
             }
 
             void AuthenticatorImpl::handleChangeUserPasswordConnectionMessage(const std::error_code& error_,
@@ -411,15 +411,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
         
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleGetUserForEmailAddressAndRecoveryStringConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleGetUserForEmailAddressAndRecoveryStringConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onGetUserForEmailAddressAndRecoveryStringCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
                 _connectionRequestsController.sendMessage(connectionMessage,
                                                           true,
-                                                          connectionMessageOpt);
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
             }
 
             void AuthenticatorImpl::handleGetUserForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
@@ -438,11 +438,11 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                         onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),boost::none);
                     }
                 }
-        else
-        {
-            onGetUserForEmailAddressAndRecoveryStringCallbackFn_(error_,boost::none);
-        }    
-    }
+                else
+                {
+                    onGetUserForEmailAddressAndRecoveryStringCallbackFn_(error_,boost::none);
+                }    
+            }
 
             void AuthenticatorImpl::changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
                                                                                            const std::string& recoveryString_,
@@ -467,15 +467,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
         
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
                 _connectionRequestsController.sendMessage(connectionMessage,
                                                           true,
-                                                          connectionMessageOpt);
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
             }
 
             void AuthenticatorImpl::handleChangeUserPasswordForEmailAddressAndRecoveryStringConnectionMessage(const std::error_code& error_,
@@ -523,16 +523,16 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
         
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleChangeUserEmailAddressConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onChangeEmailAddressCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleChangeUserEmailAddressConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onChangeEmailAddressCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
                 _connectionRequestsController.sendMessage(connectionMessage,
                                                           true,
-                                                          connectionMessageOpt);
-    }
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
+            }
 
             void AuthenticatorImpl::handleChangeUserEmailAddressConnectionMessage(const std::error_code& error_,
                                                                                   const boost::optional<ConnectionMessage>& connectionMessageOpt_,
@@ -576,15 +576,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 _lastRequestId++;
         
                 ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleCreateAndReturnRecoveryStringConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onCreateAndReturnRecoveryStringCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleCreateAndReturnRecoveryStringConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onCreateAndReturnRecoveryStringCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
                 _connectionRequestsController.sendMessage(connectionMessage,
                                                           true,
-                                                          connectionMessageOpt);
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
             }
 
             void AuthenticatorImpl::handleCreateAndReturnRecoveryStringConnectionMessage(const std::error_code& error_,
@@ -619,25 +619,25 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                         ErrorCategory::GetInstance()));
                 }
         
-        std::vector<std::string> parameters;
-        ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_DELETE_USER;
+                std::vector<std::string> parameters;
+                ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_DELETE_USER;
 
-        parameters.push_back(cookieString_);
+                parameters.push_back(cookieString_);
 
-        RequestId requestId(_connectionRequestsController.getConnectionId(),_lastRequestId+1);
-        _lastRequestId++;
+                RequestId requestId(_connectionRequestsController.getConnectionId(),_lastRequestId+1);
+                _lastRequestId++;
         
-        ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-        std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> connectionMessageOptFn =  std::bind(&AuthenticatorImpl::handleDeleteUserConnectionMessage,
-                                                                                                                this,
-                                                                                                                std::placeholders::_1,
-                                                                                                                std::placeholders::_2,
-                                                                                                                onDeleteUserCallbackFn_);
-                    const boost::optional<std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)>> connectionMessageOpt = connectionMessageOptFn;
-        _connectionRequestsController.sendMessage(connectionMessage,
-                                                  true,
-                                                  connectionMessageOpt);
-    }
+                ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleDeleteUserConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onDeleteUserCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
+                _connectionRequestsController.sendMessage(connectionMessage,
+                                                          true,
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
+            }
 
             void AuthenticatorImpl::handleDeleteUserConnectionMessage(const std::error_code& error_,
                                                                       const boost::optional<ConnectionMessage>& connectionMessageOpt_,
@@ -717,7 +717,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 ST_ASSERT(connectionMessage_._parameters.size() == 1);
                 _clientCache.removeCookieUsernameFromCache(connectionMessage_._parameters[0],
                                                            connectionMessage_._parameters[1],
-                    connectionMessage_._parameters[2]);
+                                                           connectionMessage_._parameters[2]);
                 
                 ConnectionMessage reply(connectionMessage_._requestId,
                                         ConnectionMessageType::SUCCEEDED,
@@ -739,4 +739,4 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             }
 
             
-        }}}
+}}}
