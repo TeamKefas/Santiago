@@ -1,3 +1,13 @@
+#include "CreateUserRequestHandler.h"
+#include "LoginUserRequestHandler.h"
+#include "VerifyUserForCookieRequestHandler.h"
+#include "LogoutUserForCookieRequestHandler.h"
+
+#include "LogoutUserForAllCookiesRequestHandler.h"
+#include "ChangeUserPasswordRequestHandler.h"
+#include "RemovedCookieFromAppserverRequestHandler.h"
+#include "AddResourceRequestHandler.h"
+
 #include "ServerV1.h"
 
 namespace Santiago{ namespace User { namespace Server

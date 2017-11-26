@@ -11,8 +11,6 @@
 
 #include <functional>
 #include <algorithm>
-#include "ServerMessage.h"
-#include "DatabaseInterface.h"
 #include "ServerData.h"
 #include "ConnectionServer.h"
 
@@ -28,9 +26,10 @@ namespace Santiago{ namespace Authentication { namespace Server
          * @param onCompletedCallbackFn_ -
          * @param initiatingMessage_ -
          */
-        RequestHandlerBase(ConnectionServer& connectionServer_
-                           ,const OnCompletedCallbackFn& onCompletedCallbackFn_
-                           ,const ServerMessage& initiatingMessage_)
+        RequestHandlerBase(ConnectionServer& connectionServer_,
+                           ServerData& serverData_,
+                           const OnCompletedCallbackFn& onCompletedCallbackFn_,
+                           const ConnectionMessage& initiatingMessage_)
             :_connectionServer(connectionServer_)
             ,_onCompletedCallbackFn(onCompletedCallbackFn_)
             ,_initiatingMessage(initiatingMessage_)
@@ -38,23 +37,14 @@ namespace Santiago{ namespace Authentication { namespace Server
        /**
         * ///Message\\
         */
-        virtual void start() = 0;
-       /**
-        * ///Message\\
-        * @param serverMessage - \
-        */
-        virtual void handleReplyMessage(const ServerMessage& serverMessage_) = 0;
+        virtual void handleRequest() = 0;
 
     protected:
 
         ConnectionServer&              _connectionServer;
+        ServerData                    &_serverData;
         OnCompletedCallbackFn          _onCompletedCallbackFn;
-        ServerMessage                  _initiatingMessage;
-        ServerData                     _serverData;
-
-        DatabaseInterface              _databaseInterface;
-        
-
+        ConnectionMessage              _initiatingMessage;
     };
 
 }}}

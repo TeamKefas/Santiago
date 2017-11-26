@@ -23,8 +23,7 @@ namespace Santiago{ namespace Authentication { namespace Server
     public:
 
         typedef ConnectionRequestsController::Ptr ConnectionRequestsControllerPtr;
-        typedef std::function<void(const ServerMessage&)> OnNewRequestCallbackFn;
-        typedef std::function<void(const ServerMessage&)> OnRequestReplyCallbackFn;
+        typedef std::function<void(const ConnectionMessage&)> OnNewRequestCallbackFn;
         typedef std::function<void(unsigned)> OnDisconnectCallbackFn;
         /**
          * The constructor
@@ -37,8 +36,7 @@ namespace Santiago{ namespace Authentication { namespace Server
         ConnectionServer(boost::asio::io_service& ioService_,
                          unsigned port_,
                          const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
-                         const OnNewRequestCallbackFn& onNewRequestCallbackFn_,
-                         const OnRequestReplyCallbackFn& onRequestReplyCallbackFn_);
+                         const OnNewRequestCallbackFn& onNewRequestCallbackFn_);
        /**
         * ///Message\\
         */
@@ -47,7 +45,9 @@ namespace Santiago{ namespace Authentication { namespace Server
         * ///Message\\
         * @param serverMessage_ - 
         */
-        void sendMessage(const ServerMessage& serverMessage_);
+        void sendMessage(const ConnectionMessage& message_,
+                         bool isReplyExpectingMessage_,
+                         const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_);
 
         unsigned                                           _nextConnectionId;
         
@@ -66,7 +66,7 @@ namespace Santiago{ namespace Authentication { namespace Server
         void handleDisconnect(unsigned connectionId_);
 
        
-        
+        boost::asio::io_service                           &_ioService;
         tcp::acceptor                                      _acceptor;
 
         OnDisconnectCallbackFn                             _onDisconnectCallbackFn;

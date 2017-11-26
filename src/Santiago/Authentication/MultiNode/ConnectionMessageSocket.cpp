@@ -16,6 +16,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
         ,_writeStrandPtr(writeStrandPtr_)
     {
         BOOST_ASSERT(_socketPtr);
+        startAsyncRead();
     }
     
     void ConnectionMessageSocket::startAsyncRead()

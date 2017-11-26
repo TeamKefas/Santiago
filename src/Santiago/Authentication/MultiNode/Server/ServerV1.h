@@ -9,31 +9,16 @@
  * Contains the Server class  
  */
 
-
 #include <boost/asio/socket_acceptor_service.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/optional.hpp>
 
 #include "ConnectionServer.h"
-#include "ServerMessage.h"
-
-#include "CreateUserRequestHandler.h"
-#include "LoginUserRequestHandler.h"
-#include "VerifyUserForCookieRequestHandler.h"
-#include "LogoutUserForCookieRequestHandler.h"
-
-#include "LogoutUserForAllCookiesRequestHandler.h"
-#include "ChangeUserPasswordRequestHandler.h"
-#include "RemovedCookieFromAppserverRequestHandler.h"
-#include "AddResourceRequestHandler.h"
-
-
-
-
+#include "ServerData.h"
 
 using boost::asio::ip::tcp;
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Server
 {
     class Server
     {
@@ -63,12 +48,8 @@ namespace Santiago{ namespace Authentication { namespace Server
         * @param message_- 
         */
         void handleRequestNew(const ServerMessage& message_);
-       /**
-        * ///Message\\
-        * @param message_- 
-        */
-        void handleRequestReply(const ServerMessage& message_);
-       /**
+
+        /**
         * ///Message\\
         * @param requestId_- 
         */
@@ -77,10 +58,9 @@ namespace Santiago{ namespace Authentication { namespace Server
         std::map<RequestId,RequestHandlerBasePtr>   _activeRequestHandlersList;
         boost::asio::io_service&                    _ioService;
         unsigned                                    _port;
-        ConnectionMessage                           _connectionMessage;
         ConnectionServer                            _connectionServer;
+        ServerData                                  _serverData;
     };
-}}}
-
+}}}}
 
 #endif

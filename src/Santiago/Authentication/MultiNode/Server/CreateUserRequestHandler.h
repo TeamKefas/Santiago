@@ -23,19 +23,14 @@ namespace Santiago{namespace Authentication { namespace Server
          * @param onCompletedCallbackFn_- ///NEED TO WRITE\\\
          * @param initiatingMessage_ -
          */
-        CreateUserRequestHandler(ConnectionServer& connectionServer_
-                                 ,const OnCompletedCallbackFn& onCompletedCallbackFn_
-                                 ,const ServerMessage& initiatingMessage_);
+        CreateUserRequestHandler(ConnectionServer& connectionServer_,
+                                 ServerData& serverData_,
+                                 const OnCompletedCallbackFn& onCompletedCallbackFn_,
+                                 const ConnectionMessage& initiatingMessage_);
        /**
         * ///Message\\
         */
-        virtual void start();
-       /**
-        * ///Message\\
-        * @param serverMessage - 
-        */
-	virtual void handleReplyMessage(const ServerMessage& serverMessage);
-        
+        virtual void handleRequest();
     };
 
 }}}
