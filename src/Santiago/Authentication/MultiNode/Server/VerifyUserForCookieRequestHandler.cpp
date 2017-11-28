@@ -13,9 +13,14 @@ namespace Santiago{ namespace User { namespace Server
     void VerifyUserForCookieRequestHandler::handleRequest()
     {
         std::string cookieString = _connectionMessage._parameters[0];
+        std::string userName;
         boost::optional<SantiagoDBTables::UsersRec> sessionsRec = serverData_._databaseConnection.get().getSessionsRec(cookieString,error);
+        if(sessionsRec)
+        {
+            userName = sessionsRec._userName;
+        }
         std::pair<ControllerPtr,StrandPtr> authenticatorStrandPair =
-            _serverData._authenticatorStrandPair[static_cast<int>(toupper(sessionsRec._userName[0]))
+            _serverData._authenticatorStrandPair[static_cast<int>(toupper(userName[0]))
                                                  - static_cast<int>('a')];
         
         boost::asio::spawn(

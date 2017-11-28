@@ -3,40 +3,42 @@
 namespace Santiago{ namespace Authentication { namespace Server
 {
 
-    LogoutUserForCookieRequestHandler::LogoutUserForCookieRequestHandler(ConnectionServer& connectionServer_
-                                                                         ,const OnCompletedCallbackFn& onCompletedCallbackFn_
-                                                                         ,const ServerMessage& initiatingMessage_)
-        :RequestHandlerBase(connectionServer_,onCompletedCallbackFn_,initiatingMessage_)
+    LogoutUserForCookieRequestHandler::LogoutUserForCookieRequestHandler(ConnectionServer& connectionServer_,
+                                                                         ServerData& serverData_,
+                                                                         const OnCompletedCallbackFn& onCompletedCallbackFn_,
+                                                                         const ConnectionMessage& initiatingMessage_)
+        :RequestHandlerBase(connectionServer_,serverData_,onCompletedCallbackFn_,initiatingMessage_)
     {}
     
-    void LogoutUserForCookieRequestHandler::start()
+    void LogoutUserForCookieRequestHandler::handleRequest()
     {
-        if(_databaseInterface.logoutUserForCookie(_initiatingMessage._connectionMessage->_parameters[0]))
+        std::string cookieString = _connectionMessage._parameters[0];
+        std::string userName;
+        boost::optional<SantiagoDBTables::UsersRec> sessionsRec = serverData_._databaseConnection.get().getSessionsRec(cookieString,error);
+        if(sessionsRec)
         {
-            ConnectionMessage connectionMessage(ConnectionMessageType::SUCCEEDED,std::vector<std::string>()); 
-            ServerMessage serverMessage(_initiatingMessage._connectionId
-                                        ,_initiatingMessage._requestId
-                                        ,ServerMessageType::CONNECTION_MESSAGE_REPLY
-                                        ,connectionMessage);
-            
-            _connectionServer.sendMessage(serverMessage);
-            _onCompletedCallbackFn(_initiatingMessage._requestId);
+            userName = sessionsRec._userName;
         }
-        else
-        {
-            ConnectionMessage connectionMessage(ConnectionMessageType::FAILED,std::vector<std::string>()); 
-            ServerMessage serverMessage(_initiatingMessage._connectionId
-                                        ,_initiatingMessage._requestId
-                                        ,ServerMessageType::CONNECTION_MESSAGE_REPLY
-                                        ,connectionMessage);
-            _connectionServer.sendMessage(serverMessage);
-            _onCompletedCallbackFn(_initiatingMessage._requestId);
-        }
-    }
-    
-    void LogoutUserForCookieRequestHandler::handleReplyMessage(const ServerMessage& serverMessage)
-    {
-        BOOST_ASSERT(false);
+        std::pair<ControllerPtr,StrandPtr> authenticatorStrandPair =
+            _serverData._authenticatorStrandPair[static_cast<int>(toupper(userName[0]))
+                                                 - static_cast<int>('a')];
+        
+        boost::asio::spawn(
+            *authenticatorStrandPair.second,
+            [authenticatorStrandPair,cookieString](boost::asio::yield_context yield_)
+            {
+                std::error_code error;
+                error = authenticatorStrandPair.first->logoutUserForCookie(cookieString,yield_);
+                ConnectionMessage replyMessage(connectionMessage._requestId,
+                                               ConnectionMessageType::SUCEEDED,
+                                               std::vector<std::string>());
+                if(error)
+                {
+                    replyMessage._type = ConnectionMessageType::FAILED;
+                }
+                _connectionServer.sendMessage(serverMessage,false,boost::none);
+                _onCompletedCallbackFn(_initiatingMessage._requestId);
+            });
     }
     
 }}}
