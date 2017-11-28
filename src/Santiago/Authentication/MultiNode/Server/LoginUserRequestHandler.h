@@ -22,14 +22,11 @@ namespace Santiago{ namespace Authentication { namespace Server
          * @param onCompletedCallbackFn_ -
          * @param initiatingMessage_ -
          */
-        LoginUserRequestHandler(ConnectionServer& connectionServer_
-                                ,const OnCompletedCallbackFn& onCompletedCallbackFn_
-                                ,const ServerMessage& initiatingMessage_);
-       /**
-        * ///Message\\
-        */
-        virtual void start();
-       /**
+        LoginUserRequestHandler(ConnectionServer& connectionServer_,
+                                ServerData& serverData_,
+                                const OnCompletedCallbackFn& onCompletedCallbackFn_
+                                const ServerMessage& initiatingMessage_);
+        /**
         * ///Message\\
         * @param serverMessage - \
         */

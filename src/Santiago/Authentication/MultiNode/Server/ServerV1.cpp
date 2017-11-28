@@ -2,11 +2,14 @@
 #include "LoginUserRequestHandler.h"
 #include "VerifyUserForCookieRequestHandler.h"
 #include "LogoutUserForCookieRequestHandler.h"
-
 #include "LogoutUserForAllCookiesRequestHandler.h"
 #include "ChangeUserPasswordRequestHandler.h"
-#include "RemovedCookieFromAppserverRequestHandler.h"
-#include "AddResourceRequestHandler.h"
+#include "GetUserForEmailAddressAndRecoveryStringRequestHandler.h"
+#include "ChangeUserPasswordForEmailAddressAndRecoveryStringRequestHandler.h"
+#include "ChangeUserEmailAddressRequestHandler.h"
+#include "ChangeUserEmailAddressRequestHandler.h"
+#include "CreateAndReturnRecoveryStringRequestHandler.h"
+#include "DeleteUserRequestHandler.h"
 
 #include "ServerV1.h"
 

@@ -13,9 +13,9 @@ namespace Santiago{ namespace Authentication
             _databaseConnection.get().getActiveSessions(error);
         if(error && (ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS != error.value()))
         {
-            ST_LOG_ERROR("Authenticator contruction failed. Error message:"<<
+            ST_LOG_ERROR("Authenticator construction failed. Error message:"<<
                          error.message());
-            throw std::runtime_error("Authenticator contruction failed. Error message:" +
+            throw std::runtime_error("Authenticator construction failed. Error message:" +
                                      error.message());
         }
         
@@ -46,9 +46,9 @@ namespace Santiago{ namespace Authentication
 
     template<typename ControllerData>
     std::error_code ControllerBase<ControllerData>::createUser(const std::string& userName_,
-                                                             const std::string& emailAddress_,
-                                                             const std::string& password_,
-                                                             boost::asio::yield_context yield_)
+                                                               const std::string& emailAddress_,
+                                                               const std::string& password_,
+                                                               boost::asio::yield_context yield_)
     {
 
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;

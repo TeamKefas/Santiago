@@ -23,13 +23,10 @@ namespace Santiago{ namespace Authentication { namespace Server
          * @param onCompletedCallbackFn_ -
          * @param initiatingMessage_ -
          */
-        VerifyUserForCookieRequestHandler(ConnectionServer& connectionServer_
-                                          ,const OnCompletedCallbackFn& onCompletedCallbackFn_
-                                          ,const ServerMessage& initiatingMessage_);
-       /**
-        * ///Message\\
-        */
-        virtual void start();
+        VerifyUserForCookieRequestHandler(ConnectionServer& connectionServer_,
+                                          ServerData& serverData_,
+                                          const OnCompletedCallbackFn& onCompletedCallbackFn_,
+                                          const ConnectionMessage& initiatingMessage_);
        /**
         * ///Message\\
         * @param serverMessage - 

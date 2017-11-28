@@ -3,56 +3,38 @@
 namespace Santiago{ namespace User { namespace Server
 {
 
-    VerifyUserForCookieRequestHandler::VerifyUserForCookieRequestHandler(ConnectionServer& connectionServer_
-                                                                         ,const OnCompletedCallbackFn& onCompletedCallbackFn_
-                                                                         ,const ServerMessage& initiatingMessage_)
-        :RequestHandlerBase(connectionServer_,onCompletedCallbackFn_,initiatingMessage_)
+    VerifyUserForCookieRequestHandler::VerifyUserForCookieRequestHandler(ConnectionServer& connectionServer_,
+                                                                         ServerData& serverData_,
+                                                                         const OnCompletedCallbackFn& onCompletedCallbackFn_,
+                                                                         const ConnectionMessage& initiatingMessage_)
+        :RequestHandlerBase(connectionServer_,serverData_,onCompletedCallbackFn_,initiatingMessage_)
     {}
     
-    void VerifyUserForCookieRequestHandler::start()
+    void VerifyUserForCookieRequestHandler::handleRequest()
     {
-        std::string cookie = _initiatingMessage._connectionMessage->_parameters[0];
-        bool match = (_serverData._cookieCookieDataMap.find(cookie) != _serverData._cookieCookieDataMap.end());
+        std::string cookieString = _connectionMessage._parameters[0];
+        boost::optional<SantiagoDBTables::UsersRec> sessionsRec = serverData_._databaseConnection.get().getSessionsRec(cookieString,error);
+        std::pair<ControllerPtr,StrandPtr> authenticatorStrandPair =
+            _serverData._authenticatorStrandPair[static_cast<int>(toupper(sessionsRec._userName[0]))
+                                                 - static_cast<int>('a')];
         
-        if(match)
-        {
-            ConnectionMessage connectionMessage(ConnectionMessageType::SUCCEEDED,std::vector<std::string>()); 
-            ServerMessage serverMessage(_initiatingMessage._connectionId
-                                        ,_initiatingMessage._requestId
-                                        ,ServerMessageType::CONNECTION_MESSAGE_REPLY
-                                        ,connectionMessage);
-            
-            _connectionServer.sendMessage(serverMessage);
-            _onCompletedCallbackFn(_initiatingMessage._requestId);
-        }
-        else
-        {
-            if(_databaseInterface.verifyUserForCookie(_initiatingMessage._connectionMessage->_parameters[0]))
+        boost::asio::spawn(
+            *authenticatorStrandPair.second,
+            [authenticatorStrandPair,cookieString](boost::asio::yield_context yield_)
             {
-                ConnectionMessage connectionMessage(ConnectionMessageType::SUCCEEDED,std::vector<std::string>()); 
-                ServerMessage serverMessage(_initiatingMessage._connectionId
-                                            ,_initiatingMessage._requestId
-                                            ,ServerMessageType::CONNECTION_MESSAGE_REPLY
-                                            ,connectionMessage);
-                
-                _connectionServer.sendMessage(serverMessage);
+                std::error_code error;
+                boost::optional<UserInfo> userInfoOpt;
+                std::tie(error,userInfoOpt) = authenticatorStrandPair.first->verifyCookieAndGetUserInfo(cookieString,yield_);
+                ConnectionMessage replyMessage(connectionMessage._requestId,
+                                               ConnectionMessageType::SUCEEDED,
+                                               std::vector<std::string>());
+                if(error)
+                {
+                    replyMessage._type = ConnectionMessageType::FAILED;
+                }
+                _connectionServer.sendMessage(serverMessage,false,boost::none);
                 _onCompletedCallbackFn(_initiatingMessage._requestId);
-            }
-            else
-            {
-                ConnectionMessage connectionMessage(ConnectionMessageType::FAILED,std::vector<std::string>()); 
-                ServerMessage serverMessage(_initiatingMessage._connectionId
-                                            ,_initiatingMessage._requestId
-                                            ,ServerMessageType::CONNECTION_MESSAGE_REPLY
-                                            ,connectionMessage);
-                _connectionServer.sendMessage(serverMessage);
-                _onCompletedCallbackFn(_initiatingMessage._requestId);
-            }
-        }
-    }
-    void VerifyUserForCookieRequestHandler::handleReplyMessage(const ServerMessage& serverMessage)
-    {
-        BOOST_ASSERT(false);
+            });
     }
     
 }}}

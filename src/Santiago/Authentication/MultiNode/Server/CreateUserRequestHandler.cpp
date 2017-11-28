@@ -25,7 +25,7 @@ namespace Santiago{namespace Authentication { namespace Server
             [authenticatorStrandPair,userName,emailAddress,password](boost::asio::yield_context yield_)
             {
                 std::error_code error;
-                error = authenticatorStrandPair.first->createUser(userName_,emailAddress_,password_,yield_);
+                error = authenticatorStrandPair.first->createUser(userName,emailAddres_,password,yield_);
                 ConnectionMessage replyMessage(connectionMessage._requestId,
                                                ConnectionMessageType::SUCEEDED,
                                                std::vector<std::string>());

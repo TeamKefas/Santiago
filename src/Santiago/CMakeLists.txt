@@ -14,6 +14,20 @@ set(Santiago_SRCS
   Authentication/MultiNode/ConnectionRequestsControllerBase.cpp
   Authentication/MultiNode/ClientCache.cpp
   Authentication/MultiNode/AuthenticatorImpl.cpp
+  #Authentication/MultiNode/Server/ServerV1.cpp
+  #Authentication/MultiNode/Server/ConnectionServer.cpp
+  #Authentication/MultiNode/Server/ConnectionRequestsController.cpp
+  #Authentication/MultiNode/Server/CreateUserRequestHandler.cpp
+  #Authentication/MultiNode/Server/LoginUserRequestHandler.cpp
+  #Authentication/MultiNode/Server/VerifyUserForCookieRequestHandler.cpp
+  #Authentication/MultiNode/Server/LogoutUserForCookieRequestHandler.cpp
+  #Authentication/MultiNode/Server/LogoutUserForAllCookiesRequestHandler.cpp
+  #Authentication/MultiNode/Server/ChangeUserPasswordRequestHandler.cpp
+  #Authentication/MultiNode/Server/GetUserForEmailAddressAndRecoveryStringRequestHandler.cpp
+  #Authentication/MultiNode/Server/ChangeUserPasswordForEmailAddressAndRecoveryStringRequestHandler.cpp
+  #Authentication/MultiNode/Server/ChangeUserEmailAddressRequestHandler.cpp
+  #Authentication/MultiNode/Server/CreateAndReturnRecoveryStringRequestHandler.cpp
+  #Authentication/MultiNode/Server/DeleteUserRequestHandler.cpp
   Thread/ThreadSpecificVarImpl.cpp
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp
@@ -41,6 +55,23 @@ if(WIN32)
       Authentication/MutiNode/ConnectionRequestsControllerBase.h
       Authentication/MultiNode/ClientCache.h
       Authentication/MultiNode/AuthenticatorImpl.h
+      #Authentication/MultiNode/Server/Controller.h
+      #Authentication/MultiNode/Server/ServerData.h
+      #Authentication/MultiNode/Server/ServerV1.h
+      #Authentication/MultiNode/Server/ConnectionServer.h
+      #Authentication/MultiNode/Server/ConnectionRequestsController.h
+      #Authentication/MultiNode/Server/RequestHandlerBase.h
+      #Authentication/MultiNode/Server/CreateUserRequestHandler.h
+      #Authentication/MultiNode/Server/LoginUserRequestHandler.h
+      #Authentication/MultiNode/Server/VerifyUserForCookieRequestHandler.h
+      #Authentication/MultiNode/Server/LogoutUserForCookieRequestHandler.h
+      #Authentication/MultiNode/Server/LogoutUserForAllCookiesRequestHandler.h
+      #Authentication/MultiNode/Server/ChangeUserPasswordRequestHandler.h
+      #Authentication/MultiNode/Server/GetUserForEmailAddressAndRecoveryStringRequestHandler.h
+      #Authentication/MultiNode/Server/ChangeUserPasswordForEmailAddressAndRecoveryStringRequestHandler.h
+      #Authentication/MultiNode/Server/ChangeUserEmailAddressRequestHandler.h
+      #Authentication/MultiNode/Server/CreateAndReturnRecoveryStringRequestHandler.h
+      #Authentication/MultiNode/Server/DeleteUserRequestHandler.h
       Utils/PTimeUtils.h
       Utils/STLog.h
       Utils/LogLevel.h

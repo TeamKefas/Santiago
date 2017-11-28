@@ -5,8 +5,6 @@
 
 #include "Santiago/Authentication/ControllerBase.h"
 
-#include "ControllerData.h"
-
 namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Server
 {
     class Controller:public ControllerBase<ControllerData>
