@@ -7,7 +7,7 @@ namespace Santiago{ namespace Authentication { namespace Server
                                                      ServerData& serverData_,
                                                      const OnCompletedCallbackFn& onCompletedCallbackFn_,
                                                      const ConnectionMessage& initiatingMessage_)
-        :RequestHandlerBase(connectionServer_,onCompletedCallbackFn_,initiatingMessage_)
+        :RequestHandlerBase(connectionServer_,serverData_,onCompletedCallbackFn_,initiatingMessage_)
     {}
     
     void LoginUserRequestHandler::handleRequest()
