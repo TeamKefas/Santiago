@@ -1,6 +1,5 @@
 #include "CreateUserRequestHandler.h"
 
-
 namespace Santiago{namespace Authentication { namespace Server
 {
     CreateUserRequestHandler::CreateUserRequestHandler(ConnectionServer& connectionServer_,

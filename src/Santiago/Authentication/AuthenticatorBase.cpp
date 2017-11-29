@@ -102,8 +102,8 @@ namespace Santiago{ namespace Authentication
     }
 
     void AuthenticatorBase::logoutUserForAllCookies(const std::string& userName_,
-                                                     boost::asio::yield_context yield_,
-                                                     std::error_code& error_)
+                                                    boost::asio::yield_context yield_,
+                                                    std::error_code& error_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));

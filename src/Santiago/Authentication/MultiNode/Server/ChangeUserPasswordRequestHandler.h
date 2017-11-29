@@ -23,12 +23,9 @@ namespace Santiago{ namespace Authentication { namespace Server
          * @param initiatingMessage
          */
         ChangeUserPasswordRequestHandler(ConnectionServer& connectionServer_,
+                                         ServerData& serverData_,
                                          const OnCompletedCallbackFn& onCompletedCallbackFn_,
-                                         const ServerMessage& initiatingMessage_);
-         /**
-         * ///Message\\
-         */
-        virtual void start();
+                                         const ConnectionMessage& initiatingMessage_);
         /**
          * ///Message\\
          * @param serverMessage -
