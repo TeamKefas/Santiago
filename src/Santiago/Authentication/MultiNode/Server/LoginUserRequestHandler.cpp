@@ -18,7 +18,7 @@ namespace Santiago{ namespace Authentication { namespace Server
         if(!isUserNameNotEmailAddress)
         {
             std::error_code errror;
-            boost::optional<SantiagoDBTables::UsersRec> usersRec = serverData_._databaseConnection.get().getUsersRecForUserName(userNameOrEmailAddress,error);
+            boost::optional<SantiagoDBTables::UsersRec> usersRec = serverData_._databaseConnection.get().getUsersRecForEmailAddress(userNameOrEmailAddress,error);
             if(usersRec)
             {
                 userNameOrEmailAddress = usersRec._userName;
