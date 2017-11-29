@@ -12,8 +12,8 @@ namespace Santiago{ namespace Authentication { namespace Server
     
     void LoginUserRequestHandler::handleRequest()
     {
-        std::string userNameOrEmailAddress = _connectionMessage._parameters[0];
-        bool isUserNameNotEmailAddress = _connectionMessage._parameters[1];
+        std::string userNameOrEmailAddress = _initiatingMessage._parameters[0];
+        bool isUserNameNotEmailAddress = _initiatingMessage._parameters[1];
         
         if(!isUserNameNotEmailAddress)
         {
@@ -28,7 +28,7 @@ namespace Santiago{ namespace Authentication { namespace Server
             _serverData._authenticatorStrandPair[static_cast<int>(toupper(userNameOrEmailAddress[0]))
                                                  - static_cast<int>('a')];
 
-        std::string password = _connectionMessage._parameters[2];
+        std::string password = _initiatingMessage._parameters[2];
 
         boost::asio::spawn(
             *authenticatorStrandPair.second,
@@ -37,7 +37,7 @@ namespace Santiago{ namespace Authentication { namespace Server
                 std::error_code error;
                 boost::optional<std::pair<UserInfo,std::string> > userInfoStringPairOpt;
                 std::tie(error,userInfoStringPairOpt) = authenticatorStrandPair.first->loginUser(userNameOrEmailAddress,isUserNameNotEmailAddress,password,yield_);
-                ConnectionMessage replyMessage(connectionMessage._requestId,
+                ConnectionMessage replyMessage(_initiatingMessage._requestId,
                                                ConnectionMessageType::SUCEEDED,
                                                std::vector<std::string>());
                 if(error)

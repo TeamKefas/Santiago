@@ -12,7 +12,7 @@ namespace Santiago{ namespace Authentication { namespace Server
     
     void LogoutUserForCookieRequestHandler::handleRequest()
     {
-        std::string cookieString = _connectionMessage._parameters[0];
+        std::string cookieString = _initiatingMessage._parameters[0];
         std::string userName;
         boost::optional<SantiagoDBTables::UsersRec> sessionsRec = serverData_._databaseConnection.get().getSessionsRec(cookieString,error);
         if(sessionsRec)
@@ -29,7 +29,7 @@ namespace Santiago{ namespace Authentication { namespace Server
             {
                 std::error_code error;
                 error = authenticatorStrandPair.first->logoutUserForCookie(cookieString,yield_);
-                ConnectionMessage replyMessage(connectionMessage._requestId,
+                ConnectionMessage replyMessage(_initiatingMessage._requestId,
                                                ConnectionMessageType::SUCEEDED,
                                                std::vector<std::string>());
                 if(error)

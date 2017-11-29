@@ -30,9 +30,9 @@ namespace Santiago{ namespace Authentication { namespace Server
                            ServerData& serverData_,
                            const OnCompletedCallbackFn& onCompletedCallbackFn_,
                            const ConnectionMessage& initiatingMessage_)
-            :_connectionServer(connectionServer_)
-            ,_onCompletedCallbackFn(onCompletedCallbackFn_)
-            ,_initiatingMessage(initiatingMessage_)
+            :_connectionServer(connectionServer_),
+             _onCompletedCallbackFn(onCompletedCallbackFn_),
+             _initiatingMessage(initiatingMessage_)
         {}
        /**
         * ///Message\\

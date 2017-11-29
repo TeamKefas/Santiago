@@ -12,15 +12,15 @@ namespace Santiago{ namespace Authentication { namespace Server
     
     void ChangeUserPasswordRequestHandler::handleRequest()
     {
-        std::string cookieString = _connectionMessage._parameters[0];
+        std::string cookieString = _initiatingMessage._parameters[0];
         std::string userName;
         boost::optional<SantiagoDBTables::UsersRec> sessionsRec = serverData_._databaseConnection.get().getSessionsRec(cookieString,error);
         if(sessionsRec)
         {
             userName = sessionsRec._userName;
         }
-        std::string oldPassword = _connectionMessage._parameters[1];
-        std::string newPassword = _connectionMessage._parameters[2];
+        std::string oldPassword = _initiatingMessage._parameters[1];
+        std::string newPassword = _initiatingMessage._parameters[2];
         std::pair<ControllerPtr,StrandPtr> authenticatorStrandPair =
             _serverData._authenticatorStrandPair[static_cast<int>(toupper(userName[0]))
                                                  - static_cast<int>('a')];
@@ -31,7 +31,7 @@ namespace Santiago{ namespace Authentication { namespace Server
             {
                 std::error_code error;
                 error = authenticatorStrandPair.first->changeUserPassword(cookieString,oldPassword,newPassword,yield_);
-                ConnectionMessage replyMessage(connectionMessage._requestId,
+                ConnectionMessage replyMessage(_initiatingMessage._requestId,
                                                ConnectionMessageType::SUCEEDED,
                                                std::vector<std::string>());
                 if(error)
