@@ -45,7 +45,8 @@ namespace Santiago{ namespace Authentication { namespace Server
         * ///Message\\
         * @param serverMessage_ - 
         */
-        void sendMessage(const ConnectionMessage& message_,
+        void sendMessage(unsigned connectionId_,
+                         const ConnectionMessage& message_,
                          bool isReplyExpectingMessage_,
                          const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_);
 

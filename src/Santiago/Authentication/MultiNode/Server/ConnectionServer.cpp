@@ -21,6 +21,20 @@ namespace Santiago{ namespace Authentication { namespace Server
                                            boost::asio::placeholders::error));
     }
 
+    void ConnectionServer::sendMessage(unsigned connectionId_,
+                                       const ConnectionMessage& message_,
+                                       bool isReplyExpectingMessage_,
+                                       const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_)
+    {
+        auto iterator it = _idConnectionPtrMap.find(connectionId_);
+        if(it != _idConnectionPtrMap.end())
+        {
+            it->second->sendMessage(const ConnectionMessage& message_,
+                                    bool isReplyExpectingMessage_,
+                                    const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_)
+        }
+    }
+
     void ConnectionServer::handleAccept(const ConnectionMessageSocket::MySocketPtr& socketPtr_,
                                         const boost::system::error_code& error_)
     {
