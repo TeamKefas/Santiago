@@ -3,10 +3,10 @@
 namespace Santiago{ namespace Authentication { namespace Server
 {
 
-   ChangeUserPasswordRequestHandler::ChangeUserPasswordRequestHandler(ConnectionServer& connectionServer_,
-                                                                      ServerData& serverData_,
-                                                                      const OnCompletedCallbackFn& onCompletedCallbackFn_,
-                                                                      const ConnectionMessage& initiatingMessage_)
+    ChangeUserPasswordRequestHandler::ChangeUserPasswordRequestHandler(ConnectionServer& connectionServer_,
+                                                                       ServerData& serverData_,
+                                                                       const OnCompletedCallbackFn& onCompletedCallbackFn_,
+                                                                       const ConnectionMessage& initiatingMessage_)
         :RequestHandlerBase(connectionServer_,serverData_,onCompletedCallbackFn_,initiatingMessage_)
     {}
     
