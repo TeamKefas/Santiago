@@ -31,9 +31,15 @@ namespace Santiago{namespace Authentication { namespace Server
                 std::error_code error;
                 boost::optional<std::string> stringOpt;
                 std::tie(error,stringOpt) = authenticatorStrandPair.first->createAndReturnRecoveryString(emailAddress,yield_);
+                std::vector<std::string> parameters = std::vector<std::string>();
+                if(stringOpt)
+                {
+                    parameters.push_back(*stringOpt);
+                }
+                
                 ConnectionMessage replyMessage(_initiatingMessage._requestId,
                                                ConnectionMessageType::SUCEEDED,
-                                               std::vector<std::string>());
+                                               parameters);
                 if(error)
                 {
                     replyMessage._type = ConnectionMessageType::FAILED;

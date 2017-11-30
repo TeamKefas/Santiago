@@ -30,9 +30,16 @@ namespace Santiago{ namespace User { namespace Server
                 std::error_code error;
                 boost::optional<UserInfo> userInfoOpt;
                 std::tie(error,userInfoOpt) = authenticatorStrandPair.first->verifyCookieAndGetUserInfo(cookieString,yield_);
+                std::vector<std::string> parameters = std::vector<std::string>();
+                if(userInfoOpt)
+                {
+                    parameters.push_back(userInfoOpt->_userName);
+                    parameters.push_back(userInfoOpt->_emailAddress);
+                }
+                
                 ConnectionMessage replyMessage(_initiatingMessage._requestId,
                                                ConnectionMessageType::SUCEEDED,
-                                               std::vector<std::string>());
+                                               parameters);
                 if(error)
                 {
                     replyMessage._type = ConnectionMessageType::FAILED;

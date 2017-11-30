@@ -37,9 +37,17 @@ namespace Santiago{ namespace Authentication { namespace Server
                 std::error_code error;
                 boost::optional<std::pair<UserInfo,std::string> > userInfoStringPairOpt;
                 std::tie(error,userInfoStringPairOpt) = authenticatorStrandPair.first->loginUser(userNameOrEmailAddress,isUserNameNotEmailAddress,password,yield_);
+                std::vector<std::string> parameters = std::vector<std::string>();
+                if(userInfoStringPairOpt)
+                {
+                    parameters.push_back(userInfoStringPairOpt->first._userName);
+                    parameters.push_back(userInfoStringPairOpt->first._emailAddress);
+                    parameters.push_back(userInfoStringPairOpt->second);
+                }
+                
                 ConnectionMessage replyMessage(_initiatingMessage._requestId,
                                                ConnectionMessageType::SUCEEDED,
-                                               std::vector<std::string>());
+                                               parameters);
                 if(error)
                 {
                     replyMessage._type = ConnectionMessageType::FAILED;
