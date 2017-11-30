@@ -52,7 +52,7 @@ namespace Santiago{ namespace Authentication { namespace Server
                 {
                     replyMessage._type = ConnectionMessageType::FAILED;
                 }
-                _connectionServer.sendMessage(replyMessage,false,boost::none);
+                _connectionServer.sendMessage(_initiatingMessage._requestId,replyMessage,false,boost::none);
                 _onCompletedCallbackFn(_initiatingMessage._requestId);
             });
     }
