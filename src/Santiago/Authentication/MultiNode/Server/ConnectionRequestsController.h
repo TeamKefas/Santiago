@@ -38,7 +38,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;
                 
         ConnectionRequestsController(boost::asio::io_service& ioService_,
-                                     const MySockerPtr& socketPtr_,
+                                     const MySocketPtr& socketPtr_,
                                      unsigned connectionId_,
                                      const StrandPtr& strandPtr_,
                                      const OnDisconnectCallbackFn& onDisconnectCallbackFn_,

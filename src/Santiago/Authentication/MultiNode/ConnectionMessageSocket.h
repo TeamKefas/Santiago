@@ -2,7 +2,7 @@
 #define SANTIAGO_AUTHENTICATION_MULTINODE_CONNECTIONMESSAGESOCKET_H
 
 /**
- * @file ConnectionMessageSocketNase.h
+ * @file ConnectionMessageSocket.h
  *
  * @section DESCRIPTION
  *

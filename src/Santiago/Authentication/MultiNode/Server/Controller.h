@@ -23,11 +23,11 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
         
         virtual std::error_code logoutCookieFromAllClients(const std::string& cookieString_,
                                                            boost::asio::yield_context yield_)
-        {return logoutCookieFromAllClientsCallbackFn_(cookieString_,yield_);}
+        {return logoutUserForCookie(cookieString_,yield_);}
         
         virtual std::error_code logoutUserFromAllClients(const std::string& userName_,
                                                          boost::asio::yield_context yield_)
-        {return logoutUserFromAllClientsCallbackFn_(cookieString_,yield_);}
+        {return logoutCookieFromAllClients(userName_,yield_);}
 
     };
 

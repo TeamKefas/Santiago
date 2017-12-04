@@ -13,7 +13,7 @@
 #include <boost/asio/error.hpp>
 
 #include "ConnectionRequestsController.h"
-#include "ConnectionMessageSocket.h"
+#include "Santiago/Authentication/MultiNode/ConnectionMessageSocket.h"
 using boost::asio::ip::tcp;
 
 namespace Santiago{ namespace Authentication { namespace Server
