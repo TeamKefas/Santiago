@@ -25,7 +25,9 @@ namespace Santiago{ namespace Authentication { namespace MultiNode { namespace S
         typedef std::shared_ptr<ConnectionRequestsController> ConnectionRequestsControllerPtr;
         typedef std::function<void(const ConnectionMessage&)> OnNewRequestCallbackFn;
         typedef std::function<void(unsigned)> OnDisconnectCallbackFn;
-                
+        typedef std::function<void(const std::error_code&,
+                                   const boost::optional<ConnectionMessage>&)> OnReplyMessageCallbackFn;
+        
         /**
          * The constructor
          * @param ioService_- 
@@ -44,7 +46,6 @@ namespace Santiago{ namespace Authentication { namespace MultiNode { namespace S
         void start();
        /**
         * ///Message\\
-        * @param serverMessage_ - 
         */
         void sendMessage(unsigned connectionId_,
                          const ConnectionMessage& message_,
@@ -73,8 +74,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode { namespace S
 
         OnDisconnectCallbackFn                             _onDisconnectCallbackFn;
         OnNewRequestCallbackFn                             _onNewRequestCallbackFn;
-        OnRequestReplyCallbackFn                           _onRequestReplyCallbackFn;
-
+        OnReplyMessageCallbackFn                           _onReplyMessageCallbackFn;
         
         std::map<unsigned,ConnectionRequestsControllerPtr> _idConnectionPtrMap;
 

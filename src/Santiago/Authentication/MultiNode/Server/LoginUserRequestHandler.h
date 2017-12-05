@@ -24,13 +24,12 @@ namespace Santiago{ namespace Authentication { namespace MultiNode { namespace S
          */
         LoginUserRequestHandler(ConnectionServer& connectionServer_,
                                 ServerData& serverData_,
-                                const OnCompletedCallbackFn& onCompletedCallbackFn_
-                                const ServerMessage& initiatingMessage_);
+                                const OnCompletedCallbackFn& onCompletedCallbackFn_,
+                                const ConnectionMessage& initiatingMessage_);
         /**
         * ///Message\\
-        * @param serverMessage - \
         */
-        virtual void handleReplyMessage(const ServerMessage& serverMessage);
+        virtual void handleRequest();
     };
 
 }}}}

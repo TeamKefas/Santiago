@@ -29,9 +29,8 @@ namespace Santiago{ namespace Authentication { namespace MultiNode { namespace S
                                           const ConnectionMessage& initiatingMessage_);
        /**
         * ///Message\\
-        * @param serverMessage - 
         */
-        virtual void handleReplyMessage(const ServerMessage& serverMessage);
+        virtual void handleRequest();
         
     };
 

@@ -31,6 +31,7 @@ namespace Santiago{ namespace Authentication { namespace MultiNode { namespace S
                            const OnCompletedCallbackFn& onCompletedCallbackFn_,
                            const ConnectionMessage& initiatingMessage_)
             :_connectionServer(connectionServer_),
+             _serverData(serverData_),
              _onCompletedCallbackFn(onCompletedCallbackFn_),
              _initiatingMessage(initiatingMessage_)
         {}
