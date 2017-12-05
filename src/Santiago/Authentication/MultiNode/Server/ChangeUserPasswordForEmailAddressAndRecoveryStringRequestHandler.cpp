@@ -1,7 +1,7 @@
 #include "ChangeUserPasswordForEmailAddressAndRecoveryStringRequestHandler.h"
 
 
-namespace Santiago{namespace Authentication { namespace Server
+namespace Santiago{namespace Authentication { namespace MultiNode { namespace Server
 {
     ChangeUserPasswordForEmailAddressAndRecoveryStringRequestHandler::ChangeUserPasswordForEmailAddressAndRecoveryStringRequestHandler(ConnectionServer& connectionServer_,
                                                                                                                                        ServerData& serverData_,
@@ -46,4 +46,4 @@ namespace Santiago{namespace Authentication { namespace Server
             });
     }
 
-}}}
+}}}}

@@ -14,7 +14,7 @@
 #include "ServerData.h"
 #include "ConnectionServer.h"
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode { namespace Server
 {
     class RequestHandlerBase
     {
@@ -47,6 +47,6 @@ namespace Santiago{ namespace Authentication { namespace Server
         ConnectionMessage              _initiatingMessage;
     };
 
-}}}
+}}}}
 
 #endif

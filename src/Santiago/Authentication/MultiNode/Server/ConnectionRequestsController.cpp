@@ -2,7 +2,7 @@
 
 #include<boost/asio/deadline_timer.hpp>
 
-namespace Santiago{ namespace Authentication{ namespace MultiNode{ names
+namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Server
 {
     ConnectionRequestsController::
     ConnectionRequestsController(boost::asio::io_service& ioService_,
@@ -103,4 +103,4 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ names
         return _connectionMessageSocket;
     }
 
-}}}
+}}}}

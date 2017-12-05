@@ -12,7 +12,7 @@
 #include "RequestHandlerBase.h"
 
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode { namespace Server
 {
     class LogoutUserForAllCookiesRequestHandler:public RequestHandlerBase
     {
@@ -34,6 +34,6 @@ namespace Santiago{ namespace Authentication { namespace Server
         virtual void handleReplyMessage(const ServerMessage& serverMessage);
     };
 
-}}}
+}}}}
 
 #endif

@@ -1,6 +1,6 @@
 #include "LogoutUserForAllCookiesRequestHandler.h"
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode { namespace Server
 {
     
     LogoutUserForAllCookiesRequestHandler::LogoutUserForAllCookiesRequestHandler(ConnectionServer& connectionServer_,
@@ -41,4 +41,4 @@ namespace Santiago{ namespace Authentication { namespace Server
             });
     }
             
-}}}
+}}}}

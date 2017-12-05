@@ -1,6 +1,6 @@
 #include "VerifyUserForCookieRequestHandler.h"
 
-namespace Santiago{ namespace User { namespace Server
+namespace Santiago{ namespace User { namespace MultiNode { namespace Server
 {
 
     VerifyUserForCookieRequestHandler::VerifyUserForCookieRequestHandler(ConnectionServer& connectionServer_,
@@ -49,4 +49,4 @@ namespace Santiago{ namespace User { namespace Server
             });
     }
     
-}}}
+}}}}

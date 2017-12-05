@@ -1,7 +1,7 @@
 #include "GetUserForEmailAddressAndRecoveryStringRequestHandler.h"
 
 
-namespace Santiago{namespace Authentication { namespace Server
+namespace Santiago{namespace Authentication { namespace MultiNode { namespace Server
 {
     GetUserForEmailAddressAndRecoveryStringRequestHandler::GetUserForEmailAddressAndRecoveryStringRequestHandler(ConnectionServer& connectionServer_,
                                                                                                                  ServerData& serverData_,
@@ -51,4 +51,4 @@ namespace Santiago{namespace Authentication { namespace Server
             });
     }
 
-}}}
+}}}}

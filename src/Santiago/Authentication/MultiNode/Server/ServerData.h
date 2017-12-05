@@ -7,6 +7,8 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
 {
     struct ServerData
     {
+        typedef std::shared_ptr<Controller> ControllerPtr;
+        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
         typedef Thread::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
         ThreadSpecificDbConnection&         _databaseConnection;       
         std::pair<ControllerPtr,StrandPtr>  _authenticatorStrandPair[26];

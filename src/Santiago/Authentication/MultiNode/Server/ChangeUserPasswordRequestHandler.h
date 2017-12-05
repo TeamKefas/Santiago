@@ -11,7 +11,7 @@
 
 #include "RequestHandlerBase.h"
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode { namespace Server
 {
     class ChangeUserPasswordRequestHandler:public RequestHandlerBase
     {
@@ -34,6 +34,6 @@ namespace Santiago{ namespace Authentication { namespace Server
         
     };
 
-}}}
+}}}}
 
 #endif

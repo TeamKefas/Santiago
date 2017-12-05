@@ -105,6 +105,6 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
     inline std::ostream& operator<<(std::ostream& ostream_, const ConnectionMessage& connectionMessage_)
     { return connectionMessage_.writeToStream(ostream_);}
 
-}}} //closing namespace Santiago::User::Server
+}}} //closing namespace Santiago::Authentication::MultiNode
 
 #endif

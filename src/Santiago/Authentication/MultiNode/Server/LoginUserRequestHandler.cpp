@@ -1,6 +1,6 @@
 #include "LoginUserRequestHandler.h"
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode { namespace Server
 {
 
     LoginUserRequestHandler::LoginUserRequestHandler(ConnectionServer& connectionServer_,
@@ -57,4 +57,4 @@ namespace Santiago{ namespace Authentication { namespace Server
             });
     }
         
-}}}
+}}}}

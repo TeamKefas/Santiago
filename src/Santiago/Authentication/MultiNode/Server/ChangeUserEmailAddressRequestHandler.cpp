@@ -1,7 +1,7 @@
 #include "ChangeUserEmailAddressRequestHandler.h"
 
 
-namespace Santiago{namespace Authentication { namespace Server
+namespace Santiago{namespace Authentication { namespace MultiNode { namespace Server
 {
     ChangeUserEmailAddressRequestHandler::ChangeUserEmailAddressRequestHandler(ConnectionServer& connectionServer_,
                                                                                ServerData& serverData_,
@@ -43,4 +43,4 @@ namespace Santiago{namespace Authentication { namespace Server
             });
     }
 
-}}}
+}}}}

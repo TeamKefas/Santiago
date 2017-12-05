@@ -18,7 +18,7 @@
 
 using boost::asio::ip::tcp;
 
-namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Server
+namespace Santiago{ namespace Authentication{ namespace MultiNode { namespace Server
 {
     class Server
     {

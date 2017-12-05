@@ -1,6 +1,6 @@
 #include "ChangeUserPasswordRequestHandler.h"
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode { namespace Server
 {
 
     ChangeUserPasswordRequestHandler::ChangeUserPasswordRequestHandler(ConnectionServer& connectionServer_,
@@ -43,4 +43,4 @@ namespace Santiago{ namespace Authentication { namespace Server
             });
     }
     
- }}}
+ }}}}

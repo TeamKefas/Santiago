@@ -1,7 +1,7 @@
 #include "DeleteUserRequestHandler.h"
 
 
-namespace Santiago{namespace Authentication { namespace Server
+namespace Santiago{namespace Authentication { namespace MultiNode { namespace Server
 {
     DeleteUserRequestHandler::DeleteUserRequestHandler(ConnectionServer& connectionServer_,
                                                        ServerData& serverData_,
@@ -41,4 +41,4 @@ namespace Santiago{namespace Authentication { namespace Server
             });
     }
 
-}}}
+}}}}

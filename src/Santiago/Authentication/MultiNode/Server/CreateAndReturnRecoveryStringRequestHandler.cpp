@@ -1,7 +1,7 @@
 #include "CreateAndReturnRecoveryStringRequestHandler.h"
 
 
-namespace Santiago{namespace Authentication { namespace Server
+namespace Santiago{namespace Authentication { namespace MultiNode { namespace Server
 {
     CreateAndReturnRecoveryStringRequestHandler::CreateAndReturnRecoveryStringRequestHandler(ConnectionServer& connectionServer_,
                                                                                              ServerData& serverData_,
@@ -49,5 +49,5 @@ namespace Santiago{namespace Authentication { namespace Server
             });
     }
 
-}}}
+}}}}
 

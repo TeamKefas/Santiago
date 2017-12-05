@@ -12,7 +12,7 @@
 #include "RequestHandlerBase.h"
 
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode { namespace Server
 {
     class VerifyUserForCookieRequestHandler:public RequestHandlerBase
     {
@@ -35,6 +35,6 @@ namespace Santiago{ namespace Authentication { namespace Server
         
     };
 
-}}}
+}}}}
 
 #endif

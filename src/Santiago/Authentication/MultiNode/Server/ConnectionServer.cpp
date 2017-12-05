@@ -1,6 +1,6 @@
 #include "ConnectionServer.h"
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode { namespace Server
 {
     ConnectionServer::ConnectionServer(boost::asio::io_service& ioService_,
                                        unsigned port_,
@@ -76,5 +76,4 @@ namespace Santiago{ namespace Authentication { namespace Server
         _onDisconnectCallbackFn(connectionId_);
     }
     
-    
-}}}
+}}}}
