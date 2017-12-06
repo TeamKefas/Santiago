@@ -118,12 +118,6 @@ namespace Santiago{ namespace User { namespace MultiNode { namespace Server
         requestHandlerPtr->start();
     }
 
-    void Server::handleRequestReply(const ServerMessage& message_)
-    {
-        std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
-            _activeRequestHandlersList.find(message_._requestId);
-    }
-
     void Server::handleRequestCompleted(const RequestId& requestId_)
     {
         std::map<RequestId,RequestHandlerBasePtr>::iterator iter =

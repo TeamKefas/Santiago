@@ -15,6 +15,7 @@
 
 #include "ConnectionServer.h"
 #include "ServerData.h"
+#include "RequestHandlerBase.h"
 
 using boost::asio::ip::tcp;
 
@@ -48,7 +49,6 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode { namespace Se
         * @param message_- 
         */
         void handleRequestNew(const ServerMessage& message_);
-
         /**
         * ///Message\\
         * @param requestId_- 
