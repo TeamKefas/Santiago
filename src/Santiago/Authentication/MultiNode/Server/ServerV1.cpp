@@ -52,6 +52,7 @@ namespace Santiago{ namespace User { namespace MultiNode { namespace Server
         case ConnectionMessageType::CR_LOGIN_USER:
             requestHandlerPtr.reset(new LoginUserRequestHandler
                                     (_connectionServer,
+                                     _serverData,
                                      std::bind(&Server::handleRequestCompleted
                                                 ,this,std::placeholders::_1),
                                      message_));
