@@ -1,3 +1,5 @@
+#include "ServerV1.h"
+
 #include "CreateUserRequestHandler.h"
 #include "LoginUserRequestHandler.h"
 #include "VerifyUserForCookieRequestHandler.h"
@@ -11,36 +13,32 @@
 #include "CreateAndReturnRecoveryStringRequestHandler.h"
 #include "DeleteUserRequestHandler.h"
 
-#include "ServerV1.h"
-
 namespace Santiago{ namespace User { namespace MultiNode { namespace Server
 {
-    Server::Server(boost::asio::io_service& ioService_,unsigned port_)
-        :_ioService(ioService_)
-        ,_port(port_)
-        ,_connectionMessage(nullptr,0)
-        ,_connectionServer(_ioService
-                           ,_port
-                           ,std::bind(&Server::handleDisconnect,this,std::placeholders::_1)
-                           ,std::bind(&Server::handleRequestNew,this,std::placeholders::_1)
-                           ,std::bind(&Server::handleRequestReply,this,std::placeholders::_1))
+    ServerV1::ServerV1(boost::asio::io_service& ioService_,unsigned port_)
+        :_ioService(ioService_),
+         _port(port_),
+         _connectionServer(_ioService,
+                           _port,
+                           std::bind(&Server::handleDisconnect,this,std::placeholders::_1),
+                           std::bind(&Server::handleRequestNew,this,std::placeholders::_1))
     {}
 
-    void Server::start()
+    void ServerV1::start()
     {
         _connectionServer.start();
     }
     
     
-    void Server::handleDisconnect(unsigned connectionId_)
+    void ServerV1::handleDisconnect(unsigned connectionId_)
     {
         //TODO
     }
 
-    void Server::handleRequestNew(const ServerMessage& message_)
+    void ServerV1::handleRequestNew(const ConnectionMessage& message_)
     {
         RequestHandlerBasePtr requestHandlerPtr;
-        switch(message_._connectionMessage->_type)
+        switch(message_._type)
         {
             
         case ConnectionMessageType::CR_CREATE_USER:
@@ -118,7 +116,7 @@ namespace Santiago{ namespace User { namespace MultiNode { namespace Server
         requestHandlerPtr->start();
     }
 
-    void Server::handleRequestCompleted(const RequestId& requestId_)
+    void ServerV1::handleRequestCompleted(const RequestId& requestId_)
     {
         std::map<RequestId,RequestHandlerBasePtr>::iterator iter =
             _activeRequestHandlersList.find(requestId_);

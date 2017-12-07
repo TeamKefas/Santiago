@@ -34,7 +34,6 @@ namespace Santiago{ namespace Authentication { namespace MultiNode { namespace S
          * @param port_- ///NEED TO WRITE\\\
          * @param onDisconnectCallbackFn_ -
          * @param onNewRequestCallbackFn_ -
-         * @param onRequestReplyCallbackFn_ -
          */
         ConnectionServer(boost::asio::io_service& ioService_,
                          unsigned port_,

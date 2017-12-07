@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_SERVER_SERVER_H
-#define SANTIAGO_AUTHENTICATION_SERVER_SERVER_H
+#ifndef SANTIAGO_AUTHENTICATION_SERVER_SERVERV1_H
+#define SANTIAGO_AUTHENTICATION_SERVER_SERVERV1_H
 
 /**
  * @file ServerV1.h
@@ -21,7 +21,7 @@ using boost::asio::ip::tcp;
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode { namespace Server
 {
-    class Server
+    class ServerV1
     {
     public:
 
@@ -32,7 +32,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode { namespace Se
          * @param ioService_- 
          * @param port_ -
          */
-        Server(boost::asio::io_service& ioService_,unsigned port_);
+        ServerV1(boost::asio::io_service& ioService_,unsigned port_);
        /**
         * ///Message\\
         */
@@ -48,7 +48,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode { namespace Se
         * ///Message\\
         * @param message_- 
         */
-        void handleRequestNew(const ServerMessage& message_);
+        void handleRequestNew(const ConnectionMessage& message_);
         /**
         * ///Message\\
         * @param requestId_- 
