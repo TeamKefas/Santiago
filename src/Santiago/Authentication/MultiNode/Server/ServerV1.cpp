@@ -149,7 +149,7 @@ namespace Santiago{ namespace User { namespace MultiNode { namespace Server
         }
         
         _activeRequestHandlersList.insert(std::make_pair(message_._requestId,requestHandlerPtr));
-        requestHandlerPtr->start();
+        requestHandlerPtr->handleRequest();
     }
 
     void ServerV1::handleRequestCompleted(const RequestId& requestId_)
