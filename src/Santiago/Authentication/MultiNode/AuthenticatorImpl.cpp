@@ -28,7 +28,29 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 ,_lastPingTimeOpt()
                 ,_lastRequestId(0)
             {}
-    
+
+            std::pair<std::error_code,boost::optional<UserInfo> >
+            verifyCookieAndGetUserInfo(const std::string& cookieString_,
+                                       boost::asio::yield_context yield_)
+            {
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
+        
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::pair<std::error_code,boost::optional<UserInfo> > ret;
+                
+                verifyCookieAndGetUserInfoImpl(
+                    cookieString_,
+                    [&ret,handler](const std::error_code& error_,const boost::optional<UserInfo>& userInfo_)
+                    {
+                        ret.first = error_;
+                        ret.second = userInfo_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return ret;
+            }
+                        
             void AuthenticatorImpl::verifyCookieAndGetUserInfoImpl(const std::string& cookieString_,
                                                                    const ErrorCodeUserInfoCallbackFn& onVerifyUserCallbackFn_)
             {
