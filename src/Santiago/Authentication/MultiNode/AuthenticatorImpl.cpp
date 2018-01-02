@@ -10,6 +10,8 @@
 #include "AuthenticatorImpl.h"
 #include "TimeDefs.h"
 
+#include <boost/asio/async_result.hpp>
+
 namespace Santiago{ namespace Authentication{ namespace MultiNode
         {
             AuthenticatorImpl::AuthenticatorImpl(boost::asio::io_service& ioService_,
@@ -29,9 +31,186 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 ,_lastRequestId(0)
             {}
 
+            std::error_code AuthenticatorImpl::createUser(const std::string& userName_,
+                                                          const std::string& emailAddress_,
+                                                          const std::string& password_,
+                                                          boost::asio::yield_context yield_)
+            {
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
+        
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::error_code error;
+                
+                createUserImpl(
+                    userName_,
+                    emailAddress_,
+                    password_,
+                    [&error,handler](const std::error_code& error_)
+                    {
+                        error = error_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return error;
+            }
+
+            void AuthenticatorImpl::createUserImpl(const std::string& userName_,
+                                                   const std::string& emailAddress_,
+                                                   const std::string& password_,
+                                                   const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
+            {
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                {
+                    return onCreateUserCallbackFn_(
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
+                                        ErrorCategory::GetInstance()));
+                }
+        
+                std::vector<std::string> parameters;
+                ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_CREATE_USER;
+                parameters.push_back(userName_);
+                parameters.push_back(emailAddress_);
+                parameters.push_back(generateSHA256(password_));
+
+                RequestId requestId(_connectionRequestsController.getConnectionId(),_lastRequestId+1);
+                _lastRequestId++;
+        
+                ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleCreateUserConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onCreateUserCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
+                _connectionRequestsController.sendMessage(connectionMessage,
+                                                          true,
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
+            }
+
+            void AuthenticatorImpl::handleCreateUserConnectionMessage(const std::error_code& error_,
+                                                                      const boost::optional<ConnectionMessage>& connectionMessageOpt_,
+                                                                      const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
+            {
+                if(!error_)
+                {
+                    if(connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
+                    {
+                        onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+                    }
+                    else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
+                    {
+                        //will change with appropriate error
+                        onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
+                    }
+                }
+                else
+                {
+                    onCreateUserCallbackFn_(error_);
+                }    
+            }
+
+            std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >
+            AuthenticatorImpl::loginUser(const std::string& userNameOrEmailAddress_,
+                                         bool isUserNameNotEmailAddress_,
+                                         const std::string& password_,
+                                         boost::asio::yield_context yield_)
+            {
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
+        
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > > ret;
+                
+                loginUserImpl(
+                    userNameOrEmailAddress_,
+                    isUserNameNotEmailAddress_,
+                    password_,
+                    [&ret,handler](const std::error_code& error_,const boost::optional<std::pair<UserInfo, std::string> >& userInfoStrPair_)
+                    {
+                        ret.first = error_;
+                        ret.second = userInfoStrPair_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return ret;
+            }
+            
+            void AuthenticatorImpl::loginUserImpl(const std::string& userNameOrEmailAddress_,
+                                                  bool isUserNameNotEmailAddress_,
+                                                  const std::string& password_,
+                                                  const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
+            {
+                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
+                {
+                    return onLoginUserCallbackFn_(
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
+                                        ErrorCategory::GetInstance()),
+                        boost::none);
+                }
+        
+                std::vector<std::string> parameters;
+                ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_LOGIN_USER;
+
+                parameters.push_back(userNameOrEmailAddress_);
+                if(isUserNameNotEmailAddress_)
+                {
+                    parameters.push_back("1");
+                }
+                else
+                {
+                    parameters.push_back("0");
+                }
+                parameters.push_back(generateSHA256(password_));
+
+                RequestId requestId(_connectionRequestsController.getConnectionId(),_lastRequestId+1);
+                _lastRequestId++;
+
+                ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
+                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleLoginUserConnectionMessage,
+                                                                                                             this,
+                                                                                                             std::placeholders::_1,
+                                                                                                             std::placeholders::_2,
+                                                                                                             onLoginUserCallbackFn_);
+                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
+                _connectionRequestsController.sendMessage(connectionMessage,
+                                                          true,
+                                                          errorCodeConnectionMessageOptCallBackFnOpt);
+            }
+
+            void AuthenticatorImpl::handleLoginUserConnectionMessage(const std::error_code& error_,
+                                                                     const boost::optional<ConnectionMessage>& connectionMessageOpt_,
+                                                                     const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
+            {
+                if(!error_)
+                {
+                    if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
+                    {
+                        _clientCache.addCookieUserInfoToCache(connectionMessageOpt_->_parameters[2],  //ccokiestring_
+                                                              connectionMessageOpt_->_parameters[0], //username
+                                                              connectionMessageOpt_->_parameters[1]); //emailAddress
+                
+                        onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
+                                                               ErrorCategory::GetInstance()),
+                                               std::make_pair(UserInfo(connectionMessageOpt_->_parameters[0], //username
+                                                                       connectionMessageOpt_->_parameters[1]), // emailAddress
+                                                              connectionMessageOpt_->_parameters[2]));  // cookieString
+                    }
+                    else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
+                    {
+                        //will change with appropriate error
+                        onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),boost::none);
+                    }
+                }
+                else
+                {
+                    onLoginUserCallbackFn_(error_,boost::none);
+                }    
+            }
+
             std::pair<std::error_code,boost::optional<UserInfo> >
-            verifyCookieAndGetUserInfo(const std::string& cookieString_,
-                                       boost::asio::yield_context yield_)
+            AuthenticatorImpl::verifyCookieAndGetUserInfo(const std::string& cookieString_,
+                                                          boost::asio::yield_context yield_)
             {
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
                     handler(std::forward<boost::asio::yield_context>(yield_));
@@ -118,134 +297,27 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                     onVerifyUserCallbackFn_(error_,boost::none);
                 }        
             }   
-    
-            void AuthenticatorImpl::createUserImpl(const std::string& userName_,
-                                                   const std::string& emailAddress_,
-                                                   const std::string& password_,
-                                                   const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
+
+            std::error_code AuthenticatorImpl::logoutUserForCookie(const std::string& cookieString_,
+                                                                   boost::asio::yield_context yield_)
             {
-                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
-                {
-                    return onCreateUserCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()));
-                }
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
         
-                std::vector<std::string> parameters;
-                ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_CREATE_USER;
-                parameters.push_back(userName_);
-                parameters.push_back(emailAddress_);
-                parameters.push_back(generateSHA256(password_));
-
-                RequestId requestId(_connectionRequestsController.getConnectionId(),_lastRequestId+1);
-                _lastRequestId++;
-        
-                ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleCreateUserConnectionMessage,
-                                                                                                             this,
-                                                                                                             std::placeholders::_1,
-                                                                                                             std::placeholders::_2,
-                                                                                                             onCreateUserCallbackFn_);
-                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
-                _connectionRequestsController.sendMessage(connectionMessage,
-                                                          true,
-                                                          errorCodeConnectionMessageOptCallBackFnOpt);
-            }
-
-            void AuthenticatorImpl::handleCreateUserConnectionMessage(const std::error_code& error_,
-                                                                      const boost::optional<ConnectionMessage>& connectionMessageOpt_,
-                                                                      const ErrorCodeCallbackFn& onCreateUserCallbackFn_)
-            {
-                if(!error_)
-                {
-                    if(connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
-                    {
-                        onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
-                    }
-                    else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
-                    {
-                        //will change with appropriate error
-                        onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
-                    }
-                }
-                else
-                {
-                    onCreateUserCallbackFn_(error_);
-                }    
-            }
-    
-            void AuthenticatorImpl::loginUserImpl(const std::string& userNameOrEmailAddress_,
-                                                  bool isUserNameNotEmailAddress_,
-                                                  const std::string& password_,
-                                                  const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
-            {
-                if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
-                {
-                    return onLoginUserCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()),
-                        boost::none);
-                }
-        
-                std::vector<std::string> parameters;
-                ConnectionMessageType connectionMessageType = ConnectionMessageType::CR_LOGIN_USER;
-
-                parameters.push_back(userNameOrEmailAddress_);
-                if(isUserNameNotEmailAddress_)
-                {
-                    parameters.push_back("1");
-                }
-                else
-                {
-                    parameters.push_back("0");
-                }
-                parameters.push_back(generateSHA256(password_));
-
-                RequestId requestId(_connectionRequestsController.getConnectionId(),_lastRequestId+1);
-                _lastRequestId++;
-
-                ConnectionMessage connectionMessage(requestId, connectionMessageType, parameters);
-                ErrorCodeConnectionMessageOptCallBackFn errorCodeConnectionMessageOptCallBackFn =  std::bind(&AuthenticatorImpl::handleLoginUserConnectionMessage,
-                                                                                                             this,
-                                                                                                             std::placeholders::_1,
-                                                                                                             std::placeholders::_2,
-                                                                                                             onLoginUserCallbackFn_);
-                const boost::optional<ErrorCodeConnectionMessageOptCallBackFn> errorCodeConnectionMessageOptCallBackFnOpt = errorCodeConnectionMessageOptCallBackFnOpt;
-                _connectionRequestsController.sendMessage(connectionMessage,
-                                                          true,
-                                                          errorCodeConnectionMessageOptCallBackFnOpt);
-            }
-
-            void AuthenticatorImpl::handleLoginUserConnectionMessage(const std::error_code& error_,
-                                                                     const boost::optional<ConnectionMessage>& connectionMessageOpt_,
-                                                                     const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
-            {
-                if(!error_)
-                {
-                    if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
-                    {
-                        _clientCache.addCookieUserInfoToCache(connectionMessageOpt_->_parameters[2],  //ccokiestring_
-                                                              connectionMessageOpt_->_parameters[0], //username
-                                                              connectionMessageOpt_->_parameters[1]); //emailAddress
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::error_code error;
                 
-                        onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
-                                                               ErrorCategory::GetInstance()),
-                                               std::make_pair(UserInfo(connectionMessageOpt_->_parameters[0], //username
-                                                                       connectionMessageOpt_->_parameters[1]), // emailAddress
-                                                              connectionMessageOpt_->_parameters[2]));  // cookieString
-                    }
-                    else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
+                logoutUserForCookieImpl(
+                    cookieString_,
+                    [&error,handler](const std::error_code& error_)
                     {
-                        //will change with appropriate error
-                        onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),boost::none);
-                    }
-                }
-                else
-                {
-                    onLoginUserCallbackFn_(error_,boost::none);
-                }    
+                        error = error_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return error;
             }
-
+            
             void AuthenticatorImpl::logoutUserForCookieImpl(const std::string& cookieString_,
                                                             const ErrorCodeCallbackFn& onLogoutCookieCallbackFn_)
             {
@@ -299,6 +371,26 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     onLogoutCookieCallbackFn_(error_);
                 }    
+            }
+
+            std::error_code AuthenticatorImpl::logoutUserForAllCookies(const std::string& userName_,
+                                                                       boost::asio::yield_context yield_)
+            {
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
+        
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::error_code error;
+                
+                logoutUserForAllCookiesImpl(
+                    userName_,
+                    [&error,handler](const std::error_code& error_)
+                    {
+                        error = error_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return error;
             }
 
             void AuthenticatorImpl::logoutUserForAllCookiesImpl(const std::string& userName_,
@@ -355,6 +447,30 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 }    
             }
 
+            std::error_code AuthenticatorImpl::changeUserPassword(const std::string& cookieString_,
+                                                                  const std::string& oldPassword_,
+                                                                  const std::string& newPassword_,
+                                                                  boost::asio::yield_context yield_)
+            {
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
+        
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::error_code error;
+                
+                changeUserPasswordImpl(
+                    cookieString_,
+                    oldPassword_,
+                    newPassword_,
+                    [&error,handler](const std::error_code& error_)
+                    {
+                        error = error_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return error;
+            }
+            
             void AuthenticatorImpl::changeUserPasswordImpl(const std::string& cookieString_,
                                                            const std::string& oldPassword_,
                                                            const std::string& newPassword_,
@@ -411,6 +527,30 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 }    
             }
 
+            std::pair<std::error_code,boost::optional<std::string> >
+            AuthenticatorImpl::getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                       const std::string& recoveryString_,
+                                                                       boost::asio::yield_context yield_)
+            {
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
+        
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::pair<std::error_code,boost::optional<std::string> > ret;
+                
+                getUserForEmailAddressAndRecoveryStringImpl(
+                    emailAddress_,
+                    recoveryString_,
+                    [&ret,handler](const std::error_code& error_,const boost::optional<std::string>& str_)
+                    {
+                        ret.first = error_;
+                        ret.second = str_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return ret;
+            }
+            
             void AuthenticatorImpl::getUserForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
                                                                                 const std::string& recoveryString_,
                                                                                 const ErrorCodeStringCallbackFn& onGetUserForEmailAddressAndRecoveryStringCallbackFn_)
@@ -464,6 +604,30 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     onGetUserForEmailAddressAndRecoveryStringCallbackFn_(error_,boost::none);
                 }    
+            }
+
+            std::error_code AuthenticatorImpl::changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+                                                                                                  const std::string& recoveryString_,
+                                                                                                  const std::string& newPassword_,
+                                                                                                  boost::asio::yield_context yield_)
+            {
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
+        
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::error_code error;
+                
+                changeUserPasswordForEmailAddressAndRecoveryStringImpl(
+                    emailAddress_,
+                    recoveryString_,
+                    newPassword_,
+                    [&error,handler](const std::error_code& error_)
+                    {
+                        error = error_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return error;
             }
 
             void AuthenticatorImpl::changeUserPasswordForEmailAddressAndRecoveryStringImpl(const std::string& emailAddress_,
@@ -522,6 +686,30 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 }    
             }
 
+            std::error_code AuthenticatorImpl::changeUserEmailAddress(const std::string& cookieString_,
+                                                                      const std::string& newEmailAddress_,
+                                                                      const std::string& password_,
+                                                                      boost::asio::yield_context yield_)
+            {
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
+        
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::error_code error;
+                
+                changeUserEmailAddressImpl(
+                    cookieString_,
+                    newEmailAddress_,
+                    password_,
+                    [&error,handler](const std::error_code& error_)
+                    {
+                        error = error_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return error;
+            }
+
             void AuthenticatorImpl::changeUserEmailAddressImpl(const std::string& cookieString_,
                                                                const std::string& newEmailAddress_,
                                                                const std::string& password_,
@@ -577,7 +765,29 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                     onChangeEmailAddressCallbackFn_(error_);
                 }    
             }
+
+            std::pair<std::error_code,boost::optional<std::string> >
+            AuthenticatorImpl::createAndReturnRecoveryString(const std::string& emailAddress_,
+                                                             boost::asio::yield_context yield_)
+            {
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
         
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::pair<std::error_code,boost::optional<std::string> > ret;
+                
+                createAndReturnRecoveryStringImpl(
+                    emailAddress_,
+                    [&ret,handler](const std::error_code& error_,const boost::optional<std::string>& str_)
+                    {
+                        ret.first = error_;
+                        ret.second = str_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return ret;
+            }
+            
             void AuthenticatorImpl::createAndReturnRecoveryStringImpl(const std::string& emailAddress_,
                                                                       const ErrorCodeStringCallbackFn& onCreateAndReturnRecoveryStringCallbackFn_)
             {
@@ -631,6 +841,26 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 }    
             }
 
+            std::error_code AuthenticatorImpl::deleteUser(const std::string& cookieString_,
+                                                          boost::asio::yield_context yield_)
+            {
+                typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+                    handler(std::forward<boost::asio::yield_context>(yield_));
+        
+                boost::asio::async_result<decltype(handler)> result(handler);
+                std::error_code error;
+                
+                deleteUserImpl(
+                    cookieString_,
+                    [&error,handler](const std::error_code& error_)
+                    {
+                        error = error_;
+                        asio_handler_invoke(handler, &handler);
+                    });
+                result.get();
+                return error;
+            }
+            
             void AuthenticatorImpl::deleteUserImpl(const std::string& cookieString_,
                                                    const ErrorCodeCallbackFn& onDeleteUserCallbackFn_)
             {
@@ -759,6 +989,5 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                         std::vector<std::string>());
                 _connectionRequestsController.sendMessage(reply,false,boost::none);
             }
-
             
 }}}
