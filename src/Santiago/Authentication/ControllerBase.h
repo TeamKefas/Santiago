@@ -34,13 +34,15 @@
 
 namespace Santiago{ namespace Authentication
 {
-    template<typename ControllerData>
+    template<typename ControllerTypes>
     class ControllerBase
     {
     public:
 
         typedef Thread::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
-        typedef typename ControllerData::ClientIdType ClientIdType;
+        typedef typename ControllerTypes::LocalData LocalData;
+//        typedef typename Data::ClientId ClientIdType;
+        typedef typename ControllerTypes::ClientRequestData ClientRequestData;
         
         /**
          * The constructor
@@ -55,43 +57,52 @@ namespace Santiago{ namespace Authentication
 	virtual ~ControllerBase()
 	{}
 
-        std::error_code createUser(const std::string& userName_,
+        std::error_code createUser(const ClientRequestData& requestData_,
+                                   const std::string& userName_,
                                    const std::string& emailAddress_,
                                    const std::string& password_,
                                    boost::asio::yield_context yield_);
 
         std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >
-        loginUser(const ClientIdType& clientId_,
+        loginUser(const ClientRequestData& requestData_,
                   const std::string& userNameOrEmailAddress_,
                   bool isUserNameNotEmailAddress_,
                   const std::string& password_,
                   boost::asio::yield_context yield_);
         
         std::pair<std::error_code,boost::optional<UserInfo> >
-        verifyCookieAndGetUserInfo(const ClientIdType& clientId_,
+        verifyCookieAndGetUserInfo(const ClientRequestData& requestData_,
                                    const std::string& cookieString_,
                                    boost::asio::yield_context yield_);
 
-        std::error_code logoutUserForCookie(const std::string& cookieString_,boost::asio::yield_context yield_);
+        std::error_code logoutUserForCookie(const ClientRequestData& requestData_,
+                                            const std::string& cookieString_,
+                                            boost::asio::yield_context yield_);
 
-        std::error_code logoutUserForAllCookies(const std::string& userName_,boost::asio::yield_context yield_);
+        std::error_code logoutUserForAllCookies(const ClientRequestData& requestData_,
+                                                const std::string& userName_,
+                                                boost::asio::yield_context yield_);
 
-        std::error_code changeUserPassword(const std::string& cookieString_,
+        std::error_code changeUserPassword(const ClientRequestData& requestData_,
+                                           const std::string& cookieString_,
                                            const std::string& oldPassword_,
                                            const std::string& newPassword_,
                                            boost::asio::yield_context yield_);
 
         std::pair<std::error_code,boost::optional<std::string> >
-        getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+        getUserForEmailAddressAndRecoveryString(const ClientRequestData& requestData_,
+                                                const std::string& emailAddress_,
                                                 const std::string& recoveryString_,
                                                 boost::asio::yield_context yield_);
 
-        std::error_code changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+        std::error_code changeUserPasswordForEmailAddressAndRecoveryString(const ClientRequestData& requestData_,
+                                                                           const std::string& emailAddress_,
                                                                            const std::string& recoverystring_,
                                                                            const std::string& newPassword_,
                                                                            boost::asio::yield_context yield_);
 
-        std::error_code changeUserEmailAddress(const std::string& cookieString_,
+        std::error_code changeUserEmailAddress(const ClientRequestData& requestData_,
+                                               const std::string& cookieString_,
                                                const std::string& newEmailAddress_,
                                                const std::string& password_,
                                                boost::asio::yield_context yield_);
@@ -112,15 +123,22 @@ namespace Santiago{ namespace Authentication
         std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
         verifyEmailAddressRecoveryStringAndGetUsersRec(const std::string& emailAddress_,
                                                        const std::string& recoveryString_);
-        std::error_code cleanupCookieDataAndUpdateSessionRecord(const std::string& cookieString_,
+
+        std::pair<std::error_code,boost::optional<SantiagoDBTables::SessionsRec> >
+        partiallyVerifyCookieAndGetSessionsRec(const std::string& cookieString_);
+        
+        std::error_code cleanupCookieDataAndUpdateSessionRecord(const ClientRequestData& requestData_,
+                                                                const std::string& cookieString_,
                                                                 boost::asio::yield_context yield_);
 
         std::error_code cleanupLocalCookieDataAndUpdateSessionsRecordImpl(SantiagoDBTables::SessionsRec& sessionsRec_);
-        std::error_code cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const std::string& userName_,
+        std::error_code cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const ClientRequestData& requestData_,
+                                                                              const std::string& userName_,
                                                                               boost::asio::yield_context yield_);
         boost::posix_time::time_duration getMaxSessionInactiveDuration() const;
 
-        virtual std::error_code logoutCookieFromAllClients(const std::string& cookieString_,
+        virtual std::error_code logoutCookieFromAllClients(const ClientRequestData& requestData_,
+                                                           const std::string& cookieString_,
                                                            boost::asio::yield_context yield_) = 0;
         
         virtual std::error_code logoutUserFromAllClients(const std::string& userName_,
@@ -131,7 +149,7 @@ namespace Santiago{ namespace Authentication
         std::string generateRecoveryString();
 
         ThreadSpecificDbConnection          &_databaseConnection;
-        ControllerData                       _localData;
+        LocalData                            _localData;
         
     };
 }}

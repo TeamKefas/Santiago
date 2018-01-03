@@ -20,20 +20,21 @@ namespace Santiago{ namespace Authentication
     }
 
     boost::optional<std::string> ControllerDataBase::getUserEmailAddress(const std::string& userName_) const
-     {
-         auto iter = _userNameUserDataMap.find(userName_);
-         if(iter != _userNameUserDataMap.end())
-         {
-             return iter->second._emailAddress;
-         }
-         return boost::none;
-     }
+    {
+        auto iter = _userNameUserDataMap.find(userName_);
+        if(iter != _userNameUserDataMap.end())
+        {
+            return iter->second._emailAddress;
+        }
+        return boost::none;
+    }
     
     void ControllerDataBase::removeCookie(const std::string& cookieString_)
     {
         auto cookieDataIter = _cookieStringCookieDataPtrMap.find(cookieString_);
         ST_ASSERT(cookieDataIter != _cookieStringCookieDataPtrMap.end());
-
+        ST_ASSERT(cookieDataIter->second._isBeingLoggedOut);
+        
         _cookieStringCookieDataPtrMap.erase(cookieDataIter);
 
         auto userDataIter = _userNameUserDataMap.find(cookieDataIter->second->_sessionsRec._userName);
@@ -52,13 +53,13 @@ namespace Santiago{ namespace Authentication
         }
         return;
     }
-
     
     void ControllerDataBase::removeUser(const std::string& userName_)
     {
         auto userDataIter = _userNameUserDataMap.find(userName_);
         ST_ASSERT(userDataIter != _userNameUserDataMap.end());
-
+        ST_ASSERT(userDataIter->second._isBeingLoggedOut);
+        
         std::vector<std::string> cookieList = userDataIter->second._cookieList;
         std::vector<std::string>::iterator iter;
         for(iter = cookieList.begin(); iter != cookieList.end(); ++iter)
@@ -69,7 +70,6 @@ namespace Santiago{ namespace Authentication
         return;
     }
     
-
     void ControllerDataBase::updateUserEmailAddress(const std::string& userName_,
                                                     const std::string& newEmailAddress_)
     {
@@ -77,6 +77,58 @@ namespace Santiago{ namespace Authentication
         ST_ASSERT(iter != _userNameUserDataMap.end());
         iter->second._emailAddress = newEmailAddress_;
         return;
+    }
+
+    void ControllerDataBase::setCookieBeingLoggedOutFlag(const std::string& cookieString_)
+    {
+        auto cookieDataIter = _cookieStringCookieDataPtrMap.find(cookieString_);
+        ST_ASSERT(cookieDataIter != _cookieStringCookieDataPtrMap.end());
+        ST_ASSERT(!cookieDataIter->second->_isBeingLoggedOut);
+                
+        _cookieDataIter->second->_isBeingLoggedOut = true;
+    }
+
+    void ControllerDataBase::unsetCookieBeingLoggedOutFlag(const std::string& cookieString_)
+    {
+        auto cookieDataIter = _cookieStringCookieDataPtrMap.find(cookieString_);
+        ST_ASSERT(cookieDataIter != _cookieStringCookieDataPtrMap.end());
+        ST_ASSERT(cookieDataIter->second->_isBeingLoggedOut);
+                
+        _cookieDataIter->second->_isBeingLoggedOut = false;
+    }
+
+    bool ControllerDataBase::isCookieBeingLoggedOut(const std::string& cookieString_) const
+    {
+        auto cookieDataIter = _cookieStringCookieDataPtrMap.find(cookieString_);
+        ST_ASSERT(cookieDataIter != _cookieStringCookieDataPtrMap.end());
+        
+        return _cookieDataIter->second->_isBeingLoggedOut;
+    }
+
+    void ControllerDataBase::setUserBeingLoggedOutFlag(const std::string& userName_)
+    {
+        auto userDataIter = _userNameUserDataMap.find(userName_);
+        ST_ASSERT(userDataIter != _userNameUserDataMap.end());
+        ST_ASSERT(!userDataIter->second._isBeingLoggedOut);
+        
+        userDataIter->second._isBeingLoggedOut = true;
+    }
+
+    void ControllerDataBase::unsetUserBeingLoggedOutFlag(const std::string& userName_)
+    {
+        auto userDataIter = _userNameUserDataMap.find(userName_);
+        ST_ASSERT(userDataIter != _userNameUserDataMap.end());
+        ST_ASSERT(userDataIter->second._isBeingLoggedOut);
+        
+        userDataIter->second._isBeingLoggedOut = false;
+    }
+
+    void ControllerDataBase::isUserBeingLoggedOut(const std::string& userName_) const
+    {
+        auto userDataIter = _userNameUserDataMap.find(userName_);
+        ST_ASSERT(userDataIter != _userNameUserDataMap.end());
+        
+        return userDataIter->second._isBeingLoggedOut;
     }
         
     void ControllerData::addCookie(const std::string& userName_,

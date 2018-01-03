@@ -2,8 +2,8 @@
 
 namespace Santiago{ namespace Authentication
 {
-    template<typename ControllerData>
-    ControllerBase<ControllerData>::ControllerBase(ThreadSpecificDbConnection& databaseConnection_):
+    template<typename ControllerTypes>
+    ControllerBase<ControllerTypes>::ControllerBase(ThreadSpecificDbConnection& databaseConnection_):
         _databaseConnection(databaseConnection_),
         _localData()
     {
@@ -44,11 +44,12 @@ namespace Santiago{ namespace Authentication
         }
     }
 
-    template<typename ControllerData>
-    std::error_code ControllerBase<ControllerData>::createUser(const std::string& userName_,
-                                                               const std::string& emailAddress_,
-                                                               const std::string& password_,
-                                                               boost::asio::yield_context yield_)
+    template<typename ControllerTypes>
+    std::error_code ControllerBase<ControllerTypes>::createUser(const ClientRequestData& requestData_,
+                                                                const std::string& userName_,
+                                                                const std::string& emailAddress_,
+                                                                const std::string& password_,
+                                                                boost::asio::yield_context yield_)
     {
 
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
@@ -93,9 +94,9 @@ namespace Santiago{ namespace Authentication
         return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
     }
 
-    template<typename ControllerData>
-    std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > > ControllerBase<ControllerData>::
-    loginUser(const ClientIdType& clientId_,
+    template<typename ControllerTypes>
+    std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > > ControllerBase<ControllerTypes>::
+    loginUser(const ClientRequestData& requestData_,
               const std::string& userNameOrEmailAddress_,
               bool isUserNameNotEmailAddress_,
               const std::string& password_,
@@ -124,6 +125,14 @@ namespace Santiago{ namespace Authentication
         }
         ST_ASSERT(usersRecOpt);
 
+        if(_localData.isUserBeingLoggedOut(usersRecOpt->_userName))
+        {
+            ST_LOG_INFO("User in being logged out state. userName:"<<usersRecOpt->_userName<<std::endl);
+            return std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >(
+                std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT,
+                                ErrorCategory::GetInstance()),
+                boost::none);
+        }
 
         //create new session record and add to db
         SantiagoDBTables::SessionsRec sessionsRec;
@@ -146,7 +155,7 @@ namespace Santiago{ namespace Authentication
             return std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >(error,boost::none);
         }
      
-        _localData.addCookie(usersRecOpt->_userName,usersRecOpt->_emailAddress,sessionsRec,clientId_);
+        _localData.addCookie(usersRecOpt->_userName,usersRecOpt->_emailAddress,sessionsRec,requestData_.getClientId());
         
         return std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >(
             std::error_code(ErrorCode::ERR_SUCCESS,
@@ -156,21 +165,22 @@ namespace Santiago{ namespace Authentication
                            sessionsRec._cookieString));
     }
 
-    template<typename ControllerData>
-    std::pair<std::error_code,boost::optional<UserInfo> > ControllerBase<ControllerData>::
-    verifyCookieAndGetUserInfo(const ClientIdType& clientId_,
+    template<typename ControllerTypes>
+    std::pair<std::error_code,boost::optional<UserInfo> > ControllerBase<ControllerTypes>::
+    verifyCookieAndGetUserInfo(const ClientRequestData& requestData_,
                                const std::string& cookieString_,
                                boost::asio::yield_context yield_)
     {
-        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt = _localData.getCookieSessionsRec(cookieString_);
-        if(!sessionsRecOpt)
+        std::error_code error;
+        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt;
+        std::tie(error,sessionsRecOpt) = partiallyVerifyCookieAndGetSessionsRec(cookieString_);        
+        if(error)
         {
-            ST_LOG_INFO("Cookie not valid. cookieString:" <<cookieString_<<std::endl);
-            return std::pair<std::error_code,boost::optional<UserInfo> >(
-                std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,ErrorCategory::GetInstance()),
-                boost::none);
+            ST_LOG_INFO(error.getDescription() <<" cookieString:" <<cookieString_<<std::endl);
+            return std::pair<std::error_code,boost::optional<UserInfo> >(error,boost::none);
         }
-
+        ST_ASSERT(sessionsRecOpt);
+        
         //check if the lastActiveTime older than MAX_SESSION_DURATION. If yes then logout
         if((boost::posix_time::second_clock::universal_time() - sessionsRecOpt->_lastActiveTime) >
            getMaxSessionInactiveDuration())
@@ -178,7 +188,7 @@ namespace Santiago{ namespace Authentication
 
             ST_LOG_INFO("Session lastActiveTime older than MAX_SESSION_DURATION. Going to log out. cookieString:"
                      <<cookieString_<<std::endl);            
-            cleanupCookieDataAndUpdateSessionRecord(cookieString_,yield_);
+            cleanupCookieDataAndUpdateSessionRecord(requestData_,cookieString_,yield_);
 
             return std::pair<std::error_code,boost::optional<UserInfo> >(
                 std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,
@@ -196,7 +206,7 @@ namespace Santiago{ namespace Authentication
         boost::optional<std::string> emailAddressOpt = _localData.getUserEmailAddress(sessionsRecOpt->_userName);
         ST_ASSERT(emailAddressOpt);
 
-        _localData.updateCookie(*sessionsRecOpt,clientId_);
+        _localData.updateCookie(*sessionsRecOpt,requestData_.getClientId());
 
         return std::pair<std::error_code,boost::optional<UserInfo> >(
             std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
@@ -204,23 +214,27 @@ namespace Santiago{ namespace Authentication
                      *emailAddressOpt));
     }
 
-    template<typename ControllerData>
-    std::error_code ControllerBase<ControllerData>::logoutUserForCookie(const std::string& cookieString_,
-                                                                      boost::asio::yield_context yield_)
+    template<typename ControllerTypes>
+    std::error_code ControllerBase<ControllerTypes>::logoutUserForCookie(const ClientRequestData& requestData_,
+                                                                        const std::string& cookieString_,
+                                                                        boost::asio::yield_context yield_)
     {
-        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt = _localData.getCookieSessionsRec(cookieString_);
-        if(!sessionsRecOpt)
+        std::error_code error;
+        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt;
+        std::tie(error,sessionsRecOpt) = partiallyVerifyCookieAndGetSessionsRec(cookieString_);        
+        if(error)
         {
-            ST_LOG_INFO("Cookie not valid. cookieString:" <<cookieString_<<std::endl);
-            return std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,ErrorCategory::GetInstance());
+            ST_LOG_INFO(error.getDescription() <<" cookieString:" <<cookieString_<<std::endl);
+            return error;
         }
-
-        return cleanupCookieDataAndUpdateSessionRecord(cookieString_,yield_);
+        
+        return cleanupCookieDataAndUpdateSessionRecord(requestData_,cookieString_,yield_);
     }
 
-        template<typename ControllerData>
-        std::error_code ControllerBase<ControllerData>::logoutUserForAllCookies(const std::string& userName_,
-                                                                                boost::asio::yield_context yield_)
+    template<typename ControllerTypes>
+    std::error_code ControllerBase<ControllerTypes>::logoutUserForAllCookies(const ClientRequestData& requestData_,
+                                                                            const std::string& userName_,
+                                                                            boost::asio::yield_context yield_)
     {
         //verify if such a user is already logged in
         if(!_localData.getUserEmailAddress(userName_))
@@ -230,25 +244,34 @@ namespace Santiago{ namespace Authentication
                                                           ErrorCategory::GetInstance());
         }
         
-        return cleanupCookieDataAndUpdateSessionRecordsForAllCookies(userName_,yield_);
+        if(_localData.isUserBeingLoggedOut(userName_))
+        {
+            ST_LOG_INFO("User in being logged out state. userName:"<<userName_<<std::endl);
+            return std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT,ErrorCategory::GetInstance());
+        }
+        
+        return cleanupCookieDataAndUpdateSessionRecordsForAllCookies(requestData_,userName_,yield_);
     }
 
-    template<typename ControllerData>
-    std::error_code ControllerBase<ControllerData>::changeUserPassword(
+    template<typename ControllerTypes>
+    std::error_code ControllerBase<ControllerTypes>::changeUserPassword(
+        const ClientRequestData& requestData_,
         const std::string& cookieString_,
         const std::string& oldPassword_,
         const std::string& newPassword_,
         boost::asio::yield_context yield_)
     {
-        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt = _localData.getCookieSessionsRec(cookieString_);
-        if(!sessionsRecOpt)
-        {
-            ST_LOG_INFO("Cookie not valid. cookieString:" <<cookieString_<<std::endl);
-            return std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,ErrorCategory::GetInstance());
-        }
-
-        //verify username-password
         std::error_code error;
+        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt;
+        std::tie(error,sessionsRecOpt) = partiallyVerifyCookieAndGetSessionsRec(cookieString_);        
+        if(error)
+        {
+            ST_LOG_INFO(error.getDescription() <<" cookieString:" <<cookieString_<<std::endl);
+            return error;
+        }
+        ST_ASSERT(sessionsRecOpt);
+        
+        //verify username-password
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::tie(error,usersRecOpt) =
             verifyUserNamePasswordAndGetUsersRec(sessionsRecOpt->_userName, oldPassword_);
@@ -265,9 +288,11 @@ namespace Santiago{ namespace Authentication
         return error;
     }
 
-    template<typename ControllerData>
-    std::pair<std::error_code,boost::optional<std::string> > ControllerBase<ControllerData>::
-    createAndReturnRecoveryString(const std::string& emailAddress_,boost::asio::yield_context yield_)
+    template<typename ControllerTypes>
+    std::pair<std::error_code,boost::optional<std::string> > ControllerBase<ControllerTypes>::
+    createAndReturnRecoveryString(const ClientRequestData& requestData_,
+                                  const std::string& emailAddress_,
+                                  boost::asio::yield_context yield_)
     {
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::error_code error;
@@ -283,7 +308,6 @@ namespace Santiago{ namespace Authentication
                                 ErrorCategory::GetInstance()),
                 boost::none);
         }
-            
         ST_ASSERT(usersRecOpt);
         
         SantiagoDBTables::UsersRec newUsersRec = *usersRecOpt;
@@ -302,9 +326,10 @@ namespace Santiago{ namespace Authentication
             newUsersRec._recoveryString);
     }
 
-    template<typename ControllerData>
-    std::pair<std::error_code,boost::optional<std::string> > ControllerBase<ControllerData>::
-    getUserForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+    template<typename ControllerTypes>
+    std::pair<std::error_code,boost::optional<std::string> > ControllerBase<ControllerTypes>::
+    getUserForEmailAddressAndRecoveryString(const ClientRequestData& requestData_,
+                                            const std::string& emailAddress_,
                                             const std::string& recoveryString_,
                                             boost::asio::yield_context yield_)
     {
@@ -338,9 +363,10 @@ namespace Santiago{ namespace Authentication
             usersRecOpt->_userName);
     }
 
-    template<typename ControllerData>
-    std::error_code ControllerBase<ControllerData>::
-    changeUserPasswordForEmailAddressAndRecoveryString(const std::string& emailAddress_,
+    template<typename ControllerTypes>
+    std::error_code ControllerBase<ControllerTypes>::
+    changeUserPasswordForEmailAddressAndRecoveryString(const ClientRequestData& requestData_,
+                                                       const std::string& emailAddress_,
                                                        const std::string& recoveryString_,
                                                        const std::string& newPassword_,
                                                        boost::asio::yield_context yield_)
@@ -364,21 +390,24 @@ namespace Santiago{ namespace Authentication
         return error;
     }
 
-    template<typename ControllerData>
-    std::error_code ControllerBase<ControllerData>::changeUserEmailAddress(
+    template<typename ControllerTypes>
+    std::error_code ControllerBase<ControllerTypes>::changeUserEmailAddress(
+        const ClientRequestData& requestData_,
         const std::string& cookieString_,
         const std::string& newEmailAddress_,
         const std::string& password_,
         boost::asio::yield_context yield_)
     {
-        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt = _localData.getCookieSessionsRec(cookieString_);
-        if(!sessionsRecOpt)
-        {
-            ST_LOG_INFO("Cookie not valid. cookieString:" <<cookieString_<<std::endl);
-            return std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,ErrorCategory::GetInstance());
-        }
-        
         std::error_code error;
+        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt;
+        std::tie(error,sessionsRecOpt) = partiallyVerifyCookieAndGetSessionsRec(cookieString_);        
+        if(error)
+        {
+            ST_LOG_INFO(error.getDescription() <<" cookieString:" <<cookieString_<<std::endl);
+            return error;
+        }
+        ST_ASSERT(sessionsRecOpt);
+        
         //verify password
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::tie(error,usersRecOpt) =
@@ -414,19 +443,21 @@ namespace Santiago{ namespace Authentication
 
     }
 
-    template<typename ControllerData>
-    std::error_code ControllerBase<ControllerData>::deleteUser(const std::string& cookieString_,
+    template<typename ControllerTypes>
+    std::error_code ControllerBase<ControllerTypes>::deleteUser(const ClientRequestData& requestData_,
+                                                               const std::string& cookieString_,
                                                                boost::asio::yield_context yield_)
     {
-        //verify if the cookie is in the cookieStringSessionsRecMap.
-        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt = _localData.getCookieSessionsRec(cookieString_);
-        if(!sessionsRecOpt)
-        {
-            ST_LOG_INFO("Cookie not valid. cookieString:" <<cookieString_<<std::endl);
-            return std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,ErrorCategory::GetInstance());
-        }
-        
         std::error_code error;
+        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt;
+        std::tie(error,sessionsRecOpt) = partiallyVerifyCookieAndGetSessionsRec(cookieString_);        
+        if(error)
+        {
+            ST_LOG_INFO(error.getDescription() <<" cookieString:" <<cookieString_<<std::endl);
+            return error;
+        }
+        ST_ASSERT(sessionsRecOpt);
+
         //delete from db
         boost::optional<SantiagoDBTables::UsersRec> usersRecOpt;
         std::tie(error,usersRecOpt) =
@@ -445,11 +476,13 @@ namespace Santiago{ namespace Authentication
         }
 
         //remove from memory
-        return cleanupCookieDataAndUpdateSessionRecordsForAllCookies(sessionsRecOpt->_userName,yield_);
+        return cleanupCookieDataAndUpdateSessionRecordsForAllCookies(requestData_,
+                                                                     sessionsRecOpt->_userName,
+                                                                     yield_);
     }
 
-    template<typename ControllerData>
-    std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > ControllerBase<ControllerData>::
+    template<typename ControllerTypes>
+    std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > ControllerBase<ControllerTypes>::
     verifyUserNamePasswordAndGetUsersRec(const std::string& userName_, const std::string& password_)
     {
         //get the UsersRec from db
@@ -475,8 +508,8 @@ namespace Santiago{ namespace Authentication
         return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),usersRecOpt);
     }
 
-    template<typename ControllerData>
-    std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > ControllerBase<ControllerData>::
+    template<typename ControllerTypes>
+    std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > ControllerBase<ControllerTypes>::
     verifyEmailAddressPasswordAndGetUsersRec(const std::string& emailAddress_,
                                              const std::string& password_)
     {
@@ -503,9 +536,9 @@ namespace Santiago{ namespace Authentication
         return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),usersRecOpt);
     }
 
-    template<typename ControllerData>
+    template<typename ControllerTypes>
     std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
-    ControllerBase<ControllerData>::verifyEmailAddressRecoveryStringAndGetUsersRec(const std::string& emailAddress_,
+    ControllerBase<ControllerTypes>::verifyEmailAddressRecoveryStringAndGetUsersRec(const std::string& emailAddress_,
                                                                                  const std::string& recoveryString_)
     {
         //get the UsersRec from db
@@ -531,10 +564,43 @@ namespace Santiago{ namespace Authentication
         return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),usersRecOpt);
     }
 
-    template<typename ControllerData>
-    std::error_code ControllerBase<ControllerData>::
+    template<typename ControllerTypes>
+    std::pair<std::error_code,boost::optional<SantiagoDBTables::SessionsRec> >
+    ControllerBase<ControllerTypes>::partiallyVerifyCookieAndGetSessionsRec(const std::string& cookieString_)
+    {
+        boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt = _localData.getCookieSessionsRec(cookieString_);
+        if(!sessionsRecOpt)
+        {
+            return std::pair<std::error_code,boost::optional<UserInfo> >(
+                std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,ErrorCategory::GetInstance()),
+                boost::none);
+        }
+        else if(_localData.isCookieBeingLoggedOut(cookieString_))
+        {
+            return std::pair<std::error_code,boost::optional<UserInfo> >(
+                std::error_code(ErrorCode::ERR_COOKIE_BEING_LOGGED_OUT,ErrorCategory::GetInstance()),
+                sessionsRecOpt);
+        }
+        else if(_localData.isUserBeingLoggedOut(sessionsRecOpt->_userName))
+        {
+            return std::pair<std::error_code,boost::optional<UserInfo> >(
+                std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT,ErrorCategory::GetInstance()),
+                sessionsRecOpt);
+        }
+        else
+        {
+            return std::pair<std::error_code,boost::optional<UserInfo> >(
+                std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
+                sessionsRecOpt);
+        }
+    }
+
+    template<typename ControllerTypes>
+    std::error_code ControllerBase<ControllerTypes>::
     cleanupLocalCookieDataAndUpdateSessionsRecordImpl(SantiagoDBTables::SessionsRec& sessionsRec_)
     {
+        ST_ASSERT(_localData.isCookieBeingLoggedOut(sessionsRec._cookieString));
+        
         //update the db 
         sessionsRec_._logoutTime = boost::posix_time::second_clock::universal_time();
         std::error_code error;
@@ -544,6 +610,7 @@ namespace Santiago{ namespace Authentication
         {
             ST_LOG_INFO("updateSessionsRec failed. Logging out without writing to db. CookieString:"
                         <<sessionsRec._cookieString);
+            _localData.unsetCookieBeingLoggedOutFlag(sessionsRec._cookieString);
         }
 
         //remove from _userNameUserDataMap
@@ -551,9 +618,10 @@ namespace Santiago{ namespace Authentication
         return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
     }
 
-    template<typename ControllerData>
-    std::error_code ControllerBase<ControllerData>::
-    cleanupCookieDataAndUpdateSessionRecord(const std::string& cookieString_,
+    template<typename ControllerTypes>
+    std::error_code ControllerBase<ControllerTypes>::
+    cleanupCookieDataAndUpdateSessionRecord(const ClientRequestData& requestData_,
+                                            const std::string& cookieString_,
                                             boost::asio::yield_context yield_)
     {
         //internal fn. so when this fn is called the cookie should already be verified.
@@ -562,9 +630,11 @@ namespace Santiago{ namespace Authentication
 
         //logout from all clients
         std::error_code error;
-        error = logoutCookieFromAllClients(cookieString_,yield_);
+        _localData.setCookieBeingLoggedOutFlag(cookieString_);
+        error = logoutCookieFromAllClients(requestData_,cookieString_,yield_);
         if(error)
         {
+            _localData.unsetCookieBeingLoggedOutFlag(cookieString_);
             ST_LOG_INFO("logoutCookieFromAllClients failed. CookieString:" << cookieString_ <<std::endl);
             return error;
         }
@@ -572,20 +642,23 @@ namespace Santiago{ namespace Authentication
         return cleanupLocalCookieDataAndUpdateSessionsRecordImpl(*sessionsRecOpt);
     }
 
-    template<typename ControllerData>
-    std::error_code ControllerBase<ControllerData>::
-    cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const std::string& userName_,
+    template<typename ControllerTypes>
+    std::error_code ControllerBase<ControllerTypes>::
+    cleanupCookieDataAndUpdateSessionRecordsForAllCookies(const ClientRequestData& requestData_,
+                                                          const std::string& userName_,
                                                           boost::asio::yield_context yield_)
     {
         //internal fn. the username should exist.
         ST_ASSERT(_localData.getUserEmailAddress(userName_));
         
         //logout from all clients
+        _localData.setUserBeingLoggedOutFlag(userName_);
         std::error_code error;
-        error = logoutUserFromAllClients(userName_,yield_);
+        error = logoutUserFromAllClients(requestData_,userName_,yield_);
         if(error)
         {
             ST_LOG_INFO("logoutUserFromAllClients failed. userName:" << userName_ <<std::endl);
+            _localData.unsetUserBeingLoggedOutFlag(userName_);
             return error;
         }
 
@@ -597,6 +670,7 @@ namespace Santiago{ namespace Authentication
         if(error)
         {
             ST_LOG_INFO("updateSessionsRecsWithCurrentLogoutTime failed. userName:" << userName_);
+            _localData.unsetUserBeingLoggedOutFlag(userName_);
             return error;
         }
         _localData.removeUser(userName_);
@@ -606,8 +680,8 @@ namespace Santiago{ namespace Authentication
         return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
     }
 
-    template<typename ControllerData>
-    std::string ControllerBase<ControllerData>::generateSHA256(const std::string str)
+    template<typename ControllerTypes>
+    std::string ControllerBase<ControllerTypes>::generateSHA256(const std::string str)
     {
         unsigned char hash[SHA256_DIGEST_LENGTH];
         SHA256_CTX sha256;
@@ -622,8 +696,8 @@ namespace Santiago{ namespace Authentication
         return ss.str();
     }
 
-    template<typename ControllerData>
-    std::string ControllerBase<ControllerData>::generateUniqueCookie(std::string userName_)
+    template<typename ControllerTypes>
+    std::string ControllerBase<ControllerTypes>::generateUniqueCookie(std::string userName_)
     {
         std::string str;
         str += userName_[0];
@@ -643,8 +717,8 @@ namespace Santiago{ namespace Authentication
         return str;
     }
 
-    template<typename ControllerData>
-    std::string ControllerBase<ControllerData>::generateRecoveryString()
+    template<typename ControllerTypes>
+    std::string ControllerBase<ControllerTypes>::generateRecoveryString()
     {
         std::string str;
         static const char alphanum[] =
@@ -662,8 +736,8 @@ namespace Santiago{ namespace Authentication
         return str;
     }
 
-    template<typename ControllerData>
-    boost::posix_time::time_duration ControllerBase<ControllerData>::getMaxSessionInactiveDuration() const
+    template<typename ControllerTypes>
+    boost::posix_time::time_duration ControllerBase<ControllerTypes>::getMaxSessionInactiveDuration() const
     {
         return boost::posix_time::time_duration(MAX_SESSION_DURATION,0,0,0);   
     }
