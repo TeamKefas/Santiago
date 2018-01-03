@@ -54,7 +54,9 @@ namespace Santiago
              {ERR_FASTCGI_REQUEST_ALREADY_REPLIED,         "Fastcgi request already replied"},
              {ERR_INVALID_FASTCGI_VERSION,                 "Invalid fastcgi version."},
              {ERR_FASTCGI_CONNECTION_ERROR,                "Fastcgi connection error."},
-             {ERR_AUTH_SERVER_CONNECTION_ERROR,            "Authentication server connection error"}
+             {ERR_AUTH_SERVER_CONNECTION_ERROR,            "Authentication server connection error."},
+             {ERR_COOKIE_BEING_LOGGED_OUT,                 "Session being logged out."},
+             {ERR_USER_BEING_LOGGED_OUT,                   "User being logged out."}
          }
     {}
 

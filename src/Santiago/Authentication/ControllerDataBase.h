@@ -25,18 +25,21 @@ namespace Santiago{ namespace Authentication
 
             std::string                   _emailAddress;
             std::vector<std::string>      _cookieList;
+            bool                          _isBeingLoggedOut;
         };
 
         struct CookieDataBase
         {
             CookieDataBase(const SantiagoDBTables::SessionsRec& sessionsRec_)
                 :_sessionsRec(sessionsRec_)
+                ,_isBeingLoggedOut(false)
             {}
 
             SantiagoDBTables::SessionsRec _sessionsRec;
+            bool                          _isBeingLoggedOut;
         };
         typedef std::shared_ptr<CookieDataBase> CookieDataBasePtr;
- 
+
         boost::optional<SantiagoDBTables::SessionsRec> getCookieSessionsRec(const std::string& cookieString_) const;
         std::vector<std::string> getAllCookieStringsForUser(const std::string& userName_) const;
         boost::optional<std::string> getUserEmailAddress(const std::string& userName_) const;
@@ -44,6 +47,14 @@ namespace Santiago{ namespace Authentication
         void removeCookie(const std::string& cookieString_);
         void removeUser(const std::string& userName_);
         void updateUserEmailAddress(const std::string& userName_,const std::string& newEmailAddress_);
+
+        void setCookieBeingLoggedOutFlag(const std::string& cookieString_);
+        void unsetCookieBeingLoggedOutFlag(const std::string& cookieString_);
+        bool isCookieBeingLoggedOut(const std::string& cookieString_) const;
+
+        void setUserBeingLoggedOutFlag(const std::string& userName_);
+        void unsetUserBeingLoggedOutFlag(const std::string& userName_);        
+        bool isUserBeingLoggedOut(const std::string& userName_) const;
         
     protected:
 
