@@ -7,7 +7,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                                   const std::string& password_,
                                                   boost::asio::yield_context yield_)
     {
-        return _controller.createUser(userName_,
+        return _controller.createUser(ControllerTypes::ClientRequestData(),
+                                      userName_,
                                       emailAddress_,
                                       password_,
                                       yield_);
@@ -19,7 +20,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                  const std::string& password_,
                                  boost::asio::yield_context yield_)
     {
-        return _controller.loginUser(None(),
+        return _controller.loginUser(ControllerTypes::ClientRequestData(),
                                      userNameOrEmailAddress_,
                                      isUserNameNotEmailAddress_,
                                      password_,
@@ -30,7 +31,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     AuthenticatorImpl::verifyCookieAndGetUserInfo(const std::string& cookieString_,
                                                   boost::asio::yield_context yield_)
     {
-        return _controller.verifyCookieAndGetUserInfo(None(),
+        return _controller.verifyCookieAndGetUserInfo(ControllerTypes::ClientRequestData(),
                                                       cookieString_,
                                                       yield_);
     }
@@ -38,14 +39,16 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     std::error_code AuthenticatorImpl::logoutUserForCookie(const std::string& cookieString_,
                                                            boost::asio::yield_context yield_)
     {
-        return _controller.logoutUserForCookie(cookieString_,
+        return _controller.logoutUserForCookie(ControllerTypes::ClientRequestData(),
+                                               cookieString_,
                                                yield_);
     }
 
     std::error_code AuthenticatorImpl::logoutUserForAllCookies(const std::string& userName_,
                                                                boost::asio::yield_context yield_)
     {
-        return _controller.logoutUserForAllCookies(userName_,
+        return _controller.logoutUserForAllCookies(ControllerTypes::ClientRequestData(),
+                                                   userName_,
                                                    yield_);
     }
 
@@ -54,7 +57,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                                           const std::string& newPassword_,
                                                           boost::asio::yield_context yield_)
     {
-        return _controller.changeUserPassword(cookieString_,
+        return _controller.changeUserPassword(ControllerTypes::ClientRequestData(),
+                                              cookieString_,
                                               oldPassword_,
                                               newPassword_,
                                               yield_);
@@ -65,7 +69,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                                                const std::string& recoveryString_,
                                                                boost::asio::yield_context yield_)
     {
-        return _controller.getUserForEmailAddressAndRecoveryString(emailAddress_,
+        return _controller.getUserForEmailAddressAndRecoveryString(ControllerTypes::ClientRequestData(),
+                                                                   emailAddress_,
                                                                    recoveryString_,
                                                                    yield_);
     }
@@ -76,7 +81,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         const std::string& newPassword_,
         boost::asio::yield_context yield_)
     {
-        return _controller.changeUserPasswordForEmailAddressAndRecoveryString(emailAddress_,
+        return _controller.changeUserPasswordForEmailAddressAndRecoveryString(ControllerTypes::ClientRequestData(),
+                                                                              emailAddress_,
                                                                               recoveryString_,
                                                                               newPassword_,
                                                                               yield_);
@@ -87,7 +93,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                                               const std::string& password_,
                                                               boost::asio::yield_context yield_)
     {
-        return _controller.changeUserEmailAddress(cookieString_,
+        return _controller.changeUserEmailAddress(ControllerTypes::ClientRequestData(),
+                                                  cookieString_,
                                                   newEmailAddress_,
                                                   password_,
                                                   yield_);
@@ -97,14 +104,16 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     AuthenticatorImpl::createAndReturnRecoveryString(const std::string& emailAddress_,
                                                      boost::asio::yield_context yield_)
     {
-        return _controller.createAndReturnRecoveryString(emailAddress_,
+        return _controller.createAndReturnRecoveryString(ControllerTypes::ClientRequestData(),
+                                                         emailAddress_,
                                                          yield_);
     }
 
     std::error_code AuthenticatorImpl::deleteUser(const std::string& cookieString_,
                                                   boost::asio::yield_context yield_)
     {
-        return _controller.deleteUser(cookieString_,
+        return _controller.deleteUser(ControllerTypes::ClientRequestData(),
+                                      cookieString_,
                                       yield_);
     }
     
