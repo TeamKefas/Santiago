@@ -64,7 +64,7 @@ namespace Santiago{ namespace Authentication
 
         virtual std::error_code changeUserPasswordForEmailAddressAndRecoveryString(
             const std::string& emailAddress_,
-            const std::string& recoverystring_,
+            const std::string& recoveryString_,
             const std::string& newPassword_,
             boost::asio::yield_context yield_) = 0;
 
