@@ -31,8 +31,8 @@ namespace Santiago{ namespace Authentication
         struct CookieDataBase
         {
             CookieDataBase(const SantiagoDBTables::SessionsRec& sessionsRec_)
-                :_sessionsRec(sessionsRec_)
-                ,_isBeingLoggedOut(false)
+                :_sessionsRec(sessionsRec_),
+                 _isBeingLoggedOut(false)
             {}
 
             SantiagoDBTables::SessionsRec _sessionsRec;

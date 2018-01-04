@@ -22,7 +22,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         typedef ControllerTypes::ClientRequestData ClientRequestData;
         
         Controller(ThreadSpecificDbConnection& databaseConnection_)
-            :ControllerBase<ControllerData>(databaseConnection_)
+            :ControllerBase<ControllerTypes>(databaseConnection_)
         {}
 
     protected:

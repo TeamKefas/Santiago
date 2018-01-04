@@ -108,9 +108,13 @@ namespace Santiago{ namespace Authentication
                                                boost::asio::yield_context yield_);
 
         std::pair<std::error_code,boost::optional<std::string> >
-        createAndReturnRecoveryString(const std::string& emailAddress_,boost::asio::yield_context yield_);
+        createAndReturnRecoveryString(const ClientRequestData& requestData_,
+                                      const std::string& emailAddress_,
+                                      boost::asio::yield_context yield_);
 
-        std::error_code deleteUser(const std::string& cookieString_,boost::asio::yield_context yield_);
+        std::error_code deleteUser(const ClientRequestData& requestData_,
+                                   const std::string& cookieString_,
+                                   boost::asio::yield_context yield_);
 
     protected:
         
@@ -141,7 +145,8 @@ namespace Santiago{ namespace Authentication
                                                            const std::string& cookieString_,
                                                            boost::asio::yield_context yield_) = 0;
         
-        virtual std::error_code logoutUserFromAllClients(const std::string& userName_,
+        virtual std::error_code logoutUserFromAllClients(const ClientRequestData& requestData_,
+                                                         const std::string& userName_,
                                                          boost::asio::yield_context yield_) = 0;
 
         std::string generateSHA256(const std::string str);

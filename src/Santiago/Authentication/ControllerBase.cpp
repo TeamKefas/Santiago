@@ -176,7 +176,7 @@ namespace Santiago{ namespace Authentication
         std::tie(error,sessionsRecOpt) = partiallyVerifyCookieAndGetSessionsRec(cookieString_);        
         if(error)
         {
-            ST_LOG_INFO(error.getDescription() <<" cookieString:" <<cookieString_<<std::endl);
+            ST_LOG_INFO(error.message() <<" cookieString:" <<cookieString_<<std::endl);
             return std::pair<std::error_code,boost::optional<UserInfo> >(error,boost::none);
         }
         ST_ASSERT(sessionsRecOpt);
@@ -224,7 +224,7 @@ namespace Santiago{ namespace Authentication
         std::tie(error,sessionsRecOpt) = partiallyVerifyCookieAndGetSessionsRec(cookieString_);        
         if(error)
         {
-            ST_LOG_INFO(error.getDescription() <<" cookieString:" <<cookieString_<<std::endl);
+            ST_LOG_INFO(error.message() <<" cookieString:" <<cookieString_<<std::endl);
             return error;
         }
         
@@ -266,7 +266,7 @@ namespace Santiago{ namespace Authentication
         std::tie(error,sessionsRecOpt) = partiallyVerifyCookieAndGetSessionsRec(cookieString_);        
         if(error)
         {
-            ST_LOG_INFO(error.getDescription() <<" cookieString:" <<cookieString_<<std::endl);
+            ST_LOG_INFO(error.message() <<" cookieString:" <<cookieString_<<std::endl);
             return error;
         }
         ST_ASSERT(sessionsRecOpt);
@@ -403,7 +403,7 @@ namespace Santiago{ namespace Authentication
         std::tie(error,sessionsRecOpt) = partiallyVerifyCookieAndGetSessionsRec(cookieString_);        
         if(error)
         {
-            ST_LOG_INFO(error.getDescription() <<" cookieString:" <<cookieString_<<std::endl);
+            ST_LOG_INFO(error.message() <<" cookieString:" <<cookieString_<<std::endl);
             return error;
         }
         ST_ASSERT(sessionsRecOpt);
@@ -453,7 +453,7 @@ namespace Santiago{ namespace Authentication
         std::tie(error,sessionsRecOpt) = partiallyVerifyCookieAndGetSessionsRec(cookieString_);        
         if(error)
         {
-            ST_LOG_INFO(error.getDescription() <<" cookieString:" <<cookieString_<<std::endl);
+            ST_LOG_INFO(error.message() <<" cookieString:" <<cookieString_<<std::endl);
             return error;
         }
         ST_ASSERT(sessionsRecOpt);
@@ -571,25 +571,25 @@ namespace Santiago{ namespace Authentication
         boost::optional<SantiagoDBTables::SessionsRec> sessionsRecOpt = _localData.getCookieSessionsRec(cookieString_);
         if(!sessionsRecOpt)
         {
-            return std::pair<std::error_code,boost::optional<UserInfo> >(
+            return std::pair<std::error_code,boost::optional<SantiagoDBTables::SessionsRec> >(
                 std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,ErrorCategory::GetInstance()),
                 boost::none);
         }
         else if(_localData.isCookieBeingLoggedOut(cookieString_))
         {
-            return std::pair<std::error_code,boost::optional<UserInfo> >(
+            return std::pair<std::error_code,boost::optional<SantiagoDBTables::SessionsRec> >(
                 std::error_code(ErrorCode::ERR_COOKIE_BEING_LOGGED_OUT,ErrorCategory::GetInstance()),
                 sessionsRecOpt);
         }
         else if(_localData.isUserBeingLoggedOut(sessionsRecOpt->_userName))
         {
-            return std::pair<std::error_code,boost::optional<UserInfo> >(
+            return std::pair<std::error_code,boost::optional<SantiagoDBTables::SessionsRec> >(
                 std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT,ErrorCategory::GetInstance()),
                 sessionsRecOpt);
         }
         else
         {
-            return std::pair<std::error_code,boost::optional<UserInfo> >(
+            return std::pair<std::error_code,boost::optional<SantiagoDBTables::SessionsRec> >(
                 std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
                 sessionsRecOpt);
         }
@@ -599,7 +599,7 @@ namespace Santiago{ namespace Authentication
     std::error_code ControllerBase<ControllerTypes>::
     cleanupLocalCookieDataAndUpdateSessionsRecordImpl(SantiagoDBTables::SessionsRec& sessionsRec_)
     {
-        ST_ASSERT(_localData.isCookieBeingLoggedOut(sessionsRec._cookieString));
+        ST_ASSERT(_localData.isCookieBeingLoggedOut(sessionsRec_._cookieString));
         
         //update the db 
         sessionsRec_._logoutTime = boost::posix_time::second_clock::universal_time();

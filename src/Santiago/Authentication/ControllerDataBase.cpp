@@ -33,7 +33,7 @@ namespace Santiago{ namespace Authentication
     {
         auto cookieDataIter = _cookieStringCookieDataPtrMap.find(cookieString_);
         ST_ASSERT(cookieDataIter != _cookieStringCookieDataPtrMap.end());
-        ST_ASSERT(cookieDataIter->second._isBeingLoggedOut);
+        ST_ASSERT(cookieDataIter->second->_isBeingLoggedOut);
         
         _cookieStringCookieDataPtrMap.erase(cookieDataIter);
 
@@ -85,7 +85,7 @@ namespace Santiago{ namespace Authentication
         ST_ASSERT(cookieDataIter != _cookieStringCookieDataPtrMap.end());
         ST_ASSERT(!cookieDataIter->second->_isBeingLoggedOut);
                 
-        _cookieDataIter->second->_isBeingLoggedOut = true;
+        cookieDataIter->second->_isBeingLoggedOut = true;
     }
 
     void ControllerDataBase::unsetCookieBeingLoggedOutFlag(const std::string& cookieString_)
@@ -94,7 +94,7 @@ namespace Santiago{ namespace Authentication
         ST_ASSERT(cookieDataIter != _cookieStringCookieDataPtrMap.end());
         ST_ASSERT(cookieDataIter->second->_isBeingLoggedOut);
                 
-        _cookieDataIter->second->_isBeingLoggedOut = false;
+        cookieDataIter->second->_isBeingLoggedOut = false;
     }
 
     bool ControllerDataBase::isCookieBeingLoggedOut(const std::string& cookieString_) const
@@ -102,7 +102,7 @@ namespace Santiago{ namespace Authentication
         auto cookieDataIter = _cookieStringCookieDataPtrMap.find(cookieString_);
         ST_ASSERT(cookieDataIter != _cookieStringCookieDataPtrMap.end());
         
-        return _cookieDataIter->second->_isBeingLoggedOut;
+        return cookieDataIter->second->_isBeingLoggedOut;
     }
 
     void ControllerDataBase::setUserBeingLoggedOutFlag(const std::string& userName_)
@@ -123,7 +123,7 @@ namespace Santiago{ namespace Authentication
         userDataIter->second._isBeingLoggedOut = false;
     }
 
-    void ControllerDataBase::isUserBeingLoggedOut(const std::string& userName_) const
+    bool ControllerDataBase::isUserBeingLoggedOut(const std::string& userName_) const
     {
         auto userDataIter = _userNameUserDataMap.find(userName_);
         ST_ASSERT(userDataIter != _userNameUserDataMap.end());
