@@ -3,59 +3,79 @@
 #
 # Try to find the include directory
 
-IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  SET(PFILES $ENV{ProgramW6432})
-ELSE()
-  SET(PFILES $ENV{ProgramFiles})
-ENDIF()
 
-
-FIND_PATH(MARIADB_INCLUDE_DIR mysql.h
-  $ENV{MARIADB_INCLUDE_DIR}
-  $ENV{MARIADB_DIR}/include
-  $ENV{MARIADB_DIR}/include/mariadb
-  ${PFILES}/MariaDB/*/include)
-
-IF(MARIADB_INCLUDE_DIR)
-  MESSAGE(STATUS "Found MariaDB includes: ${MARIADB_INCLUDE_DIR}")
-ENDIF()
-
+  
 IF(WIN32)
-  SET (LIB_NAME mariadbclient.lib)
+  
+  IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    SET(PFILES $ENV{ProgramW6432})
+  ELSE()
+    SET(PFILES $ENV{ProgramFiles})
+  ENDIF()
 
-  # Try to find mariadb client libraries
-  FIND_PATH(MARIADB_LIBRARY_DIR ${LIB_NAME}
-    $ENV{MARIADB_LIBRARY}
-    ${PFILES}/MariaDB/*/lib
-    $ENV{MARIADB_DIR}/lib/mariadb
-    $ENV{MARIADB_DIR}/lib
-    $ENV{MARIADB_DIR}/libmariadb)
+  FIND_PATH(MARIADB_INCLUDE_DIR mysql.h
+    ${PFILES}/MariaDB/*/include)
 
-  IF(MARIADB_LIBRARY)
-    GET_FILENAME_COMPONENT(MARIADB_LIBRARY_DIR ${MARIADB_LIBRARY} PATH)
+  # Try to find mariadb client library path
+  FIND_PATH(MARIADB_LIBRARY_DIR mariadbclient.lib
+    ${PFILES}/MariaDB/*/lib)
+  
+  IF(MARIADB_LIBRARY_DIR)
+    STRING(CONCAT MARIADB_LIBRARY "${MARIADB_LIBRARY_DIR}/" "mariadbclient.lib")
   ENDIF()
 
 ELSE()
-  SET(MARIADB_LIB libmariadbclient.a)
   FIND_PATH(MARIADB_BIN_DIR mariadb_config
-    $ENV{MARIADB_DIR}/bin
-    ${MARIADB_DIR}/bin)
+    /bin)
   IF(MARIADB_BIN_DIR)
     EXEC_PROGRAM(${MARIADB_BIN_DIR}/mariadb_config
       ARGS "--include"
-      OUTPUT_VARIABLE MARIADB_INCLUDE_DIR)
+      OUTPUT_VARIABLE MARIADB_INCLUDE_PATH)
+    # remove the preceding -I
+    STRING(SUBSTRING ${MARIADB_INCLUDE_PATH} 2 -1 MARIADB_INCLUDE_DIR)
+
     EXEC_PROGRAM(${MARIADB_BIN_DIR}/mariadb_config
       ARGS "--libs"
-      OUTPUT_VARIABLE MARIADB_LIBRARY_DIR)
-    # since we use the static library we need the directory part only
-    STRING(SUBSTRING ${MARIADB_LIBRARY_DIR} 2 -1 MARIADB_LIBRARY_DIR)
-    STRING(FIND ${MARIADB_LIBRARY_DIR} " -l" MY_LENGTH)
-    STRING(SUBSTRING ${MARIADB_LIBRARY_DIR} 0 ${MY_LENGTH} MARIADB_LIBRARY_DIR)
-    ADD_DEFINITIONS(${MARIADB_INCLUDE_DIR})
-  ENDIF()
+      OUTPUT_VARIABLE MARIADB_LIBRARY_PATH)
+    
+    # get the string from -l to end
+    STRING(FIND ${MARIADB_LIBRARY_PATH} " -l" MY_LENGTH)
+    MATH(EXPR MY_LENGTH "${MY_LENGTH} + 3")
+    STRING(SUBSTRING ${MARIADB_LIBRARY_PATH} ${MY_LENGTH} -1 MARIADB_LIBRARY) 
+    
+  ELSE()
+    
+    FIND_PATH(MARIADB_INCLUDE_DIR mysql.h
+      /usr/include
+      /usr/include/mariadb
+      /usr/include/mysql)
+    
+    FIND_PATH(MARIADB_LIBRARY_DIR libmariadbclient.a
+      /usr/lib/mariadb
+      /usr/lib
+      /usr/libmariadb)
+    
+    IF(MARIADB_LIBRARY_DIR)
+      STRING(CONCAT MARIADB_LIBRARY "${MARIADB_LIBRARY_DIR}/" "libmariadbclient.a")
+    ELSE()
+      FIND_PATH(MARIADB_LIBRARY_DIR libmariadb.a
+        /usr/lib/mariadb
+        /usr/lib
+        /usr/libmariadb)
+      
+      IF(MARIADB_LIBRARY_DIR)
+        STRING(CONCAT MARIADB_LIBRARY "${MARIADB_LIBRARY_DIR}/" "libmariadb.a")
+      ENDIF()
+      
+    ENDIF()
+  ENDIF()      
 ENDIF()
 
-IF(MARIADB_LIBRARY_DIR AND MARIADB_INCLUDE_DIR)
-  MESSAGE(STATUS "Found MariaDB libraries: ${MARIADB_LIBRARY_DIR}")
+IF(MARIADB_LIBRARY AND MARIADB_INCLUDE_DIR)
+  MESSAGE(STATUS "Found MariaDB includes: ${MARIADB_INCLUDE_DIR}")
+  MESSAGE(STATUS "Found MariaDB library: ${MARIADB_LIBRARY}")
   SET(MARIADB_FOUND TRUE)
+ELSE()
+  MESSAGE(STATUS "MariaDB not found. Includes: ${MARIADB_INCLUDE_DIR}, Libs: ${MARIADB_LIBRARY_DIR}")
+  SET(MARIADB_FOUND FALSE)
 ENDIF()
