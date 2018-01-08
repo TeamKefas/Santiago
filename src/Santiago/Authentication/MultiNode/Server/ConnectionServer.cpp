@@ -9,7 +9,7 @@ namespace Santiago{ namespace Authentication { namespace Server
         :_nextConnectionId(1)
         ,_acceptor(ioService_, tcp::endpoint(tcp::v4(),port_))
         ,_onDisconnectCallbackFn(onDisconnectCallbackFn_)
-        ,_onRequestReplyCallbackFn(onRequestReplyCallbackFn_)
+        ,_onNewRequestCallbackFn(onNewRequestCallbackFn_)
     {}
     
     void ConnectionServer::start()

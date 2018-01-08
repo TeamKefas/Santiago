@@ -14,7 +14,7 @@
 #include <boost/optional.hpp>
 
 #include "ConnectionServer.h"
-#include "ServerData.h"
+#include "ServerImpl.h"
 
 using boost::asio::ip::tcp;
 
@@ -42,24 +42,20 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
         * ///Message\\
         * @param connectionId - 
         */
-        void handleDisconnect(unsigned connectionId_);
+        void handleConnectionDisconnect(unsigned connectionId_);
        /**
         * ///Message\\
         * @param message_- 
         */
-        void handleRequestNew(const ServerMessage& message_);
+        void handleNewRequest(const ConnectionMessage& connectionMessage_);
 
-        /**
-        * ///Message\\
-        * @param requestId_- 
-        */
-        void handleRequestCompleted(const RequestId& requestId_);
+        std::pair<ServerImplPtr,StrandPtr> getServerImplAndStrandForString(const std::string& string_,
+                                                                           bool isNotEmailAddress_);
 
-        std::map<RequestId,RequestHandlerBasePtr>   _activeRequestHandlersList;
-        boost::asio::io_service&                    _ioService;
-        unsigned                                    _port;
-        ConnectionServer                            _connectionServer;
-        ServerData                                  _serverData;
+        boost::asio::io_service                          &_ioService;
+        unsigned                                          _port;
+        ConnectionServer                                  _connectionServer;
+        std::array<std::pair<ServerImplPtr,StrandPtr>,26> _serverImplStrandPairArray;
     };
 }}}}
 
