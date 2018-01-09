@@ -9,6 +9,8 @@
  * Contains the ConnectionServer class  
  */
 
+#include <mutex>
+
 #include <boost/asio/socket_acceptor_service.hpp>
 #include <boost/asio/error.hpp>
 
@@ -33,7 +35,8 @@ namespace Santiago{ namespace Authentication { namespace Server
 
         void start();
 
-        void sendMessage(const ConnectionMessage& message_,
+        void sendMessage(unsigned connectionId_,
+                         const ConnectionMessage& message_,
                          bool isReplyExpectingMessage_,
                          const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_);
 
@@ -54,6 +57,7 @@ namespace Santiago{ namespace Authentication { namespace Server
         OnNewRequestCallbackFn                             _onNewRequestCallbackFn;
         
         std::map<unsigned,ConnectionRequestsControllerPtr> _idConnectionPtrMap;
+        std::mutex                                         _mutex; //for using _idConnectionPtrMap
 
        
     };

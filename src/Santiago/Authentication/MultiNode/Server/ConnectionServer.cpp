@@ -21,6 +21,22 @@ namespace Santiago{ namespace Authentication { namespace Server
                                            boost::asio::placeholders::error));
     }
 
+    void ConnectionServer::sendMessage(unsigned connectionId_,
+                                       const ConnectionMessage& message_,
+                                       bool isReplyExpectingMessage_,
+                                       const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_)
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+        std::map<unsigned,ConnectionRequestsControllerPtr>::iterator iter =
+            _idConnectionPtrMap.find(connectionId_);
+        
+        if(iter == _idConnectionPtrMap.end())
+            return;
+        
+        iter->second->sendMessage(message_,true,onReplyMessageCallbackFn_);
+        
+    }
+
     void ConnectionServer::handleAccept(const ConnectionMessageSocket::MySocketPtr& socketPtr_,
                                         const boost::system::error_code& error_)
     {
@@ -45,6 +61,8 @@ namespace Santiago{ namespace Authentication { namespace Server
                                              std::bind(ConnectionServer::handleDisconnect,this
                                                        _nextConnectionId),
                                              _onNewRequestCallbackFn));
+        
+        std::lock_guard<std::mutex> lock(_mutex);
         BOOST_ASSERT(_idConnectionPtrMap.find(_nextConnectionId) == _idConnectionPtrMap.end());
         _idConnectionPtrMap.insert(std::make_pair(_nextConnectionId,newConnection));
         //_idConnectionPtrMap[_nextConnectionId] = newConnection;
@@ -54,6 +72,7 @@ namespace Santiago{ namespace Authentication { namespace Server
 
     void ConnectionServer::handleDisconnect(unsigned connectionId_)
     {
+        std::lock_guard<std::mutex> lock(_mutex);
         std::map<unsigned,ConnectionRequestsControllerPtr>::iterator iter =
             _idConnectionPtrMap.find(connectionId_);
         
