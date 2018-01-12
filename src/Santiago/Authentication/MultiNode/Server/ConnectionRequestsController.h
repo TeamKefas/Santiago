@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_MULTINODE_CONNECTIONREQUESTSCONTROLLER_H
-#define SANTIAGO_AUTHENTICATION_MULTINODE_CONNECTIONREQUESTSCONTROLLER_H
+#ifndef SANTIAGO_AUTHENTICATION_MULTINODE_SERVER_CONNECTIONREQUESTSCONTROLLER_H
+#define SANTIAGO_AUTHENTICATION_MULTINODE_SERVER_CONNECTIONREQUESTSCONTROLLER_H
 
 /**
  * @file ConnectionRequestsController.h
@@ -38,7 +38,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;
                 
         ConnectionRequestsController(boost::asio::io_service& ioService_,
-                                     const MySockerPtr& socketPtr_,
+                                     const MySocketPtr& socketPtr_,
                                      unsigned connectionId_,
                                      const StrandPtr& strandPtr_,
                                      const OnDisconnectCallbackFn& onDisconnectCallbackFn_,

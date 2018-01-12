@@ -27,7 +27,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             typedef std::function<void(const std::error_code&)> ErrorCodeCallbackFn;
 
             typedef std::function<void(const std::error_code&,const boost::optional<ConnectionMessage>&)> ErrorCodeConnectionMessageOptCallBackFn;
-    
+
             class AuthenticatorImpl:public AuthenticatorImplBase
             {
             public:

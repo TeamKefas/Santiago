@@ -41,7 +41,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
         return;               
     }
         
-    std::set<unsigned> ControllerData::getCookieClientIds(std::string& cookieString_) const
+    std::set<unsigned> ControllerData::getCookieClientIds(const std::string& cookieString_) const
     {
         auto iter = _cookieStringCookieDataPtrMap.find(cookieString_);
         ST_ASSERT(iter != _cookieStringCookieDataPtrMap.end());
@@ -67,4 +67,5 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
         }
         return allClientIdSets;
     }
-}}
+
+}}}}

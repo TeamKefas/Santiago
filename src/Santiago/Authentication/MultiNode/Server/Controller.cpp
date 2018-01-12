@@ -6,7 +6,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
                            const StrandPtr& strandPtr_,
                            ConnectionServer &connectionServer_)
         :ControllerBase<ControllerData>(databaseConnection_)
-        ,_strandPtr(_strandPtr)
+        ,_strandPtr(strandPtr_)
         ,_connectionServer(connectionServer_)
     {}
 
@@ -34,9 +34,9 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
             yield_);
     }
 
-    void Controller::sendMessageAndGetReplyFromClients(const std::set<unsigned>& clientIds_,
-                                                       const ConnectionMessage& connectionMessage_,
-                                                       boost::asio::yield_context yield_)
+    std::error_code Controller::sendMessageAndGetReplyFromClients(const std::set<unsigned>& clientIds_,
+                                                                  const ConnectionMessage& connectionMessage_,
+                                                                  boost::asio::yield_context yield_)
     {
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
             handler(std::forward<boost::asio::yield_context>(yield_));
@@ -47,7 +47,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
         ClientLogoutRequestsDataPtr clientRequestsDataPtr(
             new ClientLogoutRequestsData
             {
-                [ret&](const std::error_code& error_)
+                [&ret](const std::error_code& error_)
                 {
                     ret = error_;
                 },
@@ -58,17 +58,21 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
             iter != clientIds_.end();
             iter++)
         {
+            std::function<void(const std::error_code&,
+                               const boost::optional<Santiago::Authentication::MultiNode::ConnectionMessage>&)>
+                               onReplyMessageCallbackFn =
+                               std::bind(&Controller::handleClientReplyMessageOutsideStrand,
+                                         this,
+                                         clientRequestsDataPtr,
+                                         *iter,
+                                         std::placeholders::_1,
+                                         std::placeholders::_2);
             _connectionServer.sendMessage(*iter,
                                           connectionMessage_,
                                           true,
-                                          std::bind(&Controller::handleClientReplyMessageOutsideStrand,
-                                                    this,
-                                                    clientRequestsDataPtr,
-                                                    *iter,
-                                                    std::placeholders::_1,
-                                                    std::placeholders::_2));
+                                          onReplyMessageCallbackFn);
         }
-        
+            
         result.get();
         return ret;
     }
@@ -99,7 +103,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
                                                    logoutRequestsDataPtr_->_replyPendingClientIds.end(),
                                                    clientId_);
         ST_ASSERT(replyPendingClientIdsIter != logoutRequestsDataPtr_->_replyPendingClientIds.end());
-        logoutRequestsDataPtr_->_replyPendingClientIds.erase(replyPendingClientIdsIter);
+        //logoutRequestsDataPtr_->_replyPendingClientIds.erase(replyPendingClientIdsIter);
         
         if(logoutRequestsDataPtr_->_replyPendingClientIds.empty())
         {

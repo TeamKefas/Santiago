@@ -15,6 +15,8 @@
 
 #include "ConnectionServer.h"
 #include "ServerImpl.h"
+#include "Santiago/Thread/ThreadSpecificVar.h"
+#include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 
 using boost::asio::ip::tcp;
 
@@ -23,15 +25,17 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
     class Server
     {
     public:
-
-        typedef std::shared_ptr<RequestHandlerBase> RequestHandlerBasePtr;
+        typedef Thread::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
+        typedef std::shared_ptr<ServerImpl> ServerImplPtr;
+        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
         
         /**
          * The constructor
          * @param ioService_- 
          * @param port_ -
          */
-        Server(boost::asio::io_service& ioService_,unsigned port_);
+        Server(boost::asio::io_service& ioService_,unsigned port_,
+               ThreadSpecificDbConnection& databaseConnection_);
        /**
         * ///Message\\
         */
@@ -55,6 +59,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
         boost::asio::io_service                          &_ioService;
         unsigned                                          _port;
         ConnectionServer                                  _connectionServer;
+        ThreadSpecificDbConnection&                       _databaseConnection;
         std::array<std::pair<ServerImplPtr,StrandPtr>,26> _serverImplStrandPairArray;
     };
 }}}}

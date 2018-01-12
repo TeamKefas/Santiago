@@ -2,11 +2,11 @@
 
 #include<boost/asio/deadline_timer.hpp>
 
-namespace Santiago{ namespace Authentication{ namespace MultiNode{ names
+namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Server
 {
     ConnectionRequestsController::
     ConnectionRequestsController(boost::asio::io_service& ioService_,
-                                 const MySockerPtr& socketPtr_,
+                                 const MySocketPtr& socketPtr_,
                                  unsigned connectionId_,
                                  const StrandPtr& strandPtr_,
                                  const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
@@ -18,7 +18,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ names
                                   std::bind(&ConnectionRequestsController::handleConnectionMessage,
                                             this, std::placeholders::_1),
                                   strandPtr_,
-                                  _strandPtr_)
+                                  strandPtr_)
         ,_connectionId(connectionId_)
         ,_onDisconnectCallbackFn(onDisconnectCallbackFn_)
         ,_onNewRequestMessageCallbackFn(onNewRequestMessageCallbackFn_)
@@ -103,4 +103,4 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ names
         return _connectionMessageSocket;
     }
 
-}}}
+}}}}

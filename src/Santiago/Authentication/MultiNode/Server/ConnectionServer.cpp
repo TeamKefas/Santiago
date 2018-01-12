@@ -1,28 +1,29 @@
 #include "ConnectionServer.h"
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode { namespace Server
 {
     ConnectionServer::ConnectionServer(boost::asio::io_service& ioService_,
                                        unsigned port_,
                                        const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
                                        const OnNewRequestCallbackFn& onNewRequestCallbackFn_)
-        :_nextConnectionId(1)
-        ,_acceptor(ioService_, tcp::endpoint(tcp::v4(),port_))
-        ,_onDisconnectCallbackFn(onDisconnectCallbackFn_)
-        ,_onNewRequestCallbackFn(onNewRequestCallbackFn_)
+        :_nextConnectionId(1),
+         _ioService(ioService_),
+         _acceptor(ioService_, tcp::endpoint(tcp::v4(),port_)),
+         _onDisconnectCallbackFn(onDisconnectCallbackFn_),
+        _onNewRequestCallbackFn(onNewRequestCallbackFn_)
     {}
     
     void ConnectionServer::start()
     {
-        ConnectionMessageSocket::MySocketPtr socketPtr
-            (new ConnectionMessageSocket::MySocket(_acceptor.get_io_service()));
+        Authentication::MultiNode::ConnectionMessageSocket::MySocketPtr socketPtr
+            (new Authentication::MultiNode::ConnectionMessageSocket::MySocket(_acceptor.get_io_service()));
         _acceptor.async_accept(*socketPtr,
                                boost::bind(&ConnectionServer::handleAccept, this, socketPtr,
                                            boost::asio::placeholders::error));
     }
 
     void ConnectionServer::sendMessage(unsigned connectionId_,
-                                       const ConnectionMessage& message_,
+                                       const Authentication::MultiNode::ConnectionMessage& message_,
                                        bool isReplyExpectingMessage_,
                                        const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_)
     {
@@ -37,7 +38,7 @@ namespace Santiago{ namespace Authentication { namespace Server
         
     }
 
-    void ConnectionServer::handleAccept(const ConnectionMessageSocket::MySocketPtr& socketPtr_,
+    void ConnectionServer::handleAccept(const Authentication::MultiNode::ConnectionMessageSocket::MySocketPtr& socketPtr_,
                                         const boost::system::error_code& error_)
     {
         //TODO: See if an easier way to write exists.
@@ -54,13 +55,16 @@ namespace Santiago{ namespace Authentication { namespace Server
             return;
         }
         
+        const std::shared_ptr<boost::asio::strand> _strandPtr = nullptr;
         ConnectionRequestsControllerPtr newConnection(
-            new ConnectionRequestsController(_ioService_,
-                                             _socketPtr,
-                                             _nextConnectionId,
-                                             std::bind(ConnectionServer::handleDisconnect,this
-                                                       _nextConnectionId),
-                                             _onNewRequestCallbackFn));
+            new Authentication::MultiNode::Server::ConnectionRequestsController(_ioService,
+                                                                                socketPtr_,
+                                                                                _nextConnectionId,
+                                                                                _strandPtr,
+                                                                                std::bind(&ConnectionServer::handleDisconnect,
+                                                                                          this,
+                                                                                          _nextConnectionId),
+                                                                                _onNewRequestCallbackFn));
         
         std::lock_guard<std::mutex> lock(_mutex);
         BOOST_ASSERT(_idConnectionPtrMap.find(_nextConnectionId) == _idConnectionPtrMap.end());
@@ -82,4 +86,4 @@ namespace Santiago{ namespace Authentication { namespace Server
     }
     
     
-}}}
+}}}}

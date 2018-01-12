@@ -17,22 +17,6 @@
 
 namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Server
 {
-    struct ControllerTypes
-    {
-        struct ClientRequestData
-        {
-            ClientRequestData(const RequestId& requestId_)
-                :_requestId(requestId_)
-            {}
-            
-            unsigned getClientId() const {return _requestId._initiatingConnectionId;}
-
-            RequestId   _requestId;
-        };
-        
-        typedef ControllerData LocalData;
-    };
-        
     class Controller:public ControllerBase<ControllerData>
     {
     public:
@@ -56,11 +40,11 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
         struct ClientLogoutRequestsData
         {
             std::function<void(const std::error_code&)> _onCompletedCallbackFn;
-            std::set<unsigned>&                         _replyPendingClientIds;
+            const std::set<unsigned>&                         _replyPendingClientIds;
         };
         typedef std::shared_ptr<ClientLogoutRequestsData>  ClientLogoutRequestsDataPtr;
 
-        void sendMessageAndGetReplyFromClients(const std::set<unsigned>& clientIds_,
+        std::error_code sendMessageAndGetReplyFromClients(const std::set<unsigned>& clientIds_,
                                                const ConnectionMessage& connectionMessage_,
                                                boost::asio::yield_context yield_);
 

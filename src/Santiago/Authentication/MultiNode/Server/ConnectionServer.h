@@ -15,19 +15,21 @@
 #include <boost/asio/error.hpp>
 
 #include "ConnectionRequestsController.h"
-#include "ConnectionMessageSocket.h"
+#include "../ConnectionMessageSocket.h"
 using boost::asio::ip::tcp;
 
-namespace Santiago{ namespace Authentication { namespace Server
+namespace Santiago{ namespace Authentication { namespace MultiNode { namespace Server
 {
     class ConnectionServer
     {
     public:
 
-        typedef ConnectionRequestsController::Ptr ConnectionRequestsControllerPtr;
-        typedef std::function<void(const ConnectionMessage&)> OnNewRequestCallbackFn;
+        typedef std::shared_ptr<Authentication::MultiNode::Server::ConnectionRequestsController> ConnectionRequestsControllerPtr;
+        typedef std::function<void(const Authentication::MultiNode::ConnectionMessage&)> OnNewRequestCallbackFn;
         typedef std::function<void(unsigned)> OnDisconnectCallbackFn;
-
+        typedef std::function<void(const std::error_code&,
+                                   const boost::optional<Santiago::Authentication::MultiNode::ConnectionMessage>&)> OnReplyMessageCallbackFn;
+        
         ConnectionServer(boost::asio::io_service& ioService_,
                          unsigned port_,
                          const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
@@ -36,7 +38,7 @@ namespace Santiago{ namespace Authentication { namespace Server
         void start();
 
         void sendMessage(unsigned connectionId_,
-                         const ConnectionMessage& message_,
+                         const Authentication::MultiNode::ConnectionMessage& message_,
                          bool isReplyExpectingMessage_,
                          const boost::optional<OnReplyMessageCallbackFn>& onReplyMessageCallbackFn_);
 
@@ -44,7 +46,7 @@ namespace Santiago{ namespace Authentication { namespace Server
         
     protected:
 
-        void handleAccept(const ConnectionMessageSocket::MySocketPtr& socketPtr_,
+        void handleAccept(const Authentication::MultiNode::ConnectionMessageSocket::MySocketPtr& socketPtr_,
                           const boost::system::error_code& error_);
 
         void handleDisconnect(unsigned connectionId_);
@@ -61,5 +63,5 @@ namespace Santiago{ namespace Authentication { namespace Server
 
        
     };
-}}}
+}}}}
 #endif

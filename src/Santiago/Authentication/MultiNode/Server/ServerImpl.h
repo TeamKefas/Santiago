@@ -7,7 +7,7 @@
 
 #include "Santiago/SantiagoDBTables/MariaDBConnection.h"
 #include "Santiago/Thread/ThreadSpecificVar.h"
-
+#include "Santiago/Authentication/MultiNode/AuthenticatorImpl.h"
 #include "ConnectionServer.h"
 #include "Controller.h"
 
@@ -17,93 +17,25 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
     {
         typedef Thread::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<AuthenticatorImplBase> AuthenticatorImplBasePtr;
+        typedef std::function<void(const Authentication::MultiNode::ConnectionMessage&)> OnNewRequestCallbackFn;
+        typedef std::function<void(unsigned)> OnDisconnectCallbackFn;  
 
         ServerImpl(ThreadSpecificDbConnection& databaseConnection_,
                    const StrandPtr& strandPtr_,
-                   ConnectionServer& connectionServer_)
-            :_controller(databaseConnection_,
-                         strandPtr_,
-                         connectionServer_)
-        {}
+                   ConnectionServer& connectionServer_,
+                   boost::asio::io_service& ioService_,
+                   unsigned port_,
+                   const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
+                   const OnNewRequestCallbackFn& onNewRequestCallbackFn_);
+                    
+        void processRequest(const ConnectionMessage& connectionMessage_, boost::asio::yield_context yield_);
 
-        void processRequest(const ConnectionMessage& connectionMessage_)
-        {
-            switch(connectionMessage_._type)
-            {
-            case ConnectionMessageType::CR_CREATE_USER:
-                requestHandlerPtr.reset(new CreateUserRequestHandler
-                                        (_connectionServer
-                                         ,std::bind(&Server::handleRequestCompleted
-                                                ,this,std::placeholders::_1)
-                                         ,message_));
-                break;
-            case ConnectionMessageType::CR_LOGIN_USER:
-                requestHandlerPtr.reset(new LoginUserRequestHandler
-                                        (_connectionServer
-                                         ,std::bind(&Server::handleRequestCompleted
-                                                    ,this,std::placeholders::_1)
-                                         ,message_));
-                break;
-                
-            case ConnectionMessageType::CR_VERIFY_USER_FOR_COOKIE:
-                requestHandlerPtr.reset(new VerifyUserForCookieRequestHandler
-                                        (_connectionServer
-                                         ,std::bind(&Server::handleRequestCompleted
-                                                    ,this,std::placeholders::_1)
-                                         ,message_));
-                break;
-                
-            case ConnectionMessageType::CR_LOGOUT_USER_FOR_COOKIE:
-                requestHandlerPtr.reset(new LogoutUserForCookieRequestHandler
-                                        (_connectionServer
-                                         ,std::bind(&Server::handleRequestCompleted
-                                                    ,this,std::placeholders::_1)
-                                         ,message_));
-                break;
-                
-            case ConnectionMessageType::CR_LOGOUT_USER_FOR_ALL_COOKIES:
-                requestHandlerPtr.reset(new LogoutUserForAllCookiesRequestHandler
-                                        (_connectionServer
-                                         ,std::bind(&Server::handleRequestCompleted
-                                                    ,this,std::placeholders::_1)
-                                         ,message_));
-                break;
-                
-            case  ConnectionMessageType::CR_CHANGE_USER_PASSWORD:
-                requestHandlerPtr.reset(new ChangeUserPasswordRequestHandler
-                                        (_connectionServer
-                                         ,std::bind(&Server::handleRequestCompleted
-                                                    ,this,std::placeholders::_1)
-                                         ,message_));
-                break;
-            case ConnectionMessageType::CR_REMOVED_COOKIE_FROM_APPSERVER:
-                requestHandlerPtr.reset(new RemovedCookieFromAppserverRequestHandler
-                                        (_connectionServer
-                                         ,std::bind(&Server::handleRequestCompleted
-                                                    ,this,std::placeholders::_1)
-                                         ,message_));
-                break;
-                
-            case ConnectionMessageType::CR_ADD_RESOURCE:
-                requestHandlerPtr.reset(new AddResourceRequestHandler
-                                        (_connectionServer
-                                         ,std::bind(&Server::handleRequestCompleted
-                                                    ,this,std::placeholders::_1)
-                                         ,message_));
-                break;
-                
-            case ConnectionMessageType::SR_LOGOUT_USER_FOR_COOKIE:
-                BOOST_ASSERT(false);
-                break;
-                
-            case  ConnectionMessageType::SR_LOGOUT_USER_FOR_ALL_COOKIES:
-                BOOST_ASSERT(false);
-                break;
-            }
-        }
-
-        
-        Controller   _controller;
+        const OnDisconnectCallbackFn&                 _onDisconnectCallbackFn;
+        const OnNewRequestCallbackFn&                 _onNewRequestCallbackFn;
+        ConnectionServer                              _connectionServer;
+        Controller                                    _controller;
+        std::pair<AuthenticatorImplBasePtr,StrandPtr> _authenticatorStrandPair[26];
     };
 
 }}}}
