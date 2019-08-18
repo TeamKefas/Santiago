@@ -60,4 +60,8 @@ namespace Santiago
          }
     {}
 
+    std::error_code make_error_code(Santiago::ErrorCode e_) noexcept
+    {
+        return std::error_code(static_cast<int>(e_), Santiago::ErrorCategory::GetInstance());
+    }
 }

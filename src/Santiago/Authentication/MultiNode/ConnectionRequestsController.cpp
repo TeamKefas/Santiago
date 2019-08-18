@@ -32,8 +32,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         
         if(!_connectionMessageSocketPtr && isReplyExpectingMessage_)
         {
-            onReplyMessageCallbackFn(std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                                      ErrorCategory::GetInstance()),
+            onReplyMessageCallbackFn(std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR),
                                       boost::none);
             return;
         }
@@ -112,8 +111,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             _requestIdCallbackFnMap.find(message_._requestId);
         ST_ASSERT(iter != _requestIdCallbackFnMap.end());
             
-        _requestIdCallbackFnMap[message_._requestId](std::error_code(ErrorCode::ERR_SUCCESS,
-                                                            ErrorCategory::GetInstance()),
+        _requestIdCallbackFnMap[message_._requestId](std::error_code(ErrorCode::ERR_SUCCESS),
                                             message_);
         _requestIdCallbackFnMap.erase(iter);//TODO: For client there will always be only 1 reply..so directly delete        
         return;
@@ -126,8 +124,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             _requestIdCallbackFnMap.find(requestId_);
         ST_ASSERT(iter != _requestIdCallbackFnMap.end());
             
-        _requestIdCallbackFnMap[requestId_](std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                                            ErrorCategory::GetInstance()),
+        _requestIdCallbackFnMap[requestId_](std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR),
                                             boost::none);
         _requestIdCallbackFnMap.erase(iter);
         return;        

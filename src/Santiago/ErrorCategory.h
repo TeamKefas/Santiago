@@ -2,7 +2,7 @@
 #define SANTIAGO_ERRORCATEGORY_H
 
 #include <map>
-#include <system_error>
+#include <system_error> 
 
 namespace Santiago
 {
@@ -28,7 +28,7 @@ namespace Santiago
         ERR_COOKIE_BEING_LOGGED_OUT = 17,
         ERR_USER_BEING_LOGGED_OUT = 18
     };
-
+    
     class ErrorCategory:public std::error_category
     {
     public:
@@ -49,5 +49,15 @@ namespace Santiago
         std::map<int,std::string>  _errorValueDescriptionMap;
 
     };
+
+    std::error_code make_error_code(Santiago::ErrorCode e_) noexcept;
 }
+
+namespace std
+{
+    template<>
+    struct is_error_code_enum<Santiago::ErrorCode>:public std::true_type
+    {};
+}
+
 #endif

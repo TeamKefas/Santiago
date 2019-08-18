@@ -24,7 +24,7 @@ namespace Santiago{ namespace Authentication
             {}
 
             std::string                   _emailAddress;
-            std::vector<std::string>      _cookieList;
+            std::vector<std::string>      _cookieList; //NEW_TODO: Why not std::set instead of std::vector. Helps in looping through vector
             bool                          _isBeingLoggedOut;
         };
 

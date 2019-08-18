@@ -47,7 +47,7 @@ namespace Santiago{ namespace Authentication
                 if(userDataIter->second._cookieList.empty())
                 {
                     _userNameUserDataMap.erase(userDataIter);
-                    break;
+                    break; //NEW_TODO: Shouldn't break be outsude if..or are multiple entries with same string allowed.
                 }
             }
         }

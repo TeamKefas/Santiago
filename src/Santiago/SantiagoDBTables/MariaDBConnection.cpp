@@ -50,7 +50,7 @@ namespace Santiago{ namespace SantiagoDBTables
                          <<", Error code returned: "<<mysql_errno(_mysql)
                          <<", Error message :"<<mysql_error(_mysql)<< std::endl);
 
-            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION);
 	    ST_ASSERT(false);
         }
         
@@ -58,14 +58,14 @@ namespace Santiago{ namespace SantiagoDBTables
                     <<" user = " << user
                     <<" db = " << db);
                     
-        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        error_ = std::error_code(ERR_SUCCESS);
     }
 
     void MariaDBConnection::disconnect(std::error_code& error_)
     {
         ST_LOG_INFO("Closing db connection..." << std::endl);
         mysql_close(_mysql);
-        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        error_ = std::error_code(ERR_SUCCESS);
     }
 
     std::string MariaDBConnection::getEscapedString(const std::string& nonEscapedString_)
@@ -98,11 +98,11 @@ namespace Santiago{ namespace SantiagoDBTables
            (0 != mysql_errno(_mysql)))
         {
             ST_LOG_DEBUG("Db error:"<< mysql_error(_mysql) << std::endl);
-            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION);
             return;
         }
 
-        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        error_ = std::error_code(ERR_SUCCESS);
         return;
     }
 
@@ -118,12 +118,12 @@ namespace Santiago{ namespace SantiagoDBTables
         if(0 == mysql_affected_rows(_mysql))
         {
             ST_LOG_DEBUG("mysql_affected_rows() returns 0.");
-            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION);
             return INVALID_DATABASE_ID;
         }
 
         int ret = mysql_insert_id(_mysql);
-        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        error_ = std::error_code(ERR_SUCCESS);
         ST_LOG_INFO("Insert query successful." << std::endl);
 
         return ret;
@@ -144,7 +144,7 @@ namespace Santiago{ namespace SantiagoDBTables
         if(result == NULL)
         {
             ST_LOG_DEBUG("mysql_store_result() returned null." << std::endl);
-            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION);
             return;
         }
 
@@ -156,7 +156,7 @@ namespace Santiago{ namespace SantiagoDBTables
         else
         {
             ST_LOG_DEBUG("mysql_num_rows() returned 0." << std::endl);
-            error_ = std::error_code(ERR_DATABASE_GET_RETURNED_ZERO_RESULTS, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_GET_RETURNED_ZERO_RESULTS);
         }
         mysql_free_result(result);
         return;
@@ -174,11 +174,11 @@ namespace Santiago{ namespace SantiagoDBTables
         if(0 == mysql_affected_rows(_mysql))
         {
             ST_LOG_DEBUG("mysql_affected_rows() returns 0." << std::endl);
-            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION);
             return;
         }
 
-        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        error_ = std::error_code(ERR_SUCCESS);
         ST_LOG_INFO("Update query successful." << std::endl);
         return;
     }
@@ -195,11 +195,11 @@ namespace Santiago{ namespace SantiagoDBTables
         if(0 == mysql_affected_rows(_mysql))
         {
             ST_LOG_DEBUG("mysql_affected_rows() returns 0." << std::endl);
-            error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_EXCEPTION);
             return;
         }
 
-        error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+        error_ = std::error_code(ERR_SUCCESS);
         ST_LOG_INFO("Delete query successful." << std::endl);
         return;
     }
@@ -211,7 +211,7 @@ namespace Santiago{ namespace SantiagoDBTables
            !isUserInputClean(usersRec_._password) ||
            (usersRec_._recoveryString && (!isUserInputClean(*usersRec_._recoveryString))))
         {
-            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT);
             return;
         }
 
@@ -239,7 +239,7 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         if(!isUserInputClean(userName_))
         {
-            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT);
             return boost::none;
         }
 
@@ -259,7 +259,7 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         if(!isUserInputClean(emailAddress_))
         {
-            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT);
             return boost::none;
         }
 
@@ -285,7 +285,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 {
                     ST_LOG_DEBUG("More than 1 records with same username in the ST_users table"
                                  << std::endl);
-                    error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    error_ = std::error_code(ERR_DATABASE_EXCEPTION);
                     ST_ASSERT(false);
                     return;
                 }
@@ -293,7 +293,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 if(6 != mysql_num_fields(mysqlResult_))
                 {
                     ST_LOG_DEBUG("Mismatch in number of fields in the ST_users table");
-                    error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    error_ = std::error_code(ERR_DATABASE_EXCEPTION);
                     ST_ASSERT(false);
                     return;
                 }
@@ -311,7 +311,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 if(NULL != row[5])
                     usersRec->_recoveryStringCreateTime = Utils::ConvertStringToPtime(row[5]);
                     
-                error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+                error_ = std::error_code(ERR_SUCCESS);
             },
             error_);
 
@@ -325,7 +325,7 @@ namespace Santiago{ namespace SantiagoDBTables
            !isUserInputClean(newUsersRec_._password) ||
            (newUsersRec_._recoveryString && !isUserInputClean(*newUsersRec_._recoveryString)))
         {
-            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT);
             return;
         }
 
@@ -351,7 +351,7 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         if(!isUserInputClean(userName_))
         {
-            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT);
             return;
         }
 
@@ -365,7 +365,7 @@ namespace Santiago{ namespace SantiagoDBTables
         if(!isUserInputClean(sessionsRec_._userName) ||
            !isUserInputClean(sessionsRec_._cookieString))
         {
-            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT);
             return;
         }
 
@@ -385,7 +385,7 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         if(!isUserInputClean(cookieString_))
         {
-            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT);
             return boost::none;
         }
 
@@ -406,7 +406,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 {
                     ST_LOG_DEBUG("More than 1 records with same cookie_string in the ST_sessions table "
                                  << std::endl);
-                    error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    error_ = std::error_code(ERR_DATABASE_EXCEPTION);
                     ST_ASSERT(false);
                     return;
                 }
@@ -414,7 +414,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 if(6 != mysql_num_fields(mysqlResult_))
                 {
                     ST_LOG_DEBUG("Mismatch in number of fields in the ST_sessions table");
-                    error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    error_ = std::error_code(ERR_DATABASE_EXCEPTION);
                     ST_ASSERT(false);
                     return;
                 }
@@ -432,7 +432,7 @@ namespace Santiago{ namespace SantiagoDBTables
 
                 sessionsRec->_lastActiveTime = Utils::ConvertStringToPtime(row[5]);
 
-                error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+                error_ = std::error_code(ERR_SUCCESS);
             },
             error_);
 
@@ -442,7 +442,7 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         if(!isUserInputClean(sessionsRec_._cookieString))
         {
-            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+            error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT);
             return;
         }
 
@@ -462,7 +462,7 @@ namespace Santiago{ namespace SantiagoDBTables
         {
             if(!isUserInputClean(*iter))
             {
-                error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT, ErrorCategory::GetInstance());
+                error_ = std::error_code(ERR_DATABASE_INVALID_USER_INPUT);
                 return;
             }
 
@@ -492,7 +492,7 @@ namespace Santiago{ namespace SantiagoDBTables
                 if(6 != mysql_num_fields(mysqlResult_))
                 {
                     ST_LOG_DEBUG("Mismatch in number of fields in the ST_sessions table."<< std::endl);
-                    error_ = std::error_code(ERR_DATABASE_EXCEPTION, ErrorCategory::GetInstance());
+                    error_ = std::error_code(ERR_DATABASE_EXCEPTION);
                     ST_ASSERT(false);
                     return;
                 }
@@ -513,7 +513,7 @@ namespace Santiago{ namespace SantiagoDBTables
                         sessionsRec._lastActiveTime = Utils::ConvertStringToPtime(row[5]);
                     sessionsRecs.push_back(sessionsRec);
                 }
-                error_ = std::error_code(ERR_SUCCESS, ErrorCategory::GetInstance());
+                error_ = std::error_code(ERR_SUCCESS);
             },
             error_);
         return sessionsRecs;

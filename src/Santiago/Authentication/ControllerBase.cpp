@@ -64,7 +64,7 @@ namespace Santiago{ namespace Authentication
         }
         else if(usersRecOpt)
         {
-            return std::error_code(ErrorCode::ERR_USERNAME_ALREADY_EXISTS, ErrorCategory::GetInstance());
+            return std::error_code(ErrorCode::ERR_USERNAME_ALREADY_EXISTS);
         }
 
         //check for existing accounts with same emailAddress
@@ -76,7 +76,7 @@ namespace Santiago{ namespace Authentication
         }
         else if(usersRecOpt)
         {
-            return std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS, ErrorCategory::GetInstance());
+            return std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS);
         }
 
         //create new usersRec and add to db
@@ -91,7 +91,7 @@ namespace Santiago{ namespace Authentication
         }
 
         ST_LOG_INFO("Create user successfull for userName:"<<userName_<<std::endl);
-        return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
+        return std::error_code(ErrorCode::ERR_SUCCESS);
     }
 
     template<typename ControllerTypes>
@@ -129,8 +129,7 @@ namespace Santiago{ namespace Authentication
         {
             ST_LOG_INFO("User in being logged out state. userName:"<<usersRecOpt->_userName<<std::endl);
             return std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >(
-                std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT,
-                                ErrorCategory::GetInstance()),
+                std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT),
                 boost::none);
         }
 
@@ -158,8 +157,7 @@ namespace Santiago{ namespace Authentication
         _localData.addCookie(usersRecOpt->_userName,usersRecOpt->_emailAddress,sessionsRec,requestData_.getClientId());
         
         return std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >(
-            std::error_code(ErrorCode::ERR_SUCCESS,
-                            ErrorCategory::GetInstance()),
+            std::error_code(ErrorCode::ERR_SUCCESS),
             std::make_pair(UserInfo(usersRecOpt->_userName,
                                     usersRecOpt->_emailAddress),
                            sessionsRec._cookieString));
@@ -191,8 +189,7 @@ namespace Santiago{ namespace Authentication
             cleanupCookieDataAndUpdateSessionRecord(requestData_,cookieString_,yield_);
 
             return std::pair<std::error_code,boost::optional<UserInfo> >(
-                std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,
-                                ErrorCategory::GetInstance()),
+                std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE),
                 boost::none);
         }
         else //set the lastActiveTime to now
@@ -209,7 +206,7 @@ namespace Santiago{ namespace Authentication
         _localData.updateCookie(*sessionsRecOpt,requestData_.getClientId());
 
         return std::pair<std::error_code,boost::optional<UserInfo> >(
-            std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
+            std::error_code(ErrorCode::ERR_SUCCESS),
             UserInfo(sessionsRecOpt->_userName,
                      *emailAddressOpt));
     }
@@ -240,14 +237,13 @@ namespace Santiago{ namespace Authentication
         if(!_localData.getUserEmailAddress(userName_))
         {
             ST_LOG_INFO("No active session for username. username:"<<userName_);
-            return std::error_code(ErrorCode::ERR_NO_ACTIVE_SESSION_FOR_USERNAME,
-                                                          ErrorCategory::GetInstance());
+            return std::error_code(ErrorCode::ERR_NO_ACTIVE_SESSION_FOR_USERNAME);
         }
         
         if(_localData.isUserBeingLoggedOut(userName_))
         {
             ST_LOG_INFO("User in being logged out state. userName:"<<userName_<<std::endl);
-            return std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT,ErrorCategory::GetInstance());
+            return std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT);
         }
         
         return cleanupCookieDataAndUpdateSessionRecordsForAllCookies(requestData_,userName_,yield_);
@@ -304,8 +300,7 @@ namespace Santiago{ namespace Authentication
         if(ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS == error.value())
         {
             return std::pair<std::error_code,boost::optional<std::string> >(
-                std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_NOT_REGISTERED,
-                                ErrorCategory::GetInstance()),
+                std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_NOT_REGISTERED),
                 boost::none);
         }
         ST_ASSERT(usersRecOpt);
@@ -321,8 +316,7 @@ namespace Santiago{ namespace Authentication
         
         ST_LOG_INFO("Created recovery string successfully for emailAddress:"<<emailAddress_<<std::endl);
         return std::pair<std::error_code,boost::optional<std::string> >(
-            std::error_code(ErrorCode::ERR_SUCCESS,
-                            ErrorCategory::GetInstance()),
+            std::error_code(ErrorCode::ERR_SUCCESS),
             newUsersRec._recoveryString);
     }
 
@@ -343,8 +337,7 @@ namespace Santiago{ namespace Authentication
         if(ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS == error.value())
         {
             return std::pair<std::error_code,boost::optional<std::string> >(
-                std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_NOT_REGISTERED,
-                                ErrorCategory::GetInstance()),
+                std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_NOT_REGISTERED),
                 boost::none);
         }
         ST_ASSERT(usersRecOpt);
@@ -352,14 +345,12 @@ namespace Santiago{ namespace Authentication
         if(usersRecOpt->_recoveryString != recoveryString_)
         {
             return std::pair<std::error_code,boost::optional<std::string> >(
-                std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_RECOVERY_STRING,
-                                ErrorCategory::GetInstance()),
+                std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_RECOVERY_STRING),
                 boost::none);
         }
 
         return std::pair<std::error_code,boost::optional<std::string> >(
-            std::error_code(ErrorCode::ERR_SUCCESS,
-                            ErrorCategory::GetInstance()),
+            std::error_code(ErrorCode::ERR_SUCCESS),
             usersRecOpt->_userName);
     }
 
@@ -430,8 +421,7 @@ namespace Santiago{ namespace Authentication
         }        
         if(usersRecOpt)
         {
-            return std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS,
-                                   ErrorCategory::GetInstance());
+            return std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_ALREADY_EXISTS);
         }
         ST_ASSERT(ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS == error.value());
 
@@ -498,14 +488,13 @@ namespace Santiago{ namespace Authentication
         if(!usersRecOpt || (usersRecOpt->_password != generateSHA256(password_)))
         {
             ST_LOG_INFO("Wrong username_password. userName:"<<userName_<<std::endl);
-            return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_USERNAME_PASSWORD,
-                                                  ErrorCategory::GetInstance()),
+            return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_USERNAME_PASSWORD),
                                   usersRecOpt);
         }
         ST_ASSERT(!error);
 
         ST_LOG_INFO("Username password verified for userName:"<<userName_<<std::endl);
-        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),usersRecOpt);
+        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS),usersRecOpt);
     }
 
     template<typename ControllerTypes>
@@ -526,14 +515,13 @@ namespace Santiago{ namespace Authentication
         if(!usersRecOpt || (usersRecOpt->_password != generateSHA256(password_)))
         {
             ST_LOG_INFO("Wrong emailaddress_password. emailAddress:"<<emailAddress_<<std::endl);
-            return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_PASSWORD,
-                                                  ErrorCategory::GetInstance()),
+            return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_PASSWORD),
                                   usersRecOpt);
         }
         ST_ASSERT(!error);
         
         ST_LOG_INFO("EmailAddress password verified for emailAddress:"<<emailAddress_<<std::endl);
-        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),usersRecOpt);
+        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS),usersRecOpt);
     }
 
     template<typename ControllerTypes>
@@ -554,14 +542,13 @@ namespace Santiago{ namespace Authentication
         if(!usersRecOpt || (usersRecOpt->_recoveryString != recoveryString_))
         {
             ST_LOG_INFO("Wrong emailaddress_recoverystring. emailAddress:"<<emailAddress_<<std::endl);
-            return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_RECOVERY_STRING,
-                                                  ErrorCategory::GetInstance()),
+            return std::make_pair(std::error_code(ErrorCode::ERR_INVALID_EMAIL_ADDRESS_RECOVERY_STRING),
                                   usersRecOpt);
         }
         ST_ASSERT(!error);
 
         ST_LOG_INFO("EmailAddress recovery string verified for emailAddress:"<<emailAddress_<<std::endl);
-        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),usersRecOpt);
+        return std::make_pair(std::error_code(ErrorCode::ERR_SUCCESS),usersRecOpt);
     }
 
     template<typename ControllerTypes>
@@ -572,25 +559,25 @@ namespace Santiago{ namespace Authentication
         if(!sessionsRecOpt)
         {
             return std::pair<std::error_code,boost::optional<SantiagoDBTables::SessionsRec> >(
-                std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE,ErrorCategory::GetInstance()),
+                std::error_code(ErrorCode::ERR_INVALID_SESSION_COOKIE),
                 boost::none);
         }
         else if(_localData.isCookieBeingLoggedOut(cookieString_))
         {
             return std::pair<std::error_code,boost::optional<SantiagoDBTables::SessionsRec> >(
-                std::error_code(ErrorCode::ERR_COOKIE_BEING_LOGGED_OUT,ErrorCategory::GetInstance()),
+                std::error_code(ErrorCode::ERR_COOKIE_BEING_LOGGED_OUT),
                 sessionsRecOpt);
         }
         else if(_localData.isUserBeingLoggedOut(sessionsRecOpt->_userName))
         {
             return std::pair<std::error_code,boost::optional<SantiagoDBTables::SessionsRec> >(
-                std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT,ErrorCategory::GetInstance()),
+                std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT),
                 sessionsRecOpt);
         }
         else
         {
             return std::pair<std::error_code,boost::optional<SantiagoDBTables::SessionsRec> >(
-                std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
+                std::error_code(ErrorCode::ERR_SUCCESS),
                 sessionsRecOpt);
         }
     }
@@ -615,7 +602,7 @@ namespace Santiago{ namespace Authentication
 
         //remove from _userNameUserDataMap
         _localData.removeCookie(sessionsRec._cookieString);
-        return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
+        return std::error_code(ErrorCode::ERR_SUCCESS);
     }
 
     template<typename ControllerTypes>
@@ -677,7 +664,7 @@ namespace Santiago{ namespace Authentication
 
         //the user should also be removed by now
         ST_ASSERT(!_localData.getUserEmailAddress(userName_));
-        return std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance());
+        return std::error_code(ErrorCode::ERR_SUCCESS);
     }
 
     template<typename ControllerTypes>

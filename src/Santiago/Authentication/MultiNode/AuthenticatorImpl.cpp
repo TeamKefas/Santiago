@@ -63,8 +63,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onCreateUserCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()));
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR));
                 }
         
                 std::vector<std::string> parameters;
@@ -96,12 +95,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if(connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+                        onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS));
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
-                        onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
+                        onCreateUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION));
                     }
                 }
                 else
@@ -144,8 +143,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onLoginUserCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()),
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR),
                         boost::none);
                 }
         
@@ -190,8 +188,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                               connectionMessageOpt_->_parameters[0], //username
                                                               connectionMessageOpt_->_parameters[1]); //emailAddress
                 
-                        onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,
-                                                               ErrorCategory::GetInstance()),
+                        onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS),
                                                std::make_pair(UserInfo(connectionMessageOpt_->_parameters[0], //username
                                                                        connectionMessageOpt_->_parameters[1]), // emailAddress
                                                               connectionMessageOpt_->_parameters[2]));  // cookieString
@@ -199,7 +196,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
-                        onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),boost::none);
+                        onLoginUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION),boost::none);
                     }
                 }
                 else
@@ -237,8 +234,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                    (static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL))
                 {
                     return onVerifyUserCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()),
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR),
                         boost::none);
                 }
         
@@ -267,7 +263,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 }
                 else
                 {
-                    onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
+                    onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS),
                                             *userInfoOpt); 
                 }
             }
@@ -281,7 +277,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if(connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),
+                        onVerifyUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS),
                                                 UserInfo(connectionMessageOpt_->_parameters[0],  //userName
                                                          connectionMessageOpt_->_parameters[1])); //emailAddress
                     }
@@ -324,8 +320,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onLogoutCookieCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()));
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR));
                 }
         
                 std::vector<std::string> parameters;
@@ -359,12 +354,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                         _clientCache.removeCookieUsernameFromCache(connectionMessageOpt_->_parameters[2], //cookie string
                                                                    connectionMessageOpt_->_parameters[0], //userName
                                                                    connectionMessageOpt_->_parameters[1]); //emailAddress
-                        onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+                        onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS));
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
-                        onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
+                        onLogoutCookieCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION));
                     }
                 }
                 else
@@ -399,8 +394,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onLogoutAllCookiesCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()));
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR));
                 }
         
                 std::vector<std::string> parameters;
@@ -433,12 +427,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                     {
                         _clientCache.removeAllCookiesForUser(connectionMessageOpt_->_parameters[0], //userName
                                                              connectionMessageOpt_->_parameters[1]); //emailAddress 
-                        onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+                        onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS));
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
-                        onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
+                        onLogoutAllCookiesCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION));
                     }
                 }
                 else
@@ -479,8 +473,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onChangePasswordCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()));
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR));
                 }
         
                 std::vector<std::string> parameters;
@@ -513,12 +506,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        onChangePasswordCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+                        onChangePasswordCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS));
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
-                        onChangePasswordCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
+                        onChangePasswordCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION));
                     }
                 }
                 else
@@ -558,8 +551,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onGetUserForEmailAddressAndRecoveryStringCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()),
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR),
                         boost::none);
                 }
         
@@ -592,12 +584,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),connectionMessageOpt_->_parameters[0]);
+                        onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS),connectionMessageOpt_->_parameters[0]);
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
-                        onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),boost::none);
+                        onGetUserForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION),boost::none);
                     }
                 }
                 else
@@ -638,8 +630,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()));
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR));
                 }
         
                 std::vector<std::string> parameters;
@@ -672,12 +663,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+                        onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS));
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
-                        onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
+                        onChangePasswordForEmailAddressAndRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION));
                     }
                 }
                 else
@@ -718,8 +709,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onChangeEmailAddressCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()));
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR));
                 }
         
                 std::vector<std::string> parameters;
@@ -752,12 +742,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        onChangeEmailAddressCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+                        onChangeEmailAddressCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS));
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
-                        onChangeEmailAddressCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
+                        onChangeEmailAddressCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION));
                     }
                 }
                 else
@@ -794,8 +784,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onCreateAndReturnRecoveryStringCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()),
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR),
                         boost::none);
                 }
         
@@ -827,12 +816,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 {
                     if (connectionMessageOpt_->_type == ConnectionMessageType::SUCCEEDED)
                     {
-                        onCreateAndReturnRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()),connectionMessageOpt_->_parameters[0]);  //username
+                        onCreateAndReturnRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS),connectionMessageOpt_->_parameters[0]);  //username
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
-                        onCreateAndReturnRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()),boost::none);
+                        onCreateAndReturnRecoveryStringCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION),boost::none);
                     }
                 }
                 else
@@ -867,8 +856,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                 if(static_cast<double>(clock()-*_lastPingTimeOpt)/CLOCKS_PER_SEC > WITHOUT_PING_DISCONNECT_INTERVAL)
                 {
                     return onDeleteUserCallbackFn_(
-                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR,
-                                        ErrorCategory::GetInstance()));
+                        std::error_code(ErrorCode::ERR_AUTH_SERVER_CONNECTION_ERROR));
                 }
         
                 std::vector<std::string> parameters;
@@ -904,12 +892,12 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                                    connectionMessageOpt_->_parameters[1]);
                         _clientCache.removeAllCookiesForUser(connectionMessageOpt_->_parameters[0],
                                                              connectionMessageOpt_->_parameters[1]);
-                        onDeleteUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS,ErrorCategory::GetInstance()));
+                        onDeleteUserCallbackFn_(std::error_code(ErrorCode::ERR_SUCCESS));
                     }
                     else if(connectionMessageOpt_->_type == ConnectionMessageType::FAILED)
                     {
                         //will change with appropriate error
-                        onDeleteUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION,ErrorCategory::GetInstance()));
+                        onDeleteUserCallbackFn_(std::error_code(ErrorCode::ERR_DATABASE_EXCEPTION));
                     }
                 }
                 else
