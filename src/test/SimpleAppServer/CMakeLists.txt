@@ -17,4 +17,4 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(SimpleAppServerEcho ${SimpleAppServerEcho_SRCS}) 
-target_link_libraries(SimpleAppServerEcho Santiago ${MARIADB_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(SimpleAppServerEcho Santiago ${Boost_LIBRARIES})

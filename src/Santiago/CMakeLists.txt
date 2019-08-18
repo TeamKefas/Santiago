@@ -88,5 +88,5 @@ if(WIN32)
 endif(WIN32)
 
 add_library(Santiago STATIC ${Santiago_SRCS})
-target_link_libraries(Santiago ${Boost_LIBRARIES} ${MARIADB_LIBRARIES} ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY} ${CURL_LIBRARIES})
+target_link_libraries(Santiago ${Boost_LIBRARIES} ${MARIADB_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY} ${CURL_LIBRARIES})
 install(TARGETS Santiago DESTINATION /usr/local/lib)

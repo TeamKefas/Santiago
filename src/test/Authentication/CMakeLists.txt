@@ -14,4 +14,4 @@ endif(WIN32)
 
 
 add_executable(TestAuthenticationExec ${TestAuthentication_SRCS}) 
-target_link_libraries(TestAuthenticationExec Santiago ${MARIADB_LIBRARIES} ${Boost_LIBRARIES}) 
+target_link_libraries(TestAuthenticationExec Santiago ${Boost_LIBRARIES}) 

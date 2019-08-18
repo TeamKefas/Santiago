@@ -6,4 +6,4 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(ServerExec ${Server_SRCS}) 
-target_link_libraries(ServerExec Santiago ${MARIADB_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(ServerExec Santiago ${Boost_LIBRARIES})
