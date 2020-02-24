@@ -1,0 +1,88 @@
+Notes
+-----
+
+User - The end user that logs in.
+
+UserCode - The code that uses the library.
+
+Client - The client in a server-client (i.e MultiNode) authentication setup. Not applicable
+         in a SingleNode case.
+
+Server - The server in a server-client (i.e MultiNode) authentication setup. Not applicable
+         in a SingleNode case.
+
+Authenticator - The main class that exposes the library's api to the UserCode. The base
+                class AuthenticatorBase provides the common interface. The 2 child classes
+                (SingleNode:: and MultiNode:: Authenticators provides the implementation for
+                the single node and multi node setups respectively.). This class also does
+                the task of redirecting the User requests to the correct controller in the
+                correct asio strand.
+                
+Controller - The class that does the core task. Most of the implementation in the
+             ControllerBase class.
+
+ControllerData - The core user data for each controller. Also has additional consistency
+                 checks to see the constraints are met.
+
+General
+-------
+
+1) For every user with same username's starting alphabet the requests will be processed in 1
+   strand.
+
+2) For each user the username's first alphabet should be the first alphabet for the cookie
+   string. This is used to redirect the users requests to the same strand.
+
+3) For each user( more accurately for each group of users with same username starting
+   alphabet):
+   a) The SingleNode Authenticator processes the user requests in the order of the requests.
+   b) The client sends to the server in the order of the requests,
+   c) The server Controller BEGINS processing for each client-user combination in the order
+      of requests. Flags are set in the server ControllerData which block further
+      conflicting requests.
+   d) The client processes the server requests in the order of requests.
+
+4) logoutCookie will not be processed when logoutUser already in progess.
+
+5) logoutUser will not be be processed if ALL the cookies of user has a logoutCookie in
+   progress.
+
+6) Each client (including client receiving user commands) removes cookie/user only after
+   global controller isBeingLoggedOut flag is set.
+
+7) loginUserForCookie and verifyCookie not allowed when logoutUser already in progress (or
+   for verifyCookie it is blocked even if logoutCookie in progress).
+
+Pulse system
+------------
+8) Client sends pulse to server, server responds as soon as it processes the pulse. Both
+   client and server stores the time where it last processed an opposite pulse.
+
+9) Client sends the pulse at PULSE_INTERVAL time after the stored process time of its last
+   received server pulse. Pulse sent with priority in asio. (Sending will naturally be
+   different from userRequest processing strands due to 1). But pulse processing in the same
+   strand as sending/receiving.)
+
+10) Client fails locally processed requests(i.e verifyCookie) of user if last pulse was
+    before N * BASE_PULSE_INTERVAL . It uses mutexed read of the last pulse time every time
+    it starts local processing a user request. It also disconnects after
+    N * BASE_PULSE_INTERVAL.
+
+11) Server assumes a client has disconnected if the last received pulse was before
+    2.1 * N * BASE_PULSE_INTERVAL. Even for a detected client disconnect it waits for this
+    interval before assuming the client has disconnected.
+
+12) On client disconnect controller socket passes a message to its
+    Authenticators/Controllers. i.e Authenticators don't do mutexed read like in client.
+
+13) Every pulse has an integer id which will be transmitted. Every request can optionally
+    have pulse_id of the time it was DECIDED by the Controller.
+
+Cookie Timeout system
+---------------------
+
+14) Server sends the timeout time to the client.
+
+15) Client sends REMOVED_COOKIE_FROM_CLIENT message back to the server at
+    Received_cookie_pulse_time  + timeout_time - 2.1 * N * BASE_PULSE_INTERVAL. The message
+    will have a data - cookieLastUsedTime

@@ -203,7 +203,7 @@ namespace Santiago{ namespace Authentication
         boost::optional<std::string> emailAddressOpt = _localData.getUserEmailAddress(sessionsRecOpt->_userName);
         ST_ASSERT(emailAddressOpt);
 
-        _localData.updateCookie(*sessionsRecOpt,requestData_.getClientId());
+        _localData.updateCookieAndAddClient(*sessionsRecOpt,requestData_.getClientId());
 
         return std::pair<std::error_code,boost::optional<UserInfo> >(
             std::error_code(ErrorCode::ERR_SUCCESS),

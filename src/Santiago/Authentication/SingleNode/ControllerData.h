@@ -27,8 +27,12 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                        const SantiagoDBTables::SessionsRec& sessionsRec_,
                        const boost::optional<ClientIdType>&);
         
-        void updateCookie(const SantiagoDBTables::SessionsRec& newSessionsRec_,
-                          const ClientIdType&);
+        void updateCookieAndAddClient(const SantiagoDBTables::SessionsRec& newSessionsRec_,
+                                      const ClientIdType&);
+
+    protected:
+        
+        void removeCookieClientDataImpl(const CookieDataBasePtr& cookieDataPtr_) {}
         
     };
 }}}
