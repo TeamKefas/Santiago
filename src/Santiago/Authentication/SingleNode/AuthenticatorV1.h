@@ -2,9 +2,9 @@
 #define SANTIAGO_AUTHENTICATION_SINGLENODE_AUTHENTICATORV1_H
 
 #include "AuthenticatorImpl.h"
-#include "Santiago/Authentication/AuthenticatorBaseV1.h"
-#include "Santiago/Thread/ThreadSpecificVar.h"
-#include "Santiago/SantiagoDBTables/MariaDBConnection.h"
+#include "../AuthenticatorBaseV1.h"
+#include "../../Thread/ThreadSpecificVar.h"
+#include "../..//SantiagoDBTables/MariaDBConnection.h"
 
 namespace Santiago{ namespace Authentication{ namespace SingleNode
 {

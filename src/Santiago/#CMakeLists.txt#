@@ -1,0 +1,144 @@
+set(Santiago_SRCS
+  ErrorCategory.cpp
+  HTTPDefinitions.cpp
+  SantiagoDBTables/Definitions.cpp
+  SantiagoDBTables/MariaDBConnection.cpp
+  Authentication/AuthenticatorBaseV1.cpp
+  Authentication/ControllerDataBase.cpp
+  Authentication/SingleNode/AuthenticatorImpl.cpp
+  Authentication/SingleNode/AuthenticatorV1.cpp
+  Authentication/SingleNode/ControllerData.cpp
+  Authentication/MultiNode/ConnectionMessage.cpp
+  Authentication/MultiNode/ConnectionMessageSocket.cpp
+  Authentication/MultiNode/ConnectionRequestsController.cpp
+  Authentication/MultiNode/ConnectionRequestsControllerBase.cpp
+  Authentication/MultiNode/ClientCache.cpp
+  Authentication/MultiNode/AuthenticatorImpl.cpp
+  #Authentication/MultiNode/Server/ServerV1.cpp
+  #Authentication/MultiNode/Server/ConnectionServer.cpp
+  #Authentication/MultiNode/Server/ConnectionRequestsController.cpp
+  #Authentication/MultiNode/Server/CreateUserRequestHandler.cpp
+  #Authentication/MultiNode/Server/LoginUserRequestHandler.cpp
+  #Authentication/MultiNode/Server/VerifyUserForCookieRequestHandler.cpp
+  #Authentication/MultiNode/Server/LogoutUserForCookieRequestHandler.cpp
+  #Authentication/MultiNode/Server/LogoutUserForAllCookiesRequestHandler.cpp
+  #Authentication/MultiNode/Server/ChangeUserPasswordRequestHandler.cpp
+  #Authentication/MultiNode/Server/GetUserForEmailAddressAndRecoveryStringRequestHandler.cpp
+  #Authentication/MultiNode/Server/ChangeUserPasswordForEmailAddressAndRecoveryStringRequestHandler.cpp
+  #Authentication/MultiNode/Server/ChangeUserEmailAddressRequestHandler.cpp
+  #Authentication/MultiNode/Server/CreateAndReturnRecoveryStringRequestHandler.cpp
+  #Authentication/MultiNode/Server/DeleteUserRequestHandler.cpp
+  Thread/ThreadSpecificVarImpl.cpp
+  Utils/PTimeUtils.cpp
+  Utils/STLog.cpp
+  Utils/Email.cpp
+  )
+
+if(WIN32)
+  set(Santiago_SRCS ${Santiago_SRCS}
+      ErrorCategory.h
+      HTTPDefinitions.h
+      SantiagoDBTables/Definitions.h
+      SantiagoDBTables/MariaDBConnection.h
+      Authentication/AuthenticatorBaseV1.h
+      Authentication/AuthenticatorImplBase.h
+      Authentication/ControllerBase.h
+      Authentication/ControllerDataBase.h
+      Authentication/SingleNode/AuthenticatorImpl.h
+      Authentication/SingleNode/AuthenticatorV1.h
+      Authentication/SingleNode/Controller.h
+      Authentication/SingleNode/ControllerData.h
+      Authentication/MultiNode/TimeDefs.h
+      Authentication/MutiNode/ConnectionMessage.h
+      Authentication/MutiNode/ConnectionMessageSocket.h
+      Authentication/MutiNode/ConnectionRequestsController.h
+      Authentication/MutiNode/ConnectionRequestsControllerBase.h
+      Authentication/MultiNode/ClientCache.h
+      Authentication/MultiNode/AuthenticatorImpl.h
+      #Authentication/MultiNode/Server/Controller.h
+      #Authentication/MultiNode/Server/ServerData.h
+      #Authentication/MultiNode/Server/ServerV1.h
+      #Authentication/MultiNode/Server/ConnectionServer.h
+      #Authentication/MultiNode/Server/ConnectionRequestsController.h
+      #Authentication/MultiNode/Server/RequestHandlerBase.h
+      #Authentication/MultiNode/Server/CreateUserRequestHandler.h
+      #Authentication/MultiNode/Server/LoginUserRequestHandler.h
+      #Authentication/MultiNode/Server/VerifyUserForCookieRequestHandler.h
+      #Authentication/MultiNode/Server/LogoutUserForCookieRequestHandler.h
+      #Authentication/MultiNode/Server/LogoutUserForAllCookiesRequestHandler.h
+      #Authentication/MultiNode/Server/ChangeUserPasswordRequestHandler.h
+      #Authentication/MultiNode/Server/GetUserForEmailAddressAndRecoveryStringRequestHandler.h
+      #Authentication/MultiNode/Server/ChangeUserPasswordForEmailAddressAndRecoveryStringRequestHandler.h
+      #Authentication/MultiNode/Server/ChangeUserEmailAddressRequestHandler.h
+      #Authentication/MultiNode/Server/CreateAndReturnRecoveryStringRequestHandler.h
+      #Authentication/MultiNode/Server/DeleteUserRequestHandler.h
+      Utils/PTimeUtils.h
+      Utils/STLog.h
+      Utils/LogLevel.h
+      Utils/Email.h
+      FastCGI/Acceptor.h
+      FastCGI/Common.h
+      FastCGI/Connection.h
+      FastCGI/ConnectionData.h
+      FastCGI/PacketSocket.h
+      FastCGI/PairParseFunctions.h
+      FastCGI/RecordSocket.h
+      FastCGI/Request.h
+      FastCGI/RequestData.h)
+endif(WIN32)
+
+set(Santiago_PUBLIC_HEADERS ${Santiago_SRCS}
+  ErrorCategory.h
+  HTTPDefinitions.h
+      Authentication/AuthenticatorBaseV1.h
+      Authentication/AuthenticatorImplBase.h
+      Authentication/ControllerBase.h
+      Authentication/ControllerDataBase.h
+      Authentication/SingleNode/AuthenticatorImpl.h
+      Authentication/SingleNode/AuthenticatorV1.h
+      Authentication/SingleNode/Controller.h
+      Authentication/SingleNode/ControllerData.h
+      Authentication/MultiNode/TimeDefs.h
+      Authentication/MutiNode/ConnectionMessage.h
+      Authentication/MutiNode/ConnectionMessageSocket.h
+      Authentication/MutiNode/ConnectionRequestsController.h
+      Authentication/MutiNode/ConnectionRequestsControllerBase.h
+      Authentication/MultiNode/ClientCache.h
+      Authentication/MultiNode/AuthenticatorImpl.h
+      #Authentication/MultiNode/Server/Controller.h
+      #Authentication/MultiNode/Server/ServerData.h
+      #Authentication/MultiNode/Server/ServerV1.h
+      #Authentication/MultiNode/Server/ConnectionServer.h
+      #Authentication/MultiNode/Server/ConnectionRequestsController.h
+      #Authentication/MultiNode/Server/RequestHandlerBase.h
+      #Authentication/MultiNode/Server/CreateUserRequestHandler.h
+      #Authentication/MultiNode/Server/LoginUserRequestHandler.h
+      #Authentication/MultiNode/Server/VerifyUserForCookieRequestHandler.h
+      #Authentication/MultiNode/Server/LogoutUserForCookieRequestHandler.h
+      #Authentication/MultiNode/Server/LogoutUserForAllCookiesRequestHandler.h
+      #Authentication/MultiNode/Server/ChangeUserPasswordRequestHandler.h
+      #Authentication/MultiNode/Server/GetUserForEmailAddressAndRecoveryStringRequestHandler.h
+      #Authentication/MultiNode/Server/ChangeUserPasswordForEmailAddressAndRecoveryStringRequestHandler.h
+      #Authentication/MultiNode/Server/ChangeUserEmailAddressRequestHandler.h
+      #Authentication/MultiNode/Server/CreateAndReturnRecoveryStringRequestHandler.h
+      #Authentication/MultiNode/Server/DeleteUserRequestHandler.h
+      Utils/PTimeUtils.h
+      Utils/STLog.h
+      Utils/LogLevel.h
+      Utils/Email.h
+      FastCGI/Acceptor.h
+      FastCGI/Common.h
+      FastCGI/Connection.h
+      FastCGI/ConnectionData.h
+      FastCGI/PacketSocket.h
+      FastCGI/PairParseFunctions.h
+      FastCGI/RecordSocket.h
+      FastCGI/Request.h
+      FastCGI/RequestData.h)
+  
+
+add_library(Santiago STATIC ${Santiago_SRCS})
+set_target_properties(Santiago PROPERTIES PUBLIC_HEADER "Fastcgi/;another.h")
+
+target_link_libraries(Santiago ${Boost_LIBRARIES} ${MARIADB_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY} ${CURL_LIBRARIES})
+install(TARGETS Santiago DESTINATION /usr/local/lib)

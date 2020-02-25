@@ -1,7 +1,7 @@
 #ifndef SANTIAGO_AUTHENTICATION_SINGLENODE_CONTROLLER_H
 #define SANTIAGO_AUTHENTICATION_SINGLENODE_CONTROLLER_H
 
-#include "Santiago/Authentication/ControllerBase.h"
+#include "../ControllerBase.h"
 
 #include "ControllerData.h"
 

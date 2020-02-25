@@ -23,7 +23,6 @@
 
 namespace Santiago{ namespace Authentication
 {
-    
     class AuthenticatorBase
     {
     public:

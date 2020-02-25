@@ -7,9 +7,9 @@
 
 #include <boost/optional.hpp>
 
-#include "Santiago/Utils/STLog.h"
+#include "../Utils/STLog.h"
 
-#include "Santiago/SantiagoDBTables/DatabaseRecords.h"
+#include "../SantiagoDBTables/DatabaseRecords.h"
 
 namespace Santiago{ namespace Authentication
 {

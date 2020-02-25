@@ -23,10 +23,10 @@
 
 #include <boost/asio/spawn.hpp>
 
-#include "Santiago/SantiagoDBTables/MariaDBConnection.h"
-#include "Santiago/Authentication/AuthenticatorBaseV1.h"
-#include "Santiago/Thread/ThreadSpecificVar.h"
-#include "Santiago/Utils/STLog.h"
+#include "../SantiagoDBTables/MariaDBConnection.h"
+#include "../Authentication/AuthenticatorBaseV1.h"
+#include "../Thread/ThreadSpecificVar.h"
+#include "../Utils/STLog.h"
 
 #include "ControllerDataBase.h"
 

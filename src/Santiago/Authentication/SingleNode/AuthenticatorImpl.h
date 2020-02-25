@@ -1,8 +1,8 @@
 #ifndef SANTIAGO_AUTHENTICATION_SINGLENODE_AUTHENTICATORIMPL_H
 #define SANTIAGO_AUTHENTICATION_SINGLENODE_AUTHENTICATORIMPL_H
 
-#include "Santiago/Authentication/AuthenticatorImplBase.h"
-#include "Santiago/Thread/ThreadSpecificVar.h"
+#include "../AuthenticatorImplBase.h"
+#include "../../Thread/ThreadSpecificVar.h"
 
 #include "Controller.h"
 

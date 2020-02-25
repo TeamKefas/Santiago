@@ -1,5 +1,5 @@
-#ifndef SANTIAGO_AUTHENTICATION_AUTHENTICATOR_H
-#define SANTIAGO_AUTHENTICATION_AUTHENTICATOR_H
+#ifndef SANTIAGO_AUTHENTICATION_SINGLENODE_AUTHENTICATOR_H
+#define SANTIAGO_AUTHENTICATION_SINGLENODE_AUTHENTICATOR_H
 
 /**
  * @file Authenticator.h
@@ -21,12 +21,11 @@
 
 #include <openssl/sha.h>
 
-#include "Santiago/SantiagoDBTables/MariaDBConnection.h"
-//#include "Santiago/ThreadSpecificVar/ThreadSpecificVar.h"
-#include "Santiago/Thread/ThreadSpecificVar.h"
+#include "../../SantiagoDBTables/MariaDBConnection.h"
+#include "../../Thread/ThreadSpecificVar.h"
+#include "../../Utils/STLog.h"
 
-#include "Santiago/Authentication/AuthenticatorBaseV1.h"
-#include "Santiago/Utils/STLog.h"
+#include "../AuthenticatorBaseV1.h"
 #define MAX_SESSION_DURATION 1
 
 namespace Santiago{ namespace Authentication{ namespace SingleNode

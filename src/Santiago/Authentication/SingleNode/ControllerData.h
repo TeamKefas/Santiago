@@ -7,9 +7,9 @@
 
 #include <boost/optional.hpp>
 
-#include "Santiago/Utils/STLog.h"
+#include "../../Utils/STLog.h"
 
-#include "Santiago/Authentication/ControllerDataBase.h"
+#include "../ControllerDataBase.h"
 
 namespace Santiago{ namespace Authentication{ namespace SingleNode
 {
