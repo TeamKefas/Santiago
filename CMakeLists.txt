@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules")
 
 if(UNIX)
   add_definitions(-D__UNIX__)
+  add_definitions(-DBOOST_COROUTINES_NO_DEPRECATION_WARNING)
   add_compile_options(-std=c++17)
   add_compile_options(-Wall)
 endif(UNIX)

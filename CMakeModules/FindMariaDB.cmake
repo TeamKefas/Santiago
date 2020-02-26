@@ -31,17 +31,25 @@ ELSE()
     EXEC_PROGRAM(${MARIADB_BIN_DIR}/mariadb_config
       ARGS "--include"
       OUTPUT_VARIABLE MARIADB_INCLUDE_PATH)
-    # remove the preceding -I
-    STRING(SUBSTRING ${MARIADB_INCLUDE_PATH} 2 -1 MARIADB_INCLUDE_DIR)
 
+    #Removing -I and splitting multiple paths into list
+    STRING(REPLACE "-I" ""  MARIADB_INCLUDE_PATH "${MARIADB_INCLUDE_PATH}")
+#    MESSAGE(STATUS "mariadb_config returned:${MARIADB_INCLUDE_PATH} \n")
+    #Splitting the multiple paths into a list. This is needed for cmake.
+    STRING(REGEX MATCHALL "[^ ]+" MARIADB_INCLUDE_DIR "${MARIADB_INCLUDE_PATH}")
+#    MESSAGE(STATUS "path after after regex: ${MARIADB_INCLUDE_PATHS}")
+   
+   
     EXEC_PROGRAM(${MARIADB_BIN_DIR}/mariadb_config
       ARGS "--libs"
       OUTPUT_VARIABLE MARIADB_LIBRARY_PATH)
     
-    # get the string from -l to end
+    # get the string from first -l to end and removing -l and split the multiple libraries
+    # into a list
     STRING(FIND ${MARIADB_LIBRARY_PATH} " -l" MY_LENGTH)
-    MATH(EXPR MY_LENGTH "${MY_LENGTH} + 3")
-    STRING(SUBSTRING ${MARIADB_LIBRARY_PATH} ${MY_LENGTH} -1 MARIADB_LIBRARY) 
+    STRING(SUBSTRING ${MARIADB_LIBRARY_PATH} ${MY_LENGTH} -1 MARIADB_LIBRARY_PATH)
+    STRING(REPLACE "-l" ""  MARIADB_LIBRARY_PATH "${MARIADB_LIBRARY_PATH}")
+    STRING(REGEX MATCHALL "[^ ]+" MARIADB_LIBRARY "${MARIADB_LIBRARY_PATH}")    
     
   ELSE()
     
