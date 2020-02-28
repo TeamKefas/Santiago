@@ -18,8 +18,6 @@ namespace Test{ namespace Authentication{ namespace SingleNode
         typedef std::shared_ptr<Santiago::Authentication::SingleNode::Authenticator> AuthenticatorBasePtr;
         typedef Santiago::Thread::ThreadSpecificVar<Santiago::SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
 
-        typedef typename Santiago::Authentication::ControllerData::ClientIdType ClientIdType;
-
         AuthenticatorTester(boost::asio::io_service& ioService_,
                             const boost::property_tree::ptree& config_)
             :AuthenticatorTesterBase(ioService_,config_)
@@ -32,7 +30,6 @@ namespace Test{ namespace Authentication{ namespace SingleNode
         
         void initAuthenticator(const boost::property_tree::ptree& config_);
         
-        ClientIdType                    _clientId;
         ThreadSpecificDbConnection      _databaseConnection;
 
     };

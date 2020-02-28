@@ -7,7 +7,6 @@ namespace Test{ namespace Authentication{ namespace SingleNode
         _authenticatorBasePtr.reset(new Santiago::Authentication::SingleNode::Authenticator(
                                         _ioService,
                                         _config,
-                                        _clientId,
                                         _databaseConnection));
     }
 

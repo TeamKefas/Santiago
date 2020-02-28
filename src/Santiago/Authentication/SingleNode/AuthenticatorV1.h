@@ -12,11 +12,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
     {
     public:
         typedef Thread::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
-        typedef unsigned ClientIdType;
         
         Authenticator(boost::asio::io_service& ioService_,
                       const boost::property_tree::ptree& config_,
-                      const ClientIdType& clientId_,
                       ThreadSpecificDbConnection& databaseConnection_):AuthenticatorBase(ioService_,config_),_databaseConnection(databaseConnection_)
         {
             for(int i = 0; i < 26; ++i)
