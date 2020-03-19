@@ -195,6 +195,7 @@ namespace Santiago{ namespace Authentication
             if(boost::posix_time::second_clock::universal_time() - it->_lastActiveTime >=
                boost::posix_time::time_duration(MAX_SESSION_DURATION,0,0,0))
             {
+                _localData.setCookieBeingLoggedOutFlag(it->_cookieString);
                 std::error_code error = cleanupLocalCookieDataAndUpdateSessionsRecordImpl(*it);                    
                 ST_ASSERT(!error);
             }

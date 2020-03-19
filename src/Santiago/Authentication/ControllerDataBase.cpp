@@ -145,7 +145,10 @@ namespace Santiago{ namespace Authentication
     bool ControllerDataBase::isUserBeingLoggedOut(const std::string& userName_) const
     {
         auto userDataIter = _userNameUserDataMap.find(userName_);
-        ST_ASSERT(userDataIter != _userNameUserDataMap.end());
+        if(userDataIter == _userNameUserDataMap.end())
+        {
+            return false;
+        }
         
         return userDataIter->second._isBeingLoggedOut;
     }
