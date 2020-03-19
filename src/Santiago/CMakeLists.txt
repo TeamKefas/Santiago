@@ -8,6 +8,7 @@ set(Santiago_SRCS
   Authentication/SingleNode/AuthenticatorImpl.cpp
   Authentication/SingleNode/AuthenticatorV1.cpp
   Authentication/SingleNode/ControllerData.cpp
+  Authentication/SingleNode/Controller.cpp
   Authentication/MultiNode/ConnectionMessage.cpp
   Authentication/MultiNode/ConnectionMessageSocket.cpp
   Authentication/MultiNode/ConnectionRequestsController.cpp
