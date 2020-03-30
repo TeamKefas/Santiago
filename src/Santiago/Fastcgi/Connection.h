@@ -26,7 +26,7 @@ namespace Santiago{ namespace Fastcgi
  * arguments(eg Acceptor<boost::asio::ip::tcp>)
  */
     template<typename Protocol>
-    class Connection
+    class Connection:public std::enable_shared_from_this<Connection<Protocol> >
     {
         typedef std::shared_ptr<boost::asio::strand> StrandPtr;
         typedef typename Protocol::socket ProtocolSocket;
@@ -89,7 +89,10 @@ namespace Santiago{ namespace Fastcgi
         void commitReply(unsigned requestId_,RequestDataPtr requestData_)
         {
             ST_LOG_DEBUG("commitReply called."<<std::endl);
-            _strandPtr->post(std::bind(&Connection::commitReplyImpl,this,requestId_,requestData_));
+            _strandPtr->post(std::bind(&Connection::commitReplyImpl,
+                                       this->shared_from_this(),
+                                       requestId_,
+                                       requestData_));
         }
 
         /**
