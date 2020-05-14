@@ -9,7 +9,8 @@ namespace Santiago
             {MIMEType::TEXT,"text/plain"},
             {MIMEType::HTML,"text/html"},
             {MIMEType::XML,"application/xml"},
-            {MIMEType::JSON,"application/json"}
+            {MIMEType::JSON,"application/json"},
+            {MIMEType::PDF,"application/pdf"}
         };
 
         std::pair<std::string, std::string> MakeNameValuePairs(const std::string &inString_,

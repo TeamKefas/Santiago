@@ -15,7 +15,8 @@ namespace Santiago
         TEXT,
         HTML,
         XML,
-	JSON
+        JSON,
+        PDF    
     };
 
     const std::map<MIMEType,std::string>& GetMIMETypeStringMap();
