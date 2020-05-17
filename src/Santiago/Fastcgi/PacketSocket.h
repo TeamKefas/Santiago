@@ -30,8 +30,10 @@ namespace Santiago{ namespace Fastcgi
     {
 
     private:
-        static const unsigned BUFFER_INCREMENT_SIZE = 4096;
-
+        
+        static constexpr size_t INITIAL_BUFFER_SIZE = 4096;
+        static constexpr size_t BUFFER_SIZE_LEEWAY = 2096;
+        
         enum State
         {
             OPEN,
@@ -75,13 +77,7 @@ namespace Santiago{ namespace Fastcgi
          */
         void startAsyncPacketRead()
         {
-            _protocolSocketPtr->async_read_some(
-                _inputBuffer.prepare(BUFFER_INCREMENT_SIZE),
-                (*_connectionStrandPtr).wrap(std::bind(&PacketSocket::handleRead,
-                                                       this->shared_from_this(),
-                                                       std::placeholders::_1,
-                                                       std::placeholders::_2)));
-
+            asyncReadImpl(INITIAL_BUFFER_SIZE);
         }
 
         /**
@@ -180,6 +176,23 @@ namespace Santiago{ namespace Fastcgi
 
 
     private:
+        
+        /**
+         * Impl function to call async_read
+         * @param bufferIncrementSize_: bytes to increment the buffer for new read.
+         */
+        void asyncReadImpl(size_t bufferIncrementSize_)
+        {
+            ST_ASSERT(_state != CLOSED);
+            _protocolSocketPtr->async_read_some(
+                _inputBuffer.prepare(bufferIncrementSize_),
+                (*_connectionStrandPtr).wrap(std::bind(&PacketSocket::handleRead,
+                                                       this->shared_from_this(),
+                                                       std::placeholders::_1,
+                                                       std::placeholders::_2)));
+
+        }
+                
         /**
          * The read handler to be called by boost asio. Calls the newPacketCallbackFn 
          * when a complete packet is received. This function is always called in the
@@ -229,7 +242,8 @@ namespace Santiago{ namespace Fastcgi
 
                 if (_inputBuffer.size() < FCGI_HEADER_LEN + contentLength + header.paddingLength)
                 {
-                    break;
+                    asyncReadImpl(FCGI_HEADER_LEN + contentLength + header.paddingLength + BUFFER_SIZE_LEEWAY - _inputBuffer.size());
+                    return;
                 }
 
                 try
@@ -241,18 +255,22 @@ namespace Santiago{ namespace Fastcgi
                                          contentLength,
                                          content); 
                     _inputBuffer.consume(FCGI_HEADER_LEN + contentLength + header.paddingLength);                    
-                    if(_state == CLOSED)
-                    {
-                        break;
-                    }
                 }
                 catch(std::exception &e)
                 {
                     ST_LOG_ERROR("Caught exception:"<<e.what()<<std::endl);
                     _inputBuffer.consume(FCGI_HEADER_LEN + contentLength + header.paddingLength);
                 }
+                
+                if(_state == CLOSED) //if the newPacketCallbackFn called close
+                {
+                    return;
+                }
+
                 //_inputBuffer.consume(FCGI_HEADER_LEN + contentLength + header.paddingLength);          
             }
+
+            asyncReadImpl(INITIAL_BUFFER_SIZE);
         }
 
         /**
@@ -277,7 +295,7 @@ namespace Santiago{ namespace Fastcgi
                 //consume off already read data
 ;
                 _inputBuffer.consume(_inputBuffer.size());
-                size_t bytesRead = _protocolSocketPtr->read_some(_inputBuffer.prepare(BUFFER_INCREMENT_SIZE),ec);
+                size_t bytesRead = _protocolSocketPtr->read_some(_inputBuffer.prepare(INITIAL_BUFFER_SIZE),ec);
                 _inputBuffer.commit(bytesRead);
 
             }while(!ec);
