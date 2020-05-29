@@ -22,6 +22,17 @@ namespace Santiago{ namespace Authentication
               const std::string& password_,
               boost::asio::yield_context yield_);
 
+    template std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >
+    ControllerBase<SingleNode::ControllerTypes>::
+    loginUserForVerifiedOICToken(const ClientRequestData& requestData_,
+                                 const std::string& emailAddress_,
+                                 boost::asio::yield_context yield_);
+
+    template std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >
+    ControllerBase<SingleNode::ControllerTypes>::
+    createSessionsDataForUserImpl(const ClientRequestData& requestData_,
+                                  const SantiagoDBTables::UsersRec& usersRec_);
+
     template std::pair<std::error_code,boost::optional<UserInfo> >
     ControllerBase<SingleNode::ControllerTypes>::
     verifyCookieAndGetUserInfo(const ClientRequestData& requestData_,

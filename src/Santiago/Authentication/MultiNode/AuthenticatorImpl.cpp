@@ -16,8 +16,9 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         {
             AuthenticatorImpl::AuthenticatorImpl(boost::asio::io_service& ioService_,
                                                  const StrandPtr& strandPtr_,
-                                                 const boost::asio::ip::tcp::endpoint& serverEndPoint_)
-                :AuthenticatorImplBase()
+                                                 const boost::asio::ip::tcp::endpoint& serverEndPoint_,
+                                                 const std::map<std::string,std::string>& oicProviderNameCertURLMap_)
+                :AuthenticatorImplBase(oicProviderNameCertURLMap_)
                 ,_ioService(ioService_)
                 ,_strandPtr(new boost::asio::strand(_ioService))
                 ,_connectionRequestsController(_ioService,

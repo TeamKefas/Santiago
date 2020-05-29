@@ -1,7 +1,16 @@
+#include <cjose/error.h>
+#include <cjose/jws.h>
+
 #include "AuthenticatorImpl.h"
 
 namespace Santiago{ namespace Authentication{ namespace SingleNode
 {
+    AuthenticatorImpl::AuthenticatorImpl(ThreadSpecificDbConnection& databaseConnection_,
+                                         const std::map<std::string,std::string>& oicProviderNameCertURLMap_)
+        :AuthenticatorImplBase(oicProviderNameCertURLMap_)
+        ,_controller(databaseConnection_)
+    {}
+    
     std::error_code AuthenticatorImpl::createUser(const std::string& userName_,
                                                   const std::string& emailAddress_,
                                                   const std::string& password_,
@@ -25,6 +34,58 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                                      isUserNameNotEmailAddress_,
                                      password_,
                                      yield_);  
+    }
+
+    std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >
+    AuthenticatorImpl::loginUserWithOICTokenId(const std::string& oicProviderName_,
+                                               const std::string& emailAddress_,
+                                               const JWSPtr& tokenId_,
+                                               boost::asio::yield_context yield_)
+    {
+        //TODO: See if we can move this fn to the base class
+        auto iter = _oicProviderNameDataMap.find(oicProviderName_);
+        if(iter == _oicProviderNameDataMap.end())
+        {
+            ST_LOG_INFO("Unsupported oic provider name: "<< oicProviderName_ <<std::endl);
+            return std::make_pair(std::error_code(ErrorCode::ERR_UNSUPPORTED_OIC_PROVIDER),
+                                  boost::none);
+        }
+
+        cjose_err error;
+        error.code = CJOSE_ERR_NONE;
+        cjose_header_t *headerRawPtr = cjose_jws_get_protected(tokenId_.get());
+        const char *kid = cjose_header_get(headerRawPtr,"kid",&error);
+        if(kid == NULL)
+        {
+            ST_ASSERT(error.code != CJOSE_ERR_NONE);
+            ST_LOG_INFO("jws kid retrieval failed, at file "<< error.file <<":" << error.line
+                        << ", message: " << error.message <<std::endl);
+            return std::make_pair(std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED),
+                                  boost::none);            
+        }
+        ST_ASSERT(error.code == CJOSE_ERR_NONE);
+        
+        JWKPtr key = iter->second.getJWKForKeyId(kid);
+        if(!key)
+        {
+            return std::make_pair(std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED),
+                                  boost::none);
+        }
+
+        bool isVerified = cjose_jws_verify(tokenId_.get(), key.get(), &error);
+
+        if(!isVerified)
+        {
+            ST_ASSERT(error.code != CJOSE_ERR_NONE);
+            ST_LOG_INFO("jws verification failed, at file "<< error.file <<":" << error.line
+                        << ", message: " << error.message <<std::endl);
+            return std::make_pair(std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED),
+                                  boost::none);
+        }
+
+        return _controller.loginUserForVerifiedOICToken(ControllerTypes::ClientRequestData(),
+                                                        emailAddress_,
+                                                        yield_);
     }
         
     std::pair<std::error_code,boost::optional<UserInfo> >

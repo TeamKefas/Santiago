@@ -139,9 +139,42 @@ namespace Santiago{ namespace Authentication
         }
         ST_ASSERT(usersRecOpt);
 
-        if(_localData.isUserBeingLoggedOut(usersRecOpt->_userName))
+        return createSessionsDataForUserImpl(requestData_,*usersRecOpt);
+    }    
+
+    template<typename ControllerTypes>
+    std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > > ControllerBase<ControllerTypes>::
+    loginUserForVerifiedOICToken(const ClientRequestData& requestData_,
+                                 const std::string& emailAddress_,
+                                 boost::asio::yield_context yield_)
+    {
+        //verify username-password
+        std::error_code error;
+        boost::optional<SantiagoDBTables::UsersRec> usersRecOpt = 
+            _databaseConnection.get().getUsersRecForEmailAddress(emailAddress_,error);
+        if(error && (ErrorCode::ERR_DATABASE_GET_RETURNED_ZERO_RESULTS != error.value()))
         {
-            ST_LOG_INFO("User in being logged out state. userName:"<<usersRecOpt->_userName<<std::endl);
+            return std::make_pair(error,boost::none);
+        }
+        else if(!usersRecOpt)
+        {
+            ST_LOG_INFO("Unregisted user logging in using OIC:"<<emailAddress_<<std::endl);
+            return std::make_pair(std::error_code(ErrorCode::ERR_EMAIL_ADDRESS_NOT_REGISTERED),
+                                  boost::none);
+        }
+        
+        ST_ASSERT(!error && usersRecOpt);
+        return createSessionsDataForUserImpl(requestData_,*usersRecOpt);
+    }
+
+    template<typename ControllerTypes>
+    std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > > ControllerBase<ControllerTypes>::
+    createSessionsDataForUserImpl(const ClientRequestData& requestData_,
+                                  const SantiagoDBTables::UsersRec& usersRec_)
+    {
+        if(_localData.isUserBeingLoggedOut(usersRec_._userName))
+        {
+            ST_LOG_INFO("User in being logged out state. userName:"<<usersRec_._userName<<std::endl);
             return std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >(
                 std::error_code(ErrorCode::ERR_USER_BEING_LOGGED_OUT),
                 boost::none);
@@ -149,10 +182,11 @@ namespace Santiago{ namespace Authentication
 
         //create new session record and add to db
         SantiagoDBTables::SessionsRec sessionsRec;
-        sessionsRec._userName = usersRecOpt->_userName;
+        sessionsRec._userName = usersRec_._userName;
         sessionsRec._loginTime = boost::posix_time::second_clock::universal_time();
         sessionsRec._lastActiveTime = sessionsRec._loginTime;
-
+        
+        std::error_code error(ErrorCode::ERR_SUCCESS);
         for(unsigned i=0;i<5;i++)
         { //5 attempts with different cookie strings
             sessionsRec._cookieString = generateUniqueCookie(sessionsRec._userName);
@@ -168,12 +202,12 @@ namespace Santiago{ namespace Authentication
             return std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >(error,boost::none);
         }
      
-        _localData.addCookie(usersRecOpt->_userName,usersRecOpt->_emailAddress,sessionsRec,requestData_.getClientId());
+        _localData.addCookie(usersRec_._userName,usersRec_._emailAddress,sessionsRec,requestData_.getClientId());
         
         return std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >(
             std::error_code(ErrorCode::ERR_SUCCESS),
-            std::make_pair(UserInfo(usersRecOpt->_userName,
-                                    usersRecOpt->_emailAddress),
+            std::make_pair(UserInfo(usersRec_._userName,
+                                    usersRec_._emailAddress),
                            sessionsRec._cookieString));
     }
 

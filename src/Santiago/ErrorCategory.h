@@ -26,7 +26,9 @@ namespace Santiago
         ERR_FASTCGI_CONNECTION_ERROR = 15,
         ERR_AUTH_SERVER_CONNECTION_ERROR = 16,
         ERR_COOKIE_BEING_LOGGED_OUT = 17,
-        ERR_USER_BEING_LOGGED_OUT = 18
+        ERR_USER_BEING_LOGGED_OUT = 18,
+        ERR_TOKENID_VERIFICATION_FAILED = 19,
+        ERR_UNSUPPORTED_OIC_PROVIDER = 20
     };
     
     class ErrorCategory:public std::error_category

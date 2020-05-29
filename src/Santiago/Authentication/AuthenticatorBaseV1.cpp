@@ -1,4 +1,9 @@
+#include <ctime>
+#include <cjose/jws.h>
+
 #include <boost/asio.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include "AuthenticatorBaseV1.h"
 
@@ -174,6 +179,88 @@ namespace Santiago{ namespace Authentication
                               yield_);
                 postCallbackWrapper(error,userInfoStringPairOpt);
             });        
+    }
+
+    boost::optional<std::pair<UserInfo,std::string> > AuthenticatorBase::
+    loginUserWithOICTokenId(const std::string& oicProviderName_,
+                            const std::string& tokenIdString_,
+                            boost::asio::yield_context yield_,
+                            std::error_code& error_)
+    {
+        boost::optional<std::pair<JWSPtr,std::string> > tokenIdEmailIdPair =
+            verifyTokenIdClaimsAndGetEmailId(tokenIdString_,
+                                             oicProviderName_,
+                                             error_);
+        if(!tokenIdEmailIdPair)
+        {
+            return boost::none;
+        }
+
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+            handler(std::forward<boost::asio::yield_context>(yield_));
+        
+        boost::asio::async_result<decltype(handler)> result(handler);
+        boost::optional<std::pair<UserInfo,std::string> > ret;
+
+        std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair =
+            getAuthenticatorAndStrandForString(tokenIdEmailIdPair->second,false);
+
+        boost::asio::spawn(
+            *authenticatorStrandPair.second,
+            [&error_,&ret,handler,this,authenticatorStrandPair,oicProviderName_,tokenIdEmailIdPair](boost::asio::yield_context yield_)
+            {
+                std::tie(error_,ret) = authenticatorStrandPair.first->
+                    loginUserWithOICTokenId(oicProviderName_,
+                                            tokenIdEmailIdPair->second,
+                                            tokenIdEmailIdPair->first,
+                                            yield_);
+                asio_handler_invoke(handler, &handler);
+            });
+        
+        result.get();
+        return ret;
+    }
+
+    void AuthenticatorBase::loginUserWithOICTokenId(const std::string& oicProviderName_,
+                                                    const std::string& tokenIdString_,
+                                                    const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_)
+    {
+        ErrorCodeUserInfoStringPairCallbackFn postCallbackWrapper(std::bind(static_cast<void(AuthenticatorBase::*)
+                                                                            (const ErrorCodeUserInfoStringPairCallbackFn&, const std::error_code&,
+                                                                             const boost::optional<std::pair<UserInfo,std::string> >&)>
+                                                                            (&AuthenticatorBase::postCallbackFn),
+                                                                            this,
+                                                                            onLoginUserCallbackFn_,
+                                                                            std::placeholders::_1,
+                                                                            std::placeholders::_2));
+
+        std::error_code error;
+        boost::optional<std::pair<JWSPtr,std::string> > tokenIdEmailIdPair =
+            verifyTokenIdClaimsAndGetEmailId(tokenIdString_,
+                                             oicProviderName_,
+                                             error);
+        if(!tokenIdEmailIdPair)
+        {
+            postCallbackWrapper(error,boost::none);
+        }
+
+        std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair =
+            getAuthenticatorAndStrandForString(tokenIdEmailIdPair->second,false);
+
+        boost::asio::spawn(
+            *authenticatorStrandPair.second,
+            [authenticatorStrandPair,this,oicProviderName_,tokenIdEmailIdPair,postCallbackWrapper](boost::asio::yield_context yield_)
+            {
+                std::error_code error;
+                boost::optional<std::pair<UserInfo,std::string> > userInfoStringPairOpt;
+                
+                std::tie(error,userInfoStringPairOpt) = authenticatorStrandPair.first->
+                    loginUserWithOICTokenId(oicProviderName_,
+                                            tokenIdEmailIdPair->second,
+                                            tokenIdEmailIdPair->first,
+                                            yield_);
+                postCallbackWrapper(error,userInfoStringPairOpt);
+            });
     }
     
     void AuthenticatorBase::
@@ -617,6 +704,129 @@ namespace Santiago{ namespace Authentication
         std::function<void()> errorCodeStringCallbackFnImpl =
             std::bind(errorCodeStringCallbackFn_,error_,string_);
         _ioService.post(errorCodeStringCallbackFnImpl);
+    }
+
+    boost::optional<std::pair<JWSPtr,std::string> > AuthenticatorBase::
+    verifyTokenIdClaimsAndGetEmailId(const std::string& tokenIdString_,
+                                     const std::string& oicProviderName_,
+                                     std::error_code& error_)
+    {
+        try
+        {
+            //get the property_tree from the JWS tokenId
+            cjose_err error;
+            error.code = CJOSE_ERR_NONE;
+
+            JWSPtr tokenId(cjose_jws_import(tokenIdString_.c_str(),
+                                            tokenIdString_.length(),
+                                            &error),
+                           [](JWS* ptr_)
+                           {
+                               cjose_jws_release(ptr_); //cjose_jws_release() handles NULL ptr
+                           });
+            if(!tokenId)
+            {
+                ST_ASSERT(error.code != CJOSE_ERR_NONE);
+                ST_LOG_INFO("TokenId conversion to jws object failed at "<<error.file<<":"<<error.line
+                            <<", message: "<< error.message <<std::endl);
+                error_ = std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED);
+                return boost::none;
+            }
+            
+            char *jsonText = NULL; //dont call delete on this. delete when jwsPtr destroyed
+            size_t length;
+            bool flag = cjose_jws_get_plaintext(tokenId.get(),
+                                                reinterpret_cast<uint8_t**>(&jsonText),
+                                                &length,
+                                                &error);
+            if(!flag)
+            {
+                ST_LOG_INFO("Retrieving json claims for tokenId failed. oicProvider:" << oicProviderName_ <<" at "
+                            << error.file<<":"<<error.line
+                            <<", message:"<<error.message << std::endl);
+                error_ = std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED);
+                ST_ASSERT(error.code != CJOSE_ERR_NONE);
+                return boost::none;
+            }
+
+            std::istringstream ss(std::string(jsonText,0,length));
+            ST_LOG_INFO("TokenId claims in JSON: "<<ss.str());
+            boost::property_tree::ptree tokenIdClaims;
+            boost::property_tree::read_json(ss,tokenIdClaims);
+
+            //load the config info to property tree for the oic provider
+            boost::property_tree::ptree oicProviderData =
+                _config.get_child("Santiago.Authentication.OICProviders").get_child(oicProviderName_);
+            //check the issuer
+            std::string iss = tokenIdClaims.get<std::string>("iss");
+            std::string issExpected = oicProviderData.get<std::string>("iss");
+            if( iss != issExpected)
+            {
+                ST_LOG_INFO( "Wrong issuer for OIC tokenId, oicProvider: "
+                             << oicProviderName_
+                             << " iss: "<< iss
+                             << " iss expected: "<< issExpected << std::endl);
+                error_ = std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED);
+                return boost::none;
+            }
+
+            //check the aud
+            std::string aud = tokenIdClaims.get<std::string>("aud");
+            std::string audExpected = oicProviderData.get<std::string>("aud");
+            if( aud != audExpected)
+            {
+                ST_LOG_INFO( "Wrong audience for OIC tokenId, aud:"
+                             << aud
+                             << " aud expected:"
+                             << audExpected << std::endl);
+                error_ = std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED);
+                return boost::none;
+            }
+
+            //check the time stamps
+            std::time_t currentTime = std::time(nullptr);
+            long iat = tokenIdClaims.get<long>("iat");
+            long exp = tokenIdClaims.get<long>("exp");
+            boost::optional<long> nbfOpt = tokenIdClaims.get_optional<long>("nbf");
+            
+            ST_LOG_INFO("Time info: cur_time = " << currentTime
+                        <<", iat = " << iat
+                        <<", exp = " << exp
+                        <<", nbf = " << (nbfOpt? *nbfOpt: 0) << std::endl);
+
+            if( !(currentTime > iat) ||
+                !(currentTime < exp) ||
+                (nbfOpt && !(*nbfOpt > iat)) )
+            {
+                ST_LOG_INFO ("TokenId time checks failed");
+                error_ = std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED);
+                return boost::none;
+            }
+            
+            boost::optional<std::string> emailIdOpt = tokenIdClaims.get_optional<std::string>("email");
+            boost::optional<std::string> emailVerifiedOpt = tokenIdClaims.get_optional<std::string>("email_verified");
+            if(!emailIdOpt || !emailVerifiedOpt || *emailVerifiedOpt != "true" )
+            {
+                ST_LOG_INFO("email with email_verfied=true not sent in the tokenId"<<std::endl);
+                error_ = std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED);
+                return boost::none;
+            }
+            
+            error_ = std::error_code(ErrorCode::ERR_SUCCESS);
+            return std::make_pair(tokenId,*emailIdOpt);
+        }
+        catch(std::exception& e)
+        {
+            error_ = std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED);
+            ST_LOG_INFO("TokenId claims verification failed. Reason:"<<e.what());
+        }
+        catch(...)
+        {
+            error_ = std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED);
+            ST_ASSERT(false);
+        }
+        
+        return boost::none;
     }
     
 }}

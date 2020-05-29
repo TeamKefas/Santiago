@@ -56,7 +56,9 @@ namespace Santiago
              {ERR_FASTCGI_CONNECTION_ERROR,                "Fastcgi connection error."},
              {ERR_AUTH_SERVER_CONNECTION_ERROR,            "Authentication server connection error."},
              {ERR_COOKIE_BEING_LOGGED_OUT,                 "Session being logged out."},
-             {ERR_USER_BEING_LOGGED_OUT,                   "User being logged out."}
+             {ERR_USER_BEING_LOGGED_OUT,                   "User being logged out."},
+             {ERR_TOKENID_VERIFICATION_FAILED,             "TokenId verification failed."},
+             {ERR_UNSUPPORTED_OIC_PROVIDER,                "Unsupported OIC provider."}
          }
     {}
 

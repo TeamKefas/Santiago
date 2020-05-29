@@ -14,9 +14,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
         
         typedef Thread::ThreadSpecificVar<SantiagoDBTables::MariaDBConnection> ThreadSpecificDbConnection;
         
-        AuthenticatorImpl(ThreadSpecificDbConnection& databaseConnection_)
-            :_controller(databaseConnection_)
-        {}
+        AuthenticatorImpl(ThreadSpecificDbConnection& databaseConnection_,
+                          const std::map<std::string,std::string>& oicProviderNameCertURLMap_);
 
         virtual std::error_code createUser(const std::string& userName_,
                                            const std::string& emailAddress_,
@@ -28,6 +27,12 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
                   bool isUserNameNotEmailAddress_,
                   const std::string& password_,
                   boost::asio::yield_context yield_);
+
+        virtual std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >
+        loginUserWithOICTokenId(const std::string& oicProviderName_,
+                                const std::string& emailAddress_,
+                                const JWSPtr& tokenId_,
+                                boost::asio::yield_context yield_);
         
         virtual std::pair<std::error_code,boost::optional<UserInfo> >
         verifyCookieAndGetUserInfo(const std::string& cookieString_,
@@ -66,6 +71,9 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
 
         virtual std::error_code deleteUser(const std::string& cookieString_,boost::asio::yield_context yield_);
 
+    protected:
+
+        JWKPtr getJWKForKeyId(const std::string& oicProviderName_, const std::string& kid_, std::error_code& error_);
         Controller               _controller;
 
     };

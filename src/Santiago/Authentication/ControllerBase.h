@@ -61,6 +61,11 @@ namespace Santiago{ namespace Authentication
                   bool isUserNameNotEmailAddress_,
                   const std::string& password_,
                   boost::asio::yield_context yield_);
+
+        std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > >
+        loginUserForVerifiedOICToken(const ClientRequestData& requestData_,
+                                     const std::string& emailAddress_,
+                                     boost::asio::yield_context yield_);
         
         std::pair<std::error_code,boost::optional<UserInfo> >
         verifyCookieAndGetUserInfo(const ClientRequestData& requestData_,
@@ -109,7 +114,11 @@ namespace Santiago{ namespace Authentication
                                    boost::asio::yield_context yield_);
 
     protected:
-        
+
+        std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > > 
+        createSessionsDataForUserImpl(const ClientRequestData& requestData_,
+                                      const SantiagoDBTables::UsersRec& usersRec_);
+
         std::pair<std::error_code,boost::optional<SantiagoDBTables::UsersRec> > 
         verifyUserNamePasswordAndGetUsersRec(const std::string& userName_, const std::string& password_);
 

@@ -5,6 +5,7 @@ set(Santiago_SRCS
   SantiagoDBTables/MariaDBConnection.cpp
   Authentication/AuthenticatorBaseV1.cpp
   Authentication/ControllerDataBase.cpp
+  Authentication/OICProviderData.cpp
   Authentication/SingleNode/AuthenticatorImpl.cpp
   Authentication/SingleNode/AuthenticatorV1.cpp
   Authentication/SingleNode/ControllerData.cpp
@@ -33,6 +34,7 @@ set(Santiago_SRCS
   Utils/PTimeUtils.cpp
   Utils/STLog.cpp
   Utils/Email.cpp
+  Utils/DownloadFromURL.cpp
   )
 
 if(WIN32)
@@ -89,5 +91,5 @@ if(WIN32)
 endif(WIN32)
 
 add_library(Santiago STATIC ${Santiago_SRCS})
-target_link_libraries(Santiago ${Boost_LIBRARIES} ${MARIADB_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY} ${CURL_LIBRARIES})
+target_link_libraries(Santiago ${Boost_LIBRARIES} ${MARIADB_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY} ${CURL_LIBRARIES} cjose)
 install(TARGETS Santiago DESTINATION /usr/local/lib)

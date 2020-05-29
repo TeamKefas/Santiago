@@ -19,6 +19,7 @@
 #include <boost/optional.hpp>
 
 #include "AuthenticatorImplBase.h"
+#include "Common.h"
 #include "ControllerDataBase.h"
 
 namespace Santiago{ namespace Authentication
@@ -108,6 +109,21 @@ namespace Santiago{ namespace Authentication
                                                                     const std::string& password_,
                                                                     boost::asio::yield_context yield_,
                                                                     std::error_code& error_);
+
+        /**
+         * ///Message\\
+         * @param oicProviderName_ - oicProvider name. Eg: google, yahoo etc.
+         * @param tokenId_ -  tokenId from the oicProvider.
+         * @param onLoginUserCallbackFn_ - Call back function for Login operations.
+         */
+        virtual void loginUserWithOICTokenId(const std::string& oicProviderName_,
+                                             const std::string& tokenIdString_,
+                                             const ErrorCodeUserInfoStringPairCallbackFn& onLoginUserCallbackFn_);
+
+        boost::optional<std::pair<UserInfo,std::string> > loginUserWithOICTokenId(const std::string& oicProviderName_,
+                                                                                  const std::string& tokenIdString_,
+                                                                                  boost::asio::yield_context yield_,
+                                                                                  std::error_code& error_);
         
         /**
          * This function is used for logging out user account for the  given cookie string.
@@ -261,6 +277,11 @@ namespace Santiago{ namespace Authentication
                             const std::error_code& error_,
                             const boost::optional<std::string>& recoveryString_);
 
+        boost::optional<std::pair<JWSPtr,std::string> >
+        verifyTokenIdClaimsAndGetEmailId(const std::string& tokenIdString_,
+                                         const std::string& oicProviderName_,
+                                         std::error_code& error_);
+        
         
         boost::asio::io_service         &_ioService;
         boost::property_tree::ptree      _config;
