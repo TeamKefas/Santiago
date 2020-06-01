@@ -20,8 +20,8 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
             std::map<std::string,std::string> oicProviderNameCertURLMap;
             try
             {
-                for(auto iter = _config.get_child("Santiago.Authentication..OICProviders").begin();
-                    iter != _config.get_child("Santiago.Authentication..OICProviders").end();
+                for(auto iter = _config.get_child("Santiago.Authentication.OICProviders").begin();
+                    iter != _config.get_child("Santiago.Authentication.OICProviders").end();
                     iter++)
                 {
                     //iter->first gives key id
