@@ -794,9 +794,9 @@ namespace Santiago{ namespace Authentication
                         <<", exp = " << exp
                         <<", nbf = " << (nbfOpt? *nbfOpt: 0) << std::endl);
 
-            if( !(currentTime > iat) ||
+            if( !(currentTime >= iat) ||
                 !(currentTime < exp) ||
-                (nbfOpt && !(*nbfOpt > iat)) )
+                (nbfOpt && !(currentTime >= *nbfOpt)) )
             {
                 ST_LOG_INFO ("TokenId time checks failed");
                 error_ = std::error_code(ErrorCode::ERR_TOKENID_VERIFICATION_FAILED);
