@@ -646,6 +646,7 @@ namespace Santiago{ namespace Authentication
             ST_LOG_INFO("updateSessionsRec failed. Logging out without writing to db. CookieString:"
                         <<sessionsRec._cookieString);
             _localData.unsetCookieBeingLoggedOutFlag(sessionsRec._cookieString);
+            return error;
         }
 
         //remove from _userNameUserDataMap
