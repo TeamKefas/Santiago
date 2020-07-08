@@ -93,13 +93,26 @@ namespace Santiago{ namespace SantiagoDBTables
     {
         ST_LOG_INFO("Running query:" << std::endl
                     << queryString_ << std::endl);
-        
+
         if(mysql_query(_mysql, queryString_.c_str()) ||
            (0 != mysql_errno(_mysql)))
         {
-            ST_LOG_DEBUG("Db error:"<< mysql_error(_mysql) << std::endl);
-            error_ = std::error_code(ERR_DATABASE_EXCEPTION);
-            return;
+            for(int i = 0; i < 5; i++)
+            {
+                if(0 == mariadb_reconnect(_mysql))
+                {
+                    break;
+                }
+                sleep(1);
+            }
+        
+            if(mysql_query(_mysql, queryString_.c_str()) ||
+               (0 != mysql_errno(_mysql)))
+            {
+                ST_LOG_DEBUG("Db error:"<< mysql_error(_mysql) << std::endl);
+                error_ = std::error_code(ERR_DATABASE_EXCEPTION);
+                return;
+            }
         }
 
         error_ = std::error_code(ERR_SUCCESS);
