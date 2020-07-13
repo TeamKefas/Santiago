@@ -477,6 +477,11 @@ namespace Santiago{ namespace Authentication
         newUsersRec._emailAddress = newEmailAddress_;
         _databaseConnection.get().updateUsersRec(newUsersRec,error);
         //whether succeed or db error...it will be passed to the onChangePasswordCallbackFn
+        if(!error)
+        {
+            _localData.updateUserEmailAddress(newUsersRec._userName, newUsersRec._emailAddress);
+        }
+        
         return error;
 
     }
