@@ -124,7 +124,11 @@ namespace Santiago{ namespace AppServer
         boost::asio::io_service& getIOService()
         {
             checkIsInitialized();
+#if BOOST_VERSION >= 106600
+            return _strand->context();
+#else
             return _strand->get_io_service();
+#endif
         }
 
         /**

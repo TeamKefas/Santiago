@@ -43,7 +43,7 @@ namespace Santiago{ namespace Fastcgi
     public:
         typedef typename Protocol::socket ProtocolSocket;
         typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
-        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<AsioStrand> StrandPtr;
 
         typedef std::function<void(const std::error_code&,unsigned,unsigned char,unsigned,const char*)> NewPacketCallbackFn;
 
