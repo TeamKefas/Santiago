@@ -46,7 +46,7 @@ namespace Santiago{ namespace Authentication{ namespace SingleNode
             
             for(int i = 0; i < 26; ++i)
             {
-                auto strandPtr = std::make_shared<boost::asio::strand>(ioService_);
+                auto strandPtr = std::make_shared<AsioStrand>(ioService_);
                 auto authenticatorImplBasePtr = std::make_shared<AuthenticatorImpl>(_databaseConnection,oicProviderNameCertURLMap);
                 _authenticatorStrandPair[i] = std::make_pair(authenticatorImplBasePtr,strandPtr);
             }

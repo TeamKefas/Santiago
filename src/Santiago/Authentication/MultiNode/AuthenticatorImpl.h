@@ -31,7 +31,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             class AuthenticatorImpl:public AuthenticatorImplBase
             {
             public:
-                typedef std::shared_ptr<boost::asio::strand> StrandPtr;
+                typedef std::shared_ptr<AsioStrand> StrandPtr;
         
                 AuthenticatorImpl(boost::asio::io_service& ioService_,
                                   const StrandPtr& strandPtr_,

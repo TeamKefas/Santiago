@@ -13,6 +13,7 @@
 //#include <boost/assert.hpp>
 #include <boost/optional.hpp>
 
+#include "../Common.h"
 #include "../ErrorCategory.h"
 #include "../Utils/STLog.h"
 

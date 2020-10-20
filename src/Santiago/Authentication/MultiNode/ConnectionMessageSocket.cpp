@@ -4,12 +4,13 @@ namespace Santiago{ namespace Authentication { namespace MultiNode
 {
     ConnectionMessageSocket::
     ConnectionMessageSocket(const MySocketPtr& socketPtr_,
+                            boost::asio::io_service& ioService_,
                             const OnDisconnectCallbackFn& onDisconnectCallbackFn_,
                             const OnMessageCallbackFn& onMessageCallbackFn_,
                             const StrandPtr& readStrandPtr_,
                             const StrandPtr& writeStrandPtr_)
         :_socketPtr(socketPtr_)
-        ,_ioService(_socketPtr->get_io_service())
+        ,_ioService(ioService_)
         ,_onDisconnectCallbackFn(onDisconnectCallbackFn_)
         ,_onMessageCallbackFn(onMessageCallbackFn_)
         ,_readStrandPtr(readStrandPtr_)

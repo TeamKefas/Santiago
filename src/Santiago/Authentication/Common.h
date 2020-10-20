@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include "../Common.h"
 #include "../ErrorCategory.h"
 #include "../Utils/STLog.h"
 

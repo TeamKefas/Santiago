@@ -16,6 +16,7 @@
 #include <string>
 
 #include "../../Utils/STLog.h"
+#include "../../Common.h"
 #include "../../ErrorCategory.h"
 
 namespace Santiago{ namespace Authentication { namespace MultiNode

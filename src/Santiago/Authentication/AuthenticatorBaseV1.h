@@ -38,7 +38,7 @@ namespace Santiago{ namespace Authentication
         ErrorCodeUserInfoStringPairCallbackFn;
 
         typedef std::shared_ptr<AuthenticatorImplBase> AuthenticatorImplBasePtr;
-        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<AsioStrand> StrandPtr;
 
         typedef std::function<void(const std::error_code&)> ErrorCodeCallbackFn;
 

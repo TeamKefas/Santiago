@@ -4,7 +4,7 @@
 
 namespace Santiago{ namespace Authentication{ namespace SingleNode
 {
-    typedef std::shared_ptr<boost::asio::strand> StrandPtr;
+    typedef std::shared_ptr<AsioStrand> StrandPtr;
     typedef std::shared_ptr<AuthenticatorImplBase> AuthenticatorImplBasePtr;
     
     std::pair<AuthenticatorImplBasePtr,StrandPtr> Authenticator::getAuthenticatorAndStrandForString(

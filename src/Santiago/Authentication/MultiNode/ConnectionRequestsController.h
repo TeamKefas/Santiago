@@ -29,7 +29,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         typedef std::function<void(const std::error_code&,
                                    const boost::optional<ConnectionMessage>&)> OnReplyMessageCallbackFn;
         typedef std::function<void(const ConnectionMessage&)> OnServerRequestMessageCallbackFn;
-        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<AsioStrand> StrandPtr;
                 
         ConnectionRequestsController(boost::asio::io_service& ioService_,
                                      const StrandPtr& strandPtr_,
