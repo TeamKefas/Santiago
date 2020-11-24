@@ -44,7 +44,8 @@ namespace Santiago
                  {"%27", "'"},
                  {"%2A", "*"},
                  {"%2B", "+"},
-                 {"%2C", "-"}};
+                 {"%2C", ","},
+                 {"%2D", "-"}};
             
             char delimiter = '=';
             auto newEnd = inString_.substr(start, end).find(delimiter);
