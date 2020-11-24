@@ -34,6 +34,7 @@ namespace Santiago{ namespace Authentication
     {
         auto iter = _userNameUserDataMap.find(userName_);
         ST_ASSERT(iter != _userNameUserDataMap.end());
+        ST_ASSERT(!iter->second._isBeingLoggedOut);
         iter->second._emailAddress = newEmailAddress_;
         return;
     }

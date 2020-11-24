@@ -28,7 +28,7 @@ namespace Santiago{ namespace Fastcgi
     template<typename Protocol>
     class Connection:public std::enable_shared_from_this<Connection<Protocol> >
     {
-        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<AsioStrand> StrandPtr;
         typedef typename Protocol::socket ProtocolSocket;
         typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;
 
@@ -61,7 +61,7 @@ namespace Santiago{ namespace Fastcgi
             _data(std::bind(&Connection::handleRequestReady,this,std::placeholders::_1,std::placeholders::_2),
                   std::bind(&Connection::handleOnEmpty,this)),
             _ioService(ioService_),
-            _strandPtr(new boost::asio::strand(ioService_)),
+            _strandPtr(new AsioStrand(ioService_)),
             _recordSocket(_strandPtr,
                           protocolSocketPtr_,
                           std::bind(&ConnectionData::handleBeginRequest,&_data,std::placeholders::_1),

@@ -29,7 +29,7 @@ namespace Santiago{ namespace AppServer
     template<typename Protocol>
     struct RequestHandlerBase:public std::enable_shared_from_this<RequestHandlerBase<Protocol> >
     {
-        typedef std::shared_ptr<boost::asio::strand> StrandPtr;        
+        typedef std::shared_ptr<AsioStrand> StrandPtr;        
 
     public:
         typedef typename Request<Protocol>::Ptr RequestPtr;
@@ -77,7 +77,7 @@ namespace Santiago{ namespace AppServer
          * this->shared_from_this() to keep the request alive. If not sure then use
          * postInStrand() fn. postInStrand() fn will keep the handler object alive.
          */
-        boost::asio::strand& getStrand()
+        AsioStrand& getStrand()
         {
             checkIsInitialized();
             return *_strand;
@@ -89,7 +89,7 @@ namespace Santiago{ namespace AppServer
          */
         void init(boost::asio::io_service& ioService_)
         {
-            _strand.reset(new boost::asio::strand(ioService_));
+            _strand.reset(new AsioStrand(ioService_));
         }
 
     protected:
@@ -124,7 +124,11 @@ namespace Santiago{ namespace AppServer
         boost::asio::io_service& getIOService()
         {
             checkIsInitialized();
+#if BOOST_VERSION >= 106600
+            return _strand->context();
+#else
             return _strand->get_io_service();
+#endif
         }
 
         /**

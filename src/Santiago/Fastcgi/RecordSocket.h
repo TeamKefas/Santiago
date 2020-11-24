@@ -29,7 +29,7 @@ namespace Santiago{ namespace Fastcgi
     {
 
     public:       
-        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<AsioStrand> StrandPtr;
         typedef typename Protocol::socket ProtocolSocket;
         typedef std::shared_ptr<ProtocolSocket> ProtocolSocketPtr;      
         typedef std::shared_ptr<PacketSocket<Protocol> > PacketSocketPtr; 

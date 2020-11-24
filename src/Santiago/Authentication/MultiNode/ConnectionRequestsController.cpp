@@ -78,6 +78,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
         _connectionId = *(reinterpret_cast<unsigned*>(inputArray));
         _connectionMessageSocketPtr =
             new ConnectionMessageSocket(socketPtr,
+                                        _ioService,
                                         std::bind(&ConnectionRequestsController::handleConnectionDisconnect,
                                                   this),
                                         std::bind(&ConnectionRequestsController::handleConnectionMessage,

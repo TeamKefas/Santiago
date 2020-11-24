@@ -370,7 +370,7 @@ namespace Santiago{ namespace Authentication
 
         
         boost::asio::io_service         &_ioService;
-        boost::asio::strand              _strand;
+        AsioStrand              _strand;
         boost::property_tree::ptree      _config;
 
     };

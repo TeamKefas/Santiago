@@ -14,12 +14,22 @@ namespace Santiago{ namespace Authentication
                                boost::asio::yield_context yield_,
                                std::error_code& error_)
     {
+
+        //since coroutine is not considred work keeping the ioService from running out of work
+        boost::asio::io_service::work work(_ioService);
+
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
-        boost::optional<UserInfo> ret;
+#endif
         
+        boost::optional<UserInfo> ret;
+      
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(cookieString_,true);
 
         boost::asio::spawn(
@@ -72,11 +82,17 @@ namespace Santiago{ namespace Authentication
                                        boost::asio::yield_context yield_,
                                        std::error_code& error_)
     {
-        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
-        boost::asio::async_result<decltype(handler)> result(handler);
 
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
+        typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
+            handler(yield_);
+        boost::asio::async_result<decltype(handler)> result(handler);
+#endif
+        
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(userName_,true);
 
         boost::asio::spawn(
@@ -125,10 +141,15 @@ namespace Santiago{ namespace Authentication
               boost::asio::yield_context yield_,
               std::error_code& error_)
     {
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
+#endif        
         boost::optional<std::pair<UserInfo,std::string> > ret;
 
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(userNameOrEmailAddress_,isUserNameNotEmailAddress_);
@@ -196,10 +217,15 @@ namespace Santiago{ namespace Authentication
             return boost::none;
         }
 
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
+#endif
         boost::optional<std::pair<UserInfo,std::string> > ret;
 
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair =
@@ -268,10 +294,15 @@ namespace Santiago{ namespace Authentication
                         boost::asio::yield_context yield_,
                         std::error_code& error_)
     {
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
+#endif        
 
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(cookieString_,true);
 
@@ -313,10 +344,15 @@ namespace Santiago{ namespace Authentication
                             boost::asio::yield_context yield_,
                             std::error_code& error_)
     {
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
+#endif
         
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(userName_,true);
         
@@ -360,11 +396,16 @@ namespace Santiago{ namespace Authentication
                        boost::asio::yield_context yield_,
                        std::error_code& error_)
     {
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
-        
+#endif 
+       
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(cookieString_,true);
         
          boost::asio::spawn(
@@ -412,10 +453,15 @@ namespace Santiago{ namespace Authentication
                            boost::asio::yield_context yield_,
                            std::error_code& error_)
     {
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
+#endif        
         
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(cookieString_,true);
         
@@ -463,10 +509,16 @@ namespace Santiago{ namespace Authentication
                                   boost::asio::yield_context yield_,
                                   std::error_code& error_)
     {
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
+#endif
+
         boost::optional<std::string> ret;
 
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(emailAddress_,false);
@@ -517,10 +569,15 @@ namespace Santiago{ namespace Authentication
                                             boost::asio::yield_context yield_,
                                             std::error_code& error_)
     {
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
+#endif
         boost::optional<std::string> ret;
         
          std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(emailAddress_,false);
@@ -575,10 +632,15 @@ namespace Santiago{ namespace Authentication
                                                        boost::asio::yield_context yield_,
                                                        std::error_code& error_)
     {
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
+#endif
 
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(emailAddress_,false);
         
@@ -626,10 +688,15 @@ namespace Santiago{ namespace Authentication
                boost::asio::yield_context yield_,
                std::error_code& error_)
     {
+#if BOOST_VERSION >= 106600
+        boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+        auto& handler = completion.completion_handler;
+        auto& result = completion.result;
+#else        
         typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-            handler(std::forward<boost::asio::yield_context>(yield_));
-        
+            handler(yield_);
         boost::asio::async_result<decltype(handler)> result(handler);
+#endif
         
         std::pair<AuthenticatorImplBasePtr,StrandPtr> authenticatorStrandPair = getAuthenticatorAndStrandForString(cookieString_,true);
         

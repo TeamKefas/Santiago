@@ -20,7 +20,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                  const std::map<std::string,std::string>& oicProviderNameCertURLMap_)
                 :AuthenticatorImplBase(oicProviderNameCertURLMap_)
                 ,_ioService(ioService_)
-                ,_strandPtr(new boost::asio::strand(_ioService))
+                ,_strandPtr(new AsioStrand(_ioService))
                 ,_connectionRequestsController(_ioService,
                                                _strandPtr,
                                                serverEndPoint_,
@@ -37,10 +37,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                           const std::string& password_,
                                                           boost::asio::yield_context yield_)
             {
+#if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif
                 std::error_code error;
                 
                 createUserImpl(
@@ -116,10 +121,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                          const std::string& password_,
                                          boost::asio::yield_context yield_)
             {
+#if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif
                 std::pair<std::error_code,boost::optional<std::pair<UserInfo,std::string> > > ret;
                 
                 loginUserImpl(
@@ -210,10 +220,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             AuthenticatorImpl::verifyCookieAndGetUserInfo(const std::string& cookieString_,
                                                           boost::asio::yield_context yield_)
             {
+#if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif
                 std::pair<std::error_code,boost::optional<UserInfo> > ret;
                 
                 verifyCookieAndGetUserInfoImpl(
@@ -298,10 +313,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             std::error_code AuthenticatorImpl::logoutUserForCookie(const std::string& cookieString_,
                                                                    boost::asio::yield_context yield_)
             {
+#if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif                
                 std::error_code error;
                 
                 logoutUserForCookieImpl(
@@ -372,10 +392,16 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             std::error_code AuthenticatorImpl::logoutUserForAllCookies(const std::string& userName_,
                                                                        boost::asio::yield_context yield_)
             {
+#if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif
+
                 std::error_code error;
                 
                 logoutUserForAllCookiesImpl(
@@ -447,10 +473,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                                   const std::string& newPassword_,
                                                                   boost::asio::yield_context yield_)
             {
+#if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif
                 std::error_code error;
                 
                 changeUserPasswordImpl(
@@ -526,10 +557,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                                        const std::string& recoveryString_,
                                                                        boost::asio::yield_context yield_)
             {
+#if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif
                 std::pair<std::error_code,boost::optional<std::string> > ret;
                 
                 getUserForEmailAddressAndRecoveryStringImpl(
@@ -604,10 +640,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                                                                   const std::string& newPassword_,
                                                                                                   boost::asio::yield_context yield_)
             {
+#if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif
                 std::error_code error;
                 
                 changeUserPasswordForEmailAddressAndRecoveryStringImpl(
@@ -683,10 +724,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
                                                                       const std::string& password_,
                                                                       boost::asio::yield_context yield_)
             {
+#if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif
                 std::error_code error;
                 
                 changeUserEmailAddressImpl(
@@ -761,10 +807,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             AuthenticatorImpl::createAndReturnRecoveryString(const std::string& emailAddress_,
                                                              boost::asio::yield_context yield_)
             {
+ #if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif
                 std::pair<std::error_code,boost::optional<std::string> > ret;
                 
                 createAndReturnRecoveryStringImpl(
@@ -834,10 +885,15 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode
             std::error_code AuthenticatorImpl::deleteUser(const std::string& cookieString_,
                                                           boost::asio::yield_context yield_)
             {
+ #if BOOST_VERSION >= 106600
+                boost::asio::async_completion<boost::asio::yield_context, void()> completion{ yield_ };
+                auto& handler = completion.completion_handler;
+                auto& result = completion.result;
+#else        
                 typename boost::asio::handler_type<boost::asio::yield_context, void()>::type
-                    handler(std::forward<boost::asio::yield_context>(yield_));
-        
+                    handler(yield_);
                 boost::asio::async_result<decltype(handler)> result(handler);
+#endif
                 std::error_code error;
                 
                 deleteUserImpl(

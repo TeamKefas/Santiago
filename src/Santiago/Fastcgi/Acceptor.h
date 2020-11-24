@@ -72,7 +72,7 @@ namespace Santiago{ namespace Fastcgi
         /**
          * Returns the acceptor's strand
          */
-        boost::asio::strand& getStrand()
+        AsioStrand& getStrand()
         {
             return _strand;
         }
@@ -172,7 +172,7 @@ namespace Santiago{ namespace Fastcgi
         }
 
         boost::asio::io_service                    &_ioService;
-        boost::asio::strand                         _strand;
+        AsioStrand                                  _strand;
         typename Protocol::acceptor                 _acceptor;
         NewRequestCallbackFn                        _newRequestCallbackFn;
         ConnectionMap                               _activeConnections;

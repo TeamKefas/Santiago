@@ -35,7 +35,7 @@ namespace Santiago{ namespace Authentication{ namespace MultiNode{ namespace Ser
     {
     public:
         typedef ControllerTypes::ClientRequestData   ClientRequestData;
-        typedef std::shared_ptr<boost::asio::strand> StrandPtr;
+        typedef std::shared_ptr<AsioStrand> StrandPtr;
         
         Controller(ThreadSpecificDbConnection& databaseConnection_,
                    const StrandPtr& strandPtr_,
